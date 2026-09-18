@@ -1,0 +1,255 @@
+import { useEffect, useState } from "react";
+import { ExternalLink, Plus, Trash2, X } from "lucide-react";
+import type { Idea, IdeaScores, IdeaStatus, Project } from "@/data/types";
+import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER } from "@/data/types";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+
+interface Props {
+  idea: Idea | null;
+  projects: Project[];
+  onClose: () => void;
+  onSave: (id: string, patch: Partial<Idea>) => void;
+  onDelete: (id: string) => void;
+}
+
+export function IdeaDialog({ idea, projects, onClose, onSave, onDelete }: Props) {
+  const [draft, setDraft] = useState<Idea | null>(idea);
+  const [tagInput, setTagInput] = useState("");
+  const [venueInput, setVenueInput] = useState("");
+  const [linkLabel, setLinkLabel] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+
+  useEffect(() => {
+    setDraft(idea ? structuredClone(idea) : null);
+    setTagInput("");
+    setVenueInput("");
+    setLinkLabel("");
+    setLinkUrl("");
+  }, [idea]);
+
+  if (!draft) return null;
+  const set = <K extends keyof Idea>(k: K, v: Idea[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
+  const setScore = (k: keyof IdeaScores, v: number) => setDraft((d) => (d ? { ...d, scores: { ...d.scores, [k]: v } } : d));
+
+  const save = () => {
+    const { id, createdAt: _c, updatedAt: _u, ...rest } = draft;
+    void _c;
+    void _u;
+    onSave(id, rest);
+    onClose();
+  };
+
+  return (
+    <Dialog open={!!idea} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Идея</DialogTitle>
+          <DialogDescription className="sr-only">Просмотр и редактирование идеи</DialogDescription>
+          <Input value={draft.title} onChange={(e) => set("title", e.target.value)} className="h-auto border-0 bg-transparent px-0 text-xl font-semibold shadow-none focus-visible:ring-0 dark:bg-transparent" placeholder="Название идеи" />
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={draft.status} onValueChange={(v) => set("status", v as IdeaStatus)}>
+              <SelectTrigger className="h-8 w-[170px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_ORDER.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    <span className="mr-2 inline-block size-2 rounded-full" style={{ background: STATUS_COLORS[s] }} />
+                    {STATUS_LABELS[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={draft.projectId} onValueChange={(v) => set("projectId", v)}>
+              <SelectTrigger className="h-8 w-[260px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    <span className="mr-2 inline-block size-2 rounded-full" style={{ background: p.color }} />
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input value={draft.timeline} onChange={(e) => set("timeline", e.target.value)} placeholder="Сроки (напр. 3–5 мес.)" className="h-8 w-[200px]" />
+          </div>
+        </DialogHeader>
+
+        <div className="grid gap-5 md:grid-cols-[1fr_260px]">
+          <div className="flex flex-col gap-4">
+            <Field label="Исследовательский вопрос">
+              <Textarea value={draft.question} onChange={(e) => set("question", e.target.value)} className="min-h-[70px]" />
+            </Field>
+            <Field label="Метод">
+              <Textarea value={draft.method} onChange={(e) => set("method", e.target.value)} className="min-h-[140px] font-mono text-[13px]" />
+            </Field>
+            <Field label="Валидация (с чем сверять)">
+              <Textarea value={draft.validation} onChange={(e) => set("validation", e.target.value)} className="min-h-[60px]" />
+            </Field>
+            <Field label="Заметки">
+              <Textarea value={draft.notes} onChange={(e) => set("notes", e.target.value)} className="min-h-[60px]" />
+            </Field>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="rounded-lg border bg-muted/30 p-3">
+              <div className="mb-2 text-xs font-medium text-muted-foreground">Оценки (1–10)</div>
+              <div className="flex flex-col gap-2.5">
+                {(Object.keys(SCORE_LABELS) as (keyof IdeaScores)[]).map((k) => (
+                  <div key={k} className="flex items-center gap-2 text-xs">
+                    <span className="w-24 text-muted-foreground">{SCORE_LABELS[k]}</span>
+                    <input type="range" min={1} max={10} value={draft.scores[k]} onChange={(e) => setScore(k, Number(e.target.value))} className="flex-1 accent-[var(--chart-2)]" />
+                    <span className="w-4 text-right font-mono">{draft.scores[k]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <ChipList
+              label="Теги"
+              items={draft.tags}
+              input={tagInput}
+              setInput={setTagInput}
+              placeholder="тег + Enter"
+              onAdd={(v) => set("tags", [...draft.tags, v])}
+              onRemove={(i) => set("tags", draft.tags.filter((_, idx) => idx !== i))}
+              prefix="#"
+            />
+            <ChipList
+              label="Журналы / конференции"
+              items={draft.venues}
+              input={venueInput}
+              setInput={setVenueInput}
+              placeholder="eLife + Enter"
+              onAdd={(v) => set("venues", [...draft.venues, v])}
+              onRemove={(i) => set("venues", draft.venues.filter((_, idx) => idx !== i))}
+            />
+
+            <div>
+              <Label className="mb-1.5 text-xs text-muted-foreground">Ссылки</Label>
+              <div className="flex flex-col gap-1.5">
+                {draft.links.map((l, i) => (
+                  <div key={i} className="flex items-center gap-1.5 text-xs">
+                    <a href={l.url} target="_blank" rel="noreferrer" className="flex min-w-0 flex-1 items-center gap-1 truncate text-foreground hover:underline">
+                      <ExternalLink className="size-3 shrink-0" /> <span className="truncate">{l.label || l.url}</span>
+                    </a>
+                    <button className="text-muted-foreground hover:text-destructive cursor-pointer" onClick={() => set("links", draft.links.filter((_, idx) => idx !== i))}>
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+                <div className="flex gap-1">
+                  <Input value={linkLabel} onChange={(e) => setLinkLabel(e.target.value)} placeholder="название" className="h-7 text-xs" />
+                  <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://" className="h-7 text-xs" />
+                  <Button
+                    size="icon-sm"
+                    variant="outline"
+                    className="h-7 w-7 shrink-0"
+                    disabled={!linkUrl}
+                    onClick={() => {
+                      set("links", [...draft.links, { label: linkLabel, url: linkUrl }]);
+                      setLinkLabel("");
+                      setLinkUrl("");
+                    }}
+                  >
+                    <Plus />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+        <DialogFooter className="items-center sm:justify-between">
+          <div className="text-[11px] text-muted-foreground">
+            создано {new Date(draft.createdAt).toLocaleDateString("ru-RU")} · изменено {new Date(draft.updatedAt).toLocaleDateString("ru-RU")}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={() => {
+                if (confirm("Удалить идею?")) {
+                  onDelete(draft.id);
+                  onClose();
+                }
+              }}
+            >
+              <Trash2 /> Удалить
+            </Button>
+            <Button variant="outline" onClick={onClose}>Отмена</Button>
+            <Button onClick={save}>Сохранить</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+function ChipList({
+  label,
+  items,
+  input,
+  setInput,
+  placeholder,
+  onAdd,
+  onRemove,
+  prefix = "",
+}: {
+  label: string;
+  items: string[];
+  input: string;
+  setInput: (v: string) => void;
+  placeholder: string;
+  onAdd: (v: string) => void;
+  onRemove: (i: number) => void;
+  prefix?: string;
+}) {
+  return (
+    <div>
+      <Label className="mb-1.5 text-xs text-muted-foreground">{label}</Label>
+      <div className="flex flex-wrap gap-1">
+        {items.map((t, i) => (
+          <Badge key={`${t}-${i}`} variant="secondary" className="gap-1 font-normal">
+            {prefix}{t}
+            <button className="cursor-pointer opacity-60 hover:opacity-100" onClick={() => onRemove(i)}>
+              <X className="size-3" />
+            </button>
+          </Badge>
+        ))}
+      </div>
+      <Input
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && input.trim()) {
+            e.preventDefault();
+            onAdd(input.trim());
+            setInput("");
+          }
+        }}
+        placeholder={placeholder}
+        className="mt-1.5 h-7 text-xs"
+      />
+    </div>
+  );
+}
