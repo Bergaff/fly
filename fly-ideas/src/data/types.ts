@@ -59,6 +59,54 @@ export const DEFAULT_CHECKLIST: string[] = [
   "Подача в журнал",
 ];
 
+export type ExperimentOutcome = "success" | "partial" | "failed" | "inconclusive";
+
+export const OUTCOME_LABELS: Record<ExperimentOutcome, string> = {
+  success: "Получилось",
+  partial: "Частично",
+  failed: "Не получилось",
+  inconclusive: "Неясно",
+};
+
+export const OUTCOME_COLORS: Record<ExperimentOutcome, string> = {
+  success: "var(--chart-2)",
+  partial: "var(--chart-3)",
+  failed: "var(--chart-5)",
+  inconclusive: "var(--muted-foreground)",
+};
+
+/** Запись лабораторного журнала */
+export interface ExperimentEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  title: string; // что запускал
+  params: string; // параметры / сид / бэкенд / коммит
+  result: string; // что получилось (цифры, файлы)
+  conclusion: string; // вывод, что дальше
+  outcome: ExperimentOutcome;
+  createdAt: string;
+}
+
+/** Источник в общей библиографии */
+export interface Reference {
+  id: string;
+  authors: string; // "Shiu PK, Sterne GR, ..."
+  year: number | null;
+  title: string;
+  venue: string; // журнал / конференция / препринт
+  doi: string;
+  url: string;
+  tags: string[];
+  notes: string; // общий конспект
+  createdAt: string;
+}
+
+/** Привязка источника к идее: зачем он тут нужен */
+export interface IdeaCitation {
+  refId: string;
+  why: string;
+}
+
 export interface Idea {
   id: string;
   projectId: string;
@@ -76,6 +124,8 @@ export interface Idea {
   checklist: ChecklistItem[];
   deadline: string | null; // YYYY-MM-DD
   dependsOn: string[]; // id идей, из которых «растёт» эта
+  experiments: ExperimentEntry[];
+  citations: IdeaCitation[];
   createdAt: string;
   updatedAt: string;
 }
@@ -92,6 +142,17 @@ export interface AppState {
   version: 1;
   projects: Project[];
   ideas: Idea[];
+  references: Reference[];
+}
+
+export function formatReference(r: Reference): string {
+  const parts = [r.authors, r.year ? `(${r.year})` : "", r.title ? `${r.title}.` : "", r.venue].filter(Boolean);
+  return parts.join(" ");
+}
+
+export function referenceLink(r: Reference): string | null {
+  if (r.doi) return `https://doi.org/${r.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "")}`;
+  return r.url || null;
 }
 
 export function checklistProgress(idea: Pick<Idea, "checklist">) {

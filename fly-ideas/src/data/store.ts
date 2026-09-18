@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { AppState, Idea, IdeaStatus, Project } from "./types";
+import type { AppState, ExperimentEntry, Idea, IdeaStatus, Project, Reference } from "./types";
 import { SEED_STATE, makeChecklist } from "./seed";
 import { uid } from "@/lib/utils";
 
@@ -18,7 +18,10 @@ function normalize(state: AppState): AppState {
       checklist: Array.isArray(i.checklist) ? i.checklist : makeChecklist(),
       deadline: i.deadline ?? null,
       dependsOn: Array.isArray(i.dependsOn) ? i.dependsOn : [],
+      experiments: Array.isArray(i.experiments) ? i.experiments : [],
+      citations: Array.isArray(i.citations) ? i.citations : [],
     })),
+    references: Array.isArray(state.references) ? state.references : [],
   };
 }
 
@@ -62,6 +65,8 @@ export function useStore() {
       checklist: makeChecklist(),
       deadline: null,
       dependsOn: [],
+      experiments: [],
+      citations: [],
       createdAt: t,
       updatedAt: t,
       ...partial,
@@ -110,6 +115,7 @@ export function useStore() {
         projectId: toProjectId ?? src.projectId,
         title: toProjectId ? src.title : `${src.title} (копия)`,
         checklist: src.checklist.map((c) => ({ ...c, id: uid("c") })),
+        experiments: src.experiments.map((e) => ({ ...e, id: uid("e") })),
         createdAt: t,
         updatedAt: t,
       };
@@ -126,6 +132,58 @@ export function useStore() {
 
   const setStatus = useCallback((id: string, status: IdeaStatus) => {
     setState((s) => ({ ...s, ideas: s.ideas.map((i) => (i.id === id ? { ...i, status, updatedAt: stamp() } : i)) }));
+  }, []);
+
+  // ---- Журнал экспериментов ----
+  const addExperiment = useCallback((ideaId: string, entry?: Partial<ExperimentEntry>): ExperimentEntry => {
+    const t = stamp();
+    const e: ExperimentEntry = {
+      id: uid("e"),
+      date: t.slice(0, 10),
+      title: "",
+      params: "",
+      result: "",
+      conclusion: "",
+      outcome: "inconclusive",
+      createdAt: t,
+      ...entry,
+    };
+    setState((s) => ({ ...s, ideas: s.ideas.map((i) => (i.id === ideaId ? { ...i, updatedAt: t, experiments: [e, ...i.experiments] } : i)) }));
+    return e;
+  }, []);
+
+  const updateExperiment = useCallback((ideaId: string, entryId: string, patch: Partial<ExperimentEntry>) => {
+    setState((s) => ({
+      ...s,
+      ideas: s.ideas.map((i) => (i.id === ideaId ? { ...i, updatedAt: stamp(), experiments: i.experiments.map((e) => (e.id === entryId ? { ...e, ...patch } : e)) } : i)),
+    }));
+  }, []);
+
+  const deleteExperiment = useCallback((ideaId: string, entryId: string) => {
+    setState((s) => ({ ...s, ideas: s.ideas.map((i) => (i.id === ideaId ? { ...i, updatedAt: stamp(), experiments: i.experiments.filter((e) => e.id !== entryId) } : i)) }));
+  }, []);
+
+  // ---- Библиография ----
+  const addReference = useCallback((partial?: Partial<Reference>): Reference => {
+    const r: Reference = { id: uid("r"), authors: "", year: null, title: "", venue: "", doi: "", url: "", tags: [], notes: "", createdAt: stamp(), ...partial };
+    setState((s) => ({ ...s, references: [r, ...s.references] }));
+    return r;
+  }, []);
+
+  const updateReference = useCallback((id: string, patch: Partial<Reference>) => {
+    setState((s) => ({ ...s, references: s.references.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
+  }, []);
+
+  const deleteReference = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      references: s.references.filter((r) => r.id !== id),
+      ideas: s.ideas.map((i) => (i.citations.some((c) => c.refId === id) ? { ...i, citations: i.citations.filter((c) => c.refId !== id) } : i)),
+    }));
+  }, []);
+
+  const setCitations = useCallback((ideaId: string, citations: Idea["citations"]) => {
+    setState((s) => ({ ...s, ideas: s.ideas.map((i) => (i.id === ideaId ? { ...i, updatedAt: stamp(), citations } : i)) }));
   }, []);
 
   const addProject = useCallback((name: string): Project => {
@@ -170,8 +228,8 @@ export function useStore() {
   const reset = useCallback(() => setState(structuredClone(SEED_STATE)), []);
 
   const api = useMemo(
-    () => ({ addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
-    [addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addProject, updateProject, deleteProject, exportJson, importJson, reset],
+    () => ({ addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
+    [addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset],
   );
 
   return { state, ...api };

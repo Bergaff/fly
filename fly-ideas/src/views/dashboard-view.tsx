@@ -1,5 +1,5 @@
 import type { Idea } from "@/data/types";
-import { STATUS_COLORS, checklistProgress, deadlineInfo } from "@/data/types";
+import { OUTCOME_COLORS, OUTCOME_LABELS, STATUS_COLORS, checklistProgress, deadlineInfo } from "@/data/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EffortImpactChart } from "@/components/charts/effort-impact-chart";
 import { StatusFunnel } from "@/components/charts/status-funnel";
@@ -15,6 +15,10 @@ export function DashboardView({ ideas, onOpen }: { ideas: Idea[]; onOpen: (id: s
     .sort((a, b) => (a.deadline! < b.deadline! ? -1 : 1));
   const overdue = withDeadline.filter((i) => deadlineInfo(i.deadline)!.tone === "overdue").length;
   const totalSteps = ideas.reduce((a, i) => a + i.checklist.length, 0);
+  const recent = ideas
+    .flatMap((i) => i.experiments.map((e) => ({ e, i })))
+    .sort((a, b) => b.e.date.localeCompare(a.e.date) || b.e.createdAt.localeCompare(a.e.createdAt))
+    .slice(0, 8);
   const doneSteps = ideas.reduce((a, i) => a + i.checklist.filter((c) => c.done).length, 0);
 
   return (
@@ -25,6 +29,24 @@ export function DashboardView({ ideas, onOpen }: { ideas: Idea[]; onOpen: (id: s
         <Stat label="Быстрые победы" value={quick} hint="трудоёмкость ≤5, влияние ≥6" />
         <Stat label="Этапов закрыто" value={`${doneSteps}/${totalSteps}`} hint={`среднее влияние ${avg("impact")}, трудоёмкость ${avg("effort")}`} />
       </div>
+      {recent.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Последние записи журнала</CardTitle>
+            <CardDescription>Что запускалось недавно по всем идеям {"\u00b7"} {ideas.reduce((a, i) => a + i.experiments.length, 0)} записей всего</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-1.5 md:grid-cols-2">
+            {recent.map(({ e, i }) => (
+              <button key={e.id} onClick={() => onOpen(i.id)} className="flex items-center gap-2 rounded-md border px-2.5 py-2 text-left text-sm hover:bg-accent cursor-pointer">
+                <span className="size-2 shrink-0 rounded-full" style={{ background: OUTCOME_COLORS[e.outcome] }} title={OUTCOME_LABELS[e.outcome]} />
+                <span className="shrink-0 font-mono text-[11px] text-muted-foreground">{new Date(`${e.date}T00:00:00`).toLocaleDateString("ru-RU")}</span>
+                <span className="min-w-0 flex-1 truncate">{e.title || <span className="italic text-muted-foreground">без названия</span>}</span>
+                <span className="max-w-[40%] truncate text-[11px] text-muted-foreground">{i.title}</span>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      )}
       <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
         <Card>
           <CardHeader>

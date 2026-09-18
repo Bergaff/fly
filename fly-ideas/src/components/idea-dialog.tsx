@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import { CalendarClock, ExternalLink, GitBranch, ListChecks, FileText, Plus, Trash2, X } from "lucide-react";
-import type { Idea, IdeaScores, IdeaStatus, Project } from "@/data/types";
+import { useEffect, useRef, useState } from "react";
+import { BookOpen, CalendarClock, ExternalLink, FlaskConical, GitBranch, ListChecks, FileText, Plus, Trash2, X } from "lucide-react";
+import type { Idea, IdeaScores, IdeaStatus, Project, Reference } from "@/data/types";
 import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
 import { Checklist } from "@/components/checklist";
+import { ExperimentLog } from "@/components/experiment-log";
+import { CitationsEditor } from "@/components/citations-editor";
 import { DeadlineBadge } from "@/components/deadline-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -17,19 +19,24 @@ import { Separator } from "@/components/ui/separator";
 interface Props {
   idea: Idea | null;
   allIdeas: Idea[];
+  references: Reference[];
   projects: Project[];
+  onCreateReference: (title: string) => Reference;
+  onOpenReference: (id: string) => void;
   onClose: () => void;
   onSave: (id: string, patch: Partial<Idea>) => void;
   onDelete: (id: string) => void;
 }
 
-export function IdeaDialog({ idea, allIdeas, projects, onClose, onSave, onDelete, onOpenOther }: Props & { onOpenOther?: (id: string) => void }) {
+export function IdeaDialog({ idea, allIdeas, references, projects, onCreateReference, onOpenReference, onClose, onSave, onDelete, onOpenOther }: Props & { onOpenOther?: (id: string) => void }) {
   const [draft, setDraft] = useState<Idea | null>(idea);
   const [tagInput, setTagInput] = useState("");
   const [venueInput, setVenueInput] = useState("");
   const [linkLabel, setLinkLabel] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [tab, setTab] = useState("overview");
+  const draftRef = useRef<Idea | null>(null);
+  draftRef.current = draft;
 
   useEffect(() => {
     setDraft(idea ? structuredClone(idea) : null);
@@ -53,7 +60,7 @@ export function IdeaDialog({ idea, allIdeas, projects, onClose, onSave, onDelete
 
   return (
     <Dialog open={!!idea} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle className="sr-only">Идея</DialogTitle>
           <DialogDescription className="sr-only">Просмотр и редактирование идеи</DialogDescription>
@@ -101,8 +108,35 @@ export function IdeaDialog({ idea, allIdeas, projects, onClose, onSave, onDelete
           <TabsList>
             <TabsTrigger value="overview"><FileText /> Разбор</TabsTrigger>
             <TabsTrigger value="checklist"><ListChecks /> Чеклист <span className="font-mono text-[10px] text-muted-foreground">{checklistProgress(draft).done}/{checklistProgress(draft).total}</span></TabsTrigger>
+            <TabsTrigger value="log"><FlaskConical /> Журнал {draft.experiments.length > 0 && <span className="font-mono text-[10px] text-muted-foreground">{draft.experiments.length}</span>}</TabsTrigger>
+            <TabsTrigger value="refs"><BookOpen /> Источники {draft.citations.length > 0 && <span className="font-mono text-[10px] text-muted-foreground">{draft.citations.length}</span>}</TabsTrigger>
             <TabsTrigger value="links"><GitBranch /> Связи {draft.dependsOn.length > 0 && <span className="font-mono text-[10px] text-muted-foreground">{draft.dependsOn.length}</span>}</TabsTrigger>
           </TabsList>
+
+        <TabsContent value="log" className="pt-2">
+          <ExperimentLog entries={draft.experiments} onChange={(experiments) => set("experiments", experiments)} />
+        </TabsContent>
+
+        <TabsContent value="refs" className="pt-2">
+          <CitationsEditor
+            citations={draft.citations}
+            references={references}
+            onChange={(citations) => set("citations", citations)}
+            onCreateReference={onCreateReference}
+            onOpenReference={(id) => {
+              // сохраняем актуальный черновик (после setState), чтобы привязка не потерялась
+              setTimeout(() => {
+                const d = draftRef.current;
+                if (d) {
+                  const { id: ideaId, createdAt: _c, updatedAt: _u, ...rest } = d;
+                  void _c; void _u;
+                  onSave(ideaId, rest);
+                }
+                onOpenReference(id);
+              }, 0);
+            }}
+          />
+        </TabsContent>
 
         <TabsContent value="checklist" className="pt-2">
           <p className="mb-3 text-xs text-muted-foreground">Этапы «от идеи до статьи». Галочки сохраняются с датой; порядок можно менять перетаскиванием.</p>

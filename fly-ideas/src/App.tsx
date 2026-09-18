@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { BarChart3, Brain, Download, GitCompare, LayoutGrid, Moon, RotateCcw, Settings2, Sun, Upload } from "lucide-react";
+import { BarChart3, BookOpen, Brain, Download, GitCompare, LayoutGrid, Moon, RotateCcw, Settings2, Sun, Upload } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useStore } from "@/data/store";
 import { ProjectSidebar } from "@/components/project-sidebar";
@@ -7,6 +7,8 @@ import { IdeaDialog } from "@/components/idea-dialog";
 import { IdeasView } from "@/views/ideas-view";
 import { DashboardView } from "@/views/dashboard-view";
 import { CompareView } from "@/views/compare-view";
+import { LibraryView } from "@/views/library-view";
+import { ReferenceDialog } from "@/components/reference-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -18,6 +20,7 @@ export default function App() {
   const { state } = store;
   const [active, setActive] = useState<string | "all">("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openRefId, setOpenRefId] = useState<string | null>(null);
   const [compare, setCompare] = useState<string[]>([]);
   const [tab, setTab] = useState("ideas");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -27,6 +30,8 @@ export default function App() {
   const openIdea = state.ideas.find((i) => i.id === openId) ?? null;
   const compareIdeas = compare.map((id) => state.ideas.find((i) => i.id === id)).filter((i): i is NonNullable<typeof i> => !!i);
   const activeProject = state.projects.find((p) => p.id === active);
+  const openRef = state.references.find((r) => r.id === openRefId) ?? null;
+  const refUsedBy = openRef ? state.ideas.filter((i) => i.citations.some((c) => c.refId === openRef.id)).map((i) => ({ id: i.id, title: i.title })) : [];
 
   const toggleCompare = (id: string) =>
     setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? [...c.slice(1), id] : [...c, id]));
@@ -88,6 +93,7 @@ export default function App() {
                 <TabsTrigger value="ideas"><LayoutGrid /> Идеи</TabsTrigger>
                 <TabsTrigger value="dashboard"><BarChart3 /> Дашборд</TabsTrigger>
                 <TabsTrigger value="compare"><GitCompare /> Сравнение {compare.length > 0 && <span className="rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{compare.length}</span>}</TabsTrigger>
+                <TabsTrigger value="library"><BookOpen /> Библиотека <span className="font-mono text-[10px] text-muted-foreground">{state.references.length}</span></TabsTrigger>
               </TabsList>
             </Tabs>
             <div className="ml-auto flex items-center gap-1">
@@ -128,13 +134,32 @@ export default function App() {
             <TabsContent value="dashboard" className="min-h-0 overflow-hidden">
               <DashboardView ideas={visible} onOpen={setOpenId} />
             </TabsContent>
+            <TabsContent value="library" className="min-h-0">
+              <LibraryView
+                references={state.references}
+                ideas={visible}
+                allIdeas={state.ideas}
+                scopeLabel={activeProject ? `«${activeProject.name}»` : "видимые идеи"}
+                onOpen={setOpenRefId}
+                onAdd={() => setOpenRefId(store.addReference().id)}
+                onOpenIdea={(id) => { setTab("ideas"); setOpenId(id); }}
+              />
+            </TabsContent>
             <TabsContent value="compare" className="min-h-0 overflow-hidden">
               <CompareView ideas={compareIdeas} all={state.ideas} onRemove={(id) => setCompare((c) => c.filter((x) => x !== id))} onOpen={setOpenId} />
             </TabsContent>
           </Tabs>
         </main>
 
-        <IdeaDialog idea={openIdea} allIdeas={state.ideas} projects={state.projects} onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)} onClose={() => setOpenId(null)} onSave={store.updateIdea} onDelete={store.deleteIdea} />
+        <IdeaDialog
+          idea={openIdea}
+          allIdeas={state.ideas}
+          references={state.references}
+          projects={state.projects}
+          onCreateReference={(title) => store.addReference({ title })}
+          onOpenReference={(id) => { setOpenId(null); setTimeout(() => setOpenRefId(id), 0); }}
+          onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)} onClose={() => setOpenId(null)} onSave={store.updateIdea} onDelete={store.deleteIdea} />
+        <ReferenceDialog reference={openRef} usedBy={refUsedBy} onClose={() => setOpenRefId(null)} onSave={store.updateReference} onDelete={store.deleteReference} />
       </div>
     </TooltipProvider>
   );

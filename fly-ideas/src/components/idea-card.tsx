@@ -1,4 +1,4 @@
-import { ArrowRightLeft, Copy, MoreHorizontal, Trash2, Clock, ExternalLink, GitBranch, ListChecks } from "lucide-react";
+import { ArrowRightLeft, Copy, MoreHorizontal, Trash2, Clock, ExternalLink, GitBranch, ListChecks, FlaskConical, BookOpen } from "lucide-react";
 import { DeadlineBadge } from "@/components/deadline-badge";
 import type { Idea, IdeaStatus, Project } from "@/data/types";
 import { STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
@@ -109,6 +109,8 @@ export function IdeaCard({ idea, projects, onOpen, onMove, onCopyTo, onDelete, o
           </div>
           <span className="font-mono">{prog.done}/{prog.total}</span>
           {idea.dependsOn.length > 0 && <span className="flex items-center gap-0.5" title="Растёт из других идей"><GitBranch className="size-3" />{idea.dependsOn.length}</span>}
+          {idea.experiments.length > 0 && <span className="flex items-center gap-0.5" title="Записей в журнале"><FlaskConical className="size-3" />{idea.experiments.length}</span>}
+          {idea.citations.length > 0 && <span className="flex items-center gap-0.5" title="Источников"><BookOpen className="size-3" />{idea.citations.length}</span>}
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="outline" className="gap-1.5" style={{ borderColor: STATUS_COLORS[idea.status] }}>

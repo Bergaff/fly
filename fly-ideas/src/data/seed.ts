@@ -1,4 +1,4 @@
-import type { AppState, ChecklistItem, Idea, Project } from "./types";
+import type { AppState, ChecklistItem, Idea, Project, Reference } from "./types";
 import { DEFAULT_CHECKLIST } from "./types";
 import { uid } from "@/lib/utils";
 
@@ -37,17 +37,94 @@ const plusDays = (n: number) => {
   return d.toISOString().slice(0, 10);
 };
 
-type Optional = "links" | "notes" | "checklist" | "deadline" | "dependsOn";
+type Optional = "links" | "notes" | "checklist" | "deadline" | "dependsOn" | "experiments" | "citations";
 const idea = (partial: Omit<Idea, "createdAt" | "updatedAt" | Optional> & Partial<Pick<Idea, Optional>>): Idea => ({
   notes: "",
   links: [],
   checklist: makeChecklist(),
   deadline: null,
   dependsOn: [],
+  experiments: [],
+  citations: [],
   createdAt: now,
   updatedAt: now,
   ...partial,
 });
+
+export const SEED_REFERENCES: Reference[] = [
+  {
+    id: "r-shiu2024",
+    authors: "Shiu PK, Sterne GR, Spiller N, et al.",
+    year: 2024,
+    title: "A Drosophila computational brain model reveals sensorimotor processing",
+    venue: "Nature 634, 210–219",
+    doi: "10.1038/s41586-024-07763-9",
+    url: "",
+    tags: ["модель", "LIF", "baseline"],
+    notes: "Эталонная LIF-модель на коннектоме FlyWire. Предсказание моторных ответов на вкус и груминг 91–95 %. Код: philshiu/Drosophila_brain_model.",
+    createdAt: now,
+  },
+  {
+    id: "r-dorkenwald2024",
+    authors: "Dorkenwald S, Matsliah A, Sterling AR, et al.",
+    year: 2024,
+    title: "Neuronal wiring diagram of an adult brain",
+    venue: "Nature 634, 124–138",
+    doi: "10.1038/s41586-024-07558-y",
+    url: "",
+    tags: ["коннектом", "FlyWire"],
+    notes: "Полный коннектом мозга самки дрозофилы: ~139 тыс. нейронов, ~50 млн синапсов. Основа всех симуляций.",
+    createdAt: now,
+  },
+  {
+    id: "r-schlegel2024",
+    authors: "Schlegel P, Yin Y, Bates AS, et al.",
+    year: 2024,
+    title: "Whole-brain annotation and multi-connectome cell typing of Drosophila",
+    venue: "Nature 634, 139–152",
+    doi: "10.1038/s41586-024-07686-5",
+    url: "",
+    tags: ["коннектом", "типы клеток", "аннотации"],
+    notes: "Аннотации типов клеток и нейропилей — по ним выбираются области для лезий и контуры (MB, CX).",
+    createdAt: now,
+  },
+  {
+    id: "r-eckstein2024",
+    authors: "Eckstein N, Bates AS, Champion A, et al.",
+    year: 2024,
+    title: "Neurotransmitter classification from electron microscopy images at synaptic sites in Drosophila melanogaster",
+    venue: "Cell 187, 2574–2594",
+    doi: "10.1016/j.cell.2024.03.016",
+    url: "",
+    tags: ["нейромедиаторы", "веса"],
+    notes: "Предсказание нейромедиатора по ЭМ — откуда берутся знаки синапсов (возб./торм.) в LIF-модели.",
+    createdAt: now,
+  },
+  {
+    id: "r-aso2014",
+    authors: "Aso Y, Hattori D, Yu Y, et al.",
+    year: 2014,
+    title: "The neuronal architecture of the mushroom body provides a logic for associative learning",
+    venue: "eLife 3, e04577",
+    doi: "10.7554/eLife.04577",
+    url: "",
+    tags: ["грибовидные тела", "обучение", "дофамин"],
+    notes: "Архитектура MB: компартменты, DAN → KC → MBON. Логика ассоциативного обучения.",
+    createdAt: now,
+  },
+  {
+    id: "r-lappalainen2024",
+    authors: "Lappalainen JK, Tschopp FD, Prakhya S, et al.",
+    year: 2024,
+    title: "Connectome-constrained networks predict neural activity across the fly visual system",
+    venue: "Nature 634, 1132–1140",
+    doi: "10.1038/s41586-024-07939-3",
+    url: "",
+    tags: ["flyvis", "зрение", "дифференцируемая"],
+    notes: "Дифференцируемая сеть на коннектоме зрительной системы (flyvis). Сравнение «структура vs обучение».",
+    createdAt: now,
+  },
+];
 
 export const SEED_IDEAS: Idea[] = [
   idea({
@@ -73,6 +150,23 @@ export const SEED_IDEAS: Idea[] = [
     notes: "Рекомендуемый основной трек. Метод прост: глушить и мерять.",
     checklist: makeChecklist(1),
     deadline: plusDays(150),
+    citations: [
+      { refId: "r-shiu2024", why: "Baseline: воспроизводим фигуры, берём протоколы стимуляции" },
+      { refId: "r-schlegel2024", why: "Границы нейропилей и типы клеток для лезий" },
+      { refId: "r-eckstein2024", why: "Откуда знаки синапсов — учитывать при интерпретации" },
+    ],
+    experiments: [
+      {
+        id: "e-seed-1",
+        date: now.slice(0, 10),
+        title: "Пример записи: установка окружения",
+        params: "conda env fly-brain, python 3.11, brian2 2.8, numpy 1.26",
+        result: "Окружение поднялось, тест-скрипт Brian2 отработал.",
+        conclusion: "Следующий шаг — клонировать philshiu/Drosophila_brain_model и запустить пример стимуляции вкусовых нейронов.",
+        outcome: "success",
+        createdAt: now,
+      },
+    ],
   }),
   idea({
     id: "i-mb-learning",
@@ -92,6 +186,10 @@ export const SEED_IDEAS: Idea[] = [
     scores: { effort: 7, impact: 8, novelty: 7, speed: 4, risk: 5 },
     notes: "Пластичность в большой сети капризна: может всё перевозбудить или погасить. Вторая статья.",
     dependsOn: ["i-lesions"],
+    citations: [
+      { refId: "r-aso2014", why: "Архитектура MB и логика дофаминового подкрепления" },
+      { refId: "r-shiu2024", why: "Основа модели, в которую встраиваем пластичность" },
+    ],
   }),
   idea({
     id: "i-individuality",
@@ -129,6 +227,7 @@ export const SEED_IDEAS: Idea[] = [
     scores: { effort: 3, impact: 4, novelty: 3, speed: 9, risk: 1 },
     links: [{ label: "eonsystemspbc/fly-brain", url: "https://github.com/eonsystemspbc/fly-brain" }],
     notes: "Запасной аэродром. Тебя заметят разработчики Eon / GeNN.",
+    citations: [{ refId: "r-shiu2024", why: "Эталон Brian2 CPU, с которым сравниваем бэкенды" }],
     checklist: [
       ...makeChecklist(1).slice(0, 2),
       { id: uid("c"), text: "Запустить скрипт сравнения бэкендов из репозитория Eon", done: false, doneAt: null },
@@ -179,4 +278,5 @@ export const SEED_STATE: AppState = {
   version: 1,
   projects: SEED_PROJECTS,
   ideas: SEED_IDEAS,
+  references: SEED_REFERENCES,
 };
