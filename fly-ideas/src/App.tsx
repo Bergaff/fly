@@ -1,8 +1,7 @@
 import { useMemo, useRef, useState } from "react";
-import { BarChart3, BookOpen, Brain, Download, GitCompare, LayoutGrid, Moon, RotateCcw, Settings2, Sun, Upload } from "lucide-react";
 import { BrainView } from "@/views/brain-view";
 import { useTheme } from "@/lib/theme";
-import { fly } from "@/lib/bridge";
+import { fly, isElectron } from "@/lib/bridge";
 import { useStore } from "@/data/store";
 import { ProjectSidebar } from "@/components/project-sidebar";
 import { IdeaDialog } from "@/components/idea-dialog";
@@ -11,11 +10,11 @@ import { DashboardView } from "@/views/dashboard-view";
 import { CompareView } from "@/views/compare-view";
 import { LibraryView } from "@/views/library-view";
 import { ReferenceDialog } from "@/components/reference-dialog";
+import { LegalDialog, type LegalKind } from "@/components/legal-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ShimmerText } from "@/components/charts/shimmer-text";
 
 export default function App() {
   const store = useStore();
@@ -25,6 +24,7 @@ export default function App() {
   const [openRefId, setOpenRefId] = useState<string | null>(null);
   const [compare, setCompare] = useState<string[]>([]);
   const [tab, setTab] = useState("ideas");
+  const [legal, setLegal] = useState<LegalKind | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { theme, toggle: toggleTheme } = useTheme();
 
@@ -77,6 +77,14 @@ export default function App() {
     }
   };
 
+  const counters: Record<string, string> = {
+    ideas: String(visible.length),
+    dashboard: `${state.ideas.filter((i) => ["exploring", "active", "drafting"].includes(i.status)).length} в работе`,
+    compare: compare.length ? `${compare.length} из 3` : "",
+    library: String(state.references.length),
+    brain: "",
+  };
+
   return (
     <TooltipProvider>
       <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
@@ -93,40 +101,56 @@ export default function App() {
           }}
           onDropIdea={store.moveIdea}
         />
+
         <main className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center gap-3 border-b px-6 py-3">
-            <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--chart-2)] to-[var(--chart-1)] text-background">
-                <Brain className="size-4" />
-              </div>
+          <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b px-4 py-2">
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-8 shrink-0 items-center justify-center border font-mono text-[12px] tracking-[0.1em]">FI</span>
               <div className="leading-tight">
-                <div className="text-sm font-semibold">Fly Ideas</div>
-                <div className="text-[11px] text-muted-foreground">
-                  {activeProject ? activeProject.name : <ShimmerText>все проекты · {state.ideas.length} идей</ShimmerText>}
-                </div>
+                <div className="text-[13px] font-semibold tracking-[-0.01em]">Fly Ideas</div>
+                <div className="label">{activeProject ? activeProject.name : `все проекты, идей: ${state.ideas.length}`}</div>
               </div>
             </div>
-            <Tabs value={tab} onValueChange={setTab} className="ml-6">
+
+            <Tabs value={tab} onValueChange={setTab}>
               <TabsList>
-                <TabsTrigger value="ideas"><LayoutGrid /> Идеи</TabsTrigger>
-                <TabsTrigger value="dashboard"><BarChart3 /> Дашборд</TabsTrigger>
-                <TabsTrigger value="compare"><GitCompare /> Сравнение {compare.length > 0 && <span className="rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{compare.length}</span>}</TabsTrigger>
-                <TabsTrigger value="library"><BookOpen /> Библиотека <span className="font-mono text-[10px] text-muted-foreground">{state.references.length}</span></TabsTrigger>
-                <TabsTrigger value="brain"><Brain /> Мозг</TabsTrigger>
+                {(
+                  [
+                    ["ideas", "Идеи"],
+                    ["dashboard", "Дашборд"],
+                    ["compare", "Сравнение"],
+                    ["library", "Библиотека"],
+                    ["brain", "Мозг"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <TabsTrigger key={key} value={key}>
+                    {label}
+                    {counters[key] && <span className="font-mono text-[10px] text-muted-foreground">{counters[key]}</span>}
+                  </TabsTrigger>
+                ))}
               </TabsList>
             </Tabs>
-            <div className="ml-auto flex items-center gap-1">
-              <Button variant="ghost" size="icon" onClick={toggleTheme} title={theme === "dark" ? "Светлая тема" : "Тёмная тема"}>
-                {theme === "dark" ? <Sun /> : <Moon />}
+
+            <div className="ml-auto flex items-center gap-1.5">
+              <span className="label hidden xl:inline">источник: {isElectron ? "локальное окно" : "браузер, часть функций недоступна"}</span>
+              <Button variant="ghost" size="sm" onClick={toggleTheme} title="Переключить светлую и тёмную тему">
+                {theme === "dark" ? "светлая" : "тёмная"}
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><Settings2 /></Button></DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem onClick={exportFile}><Download /> Выгрузить JSON…</DropdownMenuItem>
-                  <DropdownMenuItem onClick={importClick}><Upload /> Загрузить JSON…</DropdownMenuItem>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">Меню</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel>Данные</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={exportFile}>Выгрузить JSON…</DropdownMenuItem>
+                  <DropdownMenuItem onClick={importClick}>Загрузить JSON…</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Документы</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => setLegal("terms")}>Условия использования</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLegal("privacy")}>Политика конфиденциальности</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onClick={() => confirm("Сбросить всё к стартовому набору идей?") && store.reset()}>
-                    <RotateCcw /> Сброс к стартовым идеям
+                    Сброс к стартовым идеям
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -161,7 +185,10 @@ export default function App() {
                 scopeLabel={activeProject ? `«${activeProject.name}»` : "видимые идеи"}
                 onOpen={setOpenRefId}
                 onAdd={() => setOpenRefId(store.addReference().id)}
-                onOpenIdea={(id) => { setTab("ideas"); setOpenId(id); }}
+                onOpenIdea={(id) => {
+                  setTab("ideas");
+                  setOpenId(id);
+                }}
               />
             </TabsContent>
             <TabsContent value="brain" className="min-h-0 overflow-hidden">
@@ -179,9 +206,17 @@ export default function App() {
           references={state.references}
           projects={state.projects}
           onCreateReference={(title) => store.addReference({ title })}
-          onOpenReference={(id) => { setOpenId(null); setTimeout(() => setOpenRefId(id), 0); }}
-          onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)} onClose={() => setOpenId(null)} onSave={store.updateIdea} onDelete={store.deleteIdea} />
+          onOpenReference={(id) => {
+            setOpenId(null);
+            setTimeout(() => setOpenRefId(id), 0);
+          }}
+          onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)}
+          onClose={() => setOpenId(null)}
+          onSave={store.updateIdea}
+          onDelete={store.deleteIdea}
+        />
         <ReferenceDialog reference={openRef} usedBy={refUsedBy} onClose={() => setOpenRefId(null)} onSave={store.updateReference} onDelete={store.deleteReference} />
+        <LegalDialog kind={legal} onClose={() => setLegal(null)} />
       </div>
     </TooltipProvider>
   );

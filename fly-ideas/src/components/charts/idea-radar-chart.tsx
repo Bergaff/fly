@@ -2,14 +2,15 @@ import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, Responsi
 import type { Idea } from "@/data/types";
 import { SCORE_LABELS } from "@/data/types";
 
-const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-4)"];
+/** Три идеи различаются тоном и штрихом линии, без спектра. */
+const STROKES = ["var(--foreground)", "var(--chart-1)", "var(--chart-4)"];
 
 export function IdeaRadarChart({ ideas }: { ideas: Idea[] }) {
   const axes = Object.keys(SCORE_LABELS) as (keyof typeof SCORE_LABELS)[];
   const data = axes.map((k) => {
     const row: Record<string, number | string> = { axis: SCORE_LABELS[k] };
     ideas.forEach((i) => {
-      // для сравнения инвертируем "плохие" оси: меньше трудоёмкость и риск = лучше
+      // для сравнения инвертируем «плохие» оси: меньше трудоёмкости и риска значит лучше
       const v = k === "effort" || k === "risk" ? 11 - i.scores[k] : i.scores[k];
       row[i.id] = v;
     });
@@ -21,30 +22,39 @@ export function IdeaRadarChart({ ideas }: { ideas: Idea[] }) {
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="72%">
           <PolarGrid stroke="var(--border)" />
-          <PolarAngleAxis dataKey="axis" tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} />
+          <PolarAngleAxis dataKey="axis" tick={{ fill: "var(--muted-foreground)", fontSize: 11, fontFamily: "var(--font-mono)" }} />
           <PolarRadiusAxis domain={[0, 10]} tick={false} axisLine={false} />
           <Tooltip
             content={({ payload, label }) => {
               if (!payload?.length) return null;
               return (
-                <div className="rounded-lg border bg-popover/95 px-3 py-2 text-xs shadow-md backdrop-blur">
-                  <div className="font-medium">{label}</div>
+                <div className="border bg-popover px-2 py-1.5 font-mono text-[10px] uppercase tracking-[0.05em]">
+                  <div className="text-foreground">{label}</div>
                   {payload.map((p) => (
-                    <div key={String(p.dataKey)} className="mt-1 flex items-center gap-1.5 text-muted-foreground">
-                      <span className="size-2 rounded-full" style={{ background: p.color }} />
-                      <span className="max-w-[200px] truncate">{p.name}</span>
-                      <span className="ml-auto font-mono text-foreground">{p.value}</span>
+                    <div key={String(p.dataKey)} className="mt-0.5 flex items-baseline gap-2 text-muted-foreground">
+                      <span className="max-w-[180px] truncate">{p.name}</span>
+                      <span className="ml-auto text-foreground">{p.value}</span>
                     </div>
                   ))}
-                  <div className="mt-1 text-[10px] text-muted-foreground/70">Трудоёмкость и риск инвертированы: больше = лучше</div>
                 </div>
               );
             }}
           />
           {ideas.map((i, idx) => (
-            <Radar key={i.id} name={i.title} dataKey={i.id} stroke={COLORS[idx % COLORS.length]} fill={COLORS[idx % COLORS.length]} fillOpacity={0.18} strokeWidth={2} dot={{ r: 3, fillOpacity: 1 }} />
+            <Radar
+              key={i.id}
+              name={i.title}
+              dataKey={i.id}
+              stroke={STROKES[idx % STROKES.length]}
+              strokeWidth={1}
+              strokeDasharray={idx === 1 ? "4 2" : idx === 2 ? "1 2" : undefined}
+              fill={STROKES[idx % STROKES.length]}
+              fillOpacity={0.08}
+              dot={{ r: 2, fillOpacity: 1 }}
+              isAnimationActive={false}
+            />
           ))}
-          <Legend wrapperStyle={{ fontSize: 12 }} formatter={(v: string) => <span className="text-muted-foreground">{v.length > 40 ? v.slice(0, 40) + "…" : v}</span>} />
+          <Legend wrapperStyle={{ fontSize: 11, fontFamily: "var(--font-mono)" }} formatter={(v: string) => <span style={{ color: "var(--muted-foreground)" }}>{v.length > 44 ? v.slice(0, 44) + "…" : v}</span>} />
         </RadarChart>
       </ResponsiveContainer>
     </div>

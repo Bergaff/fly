@@ -1,24 +1,27 @@
 import type { IdeaScores } from "@/data/types";
 import { SCORE_LABELS } from "@/data/types";
-import { Progress } from "@/components/ui/progress";
 
-const COLORS: Record<keyof IdeaScores, string> = {
-  effort: "var(--chart-5)",
-  impact: "var(--chart-2)",
-  novelty: "var(--chart-4)",
-  speed: "var(--chart-1)",
-  risk: "var(--chart-3)",
-};
+/**
+ * Оценки одной идеи. Цвет один: заливка означает «больше значит лучше»,
+ * контур для трудоёмкости и риска, где больше значит хуже.
+ */
+const HOLLOW: (keyof IdeaScores)[] = ["effort", "risk"];
 
 export function ScoreBars({ scores, compact }: { scores: IdeaScores; compact?: boolean }) {
   const keys = Object.keys(SCORE_LABELS) as (keyof IdeaScores)[];
   return (
-    <div className={compact ? "grid grid-cols-2 gap-x-4 gap-y-1.5" : "flex flex-col gap-2"}>
+    <div className={compact ? "grid grid-cols-2 gap-x-5 gap-y-1" : "flex flex-col gap-1.5"}>
       {keys.map((k) => (
-        <div key={k} className="flex items-center gap-2 text-xs">
-          <span className={compact ? "w-20 truncate text-muted-foreground" : "w-28 text-muted-foreground"}>{SCORE_LABELS[k]}</span>
-          <Progress value={scores[k] * 10} color={COLORS[k]} className="flex-1" />
-          <span className="w-4 text-right font-mono text-muted-foreground">{scores[k]}</span>
+        <div key={k} className="flex items-center gap-2">
+          <span className={(compact ? "w-20" : "w-28") + " shrink-0 truncate text-[11px] text-muted-foreground"}>{SCORE_LABELS[k]}</span>
+          <span className="h-2 min-w-0 flex-1 border border-border">
+            {HOLLOW.includes(k) ? (
+              <span className="block h-full border-r-2 border-foreground" style={{ width: `${scores[k] * 10}%` }} />
+            ) : (
+              <span className="block h-full bg-foreground" style={{ width: `${scores[k] * 10}%` }} />
+            )}
+          </span>
+          <span className="w-5 shrink-0 text-right font-mono text-[11px]">{scores[k]}</span>
         </div>
       ))}
     </div>

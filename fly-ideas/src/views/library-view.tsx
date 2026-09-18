@@ -1,18 +1,14 @@
 import { useMemo, useState } from "react";
-import { BookOpen, Copy, ExternalLink, Plus, Search, Tag } from "lucide-react";
 import type { Idea, Reference } from "@/data/types";
 import { formatReference, referenceLink } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { fly } from "@/lib/bridge";
-import { FolderOutput } from "lucide-react";
 
 interface Props {
   references: Reference[];
-  ideas: Idea[]; // видимые (для фильтра «только этот проект»)
+  ideas: Idea[];
   allIdeas: Idea[];
   scopeLabel: string;
   onOpen: (id: string) => void;
@@ -65,91 +61,112 @@ export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, o
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b px-6 py-3">
-        <div className="relative w-[300px]">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Автор, название, DOI, конспект…" className="pl-8" />
-        </div>
-        <div className="flex rounded-lg bg-muted p-[3px] text-xs">
+      <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2">
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Автор, название, DOI, конспект" className="w-[280px]" />
+        <div className="flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.06em]">
           {(["year", "uses", "added"] as const).map((k) => (
-            <button key={k} onClick={() => setSort(k)} className={cn("rounded-md px-2.5 py-1 cursor-pointer", sort === k ? "bg-background shadow-sm" : "text-muted-foreground")}>
-              {k === "year" ? "По году" : k === "uses" ? "По использованию" : "По добавлению"}
+            <button
+              key={k}
+              onClick={() => setSort(k)}
+              className={cn("cursor-pointer border-b border-transparent pb-0.5 hover:text-foreground", sort === k ? "border-foreground text-foreground" : "text-muted-foreground")}
+            >
+              {k === "year" ? "по году" : k === "uses" ? "по использованию" : "по добавлению"}
             </button>
           ))}
         </div>
-        <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
-          <input type="checkbox" checked={onlyScope} onChange={(e) => setOnlyScope(e.target.checked)} className="accent-[var(--chart-2)]" />
+        <label className="flex items-baseline gap-1.5 font-mono text-[10px] uppercase tracking-[0.06em] text-muted-foreground cursor-pointer">
+          <input type="checkbox" checked={onlyScope} onChange={(e) => setOnlyScope(e.target.checked)} />
           только {scopeLabel}
         </label>
-        <span className="text-xs text-muted-foreground">{list.length} из {references.length}</span>
+        <span className="label">
+          {list.length} из {references.length}
+        </span>
         <div className="ml-auto flex gap-2">
-          <Button variant="outline" onClick={copyAll} disabled={!list.length} title="Скопировать список в буфер"><Copy /> Список</Button>
-          <Button variant="outline" onClick={saveAll} disabled={!list.length} title="Сохранить список в файл…"><FolderOutput /> В файл…</Button>
-          <Button onClick={onAdd}><Plus /> Источник</Button>
+          <Button variant="outline" onClick={copyAll} disabled={!list.length} title="Скопировать список в буфер">
+            Список
+          </Button>
+          <Button variant="outline" onClick={saveAll} disabled={!list.length} title="Сохранить список в файл">
+            В файл
+          </Button>
+          <Button onClick={onAdd}>Источник</Button>
         </div>
       </div>
 
       {tags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 border-b px-6 py-2">
-          <Tag className="size-3.5 text-muted-foreground" />
-          <button onClick={() => setTag(null)} className={cn("rounded-md px-2 py-0.5 text-xs cursor-pointer", !tag ? "bg-accent" : "text-muted-foreground hover:bg-accent/50")}>все</button>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b px-4 py-2 font-mono text-[10px] uppercase tracking-[0.06em]">
+          <span className="text-muted-foreground/70">метки</span>
+          <button onClick={() => setTag(null)} className={cn("cursor-pointer border-b border-transparent hover:text-foreground", !tag ? "border-foreground text-foreground" : "text-muted-foreground")}>
+            все
+          </button>
           {tags.map((t) => (
-            <button key={t} onClick={() => setTag(tag === t ? null : t)} className={cn("rounded-md px-2 py-0.5 text-xs cursor-pointer", tag === t ? "bg-accent" : "text-muted-foreground hover:bg-accent/50")}>{t}</button>
+            <button
+              key={t}
+              onClick={() => setTag(tag === t ? null : t)}
+              className={cn("cursor-pointer border-b border-transparent hover:text-foreground", tag === t ? "border-foreground text-foreground" : "text-muted-foreground")}
+            >
+              {t}
+            </button>
           ))}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto">
         {list.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-muted-foreground">
-            <BookOpen className="size-8 opacity-40" />
-            <p>{references.length ? "Ничего не найдено." : "База источников пуста."}</p>
-            <Button variant="outline" onClick={onAdd}><Plus /> Добавить источник</Button>
+          <div className="flex h-full flex-col items-center justify-center gap-3">
+            <p className="text-[12px] text-muted-foreground">{references.length ? "Ничего не найдено." : "База источников пуста."}</p>
+            <Button variant="outline" onClick={onAdd}>
+              Добавить источник
+            </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {list.map((r) => {
-              const link = referenceLink(r);
-              const used = usage.get(r.id) ?? [];
-              return (
-                <Card key={r.id} className="cursor-pointer gap-0 py-3 transition-colors hover:border-foreground/20" onClick={() => onOpen(r.id)}>
-                  <CardContent className="grid gap-3 md:grid-cols-[1fr_260px]">
-                    <div className="min-w-0">
-                      <div className="text-sm leading-snug">
-                        <span className="font-medium">{r.authors || "—"}</span>
-                        {r.year && <span className="text-muted-foreground"> ({r.year})</span>}
+          <table className="w-full border-collapse text-left align-top">
+            <tbody>
+              {list.map((r) => {
+                const link = referenceLink(r);
+                const used = usage.get(r.id) ?? [];
+                return (
+                  <tr key={r.id} className="cursor-pointer border-b hover:bg-accent/50" onClick={() => onOpen(r.id)}>
+                    <td className="w-[70px] py-2 pl-4 font-mono text-[11px] text-muted-foreground">{r.year ?? ""}</td>
+                    <td className="min-w-0 py-2 pr-4 text-[13px]">
+                      <div className="leading-snug">
+                        <span className="font-medium">{r.authors || "автор не указан"}</span>
                         {r.title && <span>. {r.title}</span>}
                       </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      <div className="mt-0.5 flex flex-wrap items-baseline gap-x-3 text-[11px] text-muted-foreground">
                         {r.venue && <span className="italic">{r.venue}</span>}
                         {link && (
-                          <a href={link} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center gap-0.5 font-mono hover:text-foreground">
-                            <ExternalLink className="size-3" />{r.doi || "url"}
+                          <a href={link} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="font-mono hover:text-foreground">
+                            {r.doi ? `doi:${r.doi}` : "ссылка"}
                           </a>
                         )}
-                        {r.tags.map((t) => <Badge key={t} variant="secondary" className="h-4 px-1.5 text-[10px] font-normal">{t}</Badge>)}
+                        {r.tags.map((t) => (
+                          <span key={t} className="font-mono">
+                            #{t}
+                          </span>
+                        ))}
                       </div>
-                      {r.notes && <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{r.notes}</p>}
-                    </div>
-                    <div className="text-xs text-muted-foreground" onClick={(e) => e.stopPropagation()}>
-                      <div className="mb-1 text-[11px] uppercase tracking-wide opacity-70">Используется · {used.length}</div>
-                      {used.length === 0 && <div className="italic opacity-70">ни в одной идее</div>}
-                      <div className="flex flex-col gap-0.5">
+                      {r.notes && <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{r.notes}</p>}
+                    </td>
+                    <td className="w-[280px] py-2 pr-4 align-top" onClick={(e) => e.stopPropagation()}>
+                      <div className="label mb-1">используется: {used.length}</div>
+                      {used.length === 0 && <div className="text-[11px] text-muted-foreground/70">ни в одной идее</div>}
+                      <div className="flex flex-col">
                         {used.map((i) => {
                           const why = i.citations.find((c) => c.refId === r.id)?.why;
                           return (
-                            <button key={i.id} onClick={() => onOpenIdea(i.id)} className="truncate text-left hover:text-foreground hover:underline cursor-pointer" title={why || i.title}>
-                              {i.title}{why ? <span className="opacity-60"> — {why}</span> : ""}
+                            <button key={i.id} onClick={() => onOpenIdea(i.id)} className="truncate text-left text-[11px] hover:underline cursor-pointer" title={why || i.title}>
+                              {i.title}
+                              {why ? <span className="text-muted-foreground"> ({why})</span> : ""}
                             </button>
                           );
                         })}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

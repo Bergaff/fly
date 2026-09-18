@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title Fly Ideas — сборка EXE
+title Fly Ideas: сборка EXE
 cd /d "%~dp0"
 
 where node >nul 2>nul

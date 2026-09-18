@@ -11,11 +11,10 @@ function TooltipContent({ className, sideOffset = 4, children, ...props }: React
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
-        className={cn("bg-primary text-primary-foreground z-50 w-fit rounded-md px-3 py-1.5 text-xs text-balance", className)}
+        className={cn("z-50 w-fit max-w-[280px] rounded-none border border-foreground/20 bg-popover px-2 py-1 font-mono text-[10px] uppercase tracking-[0.05em] text-popover-foreground", className)}
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow className="bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );

@@ -6,7 +6,7 @@ import App from "./App.tsx";
 document.documentElement.classList.toggle("dark", localStorage.getItem("fly-ideas:theme") !== "light");
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+ <StrictMode>
+ <App />
+ </StrictMode>,
 );

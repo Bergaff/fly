@@ -1,25 +1,22 @@
-import { CalendarClock, AlertTriangle } from "lucide-react";
 import { deadlineInfo } from "@/data/types";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export function DeadlineBadge({ deadline, className }: { deadline: string | null | undefined; className?: string }) {
   const d = deadlineInfo(deadline);
   if (!d) return null;
   return (
-    <Badge
-      variant="outline"
+    <span
       title={`Дедлайн: ${d.date}`}
       className={cn(
-        "gap-1 font-normal",
-        d.tone === "overdue" && "border-destructive/60 bg-destructive/10 text-destructive",
-        d.tone === "soon" && "border-[var(--chart-3)]/60 bg-[var(--chart-3)]/10 text-[var(--chart-3)]",
-        d.tone === "ok" && "text-muted-foreground",
+        "inline-flex items-baseline gap-1.5 rounded-none border px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.06em]",
+        d.tone === "overdue" && "border-destructive/60 text-destructive",
+        d.tone === "soon" && "border-[var(--chart-3)] text-[var(--chart-3)]",
+        d.tone === "ok" && "border-border text-muted-foreground",
         className,
       )}
     >
-      {d.tone === "overdue" ? <AlertTriangle className="size-3" /> : <CalendarClock className="size-3" />}
-      {d.date} · {d.label}
-    </Badge>
+      <span>{d.date}</span>
+      <span>{d.label}</span>
+    </span>
   );
 }

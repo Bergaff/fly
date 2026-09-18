@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Check, FolderPlus, Layers, MoreHorizontal, Pencil, Trash2, X } from "lucide-react";
 import type { Project, Idea } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,19 +26,19 @@ export function ProjectSidebar({ projects, ideas, activeId, onSelect, onAdd, onR
   const count = (pid: string) => ideas.filter((i) => i.projectId === pid).length;
 
   return (
-    <aside className="flex h-full w-[260px] shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
-      <div className="px-4 pt-4 pb-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Проекты</div>
-      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2">
+    <aside className="bg-sidebar text-sidebar-foreground flex h-full w-[248px] shrink-0 flex-col border-r">
+      <div className="label border-b px-3 py-2">проекты</div>
+
+      <nav className="flex flex-1 flex-col overflow-y-auto py-1">
         <button
           onClick={() => onSelect("all")}
           className={cn(
-            "flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent cursor-pointer",
+            "flex items-center gap-2 px-3 py-1.5 text-left text-[13px] hover:bg-accent cursor-pointer",
             activeId === "all" && "bg-accent font-medium",
           )}
         >
-          <Layers className="size-4 text-muted-foreground" />
           <span className="flex-1">Все идеи</span>
-          <span className="font-mono text-xs text-muted-foreground">{ideas.length}</span>
+          <span className="font-mono text-[11px] text-muted-foreground">{ideas.length}</span>
         </button>
 
         {projects.map((p) => (
@@ -58,12 +57,12 @@ export function ProjectSidebar({ projects, ideas, activeId, onSelect, onAdd, onR
               setDragOver(null);
             }}
             className={cn(
-              "group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent",
+              "group flex items-center gap-2 px-3 py-1.5 text-[13px] hover:bg-accent",
               activeId === p.id && "bg-accent font-medium",
-              dragOver === p.id && "ring-2 ring-ring/60 bg-accent",
+              dragOver === p.id && "bg-accent outline outline-1 outline-foreground",
             )}
           >
-            <span className="size-2.5 shrink-0 rounded-full" style={{ background: p.color }} />
+            <span className="size-2 shrink-0" style={{ background: p.color }} />
             {editing === p.id ? (
               <form
                 className="flex flex-1 items-center gap-1"
@@ -73,25 +72,31 @@ export function ProjectSidebar({ projects, ideas, activeId, onSelect, onAdd, onR
                   setEditing(null);
                 }}
               >
-                <Input autoFocus value={editName} onChange={(e) => setEditName(e.target.value)} className="h-6 px-1.5 text-xs" />
-                <Button type="submit" size="icon-sm" variant="ghost" className="size-6"><Check className="size-3" /></Button>
-                <Button type="button" size="icon-sm" variant="ghost" className="size-6" onClick={() => setEditing(null)}><X className="size-3" /></Button>
+                <Input autoFocus value={editName} onChange={(e) => setEditName(e.target.value)} className="h-6 flex-1 px-1 text-[12px]" />
+                <Button type="submit" size="sm" variant="ghost" className="h-6 px-1.5">
+                  ок
+                </Button>
               </form>
             ) : (
               <>
                 <button onClick={() => onSelect(p.id)} className="flex-1 truncate text-left cursor-pointer" title={p.description || p.name}>
                   {p.name}
                 </button>
-                <span className="font-mono text-xs text-muted-foreground">{count(p.id)}</span>
+                <span className="font-mono text-[11px] text-muted-foreground">{count(p.id)}</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="icon-sm" variant="ghost" className="size-6 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
-                      <MoreHorizontal className="size-3.5" />
+                    <Button size="sm" variant="ghost" className="h-6 px-1.5 text-muted-foreground" title="Проект">
+                      ···
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => { setEditing(p.id); setEditName(p.name); }}>
-                      <Pencil /> Переименовать
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setEditing(p.id);
+                        setEditName(p.name);
+                      }}
+                    >
+                      Переименовать
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       variant="destructive"
@@ -100,7 +105,7 @@ export function ProjectSidebar({ projects, ideas, activeId, onSelect, onAdd, onR
                         if (confirm(`Удалить проект «${p.name}»? Идеи переедут в другой проект.`)) onDelete(p.id);
                       }}
                     >
-                      <Trash2 /> Удалить
+                      Удалить
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -121,16 +126,20 @@ export function ProjectSidebar({ projects, ideas, activeId, onSelect, onAdd, onR
               setAdding(false);
             }}
           >
-            <Input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Название проекта" className="h-8 text-xs" />
-            <Button type="submit" size="icon-sm" variant="ghost"><Check className="size-4" /></Button>
-            <Button type="button" size="icon-sm" variant="ghost" onClick={() => setAdding(false)}><X className="size-4" /></Button>
+            <Input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Название проекта" className="h-7 flex-1 text-[12px]" />
+            <Button type="submit" size="sm" variant="ghost" className="h-7 px-1.5">
+              ок
+            </Button>
+            <Button type="button" size="sm" variant="ghost" className="h-7 px-1.5" onClick={() => setAdding(false)}>
+              отмена
+            </Button>
           </form>
         ) : (
           <Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={() => setAdding(true)}>
-            <FolderPlus /> Новый проект
+            Новый проект
           </Button>
         )}
-        <p className="mt-2 px-2 text-[11px] leading-snug text-muted-foreground/70">Перетащи карточку идеи на проект, чтобы перенести.</p>
+        <p className="mt-2 px-1 font-mono text-[10px] leading-relaxed text-muted-foreground/70">Строку идеи можно перетащить на проект.</p>
       </div>
     </aside>
   );

@@ -12,7 +12,7 @@ export function DependencyGraph({ ideas, onSelect, highlight }: { ideas: Idea[];
     const depth = new Map<string, number>();
     const visit = (id: string, stack: Set<string>): number => {
       if (depth.has(id)) return depth.get(id)!;
-      if (stack.has(id)) return 0; // цикл
+      if (stack.has(id)) return 0;
       stack.add(id);
       const i = byId.get(id);
       const parents = (i?.dependsOn ?? []).filter((d) => byId.has(d));
@@ -46,7 +46,7 @@ export function DependencyGraph({ ideas, onSelect, highlight }: { ideas: Idea[];
     return { pos, edges, width, height, W, H };
   }, [ideas]);
 
-  if (ideas.length === 0) return <div className="py-10 text-center text-sm text-muted-foreground">Нет идей.</div>;
+  if (ideas.length === 0) return <div className="py-10 text-center text-[12px] text-muted-foreground">Нет идей.</div>;
   const { pos, edges, width, height, W, H } = layout;
   const hasEdges = edges.length > 0;
 
@@ -54,12 +54,13 @@ export function DependencyGraph({ ideas, onSelect, highlight }: { ideas: Idea[];
     <div className="overflow-x-auto">
       <svg width={width} height={height} className="mx-auto block" style={{ minWidth: 320 }}>
         <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--muted-foreground)" />
           </marker>
         </defs>
         {edges.map((e, k) => {
-          const a = pos.get(e.from)!, b = pos.get(e.to)!;
+          const a = pos.get(e.from)!;
+          const b = pos.get(e.to)!;
           const x1 = a.x + W, y1 = a.y + H / 2, x2 = b.x, y2 = b.y + H / 2;
           const mx = (x1 + x2) / 2;
           const active = highlight && (e.from === highlight || e.to === highlight);
@@ -69,8 +70,8 @@ export function DependencyGraph({ ideas, onSelect, highlight }: { ideas: Idea[];
               d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
               fill="none"
               stroke={active ? "var(--foreground)" : "var(--muted-foreground)"}
-              strokeOpacity={active ? 0.9 : 0.45}
-              strokeWidth={active ? 2 : 1.5}
+              strokeOpacity={active ? 1 : 0.5}
+              strokeWidth={1}
               markerEnd="url(#arrow)"
             />
           );
@@ -81,15 +82,17 @@ export function DependencyGraph({ ideas, onSelect, highlight }: { ideas: Idea[];
           const active = highlight === i.id;
           return (
             <g key={i.id} transform={`translate(${p.x},${p.y})`} className="cursor-pointer" onClick={() => onSelect?.(i.id)}>
-              <rect width={W} height={H} rx={10} fill="var(--card)" stroke={active ? "var(--foreground)" : "var(--border)"} strokeWidth={active ? 1.5 : 1} />
-              <rect x={0} y={0} width={4} height={H} rx={2} fill={STATUS_COLORS[i.status]} />
-              <foreignObject x={12} y={6} width={W - 20} height={H - 12}>
+              <rect width={W} height={H} fill="var(--card)" stroke={active ? "var(--foreground)" : "var(--border)"} strokeWidth={1} />
+              <foreignObject x={8} y={6} width={W - 16} height={H - 12}>
                 <div className="flex h-full flex-col justify-between text-[12px] leading-tight text-foreground">
-                  <div className="line-clamp-2 font-medium">{i.title}</div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="mt-1 size-2 shrink-0" style={{ background: STATUS_COLORS[i.status] }} />
+                    <span className="line-clamp-2">{i.title}</span>
+                  </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-1 flex-1 rounded-full bg-muted">
-                      <div className="h-full rounded-full" style={{ width: `${prog.pct}%`, background: prog.pct === 100 ? "var(--chart-2)" : "var(--chart-1)" }} />
-                    </div>
+                    <span className="h-2 flex-1 border border-border">
+                      <span className="block h-full bg-foreground" style={{ width: `${prog.pct}%` }} />
+                    </span>
                     <span className="font-mono text-[10px] text-muted-foreground">{prog.pct}%</span>
                   </div>
                 </div>
@@ -98,7 +101,7 @@ export function DependencyGraph({ ideas, onSelect, highlight }: { ideas: Idea[];
           );
         })}
       </svg>
-      {!hasEdges && <p className="mt-2 text-center text-xs text-muted-foreground">Связей пока нет — задай «Растёт из…» в диалоге идеи.</p>}
+      {!hasEdges && <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.05em] text-muted-foreground">Связей пока нет: задай «растёт из» в диалоге идеи</p>}
     </div>
   );
 }
