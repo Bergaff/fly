@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bot, Check, CircleAlert, Cpu, Download, ExternalLink, FolderOpen, HardDrive, KeyRound, Loader2, NotebookPen, Play, RefreshCw, Send, Square, Terminal, X } from "lucide-react";
+import { Bot, Check, CircleAlert, Cpu, Download, ExternalLink, FolderInput, FolderOpen, FolderOutput, HardDrive, ImageIcon, KeyRound, Loader2, NotebookPen, Play, RefreshCw, RotateCcw, Send, Square, Terminal, X } from "lucide-react";
 import type { Idea } from "@/data/types";
-import { fly, fmtBytes, isElectron, type DataItem, type EnvInfo, type LlmMessage, type RunInfo, type ScriptInfo } from "@/lib/bridge";
+import { fly, fmtBytes, isElectron, type DataItem, type DirKind, type EnvInfo, type ExternalSource, type LlmMessage, type Paths, type RunInfo, type ScriptInfo } from "@/lib/bridge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,22 @@ export function BrainView({ ideas, onAddJournalEntry }: Props) {
 }
 
 // ------------------------------------------------------------------
+/** Строка «Папка: путь [Выбрать…] [Открыть] [Сбросить]» */
+function FolderBar({ kind, label, paths, onChanged }: { kind: DirKind; label: string; paths: Paths | null; onChanged: () => void }) {
+  const cur = paths?.[kind];
+  const isDefault = !!paths && paths.defaults[kind] === cur;
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 rounded-lg border bg-muted/30 px-2.5 py-1.5 text-xs">
+      <FolderInput className="size-3.5 text-muted-foreground" />
+      <span className="text-muted-foreground">{label}:</span>
+      <span className="min-w-0 flex-1 truncate font-mono" title={cur ?? ""}>{cur ?? "…"}</span>
+      <Button size="sm" variant="outline" className="h-7" onClick={async () => { const p = await fly!.chooseFolder(kind, `${label} — выбери папку`); if (p) onChanged(); }}>Выбрать…</Button>
+      <Button size="sm" variant="ghost" className="h-7" onClick={() => cur && fly!.openPath(cur)} title="Открыть в проводнике"><FolderOpen /></Button>
+      {!isDefault && <Button size="sm" variant="ghost" className="h-7" title="Вернуть папку по умолчанию" onClick={async () => { await fly!.resetFolder(kind); onChanged(); }}><RotateCcw /></Button>}
+    </div>
+  );
+}
+
 function WebFallback() {
   return (
     <div className="flex h-full items-center justify-center p-6">
@@ -61,20 +77,22 @@ function DataPanel() {
   const [progress, setProgress] = useState<Record<string, { got: number; total: number }>>({});
   const [busy, setBusy] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [paths, setPaths] = useState<{ data: string; workspace: string } | null>(null);
+  const [paths, setPaths] = useState<Paths | null>(null);
+  const [external, setExternal] = useState<ExternalSource[]>([]);
 
   const refresh = useCallback(async () => {
     setItems(await fly!.listData());
     setPaths(await fly!.getPaths());
+    setExternal(await fly!.listExternal());
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
   useEffect(() => fly!.onDownloadProgress((p) => setProgress((s) => ({ ...s, [p.id]: { got: p.got, total: p.total } }))), []);
 
-  const dl = async (item: DataItem) => {
+  const dl = async (item: DataItem, destDir?: string) => {
     setBusy((b) => ({ ...b, [item.id]: true }));
     setErrors((e) => ({ ...e, [item.id]: "" }));
     try {
-      const r = await fly!.download(item);
+      const r = await fly!.download(item, destDir);
       if (r.size < 2000 && item.sizeMB > 1) setErrors((e) => ({ ...e, [item.id]: "Скачался крошечный файл — это заглушка Git LFS. Скачай вручную из репозитория (кнопка ↗)." }));
     } catch (e) {
       setErrors((er) => ({ ...er, [item.id]: (e as Error).message }));
@@ -85,6 +103,15 @@ function DataPanel() {
     }
   };
   const dlAll = async () => { for (const it of items.filter((i) => !i.present)) await dl(it); };
+  const dlAllTo = async () => {
+    const dir = await fly!.pickFolder("Куда скачать все файлы данных");
+    if (!dir) return;
+    for (const it of items.filter((i) => i.dest !== "scripts")) await dl(it, dir);
+  };
+  const dlTo = async (item: DataItem) => {
+    const dir = await fly!.pickFolder(`Куда скачать ${item.file}`);
+    if (dir) await dl(item, dir);
+  };
 
   const groups = useMemo(() => [...new Set(items.map((i) => i.group))], [items]);
   const missing = items.filter((i) => !i.present).length;
@@ -95,12 +122,12 @@ function DataPanel() {
         <Button onClick={dlAll} disabled={!missing || Object.values(busy).some(Boolean)}>
           <Download /> {missing ? `Скачать мозг мухи (${missing} файл.)` : "Всё скачано"}
         </Button>
-        <Button variant="outline" onClick={() => paths && fly!.openPath(paths.data)}><FolderOpen /> Открыть папку</Button>
+        <Button variant="outline" onClick={dlAllTo} disabled={Object.values(busy).some(Boolean)} title="Скачать данные в другую папку (например, на большой диск)"><FolderOutput /> Скачать в папку…</Button>
         <Button variant="ghost" size="icon" onClick={refresh}><RefreshCw /></Button>
-        {paths && <span className="ml-auto font-mono text-[11px] text-muted-foreground">{paths.data}</span>}
       </div>
+      <FolderBar kind="data" label="Папка данных" paths={paths} onChanged={refresh} />
       <p className="text-xs text-muted-foreground">
-        Файлы берутся из открытого репозитория <a className="underline" href="https://github.com/eonsystemspbc/fly-brain" target="_blank" rel="noreferrer">eonsystemspbc/fly-brain</a> (FlyWire v783, CC-BY). Полный мозг — это ~100 МБ таблиц, не терабайты: сырые ЭМ-снимки для симуляции не нужны.
+        Файлы берутся из открытого репозитория <a className="underline" href="https://github.com/eonsystemspbc/fly-brain" target="_blank" rel="noreferrer">eonsystemspbc/fly-brain</a> — это FlyWire v783 (последний публичный релиз коннектома, тот же, что в Nature 2024) и код модели Shiu et al. Полный мозг — ~100 МБ таблиц, не терабайты: сырые ЭМ-снимки для симуляции не нужны. Ссылки проверены 18.09.2026.
       </p>
       {groups.map((g) => (
         <Card key={g} className="gap-2">
@@ -124,7 +151,10 @@ function DataPanel() {
                     {busy[it.id] ? (
                       <Button size="sm" variant="outline" onClick={() => fly!.cancelDownload(it.id)}><Square className="size-3" /> {pct ?? "…"}%</Button>
                     ) : (
-                      <Button size="sm" variant={it.present ? "ghost" : "default"} onClick={() => dl(it)}><Download /> {it.present ? "Обновить" : "Скачать"}</Button>
+                      <>
+                        <Button size="icon-sm" variant="ghost" title="Скачать в другую папку…" onClick={() => dlTo(it)}><FolderOutput /></Button>
+                        <Button size="sm" variant={it.present ? "ghost" : "default"} onClick={() => dl(it)}><Download /> {it.present ? "Обновить" : "Скачать"}</Button>
+                      </>
                     )}
                   </div>
                   {pr && <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted"><div className="h-full bg-[var(--chart-1)] transition-all" style={{ width: `${pct ?? 5}%` }} /></div>}
@@ -135,6 +165,25 @@ function DataPanel() {
           </CardContent>
         </Card>
       ))}
+      {external.length > 0 && (
+        <Card className="gap-2">
+          <CardHeader>
+            <CardTitle className="text-sm">Внешние источники (вручную)</CardTitle>
+            <CardDescription className="text-xs">Официальные выгрузки и аннотации — требуют аккаунта или лежат не одним файлом. Открываются в браузере; скачанное можно положить в папку данных.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-1.5">
+            {external.map((e) => (
+              <button key={e.url} onClick={() => fly!.openExternal(e.url)} className="flex items-center gap-2 rounded-md border px-3 py-2 text-left text-sm hover:bg-accent cursor-pointer">
+                <ExternalLink className="size-3.5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <div>{e.title}</div>
+                  <div className="text-xs text-muted-foreground">{e.note}</div>
+                </div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -215,7 +264,7 @@ function ScriptsPanel() {
   const [args, setArgs] = useState("");
   const [log, setLog] = useState("");
   const [runId, setRunId] = useState<string | null>(null);
-  const [paths, setPaths] = useState<{ scripts: string } | null>(null);
+  const [paths, setPaths] = useState<Paths | null>(null);
   const logRef = useRef<HTMLPreElement>(null);
 
   const refresh = useCallback(async () => { setScripts(await fly!.listScripts()); setPaths(await fly!.getPaths()); }, []);
@@ -237,12 +286,31 @@ function ScriptsPanel() {
     setLog(`$ python ${sel} ${args}\n→ ${r.runDir}\n\n`);
   };
 
+  const importScript = async () => {
+    const f = await fly!.openFile({ filters: [{ name: "Python", extensions: ["py"] }], kind: "exports" });
+    if (!f) return;
+    const name = f.path.replace(/^.*[\\/]/, "");
+    await fly!.writeScript(name, f.content);
+    await refresh();
+    open(name);
+  };
+  const exportScript = async () => {
+    if (!sel) return;
+    const p = await fly!.saveFile({ defaultName: sel, content: code, filters: [{ name: "Python", extensions: ["py"] }] });
+    if (p) alert(`Сохранено: ${p}`);
+  };
+
   return (
+    <div className="flex flex-col gap-3">
+    <div className="grid gap-2 lg:grid-cols-2">
+      <FolderBar kind="scripts" label="Папка скриптов" paths={paths} onChanged={async () => { await refresh(); setSel(null); }} />
+      <FolderBar kind="runs" label="Папка прогонов" paths={paths} onChanged={refresh} />
+    </div>
     <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
       <Card className="gap-2 self-start">
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle className="text-sm">Скрипты</CardTitle>
-          <Button size="icon-sm" variant="ghost" onClick={() => paths && fly!.openPath(paths.scripts)} title="Открыть папку"><FolderOpen /></Button>
+          <Button size="icon-sm" variant="ghost" onClick={importScript} title="Добавить .py с диска"><FolderInput /></Button>
         </CardHeader>
         <CardContent className="flex flex-col gap-1">
           {scripts.map((s) => (
@@ -262,6 +330,7 @@ function ScriptsPanel() {
               {dirty && <Badge variant="secondary">не сохранено</Badge>}
               <Input value={args} onChange={(e) => setArgs(e.target.value)} placeholder="аргументы: --seed 1 --n-junk 100" className="h-8 w-[320px] font-mono text-xs" />
               <div className="ml-auto flex gap-2">
+                <Button variant="ghost" size="sm" onClick={exportScript} title="Сохранить копию в другое место"><FolderOutput /> Копия…</Button>
                 <Button variant="outline" size="sm" onClick={save} disabled={!dirty}>Сохранить</Button>
                 {runId ? (
                   <Button size="sm" variant="destructive" onClick={() => fly!.killRun(runId)}><Square /> Остановить</Button>
@@ -278,6 +347,7 @@ function ScriptsPanel() {
         )}
       </div>
     </div>
+    </div>
   );
 }
 
@@ -288,10 +358,20 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
   const [detail, setDetail] = useState<{ log: string; summary: Record<string, unknown> | null } | null>(null);
   const [ideaId, setIdeaId] = useState<string>(ideas[0]?.id ?? "");
   const [added, setAdded] = useState<string | null>(null);
+  const [paths, setPaths] = useState<Paths | null>(null);
+  const [images, setImages] = useState<{ name: string; dataUrl: string }[]>([]);
+  const [viewFile, setViewFile] = useState<{ name: string; text: string } | null>(null);
 
-  const refresh = useCallback(async () => setRuns(await fly!.listRuns()), []);
+  const refresh = useCallback(async () => { setRuns(await fly!.listRuns()); setPaths(await fly!.getPaths()); }, []);
   useEffect(() => { refresh(); }, [refresh]);
-  useEffect(() => { if (sel) fly!.readRun(sel.dir).then(setDetail); }, [sel]);
+  useEffect(() => {
+    if (!sel) return;
+    setViewFile(null);
+    fly!.readRun(sel.dir).then(setDetail);
+    const imgs = sel.files.filter((f) => /\.(png|jpe?g|svg|gif)$/i.test(f));
+    Promise.all(imgs.map(async (name) => { const r = await fly!.readRunFile(sel.dir, name); return r.kind === "image" ? { name, dataUrl: r.dataUrl } : null; })).then((r) => setImages(r.filter((x): x is { name: string; dataUrl: string } => !!x)));
+  }, [sel]);
+  const otherFiles = sel ? sel.files.filter((f) => !/\.(png|jpe?g|svg|gif)$/i.test(f) && f !== "log.txt" && f !== "summary.json") : [];
 
   const toJournal = () => {
     if (!sel || !ideaId) return;
@@ -301,7 +381,7 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
     onAddJournalEntry(ideaId, {
       title: `Прогон ${script}`,
       params: [`run: ${sel.dir}`, args && `args: ${args}`].filter(Boolean).join("\n"),
-      result: summary ? JSON.stringify(summary, null, 2).slice(0, 1500) : (detail?.log ?? "").slice(-1200),
+      result: [summary ? JSON.stringify(summary, null, 2).slice(0, 1400) : (detail?.log ?? "").slice(-1200), images.length ? `графики: ${images.map((i) => i.name).join(", ")}` : ""].filter(Boolean).join("\n"),
       conclusion: "",
     });
     setAdded(sel.dir);
@@ -309,6 +389,8 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
   };
 
   return (
+    <div className="flex flex-col gap-3">
+    <FolderBar kind="runs" label="Папка прогонов" paths={paths} onChanged={async () => { setSel(null); await refresh(); }} />
     <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
       <Card className="gap-2 self-start">
         <CardHeader className="flex-row items-center justify-between">
@@ -320,7 +402,7 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
           {runs.map((r) => (
             <button key={r.dir} onClick={() => setSel(r)} className={cn("rounded-md px-2 py-1.5 text-left hover:bg-accent cursor-pointer", sel?.dir === r.dir && "bg-accent")}>
               <div className="font-mono text-[11px]">{r.dir}</div>
-              <div className="text-[11px] text-muted-foreground">{r.summary ? "summary.json ✓" : "без summary"} · {r.files.length} файл.</div>
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">{r.summary ? "summary.json ✓" : "без summary"} · {r.files.length} файл.{r.files.some((f) => /\.(png|jpe?g|svg)$/i.test(f)) && <ImageIcon className="size-3" />}</div>
             </button>
           ))}
         </CardContent>
@@ -331,6 +413,7 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-sm">{sel.dir}</span>
               <Button size="sm" variant="ghost" onClick={() => fly!.openPath(sel.path)}><FolderOpen /> Папка</Button>
+              <Button size="sm" variant="ghost" title="Скопировать папку прогона в другое место" onClick={async () => { const p = await fly!.exportRun(sel.dir); if (p) alert(`Скопировано: ${p}`); }}><FolderOutput /> Экспорт…</Button>
               <div className="ml-auto flex items-center gap-2">
                 <Select value={ideaId} onValueChange={setIdeaId}>
                   <SelectTrigger className="h-8 w-[280px] text-xs"><SelectValue placeholder="В какую идею" /></SelectTrigger>
@@ -339,8 +422,26 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
                 <Button size="sm" onClick={toJournal} disabled={!ideaId}>{added === sel.dir ? <><Check /> Добавлено</> : <><NotebookPen /> В журнал идеи</>}</Button>
               </div>
             </div>
+            {images.length > 0 && (
+              <div className="grid gap-3 md:grid-cols-2">
+                {images.map((im) => (
+                  <figure key={im.name} className="overflow-hidden rounded-lg border bg-white">
+                    <img src={im.dataUrl} alt={im.name} className="w-full" />
+                    <figcaption className="border-t bg-card px-2 py-1 font-mono text-[11px] text-muted-foreground">{im.name}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
+            {otherFiles.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {otherFiles.map((f) => (
+                  <button key={f} onClick={async () => { const r = await fly!.readRunFile(sel.dir, f); if (r.kind === "text") setViewFile({ name: f, text: r.text }); }} className={cn("rounded-md border px-2 py-1 font-mono text-[11px] hover:bg-accent cursor-pointer", viewFile?.name === f && "bg-accent")}>{f}</button>
+                ))}
+              </div>
+            )}
+            {viewFile && <pre className="max-h-[300px] overflow-auto rounded-md border bg-muted/40 p-3 font-mono text-[11px] whitespace-pre-wrap">{viewFile.text}</pre>}
             {detail?.summary && (
-              <pre className="overflow-auto rounded-md border bg-muted/40 p-3 font-mono text-[12px]">{JSON.stringify(detail.summary, null, 2)}</pre>
+              <pre className="max-h-[300px] overflow-auto rounded-md border bg-muted/40 p-3 font-mono text-[12px]">{JSON.stringify(detail.summary, null, 2)}</pre>
             )}
             <pre className="max-h-[360px] overflow-auto rounded-md border p-3 font-mono text-[12px] whitespace-pre-wrap text-muted-foreground">{detail?.log || "лог пуст"}</pre>
           </>
@@ -348,6 +449,7 @@ function RunsPanel({ ideas, onAddJournalEntry }: Props) {
           <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">Выбери прогон, чтобы посмотреть результат и отправить его в журнал идеи.</div>
         )}
       </div>
+    </div>
     </div>
   );
 }

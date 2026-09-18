@@ -7,9 +7,17 @@ contextBridge.exposeInMainWorld("fly", {
   checkEnv: () => ipcRenderer.invoke("fly:checkEnv"),
   openPath: (p) => ipcRenderer.invoke("fly:openPath", p),
   openExternal: (url) => ipcRenderer.invoke("fly:openExternal", url),
+  chooseFolder: (kind, title) => ipcRenderer.invoke("fly:chooseFolder", kind, title),
+  pickFolder: (title) => ipcRenderer.invoke("fly:pickFolder", title),
+  resetFolder: (kind) => ipcRenderer.invoke("fly:resetFolder", kind),
+  saveFile: (opts) => ipcRenderer.invoke("fly:saveFile", opts),
+  openFile: (opts) => ipcRenderer.invoke("fly:openFile", opts),
+  listExternal: () => ipcRenderer.invoke("fly:listExternal"),
+  readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),
+  exportRun: (dir) => ipcRenderer.invoke("fly:exportRun", dir),
   // --- данные мозга ---
   listData: () => ipcRenderer.invoke("fly:listData"),
-  download: (item) => ipcRenderer.invoke("fly:download", item),
+  download: (item, destDir) => ipcRenderer.invoke("fly:download", item, destDir),
   cancelDownload: (id) => ipcRenderer.invoke("fly:cancelDownload", id),
   onDownloadProgress: (cb) => {
     const h = (_e, p) => cb(p);

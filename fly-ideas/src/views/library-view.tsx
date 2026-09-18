@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { fly } from "@/lib/bridge";
+import { FolderOutput } from "lucide-react";
 
 interface Props {
   references: Reference[];
@@ -46,9 +48,19 @@ export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, o
     return [...l].sort(by);
   }, [references, q, tag, onlyScope, scopeIds, sort, usage]);
 
-  const copyAll = () => {
-    const txt = list.map((r, i) => `[${i + 1}] ${formatReference(r)}${r.doi ? ` https://doi.org/${r.doi}` : r.url ? ` ${r.url}` : ""}`).join("\n");
-    navigator.clipboard.writeText(txt);
+  const bibText = () => list.map((r, i) => `[${i + 1}] ${formatReference(r)}${r.doi ? ` https://doi.org/${r.doi}` : r.url ? ` ${r.url}` : ""}`).join("\n");
+  const copyAll = () => navigator.clipboard.writeText(bibText());
+  const saveAll = async () => {
+    const name = `bibliography-${new Date().toISOString().slice(0, 10)}.txt`;
+    if (fly) {
+      const p = await fly.saveFile({ defaultName: name, content: bibText(), filters: [{ name: "Текст", extensions: ["txt", "md"] }], kind: "exports" });
+      if (p) alert(`Сохранено: ${p}`);
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([bibText()], { type: "text/plain" }));
+    a.download = name;
+    a.click();
   };
 
   return (
@@ -72,6 +84,7 @@ export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, o
         <span className="text-xs text-muted-foreground">{list.length} из {references.length}</span>
         <div className="ml-auto flex gap-2">
           <Button variant="outline" onClick={copyAll} disabled={!list.length} title="Скопировать список в буфер"><Copy /> Список</Button>
+          <Button variant="outline" onClick={saveAll} disabled={!list.length} title="Сохранить список в файл…"><FolderOutput /> В файл…</Button>
           <Button onClick={onAdd}><Plus /> Источник</Button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, ipcMain } = require("electron");
+const { app, BrowserWindow, shell, ipcMain, dialog } = require("electron");
 const path = require("node:path");
 const fs = require("node:fs");
 const fsp = require("node:fs/promises");
@@ -16,19 +16,38 @@ const isDev = !!process.env.VITE_DEV_SERVER_URL;
 // ------------------------------------------------------------
 const appRoot = isDev ? path.join(__dirname, "..") : path.dirname(process.execPath);
 const WS = path.join(appRoot, "workspace");
-const DIRS = { data: path.join(WS, "data"), scripts: path.join(WS, "scripts"), runs: path.join(WS, "runs") };
+const DEFAULT_DIRS = { data: path.join(WS, "data"), scripts: path.join(WS, "scripts"), runs: path.join(WS, "runs"), exports: app.getPath("documents") };
 const TEMPLATES = isDev ? path.join(__dirname, "..", "experiments", "templates") : path.join(process.resourcesPath, "templates");
 const SECRETS = path.join(app.getPath("userData"), "secrets.json");
+const CONFIG = path.join(app.getPath("userData"), "config.json");
 
-function ensureDirs() {
-  for (const d of Object.values(DIRS)) fs.mkdirSync(d, { recursive: true });
-  // копируем шаблоны, если их ещё нет
-  if (fs.existsSync(TEMPLATES)) {
-    for (const f of fs.readdirSync(TEMPLATES)) {
-      const dst = path.join(DIRS.scripts, f);
-      if (!fs.existsSync(dst)) fs.copyFileSync(path.join(TEMPLATES, f), dst);
-    }
+function readConfig() {
+  try { return JSON.parse(fs.readFileSync(CONFIG, "utf8")); } catch { return {}; }
+}
+function writeConfig(c) {
+  fs.mkdirSync(path.dirname(CONFIG), { recursive: true });
+  fs.writeFileSync(CONFIG, JSON.stringify(c, null, 2));
+}
+/** Текущие папки: пользовательские из config.json поверх дефолтных */
+function getDirs() {
+  const c = readConfig().dirs || {};
+  const d = { ...DEFAULT_DIRS };
+  for (const k of Object.keys(DEFAULT_DIRS)) if (c[k] && typeof c[k] === "string") d[k] = c[k];
+  return d;
+}
+const DIRS = new Proxy({}, { get: (_t, k) => getDirs()[k] });
+
+function copyTemplates(scriptsDir) {
+  if (!fs.existsSync(TEMPLATES)) return;
+  for (const f of fs.readdirSync(TEMPLATES)) {
+    const dst = path.join(scriptsDir, f);
+    if (!fs.existsSync(dst)) fs.copyFileSync(path.join(TEMPLATES, f), dst);
   }
+}
+function ensureDirs() {
+  const d = getDirs();
+  for (const k of ["data", "scripts", "runs"]) fs.mkdirSync(d[k], { recursive: true });
+  copyTemplates(d.scripts);
 }
 
 // ------------------------------------------------------------
@@ -67,9 +86,9 @@ const DATA_CATALOG = [
     group: "Код модели (Shiu et al.)",
     title: "model.py — LIF-модель на Brian2",
     file: "paper_model.py",
-    url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/code/paper-brian2/model.py",
+    url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/code/paper-phil-drosophila/model.py",
     sizeMB: 0.02,
-    note: "Ядро модели из статьи; кладём рядом со скриптами",
+    note: "Ядро модели из статьи (create_model, run_exp); кладём рядом со скриптами как paper_model.py",
     dest: "scripts",
   },
   {
@@ -77,11 +96,39 @@ const DATA_CATALOG = [
     group: "Код модели (Shiu et al.)",
     title: "utils.py — анализ спайков",
     file: "paper_utils.py",
-    url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/code/paper-brian2/utils.py",
+    url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/code/paper-phil-drosophila/utils.py",
     sizeMB: 0.01,
     note: "load_exps, get_rate — помощники из статьи",
     dest: "scripts",
   },
+  {
+    id: "paper-example",
+    group: "Код модели (Shiu et al.)",
+    title: "example.ipynb — учебный ноутбук",
+    file: "paper_example.ipynb",
+    url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/code/paper-phil-drosophila/example.ipynb",
+    sizeMB: 0.1,
+    note: "Активация, глушение, анализ частот — открывать в Jupyter/VS Code",
+    dest: "scripts",
+  },
+  {
+    id: "eon-env",
+    group: "Код модели (Shiu et al.)",
+    title: "environment.yml — conda-окружение Eon",
+    file: "eon_environment.yml",
+    url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/environment.yml",
+    sizeMB: 0.01,
+    note: "conda env create -f eon_environment.yml — полный набор с GPU-бэкендами",
+    dest: "scripts",
+  },
+];
+
+/** Внешние источники — открываются в браузере, скачиваются вручную */
+const EXTERNAL_SOURCES = [
+  { title: "FlyWire Codex — обзор нейронов и скачивание v783", url: "https://codex.flywire.ai/api/download", note: "Официальные выгрузки коннектома (нужен бесплатный аккаунт)" },
+  { title: "Schlegel et al. 2024 — аннотации типов клеток", url: "https://www.nature.com/articles/s41586-024-07686-5#Sec46", note: "Supplementary Data: типы клеток для выбора контуров (MB, CX)" },
+  { title: "philshiu/Drosophila_brain_model — оригинал статьи", url: "https://github.com/philshiu/Drosophila_brain_model", note: "Исходный репозиторий Shiu et al., данные v630" },
+  { title: "eonsystemspbc/fly-brain — все бэкенды", url: "https://github.com/eonsystemspbc/fly-brain", note: "Brian2 / CUDA / PyTorch / NEST / GeNN, бенчмарки" },
 ];
 
 const activeDownloads = new Map();
@@ -104,8 +151,9 @@ function fetchFollow(url, redirects = 0) {
   });
 }
 
-async function download(win, item) {
-  const destDir = item.dest === "scripts" ? DIRS.scripts : DIRS.data;
+async function download(win, item, destDirOverride) {
+  const destDir = destDirOverride || (item.dest === "scripts" ? DIRS.scripts : DIRS.data);
+  fs.mkdirSync(destDir, { recursive: true });
   const dest = path.join(destDir, item.file);
   const tmp = dest + ".part";
   const { res, req } = await fetchFollow(item.url);
@@ -259,7 +307,51 @@ async function llmChat({ provider, model, messages, temperature }) {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  ipcMain.handle("fly:getPaths", () => ({ workspace: WS, ...DIRS, templates: TEMPLATES }));
+  ipcMain.handle("fly:getPaths", () => ({ workspace: WS, ...getDirs(), defaults: DEFAULT_DIRS, templates: TEMPLATES }));
+
+  // --- выбор папок ---
+  ipcMain.handle("fly:chooseFolder", async (_e, kind, title) => {
+    const r = await dialog.showOpenDialog(getWin(), { title: title || "Выбери папку", defaultPath: getDirs()[kind] || app.getPath("documents"), properties: ["openDirectory", "createDirectory"] });
+    if (r.canceled || !r.filePaths[0]) return null;
+    const p = r.filePaths[0];
+    if (kind && kind in DEFAULT_DIRS) {
+      const c = readConfig();
+      c.dirs = { ...(c.dirs || {}), [kind]: p };
+      writeConfig(c);
+      if (kind === "scripts") copyTemplates(p);
+      else fs.mkdirSync(p, { recursive: true });
+    }
+    return p;
+  });
+  ipcMain.handle("fly:pickFolder", async (_e, title) => {
+    const r = await dialog.showOpenDialog(getWin(), { title: title || "Выбери папку", properties: ["openDirectory", "createDirectory"] });
+    return r.canceled ? null : r.filePaths[0];
+  });
+  ipcMain.handle("fly:resetFolder", (_e, kind) => {
+    const c = readConfig();
+    if (c.dirs) delete c.dirs[kind];
+    writeConfig(c);
+    ensureDirs();
+    return getDirs()[kind];
+  });
+
+  // --- сохранить / открыть файл через системный диалог ---
+  ipcMain.handle("fly:saveFile", async (_e, { defaultName, content, filters, kind }) => {
+    const dir = getDirs()[kind || "exports"] || app.getPath("documents");
+    const r = await dialog.showSaveDialog(getWin(), { defaultPath: path.join(dir, defaultName || "file.txt"), filters: filters || [{ name: "Все файлы", extensions: ["*"] }] });
+    if (r.canceled || !r.filePath) return null;
+    await fsp.writeFile(r.filePath, content, "utf8");
+    const c = readConfig();
+    c.dirs = { ...(c.dirs || {}), exports: path.dirname(r.filePath) };
+    writeConfig(c);
+    return r.filePath;
+  });
+  ipcMain.handle("fly:openFile", async (_e, { filters, kind }) => {
+    const dir = getDirs()[kind || "exports"] || app.getPath("documents");
+    const r = await dialog.showOpenDialog(getWin(), { defaultPath: dir, filters: filters || [{ name: "Все файлы", extensions: ["*"] }], properties: ["openFile"] });
+    if (r.canceled || !r.filePaths[0]) return null;
+    return { path: r.filePaths[0], content: await fsp.readFile(r.filePaths[0], "utf8") };
+  });
   ipcMain.handle("fly:checkEnv", () => checkEnv());
   ipcMain.handle("fly:openPath", (_e, p) => shell.openPath(p));
   ipcMain.handle("fly:openExternal", (_e, url) => shell.openExternal(url));
@@ -275,7 +367,8 @@ function registerIpc(getWin) {
       }),
     );
   });
-  ipcMain.handle("fly:download", async (_e, item) => download(getWin(), item));
+  ipcMain.handle("fly:download", async (_e, item, destDir) => download(getWin(), item, destDir));
+  ipcMain.handle("fly:listExternal", () => EXTERNAL_SOURCES);
   ipcMain.handle("fly:cancelDownload", (_e, id) => { activeDownloads.get(id)?.destroy(); activeDownloads.delete(id); });
 
   ipcMain.handle("fly:listScripts", async () => {
@@ -304,6 +397,25 @@ function registerIpc(getWin) {
       const files = await fsp.readdir(p);
       return { dir: d, path: p, summary, files };
     }));
+  });
+  ipcMain.handle("fly:readRunFile", async (_e, dir, name) => {
+    const p = path.join(DIRS.runs, path.basename(dir), path.basename(name));
+    const ext = path.extname(name).toLowerCase();
+    if ([".png", ".jpg", ".jpeg", ".svg", ".gif"].includes(ext)) {
+      const mime = ext === ".svg" ? "image/svg+xml" : ext === ".png" ? "image/png" : ext === ".gif" ? "image/gif" : "image/jpeg";
+      return { kind: "image", dataUrl: `data:${mime};base64,${(await fsp.readFile(p)).toString("base64")}` };
+    }
+    const st = await fsp.stat(p);
+    if (st.size > 400_000) return { kind: "text", text: `(файл ${(st.size / 1e6).toFixed(1)} МБ — открой в папке)` };
+    return { kind: "text", text: await fsp.readFile(p, "utf8") };
+  });
+  ipcMain.handle("fly:exportRun", async (_e, dir) => {
+    const src = path.join(DIRS.runs, path.basename(dir));
+    const dest = await dialog.showOpenDialog(getWin(), { title: "Куда скопировать прогон", properties: ["openDirectory", "createDirectory"] });
+    if (dest.canceled || !dest.filePaths[0]) return null;
+    const target = path.join(dest.filePaths[0], path.basename(dir));
+    await fsp.cp(src, target, { recursive: true });
+    return target;
   });
   ipcMain.handle("fly:readRun", async (_e, dir) => {
     const p = path.join(DIRS.runs, path.basename(dir));

@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { BarChart3, BookOpen, Brain, Download, GitCompare, LayoutGrid, Moon, RotateCcw, Settings2, Sun, Upload } from "lucide-react";
 import { BrainView } from "@/views/brain-view";
 import { useTheme } from "@/lib/theme";
+import { fly } from "@/lib/bridge";
 import { useStore } from "@/data/store";
 import { ProjectSidebar } from "@/components/project-sidebar";
 import { IdeaDialog } from "@/components/idea-dialog";
@@ -43,11 +44,17 @@ export default function App() {
     setOpenId(created.id);
   };
 
-  const exportFile = () => {
+  const exportFile = async () => {
+    const name = `fly-ideas-${new Date().toISOString().slice(0, 10)}.json`;
+    if (fly) {
+      const p = await fly.saveFile({ defaultName: name, content: store.exportJson(), filters: [{ name: "JSON", extensions: ["json"] }], kind: "exports" });
+      if (p) alert(`Сохранено: ${p}`);
+      return;
+    }
     const blob = new Blob([store.exportJson()], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `fly-ideas-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = name;
     a.click();
     URL.revokeObjectURL(a.href);
   };
@@ -55,6 +62,16 @@ export default function App() {
   const importFile = async (f: File) => {
     try {
       store.importJson(await f.text());
+    } catch (e) {
+      alert(`Не удалось импортировать: ${(e as Error).message}`);
+    }
+  };
+  const importClick = async () => {
+    if (!fly) return fileRef.current?.click();
+    const r = await fly.openFile({ filters: [{ name: "JSON", extensions: ["json"] }], kind: "exports" });
+    if (!r) return;
+    try {
+      store.importJson(r.content);
     } catch (e) {
       alert(`Не удалось импортировать: ${(e as Error).message}`);
     }
@@ -105,8 +122,8 @@ export default function App() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><Settings2 /></Button></DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem onClick={exportFile}><Download /> Выгрузить JSON</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => fileRef.current?.click()}><Upload /> Загрузить JSON</DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportFile}><Download /> Выгрузить JSON…</DropdownMenuItem>
+                  <DropdownMenuItem onClick={importClick}><Upload /> Загрузить JSON…</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onClick={() => confirm("Сбросить всё к стартовому набору идей?") && store.reset()}>
                     <RotateCcw /> Сброс к стартовым идеям

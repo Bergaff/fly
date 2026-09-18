@@ -26,14 +26,27 @@ export interface RunInfo { dir: string; path: string; summary: Record<string, un
 export interface RunOutput { runId: string; stream: "stdout" | "stderr" | "exit"; text: string; code?: number }
 export interface LlmMessage { role: "system" | "user" | "assistant"; content: string }
 
+export type DirKind = "data" | "scripts" | "runs" | "exports";
+export interface Paths { workspace: string; data: string; scripts: string; runs: string; exports: string; defaults: Record<DirKind, string>; templates: string }
+export interface ExternalSource { title: string; url: string; note: string }
+export interface FileFilter { name: string; extensions: string[] }
+
 export interface FlyBridge {
   isElectron: true;
-  getPaths(): Promise<{ workspace: string; data: string; scripts: string; runs: string; templates: string }>;
+  getPaths(): Promise<Paths>;
+  chooseFolder(kind: DirKind, title?: string): Promise<string | null>;
+  pickFolder(title?: string): Promise<string | null>;
+  resetFolder(kind: DirKind): Promise<string>;
+  saveFile(opts: { defaultName: string; content: string; filters?: FileFilter[]; kind?: DirKind }): Promise<string | null>;
+  openFile(opts: { filters?: FileFilter[]; kind?: DirKind }): Promise<{ path: string; content: string } | null>;
+  listExternal(): Promise<ExternalSource[]>;
+  readRunFile(dir: string, name: string): Promise<{ kind: "image"; dataUrl: string } | { kind: "text"; text: string }>;
+  exportRun(dir: string): Promise<string | null>;
   checkEnv(): Promise<EnvInfo>;
   openPath(p: string): Promise<string>;
   openExternal(url: string): Promise<void>;
   listData(): Promise<DataItem[]>;
-  download(item: DataItem): Promise<{ path: string; size: number }>;
+  download(item: DataItem, destDir?: string): Promise<{ path: string; size: number }>;
   cancelDownload(id: string): Promise<void>;
   onDownloadProgress(cb: (p: { id: string; got: number; total: number }) => void): () => void;
   listScripts(): Promise<ScriptInfo[]>;
