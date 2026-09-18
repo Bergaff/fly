@@ -15,10 +15,61 @@ interface Props {
  onAddJournalEntry: (ideaId: string, entry: { title: string; params: string; result: string; conclusion: string }) => void;
 }
 
+const PROMPT_TEMPLATE = `Напиши скрипт на Python для такой задачи: <что нужно>.
+Требования:
+- argparse: --seed, --n-run и параметры протокола со значениями по умолчанию;
+- входные данные читать из переменной окружения FLY_DATA;
+- графики png и файл summary.json складывать в FLY_RUN_DIR;
+- в summary.json записать args, метрики и имена созданных файлов;
+- ход работы печатать в stdout, ошибки не глотать;`;
+
+/** Короткий порядок работы: с чего начать тому, кто открыл вкладку впервые. */
+function StartHere() {
+ const [open, setOpen] = useState(true);
+ const steps: [string, string][] = [
+  ["Данные", "вкладка «Данные мозга»: выбери папку и нажми «Скачать мозг мухи», это около 100 МБ. Для первой пробы данные не нужны: шаблон 02 работает сам по себе."],
+  ["Окружение", "вкладка «Окружение» покажет Python и пакеты. Чего не хватает, поставь командой, которая там же и написана."],
+  ["Первый прогон", "вкладка «Скрипты»: открой 00_check_env.py и запусти, затем 02_mb_toy_interference.py. Аргументы пишутся в поле рядом, например --relearn extinction --n-junk 25 --seed 1."],
+  ["Результат", "вкладка «Прогоны»: там лог, summary.json и картинки. Кнопка «В журнал идеи» переносит запись в выбранную идею, дополни её в идее на вкладке «Журнал»."],
+  ["Код помощником", "вкладка «Помощник»: вставь ключ DeepSeek, выбери идею в списке «Контекст» и напиши словами, что нужно. Блок Python из ответа сохраняется кнопкой «Сохранить как скрипт», файл попадает в папку скриптов. Имя задаётся строкой # file: имя.py в начале кода."],
+  ["Чтобы скрипт сразу работал", "в запросе проси argparse, чтение из FLY_DATA и запись summary.json в FLY_RUN_DIR: тогда результат сам появится во вкладке «Прогоны»."],
+ ];
+ return (
+  <section className="mb-4 border">
+   <div className="flex items-center gap-3 border-b px-3 py-2">
+    <span className="label">порядок работы</span>
+    <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setOpen((v) => !v)}>
+     {open ? "свернуть" : "развернуть"}
+    </Button>
+   </div>
+   {open && (
+    <div className="flex flex-col">
+     {steps.map(([t, d], i) => (
+      <div key={t} className="flex gap-3 border-b px-3 py-2 last:border-b-0">
+       <span className="mt-0.5 font-mono text-[10px] text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+       <div className="min-w-0">
+        <div className="text-[12px] font-medium">{t}</div>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{d}</p>
+       </div>
+      </div>
+     ))}
+     <div className="flex items-start gap-3 px-3 py-2">
+      <pre className="min-w-0 flex-1 overflow-x-auto border bg-muted/40 p-2 font-mono text-[11px] leading-relaxed whitespace-pre-wrap">{PROMPT_TEMPLATE}</pre>
+      <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(PROMPT_TEMPLATE)}>
+       Скопировать шаблон запроса
+      </Button>
+     </div>
+    </div>
+   )}
+  </section>
+ );
+}
+
 export function BrainView({ ideas, onAddJournalEntry }: Props) {
  if (!isElectron) return <WebFallback />;
  return (
- <div className="flex h-full flex-col overflow-y-auto p-6">
+ <div className="flex h-full flex-col overflow-y-auto p-4">
+ <StartHere />
  <Tabs defaultValue="data" className="gap-4">
  <TabsList>
  <TabsTrigger value="data">Данные мозга</TabsTrigger>

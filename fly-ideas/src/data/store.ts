@@ -25,13 +25,28 @@ function normalize(state: AppState): AppState {
  };
 }
 
+/** Добавляет в сохранение стартовые идеи и источники, которых в нём ещё нет.
+ *  Правки пользователя не трогает: свои идеи остаются как есть. */
+function withNewSeed(state: AppState): AppState {
+  const seeded = new Set(state.seeded ?? []);
+  const freshIdeas = SEED_STATE.ideas.filter((i) => !seeded.has(i.id) && !state.ideas.some((x) => x.id === i.id));
+  const freshRefs = SEED_STATE.references.filter((r) => !seeded.has(r.id) && !state.references.some((x) => x.id === r.id));
+  if (!freshIdeas.length && !freshRefs.length) return state;
+  return {
+    ...state,
+    ideas: [...state.ideas, ...freshIdeas],
+    references: [...state.references, ...freshRefs],
+    seeded: [...seeded, ...freshIdeas.map((i) => i.id), ...freshRefs.map((r) => r.id)],
+  };
+}
+
 function load(): AppState {
  try {
  const raw = localStorage.getItem(KEY);
  if (!raw) return structuredClone(SEED_STATE);
  const parsed = JSON.parse(raw) as AppState;
  if (parsed.version !== 1 || !Array.isArray(parsed.ideas)) return structuredClone(SEED_STATE);
- return normalize(parsed);
+ return withNewSeed(normalize(parsed));
  } catch {
  return structuredClone(SEED_STATE);
  }

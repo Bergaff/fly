@@ -143,6 +143,9 @@ export interface AppState {
  projects: Project[];
  ideas: Idea[];
  references: Reference[];
+ /** id стартовых идей и источников, которые уже показаны или удалены вручную:
+ * по этому списку новые версии набора не возвращают убранное и не дублируют старое */
+ seeded?: string[];
 }
 
 export function formatReference(r: Reference): string {
