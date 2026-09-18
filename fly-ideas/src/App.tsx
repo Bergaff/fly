@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { BarChart3, BookOpen, Brain, Download, GitCompare, LayoutGrid, Moon, RotateCcw, Settings2, Sun, Upload } from "lucide-react";
+import { BrainView } from "@/views/brain-view";
 import { useTheme } from "@/lib/theme";
 import { useStore } from "@/data/store";
 import { ProjectSidebar } from "@/components/project-sidebar";
@@ -94,6 +95,7 @@ export default function App() {
                 <TabsTrigger value="dashboard"><BarChart3 /> Дашборд</TabsTrigger>
                 <TabsTrigger value="compare"><GitCompare /> Сравнение {compare.length > 0 && <span className="rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{compare.length}</span>}</TabsTrigger>
                 <TabsTrigger value="library"><BookOpen /> Библиотека <span className="font-mono text-[10px] text-muted-foreground">{state.references.length}</span></TabsTrigger>
+                <TabsTrigger value="brain"><Brain /> Мозг</TabsTrigger>
               </TabsList>
             </Tabs>
             <div className="ml-auto flex items-center gap-1">
@@ -144,6 +146,9 @@ export default function App() {
                 onAdd={() => setOpenRefId(store.addReference().id)}
                 onOpenIdea={(id) => { setTab("ideas"); setOpenId(id); }}
               />
+            </TabsContent>
+            <TabsContent value="brain" className="min-h-0 overflow-hidden">
+              <BrainView ideas={state.ideas} onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })} />
             </TabsContent>
             <TabsContent value="compare" className="min-h-0 overflow-hidden">
               <CompareView ideas={compareIdeas} all={state.ideas} onRemove={(id) => setCompare((c) => c.filter((x) => x !== id))} onOpen={setOpenId} />
