@@ -51,6 +51,56 @@ function ensureDirs() {
 }
 
 // ------------------------------------------------------------
+// Права помощника на файлы: по умолчанию создавать можно, перезаписывать нельзя
+// ------------------------------------------------------------
+const DEFAULT_PERMS = { createFiles: true, overwriteFiles: false, runScripts: true };
+function getPermissions() {
+  return { ...DEFAULT_PERMS, ...(readConfig().permissions || {}) };
+}
+function setPermissions(patch) {
+  const c = readConfig();
+  c.permissions = { ...getPermissions(), ...patch };
+  writeConfig(c);
+  return c.permissions;
+}
+
+/** Имя проекта приводим к безопасному виду: оно становится именем папки */
+function slug(projectId) {
+  const s = String(projectId || "project").replace(/[^A-Za-z0-9._-]/g, "-").replace(/^-+|-+$/g, "");
+  return s || "project";
+}
+/** Путь внутри родительской папки, не выше её */
+function within(parent, target) {
+  const rel = path.relative(parent, target);
+  return !!rel && !rel.startsWith("..") && !path.isAbsolute(rel);
+}
+
+/** Рабочие папки проекта: код и прогоны. Можно переназначить через config.json. */
+function projectPaths(projectId) {
+  const id = slug(projectId);
+  const cfg = readConfig().projectDirs || {};
+  const over = cfg[id] || {};
+  const defaults = { code: path.join(DIRS.scripts, id), runs: path.join(DIRS.runs, id) };
+  const code = typeof over.code === "string" ? over.code : defaults.code;
+  const runs = typeof over.runs === "string" ? over.runs : defaults.runs;
+  fs.mkdirSync(code, { recursive: true });
+  fs.mkdirSync(runs, { recursive: true });
+  if (fs.readdirSync(code).length === 0) copyTemplates(code);
+  return { projectId: id, code, runs, defaults };
+}
+function setProjectDir(projectId, kind, dir) {
+  const id = slug(projectId);
+  const c = readConfig();
+  c.projectDirs = c.projectDirs || {};
+  const cur = c.projectDirs[id] || {};
+  if (dir) cur[kind] = dir;
+  else delete cur[kind];
+  c.projectDirs[id] = cur;
+  writeConfig(c);
+  return projectPaths(projectId);
+}
+
+// ------------------------------------------------------------
 // Каталог данных мозга: что можно скачать одной кнопкой
 // ------------------------------------------------------------
 const DATA_CATALOG = [
@@ -248,16 +298,20 @@ print(json.dumps(out))
 // ------------------------------------------------------------
 const runs = new Map();
 
-async function runScript(win, name, args) {
+async function runScript(win, projectId, name, args) {
   const py = await pickPython();
   if (!py) throw new Error("Python 3 не найден. Установи Miniconda или python.org (галочка «Add to PATH»).");
+  if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
+  const ws = projectPaths(projectId);
+  const file = path.join(ws.code, path.basename(name));
+  if (!within(ws.code, file)) throw new Error("Скрипт вне папки проекта.");
   const [cmd, ...pre] = py.cmd.split(" ");
-  const runId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + name.replace(/\.py$/, "");
-  const runDir = path.join(DIRS.runs, runId);
+  const runId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + path.basename(name).replace(/\.py$/, "");
+  const runDir = path.join(ws.runs, runId);
   fs.mkdirSync(runDir, { recursive: true });
-  const script = path.join(DIRS.scripts, name);
-  const env = { ...process.env, FLY_DATA: DIRS.data, FLY_RUN_DIR: runDir, FLY_SCRIPTS: DIRS.scripts, PYTHONUNBUFFERED: "1", PYTHONIOENCODING: "utf-8" };
-  const p = spawn(cmd, [...pre, script, ...(args || [])], { cwd: DIRS.scripts, env, shell: process.platform === "win32" });
+  const script = file;
+  const env = { ...process.env, FLY_DATA: DIRS.data, FLY_RUN_DIR: runDir, FLY_SCRIPTS: ws.code, FLY_PROJECT: ws.projectId, PYTHONUNBUFFERED: "1", PYTHONIOENCODING: "utf-8" };
+  const p = spawn(cmd, [...pre, script, ...(args || [])], { cwd: ws.code, env, shell: process.platform === "win32" });
   runs.set(runId, p);
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
   const send = (stream, text) => {
@@ -288,11 +342,12 @@ function writeSecrets(s) {
 async function llmChat({ provider, model, messages, temperature }) {
   const secrets = readSecrets();
   const cfg = {
-    deepseek: { url: "https://api.deepseek.com/chat/completions", key: secrets.deepseek, model: model || "deepseek-chat" },
-    openai: { url: "https://api.openai.com/v1/chat/completions", key: secrets.openai, model: model || "gpt-4o-mini" },
+    deepseek: { url: "https://api.deepseek.com/chat/completions", key: secrets.deepseek, model: model || "deepseek-chat", keyName: "DeepSeek" },
+    perplexity: { url: "https://api.perplexity.ai/chat/completions", key: secrets.perplexity, model: model || "sonar", keyName: "Perplexity" },
+    openai: { url: "https://api.openai.com/v1/chat/completions", key: secrets.openai, model: model || "gpt-4o-mini", keyName: "OpenAI" },
   }[provider || "deepseek"];
   if (!cfg) throw new Error("Неизвестный провайдер");
-  if (!cfg.key) throw new Error("Ключ API не задан — вкладка «Мозг» → Помощник → ⚙");
+  if (!cfg.key) throw new Error(`Ключ ${cfg.keyName} не задан: вкладка «Мозг», панель помощника.`);
   const res = await fetch(cfg.url, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.key}` },
@@ -371,35 +426,83 @@ function registerIpc(getWin) {
   ipcMain.handle("fly:listExternal", () => EXTERNAL_SOURCES);
   ipcMain.handle("fly:cancelDownload", (_e, id) => { activeDownloads.get(id)?.destroy(); activeDownloads.delete(id); });
 
-  ipcMain.handle("fly:listScripts", async () => {
-    const files = (await fsp.readdir(DIRS.scripts)).filter((f) => f.endsWith(".py"));
+  // --- рабочее место проекта: папки кода и прогонов ---
+  ipcMain.handle("fly:projectPaths", (_e, projectId) => projectPaths(projectId));
+  ipcMain.handle("fly:chooseProjectFolder", async (_e, projectId, kind, title) => {
+    const r = await dialog.showOpenDialog(getWin(), {
+      title: title || "Выбери папку проекта",
+      defaultPath: projectPaths(projectId)[kind === "runs" ? "runs" : "code"],
+      properties: ["openDirectory", "createDirectory"],
+    });
+    if (r.canceled || !r.filePaths[0]) return null;
+    return setProjectDir(projectId, kind === "runs" ? "runs" : "code", r.filePaths[0]);
+  });
+  ipcMain.handle("fly:resetProjectFolder", (_e, projectId, kind) => setProjectDir(projectId, kind === "runs" ? "runs" : "code", null));
+  ipcMain.handle("fly:getPermissions", () => getPermissions());
+  ipcMain.handle("fly:setPermissions", (_e, patch) => setPermissions(patch || {}));
+
+  ipcMain.handle("fly:listScripts", async (_e, projectId) => {
+    const ws = projectPaths(projectId);
+    const files = (await fsp.readdir(ws.code)).filter((f) => f.endsWith(".py"));
     return Promise.all(files.map(async (f) => {
-      const txt = await fsp.readFile(path.join(DIRS.scripts, f), "utf8");
+      const full = path.join(ws.code, f);
+      const txt = await fsp.readFile(full, "utf8");
       const m = txt.match(/^"""\s*\n?([\s\S]*?)"""/);
-      return { name: f, doc: m ? m[1].trim().split("\n")[0] : "" };
+      const st = await fsp.stat(full);
+      return { name: f, doc: m ? m[1].trim().split("\n")[0] : "", size: st.size, mtime: st.mtimeMs };
     }));
   });
-  ipcMain.handle("fly:readScript", (_e, name) => fsp.readFile(path.join(DIRS.scripts, path.basename(name)), "utf8"));
-  ipcMain.handle("fly:writeScript", (_e, name, content) => fsp.writeFile(path.join(DIRS.scripts, path.basename(name)), content, "utf8"));
-  ipcMain.handle("fly:runScript", (_e, name, args) => runScript(getWin(), path.basename(name), args));
+  ipcMain.handle("fly:readScript", (_e, projectId, name) => {
+    const ws = projectPaths(projectId);
+    const full = path.join(ws.code, path.basename(name));
+    if (!within(ws.code, full)) throw new Error("Файл вне папки проекта.");
+    return fsp.readFile(full, "utf8");
+  });
+  ipcMain.handle("fly:writeScript", async (_e, projectId, name, content, opts) => {
+    const ws = projectPaths(projectId);
+    const perms = getPermissions();
+    const base = path.basename(name).replace(/[^\w.\-]+/g, "_");
+    const file = path.join(ws.code, base.endsWith(".py") ? base : base + ".py");
+    if (!within(ws.code, file)) throw new Error("Файл вне папки проекта.");
+    const exists = fs.existsSync(file);
+    if (!exists && !perms.createFiles) throw new Error("Создание файлов выключено: включи галочку «помощник создаёт файлы».");
+    if (exists && !perms.overwriteFiles && !(opts && opts.allowOverwrite)) {
+      throw new Error(`Файл ${path.basename(file)} уже есть. Включи «перезапись» или сохрани под другим именем.`);
+    }
+    await fsp.writeFile(file, content, "utf8");
+    return { file: path.basename(file), path: file, created: !exists };
+  });
+  ipcMain.handle("fly:deleteScript", async (_e, projectId, name) => {
+    const ws = projectPaths(projectId);
+    const full = path.join(ws.code, path.basename(name));
+    if (!within(ws.code, full)) throw new Error("Файл вне папки проекта.");
+    await fsp.rm(full, { force: true });
+    return true;
+  });
+  ipcMain.handle("fly:runScript", (_e, projectId, name, args) => runScript(getWin(), projectId, path.basename(name), args));
   ipcMain.handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });
 
   ipcMain.handle("fly:getSecret", (_e, k) => { const s = readSecrets(); return s[k] ? `${s[k].slice(0, 6)}…${s[k].slice(-4)}` : null; });
   ipcMain.handle("fly:setSecret", (_e, k, v) => { const s = readSecrets(); if (v) s[k] = v; else delete s[k]; writeSecrets(s); return true; });
   ipcMain.handle("fly:llmChat", (_e, req) => llmChat(req));
 
-  ipcMain.handle("fly:listRuns", async () => {
-    const dirs = (await fsp.readdir(DIRS.runs, { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name).sort().reverse();
+  ipcMain.handle("fly:listRuns", async (_e, projectId) => {
+    const ws = projectPaths(projectId);
+    const entries = await fsp.readdir(ws.runs, { withFileTypes: true }).catch(() => []);
+    const dirs = entries.filter((d) => d.isDirectory()).map((d) => d.name).sort().reverse();
     return Promise.all(dirs.slice(0, 50).map(async (d) => {
-      const p = path.join(DIRS.runs, d);
+      const full = path.join(ws.runs, d);
       let summary = null;
-      try { summary = JSON.parse(await fsp.readFile(path.join(p, "summary.json"), "utf8")); } catch {}
-      const files = await fsp.readdir(p);
-      return { dir: d, path: p, summary, files };
+      try { summary = JSON.parse(await fsp.readFile(path.join(full, "summary.json"), "utf8")); } catch {}
+      const files = await fsp.readdir(full);
+      let mtime = 0;
+      try { mtime = (await fsp.stat(full)).mtimeMs; } catch {}
+      return { dir: full, path: full, label: d, summary, files, mtime };
     }));
   });
   ipcMain.handle("fly:readRunFile", async (_e, dir, name) => {
-    const p = path.join(DIRS.runs, path.basename(dir), path.basename(name));
+    const p = path.join(dir, path.basename(name));
+    if (!within(DIRS.runs, p)) throw new Error("Файл вне папки прогонов.");
     const ext = path.extname(name).toLowerCase();
     if ([".png", ".jpg", ".jpeg", ".svg", ".gif"].includes(ext)) {
       const mime = ext === ".svg" ? "image/svg+xml" : ext === ".png" ? "image/png" : ext === ".gif" ? "image/gif" : "image/jpeg";
@@ -410,7 +513,8 @@ function registerIpc(getWin) {
     return { kind: "text", text: await fsp.readFile(p, "utf8") };
   });
   ipcMain.handle("fly:exportRun", async (_e, dir) => {
-    const src = path.join(DIRS.runs, path.basename(dir));
+    const src = dir;
+    if (!within(DIRS.runs, src)) throw new Error("Папка вне каталога прогонов.");
     const dest = await dialog.showOpenDialog(getWin(), { title: "Куда скопировать прогон", properties: ["openDirectory", "createDirectory"] });
     if (dest.canceled || !dest.filePaths[0]) return null;
     const target = path.join(dest.filePaths[0], path.basename(dir));
@@ -418,7 +522,8 @@ function registerIpc(getWin) {
     return target;
   });
   ipcMain.handle("fly:readRun", async (_e, dir) => {
-    const p = path.join(DIRS.runs, path.basename(dir));
+    const p = dir;
+    if (!within(DIRS.runs, p)) throw new Error("Папка вне каталога прогонов.");
     const out = { log: "", summary: null };
     try { out.log = (await fsp.readFile(path.join(p, "log.txt"), "utf8")).slice(-20000); } catch {}
     try { out.summary = JSON.parse(await fsp.readFile(path.join(p, "summary.json"), "utf8")); } catch {}
@@ -434,7 +539,7 @@ function createWindow() {
     height: 920,
     minWidth: 1024,
     minHeight: 640,
-    backgroundColor: "#18181b",
+    backgroundColor: "#262320",
     autoHideMenuBar: true,
     title: "Fly Ideas",
     webPreferences: { contextIsolation: true, nodeIntegration: false, preload: path.join(__dirname, "preload.cjs") },

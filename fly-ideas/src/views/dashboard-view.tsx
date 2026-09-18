@@ -24,7 +24,7 @@ export function DashboardView({ ideas, onOpen }: { ideas: Idea[]; onOpen: (id: s
     .slice(0, 8);
 
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto p-4">
+    <div className="h-full overflow-y-auto p-4"><div className="flex flex-col gap-4">
       <section className="grid grid-cols-2 border xl:grid-cols-4">
         <Stat label="всего идей" value={ideas.length} hint={`влияние в среднем ${avg("impact")}`} />
         <Stat label="в работе" value={inWork} hint="изучаю, в работе, пишу" />
@@ -97,6 +97,7 @@ export function DashboardView({ ideas, onOpen }: { ideas: Idea[]; onOpen: (id: s
           </div>
         )}
       </Panel>
+      </div>
     </div>
   );
 }

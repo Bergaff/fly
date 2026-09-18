@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { fly } from "@/lib/bridge";
+import { LiteratureSearchDialog } from "@/components/literature-search";
 
 interface Props {
   references: Reference[];
@@ -14,13 +15,15 @@ interface Props {
   onOpen: (id: string) => void;
   onAdd: () => void;
   onOpenIdea: (id: string) => void;
+  onAddReferences: (items: Partial<Reference>[]) => void;
 }
 
-export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, onAdd, onOpenIdea }: Props) {
+export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, onAdd, onOpenIdea, onAddReferences }: Props) {
   const [q, setQ] = useState("");
   const [tag, setTag] = useState<string | null>(null);
   const [onlyScope, setOnlyScope] = useState(false);
   const [sort, setSort] = useState<"year" | "added" | "uses">("year");
+  const [lit, setLit] = useState(false);
 
   const usage = useMemo(() => {
     const m = new Map<string, Idea[]>();
@@ -87,6 +90,9 @@ export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, o
           </Button>
           <Button variant="outline" onClick={saveAll} disabled={!list.length} title="Сохранить список в файл">
             В файл
+          </Button>
+          <Button variant="outline" onClick={() => setLit(true)} title="Поиск литературы через Perplexity">
+            Литература…
           </Button>
           <Button onClick={onAdd}>Источник</Button>
         </div>
@@ -169,6 +175,13 @@ export function LibraryView({ references, ideas, allIdeas, scopeLabel, onOpen, o
           </table>
         )}
       </div>
+
+      <LiteratureSearchDialog
+        open={lit}
+        defaultQuery={q}
+        onClose={() => setLit(false)}
+        onAdd={(items) => onAddReferences(items)}
+      />
     </div>
   );
 }

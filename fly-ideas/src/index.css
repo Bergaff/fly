@@ -118,6 +118,11 @@
   * {
     @apply border-border;
   }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
   html {
     font-family: var(--font-sans);
   }
@@ -125,6 +130,7 @@
     @apply bg-background text-foreground;
     font-feature-settings: "tnum" 1, "kern" 1;
     text-rendering: optimizeLegibility;
+    overflow: hidden;
   }
   /* фокус: рамка, без свечения */
   :focus-visible {
@@ -135,19 +141,31 @@
     background: var(--foreground);
     color: var(--background);
   }
+  /* полосы прокрутки видны всегда, не наезжают на содержимое */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted-foreground) var(--secondary);
+  }
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--background);
+    background: var(--secondary);
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border: 1px solid var(--background);
+    background: var(--muted-foreground);
+    border: 3px solid var(--secondary);
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--muted-foreground);
+    background: var(--foreground);
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--secondary);
+  }
+  .scroll-pane {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
   }
   input[type="checkbox"] {
     appearance: none;

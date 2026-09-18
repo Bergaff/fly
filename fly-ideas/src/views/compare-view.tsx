@@ -19,7 +19,7 @@ export function CompareView({ ideas, all, onRemove, onOpen }: { ideas: Idea[]; a
   ];
 
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto p-4">
+    <div className="h-full overflow-y-auto p-4"><div className="flex flex-col gap-4">
       <section className="border">
         <div className="label border-b px-3 py-2">Профиль оценок. Трудоёмкость и риск инвертированы: больше площади значит лучше</div>
         <div className="p-3">
@@ -66,6 +66,7 @@ export function CompareView({ ideas, all, onRemove, onOpen }: { ideas: Idea[]; a
           </table>
         </section>
       )}
+      </div>
     </div>
   );
 }

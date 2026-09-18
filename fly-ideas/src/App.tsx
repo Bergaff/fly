@@ -102,7 +102,7 @@ export default function App() {
           onDropIdea={store.moveIdea}
         />
 
-        <main className="flex min-w-0 flex-1 flex-col">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b px-4 py-2">
             <div className="flex items-center gap-2.5">
               <span className="flex size-8 shrink-0 items-center justify-center border font-mono text-[12px] tracking-[0.1em]">FI</span>
@@ -158,8 +158,8 @@ export default function App() {
             </div>
           </header>
 
-          <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-0">
-            <TabsContent value="ideas" className="min-h-0">
+          <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-0 overflow-hidden">
+            <TabsContent value="ideas" className="min-h-0 overflow-hidden">
               <IdeasView
                 ideas={visible}
                 projects={state.projects}
@@ -177,7 +177,7 @@ export default function App() {
             <TabsContent value="dashboard" className="min-h-0 overflow-hidden">
               <DashboardView ideas={visible} onOpen={setOpenId} />
             </TabsContent>
-            <TabsContent value="library" className="min-h-0">
+            <TabsContent value="library" className="min-h-0 overflow-hidden">
               <LibraryView
                 references={state.references}
                 ideas={visible}
@@ -185,6 +185,7 @@ export default function App() {
                 scopeLabel={activeProject ? `«${activeProject.name}»` : "видимые идеи"}
                 onOpen={setOpenRefId}
                 onAdd={() => setOpenRefId(store.addReference().id)}
+                onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
                 onOpenIdea={(id) => {
                   setTab("ideas");
                   setOpenId(id);
@@ -192,7 +193,14 @@ export default function App() {
               />
             </TabsContent>
             <TabsContent value="brain" className="min-h-0 overflow-hidden">
-              <BrainView ideas={state.ideas} onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })} />
+              <BrainView
+                ideas={state.ideas}
+                projects={state.projects.map((pr) => ({ id: pr.id, name: pr.name }))}
+                activeProject={active}
+                onSelectProject={setActive}
+                onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
+                onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
+              />
             </TabsContent>
             <TabsContent value="compare" className="min-h-0 overflow-hidden">
               <CompareView ideas={compareIdeas} all={state.ideas} onRemove={(id) => setCompare((c) => c.filter((x) => x !== id))} onOpen={setOpenId} />

@@ -15,6 +15,12 @@ contextBridge.exposeInMainWorld("fly", {
   listExternal: () => ipcRenderer.invoke("fly:listExternal"),
   readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),
   exportRun: (dir) => ipcRenderer.invoke("fly:exportRun", dir),
+  // --- рабочее место проекта ---
+  projectPaths: (projectId) => ipcRenderer.invoke("fly:projectPaths", projectId),
+  chooseProjectFolder: (projectId, kind, title) => ipcRenderer.invoke("fly:chooseProjectFolder", projectId, kind, title),
+  resetProjectFolder: (projectId, kind) => ipcRenderer.invoke("fly:resetProjectFolder", projectId, kind),
+  getPermissions: () => ipcRenderer.invoke("fly:getPermissions"),
+  setPermissions: (patch) => ipcRenderer.invoke("fly:setPermissions", patch),
   // --- данные мозга ---
   listData: () => ipcRenderer.invoke("fly:listData"),
   download: (item, destDir) => ipcRenderer.invoke("fly:download", item, destDir),
@@ -24,11 +30,12 @@ contextBridge.exposeInMainWorld("fly", {
     ipcRenderer.on("fly:downloadProgress", h);
     return () => ipcRenderer.removeListener("fly:downloadProgress", h);
   },
-  // --- запуск скриптов ---
-  listScripts: () => ipcRenderer.invoke("fly:listScripts"),
-  readScript: (name) => ipcRenderer.invoke("fly:readScript", name),
-  writeScript: (name, content) => ipcRenderer.invoke("fly:writeScript", name, content),
-  runScript: (name, args) => ipcRenderer.invoke("fly:runScript", name, args),
+  // --- скрипты проекта ---
+  listScripts: (projectId) => ipcRenderer.invoke("fly:listScripts", projectId),
+  readScript: (projectId, name) => ipcRenderer.invoke("fly:readScript", projectId, name),
+  writeScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeScript", projectId, name, content, opts),
+  deleteScript: (projectId, name) => ipcRenderer.invoke("fly:deleteScript", projectId, name),
+  runScript: (projectId, name, args) => ipcRenderer.invoke("fly:runScript", projectId, name, args),
   killRun: (runId) => ipcRenderer.invoke("fly:killRun", runId),
   onRunOutput: (cb) => {
     const h = (_e, p) => cb(p);
@@ -38,9 +45,9 @@ contextBridge.exposeInMainWorld("fly", {
   // --- секреты (ключи API хранятся в userData, не в localStorage) ---
   getSecret: (k) => ipcRenderer.invoke("fly:getSecret", k),
   setSecret: (k, v) => ipcRenderer.invoke("fly:setSecret", k, v),
-  // --- LLM-прокси (ключ не покидает main-процесс) ---
+  // --- LLM-прокси: ключ не покидает main-процесс ---
   llmChat: (req) => ipcRenderer.invoke("fly:llmChat", req),
   // --- результаты прогонов ---
-  listRuns: () => ipcRenderer.invoke("fly:listRuns"),
+  listRuns: (projectId) => ipcRenderer.invoke("fly:listRuns", projectId),
   readRun: (dir) => ipcRenderer.invoke("fly:readRun", dir),
 });
