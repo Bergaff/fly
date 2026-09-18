@@ -13,6 +13,8 @@ export function EffortImpactChart({ ideas, onSelect }: Props) {
     x: i.scores.effort,
     y: i.scores.impact,
     z: i.scores.novelty,
+    s: i.scores.speed,
+    r: i.scores.risk,
     title: i.title,
     status: i.status,
     fill: STATUS_COLORS[i.status],
@@ -23,7 +25,13 @@ export function EffortImpactChart({ ideas, onSelect }: Props) {
       <div className="h-[320px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 8, right: 12, bottom: 20, left: 0 }}>
-            <ReferenceArea x1={1} x2={5.5} y1={5.5} y2={10} fill="var(--chart-2)" fillOpacity={0.07} stroke="none" />
+            <defs>
+              {/* зона «мало усилий, много пользы» размечена штриховкой, без заливки-градиента */}
+              <pattern id="quick-zone" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="var(--muted-foreground)" strokeWidth="1" strokeOpacity="0.35" />
+              </pattern>
+            </defs>
+            <ReferenceArea x1={1} x2={5.5} y1={5.5} y2={10} fill="url(#quick-zone)" stroke="none" />
             <CartesianGrid stroke="var(--border)" strokeDasharray="1 3" />
             <XAxis
               type="number"
@@ -57,12 +65,26 @@ export function EffortImpactChart({ ideas, onSelect }: Props) {
                 const p = payload?.[0]?.payload as (typeof data)[number] | undefined;
                 if (!p) return null;
                 return (
-                  <div className="max-w-[260px] border bg-popover px-2 py-1.5">
+                  <div className="w-[240px] border bg-popover p-2">
                     <div className="text-[12px] leading-snug text-foreground">{p.title}</div>
-                    <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.05em] text-muted-foreground">
-                      трудоёмкость {p.x}, влияние {p.y}, новизна {p.z}
+                    <div className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
+                      {[
+                        ["трудоёмкость", p.x],
+                        ["влияние", p.y],
+                        ["новизна", p.z],
+                        ["скорость", p.s],
+                        ["риск", p.r],
+                      ].map(([k, v]) => (
+                        <span key={String(k)} className="flex items-baseline justify-between gap-2">
+                          <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-muted-foreground">{k}</span>
+                          <span className="font-mono text-[11px] text-foreground">{v}</span>
+                        </span>
+                      ))}
                     </div>
-                    <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.05em] text-muted-foreground">{STATUS_LABELS[p.status]}</div>
+                    <div className="mt-1.5 flex items-center gap-1.5 border-t pt-1.5">
+                      <span className="size-2" style={{ background: p.fill }} />
+                      <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-muted-foreground">{STATUS_LABELS[p.status]}</span>
+                    </div>
                   </div>
                 );
               }}
@@ -76,7 +98,8 @@ export function EffortImpactChart({ ideas, onSelect }: Props) {
                 const r = 3.5 + payload.z * 0.55;
                 return (
                   <g className="cursor-pointer">
-                    <circle cx={cx} cy={cy} r={r} fill={payload.fill} fillOpacity={0.75} stroke="var(--background)" strokeWidth={1} />
+                    <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} fill={payload.fill} fillOpacity={0.2} />
+                    <rect x={cx - r / 2} y={cy - r / 2} width={r} height={r} fill={payload.fill} />
                   </g>
                 );
               }}
@@ -91,6 +114,7 @@ export function EffortImpactChart({ ideas, onSelect }: Props) {
             {STATUS_LABELS[s]}
           </span>
         ))}
+        <span className="label ml-auto">штриховка: зона быстрых побед</span>
       </div>
     </div>
   );
