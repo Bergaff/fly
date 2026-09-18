@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, Plus, Trash2, X } from "lucide-react";
+import { CalendarClock, ExternalLink, GitBranch, ListChecks, FileText, Plus, Trash2, X } from "lucide-react";
 import type { Idea, IdeaScores, IdeaStatus, Project } from "@/data/types";
-import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER } from "@/data/types";
+import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
+import { Checklist } from "@/components/checklist";
+import { DeadlineBadge } from "@/components/deadline-badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +16,20 @@ import { Separator } from "@/components/ui/separator";
 
 interface Props {
   idea: Idea | null;
+  allIdeas: Idea[];
   projects: Project[];
   onClose: () => void;
   onSave: (id: string, patch: Partial<Idea>) => void;
   onDelete: (id: string) => void;
 }
 
-export function IdeaDialog({ idea, projects, onClose, onSave, onDelete }: Props) {
+export function IdeaDialog({ idea, allIdeas, projects, onClose, onSave, onDelete, onOpenOther }: Props & { onOpenOther?: (id: string) => void }) {
   const [draft, setDraft] = useState<Idea | null>(idea);
   const [tagInput, setTagInput] = useState("");
   const [venueInput, setVenueInput] = useState("");
   const [linkLabel, setLinkLabel] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
+  const [tab, setTab] = useState("overview");
 
   useEffect(() => {
     setDraft(idea ? structuredClone(idea) : null);
@@ -80,10 +85,35 @@ export function IdeaDialog({ idea, projects, onClose, onSave, onDelete }: Props)
                 ))}
               </SelectContent>
             </Select>
-            <Input value={draft.timeline} onChange={(e) => set("timeline", e.target.value)} placeholder="Сроки (напр. 3–5 мес.)" className="h-8 w-[200px]" />
+            <Input value={draft.timeline} onChange={(e) => set("timeline", e.target.value)} placeholder="Сроки (напр. 3–5 мес.)" className="h-8 w-[180px]" />
+            <div className="flex items-center gap-1.5">
+              <CalendarClock className="size-4 text-muted-foreground" />
+              <Input type="date" value={draft.deadline ?? ""} onChange={(e) => set("deadline", e.target.value || null)} className="h-8 w-[150px]" title="Дедлайн" />
+              {draft.deadline && (
+                <Button size="icon-sm" variant="ghost" className="size-7" onClick={() => set("deadline", null)} title="Убрать дедлайн"><X className="size-3.5" /></Button>
+              )}
+              <DeadlineBadge deadline={draft.deadline} />
+            </div>
           </div>
         </DialogHeader>
 
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList>
+            <TabsTrigger value="overview"><FileText /> Разбор</TabsTrigger>
+            <TabsTrigger value="checklist"><ListChecks /> Чеклист <span className="font-mono text-[10px] text-muted-foreground">{checklistProgress(draft).done}/{checklistProgress(draft).total}</span></TabsTrigger>
+            <TabsTrigger value="links"><GitBranch /> Связи {draft.dependsOn.length > 0 && <span className="font-mono text-[10px] text-muted-foreground">{draft.dependsOn.length}</span>}</TabsTrigger>
+          </TabsList>
+
+        <TabsContent value="checklist" className="pt-2">
+          <p className="mb-3 text-xs text-muted-foreground">Этапы «от идеи до статьи». Галочки сохраняются с датой; порядок можно менять перетаскиванием.</p>
+          <Checklist items={draft.checklist} onChange={(items) => set("checklist", items)} />
+        </TabsContent>
+
+        <TabsContent value="links" className="pt-2">
+          <DependsOnEditor draft={draft} allIdeas={allIdeas} onChange={(ids) => set("dependsOn", ids)} onOpenOther={(id) => { onClose(); onOpenOther?.(id); }} />
+        </TabsContent>
+
+        <TabsContent value="overview" className="pt-2">
         <div className="grid gap-5 md:grid-cols-[1fr_260px]">
           <div className="flex flex-col gap-4">
             <Field label="Исследовательский вопрос">
@@ -168,6 +198,8 @@ export function IdeaDialog({ idea, projects, onClose, onSave, onDelete }: Props)
             </div>
           </div>
         </div>
+        </TabsContent>
+        </Tabs>
 
         <Separator />
         <DialogFooter className="items-center sm:justify-between">
@@ -250,6 +282,54 @@ function ChipList({
         placeholder={placeholder}
         className="mt-1.5 h-7 text-xs"
       />
+    </div>
+  );
+}
+
+function DependsOnEditor({ draft, allIdeas, onChange, onOpenOther }: { draft: Idea; allIdeas: Idea[]; onChange: (ids: string[]) => void; onOpenOther: (id: string) => void }) {
+  const parents = draft.dependsOn.map((id) => allIdeas.find((i) => i.id === id)).filter((i): i is Idea => !!i);
+  const children = allIdeas.filter((i) => i.dependsOn.includes(draft.id));
+  const candidates = allIdeas.filter((i) => i.id !== draft.id && !draft.dependsOn.includes(i.id) && !i.dependsOn.includes(draft.id));
+  const [pick, setPick] = useState("");
+  return (
+    <div className="grid gap-5 md:grid-cols-2">
+      <div>
+        <Label className="mb-2 text-xs text-muted-foreground">Растёт из (нужно сделать раньше)</Label>
+        <div className="flex flex-col gap-1.5">
+          {parents.length === 0 && <div className="text-xs text-muted-foreground/70">Нет зависимостей — идея самостоятельная.</div>}
+          {parents.map((p) => (
+            <div key={p.id} className="flex items-center gap-2 rounded-md border px-2 py-1.5 text-sm">
+              <span className="size-2 shrink-0 rounded-full" style={{ background: STATUS_COLORS[p.status] }} />
+              <button className="min-w-0 flex-1 truncate text-left hover:underline cursor-pointer" onClick={() => onOpenOther(p.id)}>{p.title}</button>
+              <span className="font-mono text-[10px] text-muted-foreground">{checklistProgress(p).pct}%</span>
+              <button className="cursor-pointer text-muted-foreground hover:text-destructive" onClick={() => onChange(draft.dependsOn.filter((d) => d !== p.id))}><X className="size-3.5" /></button>
+            </div>
+          ))}
+          <div className="mt-1 flex gap-1.5">
+            <Select value={pick} onValueChange={setPick}>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Добавить зависимость…" /></SelectTrigger>
+              <SelectContent>
+                {candidates.length === 0 && <div className="px-2 py-1.5 text-xs text-muted-foreground">Нечего добавить</div>}
+                {candidates.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button size="icon-sm" variant="outline" disabled={!pick} onClick={() => { onChange([...draft.dependsOn, pick]); setPick(""); }}><Plus /></Button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <Label className="mb-2 text-xs text-muted-foreground">Из неё растут</Label>
+        <div className="flex flex-col gap-1.5">
+          {children.length === 0 && <div className="text-xs text-muted-foreground/70">Пока ничего. Задай эту идею как «растёт из» у других.</div>}
+          {children.map((c) => (
+            <button key={c.id} className="flex items-center gap-2 rounded-md border px-2 py-1.5 text-left text-sm hover:bg-accent cursor-pointer" onClick={() => onOpenOther(c.id)}>
+              <span className="size-2 shrink-0 rounded-full" style={{ background: STATUS_COLORS[c.status] }} />
+              <span className="min-w-0 flex-1 truncate">{c.title}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">{STATUS_LABELS[c.status]}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

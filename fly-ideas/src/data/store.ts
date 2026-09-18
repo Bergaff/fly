@@ -1,8 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AppState, Idea, IdeaStatus, Project } from "./types";
-import { SEED_STATE } from "./seed";
+import { SEED_STATE, makeChecklist } from "./seed";
+import { uid } from "@/lib/utils";
+
+export { uid };
 
 const KEY = "fly-ideas:state:v1";
+
+/** Дополняет идеи из старых сохранений новыми полями */
+function normalize(state: AppState): AppState {
+  return {
+    ...state,
+    ideas: state.ideas.map((i) => ({
+      ...i,
+      links: i.links ?? [],
+      notes: i.notes ?? "",
+      checklist: Array.isArray(i.checklist) ? i.checklist : makeChecklist(),
+      deadline: i.deadline ?? null,
+      dependsOn: Array.isArray(i.dependsOn) ? i.dependsOn : [],
+    })),
+  };
+}
 
 function load(): AppState {
   try {
@@ -10,13 +28,11 @@ function load(): AppState {
     if (!raw) return structuredClone(SEED_STATE);
     const parsed = JSON.parse(raw) as AppState;
     if (parsed.version !== 1 || !Array.isArray(parsed.ideas)) return structuredClone(SEED_STATE);
-    return parsed;
+    return normalize(parsed);
   } catch {
     return structuredClone(SEED_STATE);
   }
 }
-
-export const uid = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 8)}${Date.now().toString(36).slice(-4)}`;
 
 export function useStore() {
   const [state, setState] = useState<AppState>(load);
@@ -43,6 +59,9 @@ export function useStore() {
       scores: { effort: 5, impact: 5, novelty: 5, speed: 5, risk: 5 },
       notes: "",
       links: [],
+      checklist: makeChecklist(),
+      deadline: null,
+      dependsOn: [],
       createdAt: t,
       updatedAt: t,
       ...partial,
@@ -59,7 +78,25 @@ export function useStore() {
   }, []);
 
   const deleteIdea = useCallback((id: string) => {
-    setState((s) => ({ ...s, ideas: s.ideas.filter((i) => i.id !== id) }));
+    setState((s) => ({
+      ...s,
+      ideas: s.ideas.filter((i) => i.id !== id).map((i) => (i.dependsOn.includes(id) ? { ...i, dependsOn: i.dependsOn.filter((d) => d !== id) } : i)),
+    }));
+  }, []);
+
+  const toggleCheck = useCallback((ideaId: string, itemId: string) => {
+    setState((s) => ({
+      ...s,
+      ideas: s.ideas.map((i) =>
+        i.id !== ideaId
+          ? i
+          : {
+              ...i,
+              updatedAt: stamp(),
+              checklist: i.checklist.map((c) => (c.id === itemId ? { ...c, done: !c.done, doneAt: !c.done ? stamp() : null } : c)),
+            },
+      ),
+    }));
   }, []);
 
   const duplicateIdea = useCallback((id: string, toProjectId?: string) => {
@@ -72,6 +109,7 @@ export function useStore() {
         id: uid("i"),
         projectId: toProjectId ?? src.projectId,
         title: toProjectId ? src.title : `${src.title} (копия)`,
+        checklist: src.checklist.map((c) => ({ ...c, id: uid("c") })),
         createdAt: t,
         updatedAt: t,
       };
@@ -126,14 +164,14 @@ export function useStore() {
     if (parsed.version !== 1 || !Array.isArray(parsed.ideas) || !Array.isArray(parsed.projects)) {
       throw new Error("Неверный формат файла");
     }
-    setState(parsed);
+    setState(normalize(parsed));
   }, []);
 
   const reset = useCallback(() => setState(structuredClone(SEED_STATE)), []);
 
   const api = useMemo(
-    () => ({ addIdea, updateIdea, deleteIdea, duplicateIdea, moveIdea, setStatus, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
-    [addIdea, updateIdea, deleteIdea, duplicateIdea, moveIdea, setStatus, addProject, updateProject, deleteProject, exportJson, importJson, reset],
+    () => ({ addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
+    [addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addProject, updateProject, deleteProject, exportJson, importJson, reset],
   );
 
   return { state, ...api };

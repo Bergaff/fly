@@ -39,6 +39,26 @@ export const SCORE_LABELS: Record<keyof IdeaScores, string> = {
   risk: "Риск",
 };
 
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  done: boolean;
+  doneAt?: string | null;
+}
+
+/** Стандартный конвейер «от идеи до статьи» */
+export const DEFAULT_CHECKLIST: string[] = [
+  "Прочитать ключевые статьи по теме",
+  "Поднять окружение (conda, Brian2 / fly-brain)",
+  "Воспроизвести baseline (фигуры Shiu et al.)",
+  "Написать протокол эксперимента",
+  "Сделать прогоны, сохранить сырые данные и сиды",
+  "Сверить с литературой / валидировать",
+  "Черновик статьи",
+  "Препринт на bioRxiv",
+  "Подача в журнал",
+];
+
 export interface Idea {
   id: string;
   projectId: string;
@@ -53,6 +73,9 @@ export interface Idea {
   scores: IdeaScores;
   notes: string;
   links: { label: string; url: string }[];
+  checklist: ChecklistItem[];
+  deadline: string | null; // YYYY-MM-DD
+  dependsOn: string[]; // id идей, из которых «растёт» эта
   createdAt: string;
   updatedAt: string;
 }
@@ -69,4 +92,24 @@ export interface AppState {
   version: 1;
   projects: Project[];
   ideas: Idea[];
+}
+
+export function checklistProgress(idea: Pick<Idea, "checklist">) {
+  const total = idea.checklist.length;
+  const done = idea.checklist.filter((c) => c.done).length;
+  return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+export type DeadlineTone = "overdue" | "soon" | "ok";
+
+export function deadlineInfo(deadline: string | null | undefined): { days: number; tone: DeadlineTone; label: string; date: string } | null {
+  if (!deadline) return null;
+  const d = new Date(`${deadline}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.round((d.getTime() - today.getTime()) / 86_400_000);
+  const tone: DeadlineTone = days < 0 ? "overdue" : days <= 14 ? "soon" : "ok";
+  const label = days < 0 ? `просрочено на ${-days} дн.` : days === 0 ? "сегодня" : days === 1 ? "завтра" : `через ${days} дн.`;
+  return { days, tone, label, date: d.toLocaleDateString("ru-RU") };
 }

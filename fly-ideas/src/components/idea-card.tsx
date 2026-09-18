@@ -1,6 +1,7 @@
-import { ArrowRightLeft, Copy, MoreHorizontal, Trash2, Clock, ExternalLink } from "lucide-react";
+import { ArrowRightLeft, Copy, MoreHorizontal, Trash2, Clock, ExternalLink, GitBranch, ListChecks } from "lucide-react";
+import { DeadlineBadge } from "@/components/deadline-badge";
 import type { Idea, IdeaStatus, Project } from "@/data/types";
-import { STATUS_COLORS, STATUS_LABELS, STATUS_ORDER } from "@/data/types";
+import { STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ interface Props {
 
 export function IdeaCard({ idea, projects, onOpen, onMove, onCopyTo, onDelete, onStatus, selected, onToggleSelect }: Props) {
   const others = projects.filter((p) => p.id !== idea.projectId);
+  const prog = checklistProgress(idea);
   return (
     <Card
       draggable
@@ -100,11 +102,20 @@ export function IdeaCard({ idea, projects, onOpen, onMove, onCopyTo, onDelete, o
       </CardHeader>
       <CardContent className="flex flex-col gap-3 px-4">
         <ScoreBars scores={idea.scores} compact />
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground" title="Прогресс чеклиста">
+          <ListChecks className="size-3.5" />
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full transition-all" style={{ width: `${prog.pct}%`, background: prog.pct === 100 ? "var(--chart-2)" : "var(--chart-1)" }} />
+          </div>
+          <span className="font-mono">{prog.done}/{prog.total}</span>
+          {idea.dependsOn.length > 0 && <span className="flex items-center gap-0.5" title="Растёт из других идей"><GitBranch className="size-3" />{idea.dependsOn.length}</span>}
+        </div>
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="outline" className="gap-1.5" style={{ borderColor: STATUS_COLORS[idea.status] }}>
             <span className="size-1.5 rounded-full" style={{ background: STATUS_COLORS[idea.status] }} />
             {STATUS_LABELS[idea.status]}
           </Badge>
+          <DeadlineBadge deadline={idea.deadline} />
           {idea.timeline && (
             <Badge variant="secondary" className="gap-1 font-normal">
               <Clock className="size-3" /> {idea.timeline}

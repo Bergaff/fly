@@ -1,4 +1,6 @@
-import type { AppState, Idea, Project } from "./types";
+import type { AppState, ChecklistItem, Idea, Project } from "./types";
+import { DEFAULT_CHECKLIST } from "./types";
+import { uid } from "@/lib/utils";
 
 const now = new Date().toISOString();
 
@@ -26,9 +28,22 @@ export const SEED_PROJECTS: Project[] = [
   },
 ];
 
-const idea = (partial: Omit<Idea, "createdAt" | "updatedAt" | "links" | "notes"> & Partial<Pick<Idea, "links" | "notes">>): Idea => ({
+export const makeChecklist = (doneCount = 0): ChecklistItem[] =>
+  DEFAULT_CHECKLIST.map((text, i) => ({ id: uid("c"), text, done: i < doneCount, doneAt: i < doneCount ? now : null }));
+
+const plusDays = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+type Optional = "links" | "notes" | "checklist" | "deadline" | "dependsOn";
+const idea = (partial: Omit<Idea, "createdAt" | "updatedAt" | Optional> & Partial<Pick<Idea, Optional>>): Idea => ({
   notes: "",
   links: [],
+  checklist: makeChecklist(),
+  deadline: null,
+  dependsOn: [],
   createdAt: now,
   updatedAt: now,
   ...partial,
@@ -56,6 +71,8 @@ export const SEED_IDEAS: Idea[] = [
       { label: "FlyWire Codex", url: "https://codex.flywire.ai" },
     ],
     notes: "Рекомендуемый основной трек. Метод прост: глушить и мерять.",
+    checklist: makeChecklist(1),
+    deadline: plusDays(150),
   }),
   idea({
     id: "i-mb-learning",
@@ -74,6 +91,7 @@ export const SEED_IDEAS: Idea[] = [
     status: "backlog",
     scores: { effort: 7, impact: 8, novelty: 7, speed: 4, risk: 5 },
     notes: "Пластичность в большой сети капризна: может всё перевозбудить или погасить. Вторая статья.",
+    dependsOn: ["i-lesions"],
   }),
   idea({
     id: "i-individuality",
@@ -92,6 +110,7 @@ export const SEED_IDEAS: Idea[] = [
     status: "backlog",
     scores: { effort: 6, impact: 9, novelty: 9, speed: 3, risk: 7 },
     notes: "Рамку «что считать фенотипом» придётся придумывать самому. Если получится — самая цитируемая.",
+    dependsOn: ["i-lesions"],
   }),
   idea({
     id: "i-benchmark",
@@ -110,6 +129,14 @@ export const SEED_IDEAS: Idea[] = [
     scores: { effort: 3, impact: 4, novelty: 3, speed: 9, risk: 1 },
     links: [{ label: "eonsystemspbc/fly-brain", url: "https://github.com/eonsystemspbc/fly-brain" }],
     notes: "Запасной аэродром. Тебя заметят разработчики Eon / GeNN.",
+    checklist: [
+      ...makeChecklist(1).slice(0, 2),
+      { id: uid("c"), text: "Запустить скрипт сравнения бэкендов из репозитория Eon", done: false, doneAt: null },
+      { id: uid("c"), text: "Добавить протоколы: шум, лезии, длинные прогоны", done: false, doneAt: null },
+      { id: uid("c"), text: "Замерить скорость и память на CPU / GPU", done: false, doneAt: null },
+      ...makeChecklist().slice(6),
+    ],
+    deadline: plusDays(60),
   }),
   idea({
     id: "i-song",
@@ -127,6 +154,7 @@ export const SEED_IDEAS: Idea[] = [
     status: "backlog",
     scores: { effort: 6, impact: 6, novelty: 7, speed: 4, risk: 6 },
     notes: "Мостик к акустической коммуникации. Модели JO в симуляции нет — придётся достраивать.",
+    dependsOn: ["i-lesions", "i-benchmark"],
   }),
   idea({
     id: "i-pci",

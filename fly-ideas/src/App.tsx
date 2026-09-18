@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
-import { BarChart3, Brain, Download, GitCompare, LayoutGrid, RotateCcw, Settings2, Upload } from "lucide-react";
+import { BarChart3, Brain, Download, GitCompare, LayoutGrid, Moon, RotateCcw, Settings2, Sun, Upload } from "lucide-react";
+import { useTheme } from "@/lib/theme";
 import { useStore } from "@/data/store";
 import { ProjectSidebar } from "@/components/project-sidebar";
 import { IdeaDialog } from "@/components/idea-dialog";
@@ -20,6 +21,7 @@ export default function App() {
   const [compare, setCompare] = useState<string[]>([]);
   const [tab, setTab] = useState("ideas");
   const fileRef = useRef<HTMLInputElement>(null);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   const visible = useMemo(() => (active === "all" ? state.ideas : state.ideas.filter((i) => i.projectId === active)), [state.ideas, active]);
   const openIdea = state.ideas.find((i) => i.id === openId) ?? null;
@@ -54,7 +56,7 @@ export default function App() {
 
   return (
     <TooltipProvider>
-      <div className="dark flex h-screen w-screen overflow-hidden bg-background text-foreground">
+      <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
         <ProjectSidebar
           projects={state.projects}
           ideas={state.ideas}
@@ -88,7 +90,10 @@ export default function App() {
                 <TabsTrigger value="compare"><GitCompare /> Сравнение {compare.length > 0 && <span className="rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{compare.length}</span>}</TabsTrigger>
               </TabsList>
             </Tabs>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-1">
+              <Button variant="ghost" size="icon" onClick={toggleTheme} title={theme === "dark" ? "Светлая тема" : "Тёмная тема"}>
+                {theme === "dark" ? <Sun /> : <Moon />}
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><Settings2 /></Button></DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -129,7 +134,7 @@ export default function App() {
           </Tabs>
         </main>
 
-        <IdeaDialog idea={openIdea} projects={state.projects} onClose={() => setOpenId(null)} onSave={store.updateIdea} onDelete={store.deleteIdea} />
+        <IdeaDialog idea={openIdea} allIdeas={state.ideas} projects={state.projects} onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)} onClose={() => setOpenId(null)} onSave={store.updateIdea} onDelete={store.deleteIdea} />
       </div>
     </TooltipProvider>
   );
