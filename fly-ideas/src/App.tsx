@@ -6,6 +6,7 @@ import { useStore } from "@/data/store";
 import { ProjectSidebar } from "@/components/project-sidebar";
 import { IdeaDialog } from "@/components/idea-dialog";
 import { IdeasView } from "@/views/ideas-view";
+import { ProjectView } from "@/views/project-view";
 import { DashboardView } from "@/views/dashboard-view";
 import { CompareView } from "@/views/compare-view";
 import { LibraryView } from "@/views/library-view";
@@ -78,6 +79,7 @@ export default function App() {
   };
 
   const counters: Record<string, string> = {
+    project: "",
     ideas: String(visible.length),
     dashboard: `${state.ideas.filter((i) => ["exploring", "active", "drafting"].includes(i.status)).length} в работе`,
     compare: compare.length ? `${compare.length} из 3` : "",
@@ -92,12 +94,18 @@ export default function App() {
           projects={state.projects}
           ideas={state.ideas}
           activeId={active}
-          onSelect={setActive}
+          onSelect={(id) => {
+            setActive(id);
+            setTab(id === "all" ? "ideas" : "project");
+          }}
           onAdd={(n) => store.addProject(n)}
           onRename={(id, name) => store.updateProject(id, { name })}
           onDelete={(id) => {
             store.deleteProject(id);
-            if (active === id) setActive("all");
+            if (active === id) {
+              setActive("all");
+              setTab("ideas");
+            }
           }}
           onDropIdea={store.moveIdea}
         />
@@ -116,6 +124,7 @@ export default function App() {
               <TabsList>
                 {(
                   [
+                    ...(activeProject ? ([["project", "Проект"]] as const) : []),
                     ["ideas", "Идеи"],
                     ["dashboard", "Дашборд"],
                     ["compare", "Сравнение"],
@@ -159,6 +168,21 @@ export default function App() {
           </header>
 
           <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-0 overflow-hidden">
+            {activeProject && (
+              <TabsContent value="project" className="min-h-0 overflow-hidden">
+                <ProjectView
+                  project={activeProject}
+                  ideas={visible}
+                  references={state.references}
+                  onUpdate={(patch) => store.updateProject(activeProject.id, patch)}
+                  onOpenWorkspace={() => setTab("brain")}
+                  onOpenIdea={setOpenId}
+                  onAddIdea={addIdea}
+                  onShowIdeas={() => setTab("ideas")}
+                  onShowDashboard={() => setTab("dashboard")}
+                />
+              </TabsContent>
+            )}
             <TabsContent value="ideas" className="min-h-0 overflow-hidden">
               <IdeasView
                 ideas={visible}
