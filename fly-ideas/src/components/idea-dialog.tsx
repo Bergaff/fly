@@ -5,6 +5,7 @@ import { Checklist } from "@/components/checklist";
 import { ExperimentLog } from "@/components/experiment-log";
 import { CitationsEditor } from "@/components/citations-editor";
 import { DeadlineBadge } from "@/components/deadline-badge";
+import { ArticleDraftButton } from "@/components/article-draft";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -100,6 +101,7 @@ export function IdeaDialog({ idea, allIdeas, references, projects, onCreateRefer
  )}
  <DeadlineBadge deadline={draft.deadline} />
  </div>
+ <ArticleDraftButton idea={draft} project={projects.find((p) => p.id === draft.projectId)} references={references} />
  </div>
  </DialogHeader>
 

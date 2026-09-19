@@ -897,9 +897,13 @@ function MessageBody({ content, onSaveCode }: { content: string; onSaveCode: (co
 function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const steps: [string, string][] = [
     ["Данные", "раздел «Данные и окружение»: выбери папку и нажми «Скачать мозг мухи», это около 100 МБ. Для первой пробы данные не нужны: шаблон 02 работает сам по себе."],
-    ["Окружение", "там же видно Python и пакеты. Чего не хватает, поставь командой, которая написана рядом."],
+    ["Окружение", "там же видно Python и пакеты. Для прогонов модели надёжнее окружение conda: conda env create -f environment.yml в папке приложения, затем conda activate fly-brain. Внутри уже есть Brian2, NAVis и neuprint-python, а numpy держится ниже второй версии, иначе brian2 не импортируется."],
     ["Первый прогон", "слева открой 00_check_env.py и запусти, затем 02_mb_toy_interference.py. Аргументы пишутся в поле над редактором: --relearn extinction --n-junk 25 --seed 1"],
     ["Посмотреть нейроны", "шаблон 05_neuron_gallery.py рисует морфологию нейронов в трёх проекциях и накладывает активность из прогона: --ids 12781 556329 (скелеты скачаются сами) или --spikes путь_к_spikes.parquet, с флагом --animate получится gif с распространением сигнала."],
+    ["Прогон модели", "шаблон 06_brian2_shiu.py считает LIF-сеть на Brian2: сам подбирает фоновый вес под целевую частоту, стимулирует и заглушает заданные нейроны, пишет spikes.parquet, rates_top.csv, raster.png. Проверка без данных: --synth --n 2000 --t 0.5."],
+    ["Связка фигур", "шаблон 07_morph_activity_figure.py кладёт морфологию и активность в одну фигуру. Половины подписаны, потому что id MaleCNS и FlyWire v783 не совпадают; таблица соответствия передаётся флагом --map."],
+    ["Коннектом самца", "шаблон 08_malecns_loader.py сам находит в бакете Janelia таблицы MaleCNS v1.0 и приводит их к колонкам pre, post, weight: --check показывает, что там лежит, --synth проверяет разбор без интернета."],
+    ["Протокол обучения", "шаблон 09_mb_circuit_v783.py берёт реальные KC, MBON и PPL1 из v783, ведёт два компартмента MBON и считает обучение, угасание и пассивную релаксацию: --n-pair 10 --extinction 20 --appetitive 6."],
     ["Результат", "внизу появятся графики, summary.json и лог. Кнопка «в журнал идеи» переносит запись в выбранную идею, дополни её в идее на вкладке «Журнал»."],
     ["Код помощником", "справа вставь ключ DeepSeek и напиши задачу словами. Файл из ответа сохраняется в папку проекта сам (галочка «сохранять код из ответа») либо кнопкой «сохранить в проект». Имя задаётся строкой # file: имя.py."],
     ["Литература", "переключи помощника на Perplexity (ключ с perplexity.ai), спроси про литературу и нажми «добавить в библиотеку»: строки с DOI разберутся в источники."],
@@ -1177,7 +1181,12 @@ function EnvPanel() {
           )}
           <div>
             <div className="font-medium">{env?.python ? "1" : "2"}. Пакеты для CPU-модели</div>
-            <pre className="mt-1 overflow-x-auto border bg-muted/40 p-2 font-mono text-[11px]">pip install numpy pandas pyarrow scipy matplotlib brian2</pre>
+            <p className="text-muted-foreground">
+              Каждое окружение отдельно: <code className="bg-muted px-1">conda env create -f environment.yml</code> ставит
+              fly-brain целиком (Brian2, NAVis, neuprint-python, cloud-volume). Быстрый путь без conda:{" "}
+              <code className="bg-muted px-1">pip install "numpy&lt;2" pandas pyarrow scipy matplotlib brian2</code>. Версия numpy важна:
+              в numpy 2 убрали ndarray.ptp, и brian2 падает при импорте.
+            </p>
           </div>
           <div>
             <div className="font-medium">{env?.python ? "2" : "3"}. GPU-бэкенды, потом</div>
