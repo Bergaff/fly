@@ -302,10 +302,15 @@ if not args.no_plot and len(spikes):
             rank = sub["flywire_id"].rank(method="dense").astype(int)
             ax[0].plot(sub["t_global"].to_numpy(), rank.to_numpy(), ".", markersize=1.4,
                        color=COLORS[k % len(COLORS)], label=f"{exp} ({int(np.mean(per_exp[exp]))} спайков)")
+    if stim_idx and len(spikes):
+        hot = spikes[spikes.flywire_id.isin(ids[stim_idx])]
+        if len(hot):
+            ax[0].plot(hot["t_global"].to_numpy(), hot["flywire_id"].rank(method="dense").astype(int).to_numpy(),
+                       ".", markersize=2.6, color="#8a4b4b", label="стимулируемые нейроны")
     ax[0].set_title("спайки по времени, условия наложены")
     ax[0].set_xlabel("время, мс (попытки подряд)")
     ax[0].set_ylabel("нейрон, ранк активности")
-    ax[0].legend(frameon=False, fontsize=8)
+    ax[0].legend(loc="upper left", fontsize=8, framealpha=0.92, facecolor="#f6f3ee", edgecolor="none")
     ax[0].spines[["top", "right"]].set_visible(False)
     for k, exp in enumerate(exps):
         if exp in traces:
