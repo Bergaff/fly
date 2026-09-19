@@ -1,0 +1,31 @@
+# Окружение для прогонов модели мозга.
+# conda env create -f environment.yml
+# conda activate fly-brain
+#
+# Почему именно так:
+#  - brian2 2.9 требует numpy < 2 (в numpy 2 убрали ndarray.ptp, brian2 падает при импорте);
+#  - python 3.11 подобран под brian2, navis и neuprint-python;
+#  - navis и neuprint-python нужны для скелетов и запросов к MaleCNS,
+#    cloud-volume для выгрузки объёмов и синапсов из бакета Janelia.
+name: fly-brain
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy=1.26.*
+  - scipy
+  - pandas
+  - pyarrow
+  - matplotlib
+  - pillow
+  - requests
+  - tqdm
+  - pip:
+      - brian2==2.9.0
+      - joblib
+      - networkx
+      - navis
+      - neuprint-python
+      - cloud-volume
+      - flybrains
