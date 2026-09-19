@@ -7,6 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DeadlineBadge } from "@/components/deadline-badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const PALETTE = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
@@ -38,6 +46,7 @@ export function ProjectView({
   const [runs, setRuns] = useState<RunInfo[]>([]);
   const [desc, setDesc] = useState(project.description);
   const [name, setName] = useState(project.name);
+  const [folders, setFolders] = useState(false);
 
   useEffect(() => {
     setDesc(project.description);
@@ -199,9 +208,14 @@ export function ProjectView({
                     {started ? "Открыть рабочее место" : "Открыть и разложить шаблоны"}
                   </Button>
                   {paths && (
-                    <Button size="sm" variant="ghost" onClick={() => void fly?.openPath(paths.runs)}>
-                      Показать прогоны
-                    </Button>
+                    <>
+                      <Button size="sm" variant="ghost" onClick={() => void fly?.openPath(paths.runs)}>
+                        Показать прогоны
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setFolders(true)}>
+                        Сменить папки
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -326,6 +340,69 @@ export function ProjectView({
           </section>
         )}
       </div>
+
+      <Dialog open={folders} onOpenChange={setFolders}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Папки проекта</DialogTitle>
+            <DialogDescription className="text-xs">
+              Код проекта и прогоны можно держать в любом месте диска, например на большом диске или в папке с данным
+              коннектома. Выбор запоминается для этого проекта.
+            </DialogDescription>
+          </DialogHeader>
+          {paths && (
+            <div className="flex flex-col gap-3">
+              {(
+                [
+                  ["код", "code"],
+                  ["прогоны", "runs"],
+                ] as const
+              ).map(([title, kind]) => (
+                <div key={kind} className="border">
+                  <div className="label border-b px-2 py-1.5">{title}</div>
+                  <div className="flex items-center gap-2 p-2">
+                    <span className="min-w-0 flex-1 truncate font-mono text-[11px]" title={paths[kind]}>
+                      {paths[kind]}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        const next = await fly?.chooseProjectFolder(project.id, kind, `Папка: ${title}`);
+                        if (next) {
+                          setPaths(next);
+                          setRuns(await (fly?.listRuns(project.id) ?? Promise.resolve([])));
+                        }
+                      }}
+                    >
+                      Выбрать…
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={async () => {
+                        const next = await fly?.resetProjectFolder(project.id, kind);
+                        if (next) setPaths(next);
+                      }}
+                    >
+                      по умолчанию
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <p className="text-[11px] text-muted-foreground">
+                По умолчанию: <span className="font-mono">{paths.defaults.code}</span> и{" "}
+                <span className="font-mono">{paths.defaults.runs}</span> внутри папки приложения.
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button size="sm" onClick={() => setFolders(false)}>
+              Готово
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
