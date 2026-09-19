@@ -56,6 +56,7 @@ ap.add_argument("--n", type=int, default=2000, help="размер синтети
 ap.add_argument("--max-neurons", type=int, default=0, help="обрезать реальную сеть до N нейронов (0 = целиком)")
 ap.add_argument("--stim", type=str, default="", help="id нейронов для стимуляции, через запятую")
 ap.add_argument("--silence", type=str, default="", help="id нейронов, которые заглушить, через запятую")
+ap.add_argument("--stim-random", type=int, default=0, help="стимулировать N случайных нейронов (для проверок)")
 ap.add_argument("--t", type=float, default=1.0, help="секунд биовремени на попытку")
 ap.add_argument("--n-run", type=int, default=3, help="попыток на условие")
 ap.add_argument("--rate", type=float, default=None, help="перекрыть r_poi (Гц)")
@@ -162,6 +163,8 @@ def parse_ids(text):
 
 
 stim_idx = parse_ids(args.stim)
+if not stim_idx and args.stim_random:
+    stim_idx = sorted(np.random.default_rng(args.seed).choice(N, min(args.stim_random, N), replace=False).tolist())
 silence_idx = parse_ids(args.silence)
 if args.stim and not stim_idx:
     sys.exit("Ни один из --stim не встречается в таблице связей. Проверь, что id из того же коннектома.")
