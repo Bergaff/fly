@@ -175,11 +175,46 @@ const DATA_CATALOG = [
 
 /** Внешние источники — открываются в браузере, скачиваются вручную */
 const EXTERNAL_SOURCES = [
+  { title: "MaleCNS v1.0: коннектом ЦНС самца (Janelia)", url: "https://male-cns.janelia.org/", note: "Мозг, оптические доли и брюшная нервная цепочка в одном препарате, 165 тыс. нейронов. Файлы feather, лицензия CC-BY 4.0" },
+  { title: "neuPrint: male-cns:v1.0", url: "https://neuprint.janelia.org/?dataset=male-cns%3Av1.0", note: "Запросы по связности и аннотациям, нужен бесплатный аккаунт; доступ из Python через neuprint-python" },
+  { title: "MaleCNS Cell Type Explorer", url: "https://reiserlab.github.io/celltype-explorer-drosophila-male-cns/", note: "Просмотр типов клеток и связности между типами без аккаунта" },
+  { title: "Сравнение полов: dimorphism overview", url: "https://janelia-flyem.github.io/male-cns/build/dimorphism_overview/", note: "Прямое сравнение связности диморфных клеток самца и самки FlyWire" },
+  { title: "Код анализа к статье про MaleCNS", url: "https://github.com/flyconnectome/2025malecns", note: "Скрипты и производные таблицы статьи о диморфизме" },
   { title: "FlyWire Codex — обзор нейронов и скачивание v783", url: "https://codex.flywire.ai/api/download", note: "Официальные выгрузки коннектома (нужен бесплатный аккаунт)" },
   { title: "Schlegel et al. 2024 — аннотации типов клеток", url: "https://www.nature.com/articles/s41586-024-07686-5#Sec46", note: "Supplementary Data: типы клеток для выбора контуров (MB, CX)" },
   { title: "philshiu/Drosophila_brain_model — оригинал статьи", url: "https://github.com/philshiu/Drosophila_brain_model", note: "Исходный репозиторий Shiu et al., данные v630" },
   { title: "eonsystemspbc/fly-brain — все бэкенды", url: "https://github.com/eonsystemspbc/fly-brain", note: "Brian2 / CUDA / PyTorch / NEST / GeNN, бенчмарки" },
 ];
+
+const MALE_CNS_BASE = "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/";
+
+// ------------------------------------------------------------
+// MaleCNS v1.0: полный коннектом ЦНС самца (Janelia), лицензия CC-BY 4.0
+// ------------------------------------------------------------
+DATA_CATALOG.push(
+  {
+    id: "malecns-annotations",
+    group: "MaleCNS v1.0, ЦНС самца (Janelia)",
+    title: "Аннотации нейронов: классы, типы, стороны",
+    file: "body-annotations-male-cns-v1.0-minconf-0.5.feather",
+    url: MALE_CNS_BASE + "body-annotations-male-cns-v1.0-minconf-0.5.feather",
+    page: "https://male-cns.janelia.org/download/",
+    sizeMB: 13,
+    note: "Около 12 тыс. типов клеток, включая полоспецифичные и диморфные. Читается pyarrow или pandas.",
+    dest: "data",
+  },
+  {
+    id: "malecns-neurotransmitters",
+    group: "MaleCNS v1.0, ЦНС самца (Janelia)",
+    title: "Предсказание нейромедиатора по нейрону",
+    file: "body-neurotransmitters-male-cns-v1.0.feather",
+    url: MALE_CNS_BASE + "body-neurotransmitters-male-cns-v1.0.feather",
+    page: "https://male-cns.janelia.org/download/",
+    sizeMB: 42,
+    note: "Нужно для знаков синапсов при сборке LIF-модели на мужском коннектоме.",
+    dest: "data",
+  },
+);
 
 const activeDownloads = new Map();
 

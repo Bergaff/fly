@@ -9,6 +9,8 @@ export interface DataItem {
   sizeMB: number;
   note: string;
   dest?: "data" | "scripts";
+  /** ссылка для кнопки «источник», если файл лежит не на GitHub */
+  page?: string;
   path: string;
   size: number | null;
   present: boolean;

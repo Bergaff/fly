@@ -1052,7 +1052,7 @@ function DataPanel() {
                         size="sm"
                         variant="ghost"
                         title="Открыть страницу файла на GitHub"
-                        onClick={() => fly!.openExternal(it.url.replace("raw.githubusercontent.com", "github.com").replace("/main/", "/blob/main/"))}
+                        onClick={() => fly!.openExternal(it.page ?? it.url.replace("raw.githubusercontent.com", "github.com").replace("/main/", "/blob/main/"))}
                       >
                         источник
                       </Button>
