@@ -74,6 +74,10 @@
       {
         "from": "experiments/templates",
         "to": "templates"
+      },
+      {
+        "from": "mcp",
+        "to": "mcp"
       }
     ]
   }

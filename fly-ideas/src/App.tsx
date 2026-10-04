@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BrainView } from "@/views/brain-view";
 import { useTheme } from "@/lib/theme";
 import { fly, isElectron } from "@/lib/bridge";
@@ -12,6 +12,7 @@ import { CompareView } from "@/views/compare-view";
 import { LibraryView } from "@/views/library-view";
 import { ReferenceDialog } from "@/components/reference-dialog";
 import { LegalDialog, type LegalKind } from "@/components/legal-dialog";
+import type { AgentInfo } from "@/lib/bridge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -26,6 +27,8 @@ export default function App() {
   const [compare, setCompare] = useState<string[]>([]);
   const [tab, setTab] = useState("ideas");
   const [legal, setLegal] = useState<LegalKind | null>(null);
+  const [agent, setAgent] = useState<AgentInfo | null>(null);
+  const [notes, setNotes] = useState<{ id: number; text: string }[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const { theme, toggle: toggleTheme } = useTheme();
 
@@ -38,6 +41,75 @@ export default function App() {
 
   const toggleCompare = (id: string) =>
     setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? [...c.slice(1), id] : [...c, id]));
+
+  const pushNote = useCallback((text: string) => {
+    const id = Date.now() + Math.random();
+    setNotes((n) => [...n.slice(-3), { id, text }]);
+    setTimeout(() => setNotes((n) => n.filter((x) => x.id !== id)), 12000);
+  }, []);
+
+  // Снимок состояния для внешнего агента: он читает его через локальный мост
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    const t = setTimeout(() => void bridge.syncState(state), 350);
+    return () => clearTimeout(t);
+  }, [state]);
+
+  useEffect(() => {
+    if (!fly) return;
+    void fly.agentInfo().then(setAgent);
+  }, []);
+
+  // Записи агента применяем к store через те же функции, что и обычные действия
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    return bridge.onAgentWrite(({ reqId, kind, payload }) => {
+      try {
+        if (kind === "journal") {
+          const w = payload as { ideaId: string; title: string; params: string; result: string; conclusion: string; outcome?: string };
+          const entry = store.addExperiment(w.ideaId, {
+            title: w.title,
+            params: w.params,
+            result: w.result,
+            conclusion: w.conclusion,
+            outcome: (w.outcome as never) ?? "inconclusive",
+          });
+          void bridge.agentAck(reqId, { ok: true, entryId: entry.id });
+        } else if (kind === "idea") {
+          const w = payload as { projectId: string; title: string; question: string; method: string; validation: string };
+          const created = store.addIdea(w.projectId, {
+            title: w.title,
+            question: w.question,
+            method: w.method,
+            validation: w.validation,
+          });
+          void bridge.agentAck(reqId, { ok: true, ideaId: created.id });
+        } else if (kind === "reference") {
+          const created = store.addReference(payload as never);
+          void bridge.agentAck(reqId, { ok: true, refId: created.id });
+        } else if (kind === "ideaPatch") {
+          const w = payload as { id: string; patch: Record<string, unknown> };
+          store.updateIdea(w.id, w.patch as never);
+          void bridge.agentAck(reqId, { ok: true });
+        } else {
+          void bridge.agentAck(reqId, { ok: false, error: `Неизвестный тип записи: ${kind}` });
+        }
+      } catch (e) {
+        void bridge.agentAck(reqId, { ok: false, error: String((e as Error).message || e) });
+      }
+    });
+  }, [store]);
+
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    return bridge.onAgentNotice((n) => {
+      pushNote(n.text);
+      void bridge.agentInfo().then(setAgent);
+    });
+  }, [pushNote]);
 
   const addIdea = () => {
     const pid = active === "all" ? state.projects[0].id : active;
@@ -141,6 +213,14 @@ export default function App() {
             </Tabs>
 
             <div className="ml-auto flex items-center gap-1.5">
+              {agent?.running && (
+                <span
+                  className="label hidden border px-1.5 py-0.5 xl:inline"
+                  title={`Внешний агент читает идеи и запускает прогоны через ${agent.file}`}
+                >
+                  агент: порт {agent.port}
+                </span>
+              )}
               <span className="label hidden xl:inline">источник: {isElectron ? "локальное окно" : "браузер, часть функций недоступна"}</span>
               <Button variant="ghost" size="sm" onClick={toggleTheme} title="Переключить светлую и тёмную тему">
                 {theme === "dark" ? "светлая" : "тёмная"}
@@ -247,6 +327,25 @@ export default function App() {
           onSave={store.updateIdea}
           onDelete={store.deleteIdea}
         />
+        {notes.length > 0 && (
+          <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[320px] flex-col gap-2">
+            {notes.map((n) => (
+              <div key={n.id} className="pointer-events-auto border bg-card p-2 text-[12px]">
+                <div className="flex items-start gap-2">
+                  <span className="label shrink-0">агент</span>
+                  <span className="min-w-0 flex-1">{n.text}</span>
+                  <button
+                    className="shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
+                    onClick={() => setNotes((list) => list.filter((x) => x.id !== n.id))}
+                    title="Скрыть"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         <ReferenceDialog reference={openRef} usedBy={refUsedBy} onClose={() => setOpenRefId(null)} onSave={store.updateReference} onDelete={store.deleteReference} />
         <LegalDialog kind={legal} onClose={() => setLegal(null)} />
       </div>

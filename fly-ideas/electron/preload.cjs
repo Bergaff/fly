@@ -47,6 +47,21 @@ contextBridge.exposeInMainWorld("fly", {
   setSecret: (k, v) => ipcRenderer.invoke("fly:setSecret", k, v),
   // --- LLM-прокси: ключ не покидает main-процесс ---
   llmChat: (req) => ipcRenderer.invoke("fly:llmChat", req),
+  // --- мост для внешнего агента (MCP): локальный HTTP, приложение источник правды ---
+  agentInfo: () => ipcRenderer.invoke("fly:agentInfo"),
+  setAgentEnabled: (on) => ipcRenderer.invoke("fly:setAgentEnabled", on),
+  syncState: (st) => ipcRenderer.invoke("fly:syncState", st),
+  agentAck: (reqId, result) => ipcRenderer.invoke("fly:agentAck", reqId, result),
+  onAgentWrite: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:agentWrite", h);
+    return () => ipcRenderer.removeListener("fly:agentWrite", h);
+  },
+  onAgentNotice: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:agentNotice", h);
+    return () => ipcRenderer.removeListener("fly:agentNotice", h);
+  },
   // --- результаты прогонов ---
   listRuns: (projectId) => ipcRenderer.invoke("fly:listRuns", projectId),
   readRun: (dir) => ipcRenderer.invoke("fly:readRun", dir),

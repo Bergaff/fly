@@ -5,6 +5,7 @@ const fsp = require("node:fs/promises");
 const { spawn } = require("node:child_process");
 const https = require("node:https");
 const http = require("node:http");
+const crypto = require("node:crypto");
 
 const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
@@ -358,6 +359,7 @@ async function runScript(win, projectId, name, args) {
   p.on("close", (code) => {
     log.end();
     runs.delete(runId);
+    runStatus.set(runId, { code, dir: runDir, finishedAt: new Date().toISOString() });
     win.webContents.send("fly:runOutput", { runId, stream: "exit", code, text: `\n[завершено, код ${code}]\n` });
   });
   return { runId, runDir };
@@ -391,6 +393,333 @@ async function llmChat({ provider, model, messages, temperature }) {
   if (!res.ok) throw new Error(`${provider}: HTTP ${res.status} ${await res.text()}`);
   const j = await res.json();
   return { content: j.choices?.[0]?.message?.content ?? "", usage: j.usage };
+}
+
+// ------------------------------------------------------------
+// Мост для внешнего агента (MCP): локальный HTTP на 127.0.0.1 с токеном.
+// Приложение остаётся источником правды: чтение из снимка состояния,
+// запись и запуски проходят проверки и видны в интерфейсе.
+// ------------------------------------------------------------
+const AGENT_FILE = path.join(app.getPath("userData"), "agent.json");
+const MCP_SERVER = isDev ? path.join(__dirname, "..", "mcp", "server.mjs") : path.join(process.resourcesPath, "mcp", "server.mjs");
+const STATE_FILE = path.join(app.getPath("userData"), "state.json");
+const AGENT = { token: crypto.randomBytes(24).toString("hex"), port: 0, server: null, state: null, syncedAt: 0 };
+const agentWrites = new Map();
+const runStatus = new Map();
+let agentSeq = 0;
+let snapshotTimer = null;
+
+const win = () => BrowserWindow.getAllWindows()[0] || null;
+
+function agentEnabled() {
+  return readConfig().agentEnabled !== false;
+}
+/** Путь внутри любой из папок прогонов: общей или переназначенной проектом */
+function withinRuns(p) {
+  if (within(DIRS.runs, p)) return true;
+  const cfg = readConfig().projectDirs || {};
+  for (const v of Object.values(cfg)) if (v && typeof v.runs === "string" && within(v.runs, p)) return true;
+  return false;
+}
+function agentNote(text) {
+  win()?.webContents.send("fly:agentNotice", { text, at: Date.now() });
+}
+function writeSnapshot() {
+  if (snapshotTimer) clearTimeout(snapshotTimer);
+  snapshotTimer = setTimeout(() => {
+    try {
+      fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
+      fs.writeFileSync(STATE_FILE, JSON.stringify(AGENT.state || {}, null, 1));
+    } catch {}
+  }, 500);
+}
+/** Запись просим применить у окна: оно держит store и показывает уведомление */
+function agentAsk(kind, payload, timeoutMs = 20000) {
+  const w = win();
+  if (!w) return Promise.reject(new Error("Окно приложения недоступно."));
+  const reqId = `a${++agentSeq}`;
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => {
+      agentWrites.delete(reqId);
+      reject(new Error("Приложение не подтвердило запись за 20 секунд."));
+    }, timeoutMs);
+    agentWrites.set(reqId, { resolve, reject, t });
+    w.webContents.send("fly:agentWrite", { reqId, kind, payload });
+  });
+}
+function agentAck(reqId, result) {
+  const w = agentWrites.get(reqId);
+  if (!w) return false;
+  clearTimeout(w.t);
+  agentWrites.delete(reqId);
+  w.resolve(result);
+  return true;
+}
+
+function state() {
+  return AGENT.state || { projects: [], ideas: [], references: [] };
+}
+function findIdea({ id, title }) {
+  const list = state().ideas || [];
+  if (id) return list.find((i) => i.id === id || i.id.toLowerCase() === String(id).toLowerCase());
+  if (title) {
+    const q = String(title).toLowerCase();
+    return list.find((i) => i.title.toLowerCase() === q) || list.find((i) => i.title.toLowerCase().includes(q));
+  }
+  return null;
+}
+const ideaBrief = (i) => ({
+  id: i.id, title: i.title, projectId: i.projectId, status: i.status,
+  scores: i.scores, deadline: i.deadline,
+  чеклист: { пройдено: i.checklist.filter((c) => c.done).length, всего: i.checklist.length },
+  метки: i.tags, прогонов: i.experiments.length, источников: i.citations.length,
+});
+
+async function agentRoute(route, q, body, method) {
+  switch (route) {
+    case "/status": {
+      const st = state();
+      const dirs = getDirs();
+      return {
+        приложение: "Fly Ideas",
+        порт: AGENT.port,
+        agentFile: AGENT_FILE,
+        состояниеОбновлено: AGENT.syncedAt ? new Date(AGENT.syncedAt).toISOString() : null,
+        права: getPermissions(),
+        папки: { данные: dirs.data, скрипты: dirs.scripts, прогоны: dirs.runs, экспорт: dirs.exports },
+        проекты: (st.projects || []).map((p) => ({ id: p.id, name: p.name, идей: (st.ideas || []).filter((i) => i.projectId === p.id).length })),
+        идейВсего: (st.ideas || []).length,
+        источниковВсего: (st.references || []).length,
+      };
+    }
+    case "/projects": {
+      const st = state();
+      return (st.projects || []).map((p) => ({ ...p, идей: (st.ideas || []).filter((i) => i.projectId === p.id).length }));
+    }
+    case "/ideas": {
+      const st = state();
+      let list = st.ideas || [];
+      if (q.projectId && q.projectId !== "all") list = list.filter((i) => i.projectId === q.projectId);
+      if (q.status) list = list.filter((i) => i.status === q.status);
+      if (q.query) {
+        const needle = String(q.query).toLowerCase();
+        list = list.filter((i) => (i.title + " " + i.question + " " + i.method + " " + i.tags.join(" ")).toLowerCase().includes(needle));
+      }
+      list = [...list].sort((a, b) => b.scores.impact + b.scores.novelty + b.scores.speed - (b.scores.effort + b.scores.risk) - (a.scores.impact + a.scores.novelty + a.scores.speed - (a.scores.effort + a.scores.risk)));
+      return list.slice(0, Number(q.limit) || 40).map(ideaBrief);
+    }
+    case "/idea": {
+      if (method === "POST") {   // создание идеи
+        if (!body.title) throw new Error("Нужно название идеи");
+        const st0 = state();
+        const projectId = body.projectId || (st0.projects || [])[0]?.id;
+        if (!projectId) throw new Error("В приложении нет ни одного проекта");
+        const res = await agentAsk("idea", {
+          projectId, title: body.title, question: body.question || "", method: body.method || "", validation: body.validation || "",
+        });
+        agentNote(`агент завёл идею «${body.title}»`);
+        return { ok: true, ...res };
+      }
+      const found = findIdea(q);
+      if (!found) return { error: "Идея не найдена. Посмотри fly_list_ideas." };
+      const st = state();
+      const refs = new Map((st.references || []).map((r) => [r.id, r]));
+      const project = (st.projects || []).find((p) => p.id === found.projectId);
+      return {
+        ...checkedIdea(found),
+        проект: project ? { id: project.id, name: project.name } : null,
+        чеклист: found.checklist.map((c) => ({ текст: c.text, сделано: c.done, дата: c.doneAt || null })),
+        журнал: found.experiments.map((e) => ({ id: e.id, дата: e.date, что: e.title, параметры: e.params, результат: e.result, вывод: e.conclusion, исход: e.outcome })),
+        источники: found.citations.map((c) => ({ refId: c.refId, зачем: c.why, ссылка: refs.get(c.refId) || null })),
+        связи: (found.dependsOn || []).map((id) => ({ id, title: (st.ideas || []).find((i) => i.id === id)?.title || "?" })),
+      };
+    }
+    case "/idea/patch": {
+      if (!body.id) throw new Error("Нужен id идеи");
+      const found = findIdea({ id: body.id });
+      if (!found) throw new Error("Идея не найдена");
+      const allowed = ["status", "question", "method", "validation", "notes", "deadline", "tags", "scores", "timeline", "venues"];
+      const patch = {};
+      for (const [k, v] of Object.entries(body.patch || {})) if (allowed.includes(k)) patch[k] = v;
+      if (!Object.keys(patch).length) throw new Error("Нечего менять: допустимые поля " + allowed.join(", "));
+      const res = await agentAsk("ideaPatch", { id: found.id, patch });
+      agentNote(`агент поправил идею «${found.title}» (${Object.keys(patch).join(", ")})`);
+      return { ok: true, ...res };
+    }
+    case "/library": {
+      let list = state().references || [];
+      if (q.tag) list = list.filter((r) => r.tags.includes(q.tag));
+      if (q.query) {
+        const needle = String(q.query).toLowerCase();
+        list = list.filter((r) => (r.authors + " " + r.title + " " + r.venue + " " + r.doi + " " + r.tags.join(" ") + " " + r.notes).toLowerCase().includes(needle));
+      }
+      return list.slice(0, Number(q.limit) || 40).map((r) => ({ id: r.id, авторы: r.authors, год: r.year, название: r.title, журнал: r.venue, doi: r.doi, url: r.url, метки: r.tags, конспект: r.notes }));
+    }
+    case "/scripts": {
+      const ws = projectPaths(q.projectId);
+      const files = (await fsp.readdir(ws.code, { withFileTypes: true })).filter((f) => f.isFile() && f.name.endsWith(".py"));
+      const out = [];
+      for (const f of files) {
+        const full = path.join(ws.code, f.name);
+        const st = await fsp.stat(full);
+        let doc = "";
+        try {
+          const head = (await fsp.readFile(full, "utf8")).split("\n").slice(0, 12).join(" ").replace(/"/g, "'");
+          doc = (head.match(/"""(.+?)"""/) || head.match(/^#\s*(.+)/m) || ["", ""])[1].slice(0, 200);
+        } catch {}
+        out.push({ имя: f.name, описание: doc.trim(), размер: st.size, изменён: new Date(st.mtimeMs).toISOString() });
+      }
+      return { папка: ws.code, папкаПрогонов: ws.runs, файлы: out.sort((a, b) => a.имя.localeCompare(b.имя)) };
+    }
+    case "/script": {
+      const ws = projectPaths(q.projectId);
+      const file = path.join(ws.code, path.basename(q.name));
+      if (!within(ws.code, file)) throw new Error("Скрипт вне папки проекта");
+      return { имя: path.basename(q.name), код: await fsp.readFile(file, "utf8") };
+    }
+    case "/runs": {
+      const ws = projectPaths(q.projectId);
+      const entries = await fsp.readdir(ws.runs, { withFileTypes: true }).catch(() => []);
+      const dirs = entries.filter((d) => d.isDirectory()).map((d) => d.name).sort().reverse().slice(0, Number(q.limit) || 20);
+      const out = [];
+      for (const d of dirs) {
+        const full = path.join(ws.runs, d);
+        let summary = null;
+        try { summary = JSON.parse(await fsp.readFile(path.join(full, "summary.json"), "utf8")); } catch {}
+        const files = await fsp.readdir(full).catch(() => []);
+        const st = await fsp.stat(full).catch(() => null);
+        out.push({ папка: full, когда: st ? new Date(st.mtimeMs).toISOString() : null, файлы: files, сводка: summary });
+      }
+      return { папкаПрогонов: ws.runs, прогоны: out };
+    }
+    case "/run": {
+      if (q.dir) {  // GET: чтение итога
+        if (!withinRuns(q.dir)) throw new Error("Папка вне каталога прогонов");
+        const out = { папка: q.dir, файлы: await fsp.readdir(q.dir).catch(() => []) };
+        try { out.сводка = JSON.parse(await fsp.readFile(path.join(q.dir, "summary.json"), "utf8")); } catch { out.сводка = null; }
+        try { out.лог = (await fsp.readFile(path.join(q.dir, "log.txt"), "utf8")).slice(-8000); } catch { out.лог = ""; }
+        return out;
+      }
+      // POST: запуск
+      if (!body.script) throw new Error("Нужно имя скрипта");
+      const started = await runScript(win(), body.projectId, body.script, body.args || []);
+      agentNote(`агент запустил ${path.basename(body.script)}`);
+      return { ...started, подсказка: "итог забирай через fly_wait_run или fly_read_run" };
+    }
+    case "/run/status": {
+      const st = runStatus.get(q.runId);
+      return { runId: q.runId, running: runs.has(q.runId), dir: st?.dir || null, код: st?.code ?? null, завершён: st?.finishedAt ?? null };
+    }
+    case "/kill": {
+      const p = runs.get(body.runId);
+      if (!p) throw new Error("Прогон не найден или уже завершён");
+      p.kill();
+      agentNote(`агент остановил прогон ${body.runId}`);
+      return { ok: true };
+    }
+    case "/journal": {
+      const idea = findIdea({ id: body.ideaId });
+      if (!idea) throw new Error("Идея не найдена: посмотри fly_list_ideas");
+      const res = await agentAsk("journal", {
+        ideaId: idea.id, title: body.title || "запись агента", params: body.params || "",
+        result: body.result || "", conclusion: body.conclusion || "", outcome: body.outcome || "inconclusive",
+      });
+      agentNote(`агент добавил запись в журнал идеи «${idea.title}»`);
+      return { ok: true, идея: idea.title, ...res };
+    }
+    case "/reference": {
+      if (!body.title) throw new Error("Нужно название источника");
+      const res = await agentAsk("reference", body);
+      agentNote(`агент добавил источник «${String(body.title).slice(0, 60)}»`);
+      return { ok: true, ...res };
+    }
+    case "/data": {
+      const dir = getDirs().data;
+      const items = await fsp.readdir(dir, { withFileTypes: true }).catch(() => []);
+      const out = [];
+      for (const it of items) {
+        const full = path.join(dir, it.name);
+        if (it.isDirectory()) {
+          const inside = await fsp.readdir(full).catch(() => []);
+          out.push({ имя: it.name + "/", файлов: inside.length, примеры: inside.slice(0, 5) });
+        } else {
+          const st = await fsp.stat(full).catch(() => null);
+          out.push({ имя: it.name, МБ: st ? +(st.size / 1048576).toFixed(1) : null });
+        }
+      }
+      return { папка: dir, содержимое: out };
+    }
+    default:
+      throw new Error("Неизвестный маршрут " + route);
+  }
+}
+
+function checkedIdea(i) {
+  return {
+    id: i.id, title: i.title, status: i.status, вопрос: i.question, метод: i.method,
+    валидация: i.validation, заметки: i.notes, оценки: i.scores, срок: i.deadline,
+    срокиОценка: i.timeline, метки: i.tags, журналы: i.venues,
+    ссылки: i.links, создана: i.createdAt, изменена: i.updatedAt,
+  };
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    let b = "";
+    req.on("data", (c) => {
+      b += c;
+      if (b.length > 2_000_000) req.destroy();
+    });
+    req.on("end", () => {
+      try { resolve(b ? JSON.parse(b) : {}); } catch (e) { reject(e); }
+    });
+    req.on("error", reject);
+  });
+}
+
+function startAgentServer() {
+  if (AGENT.server || !agentEnabled()) return;
+  AGENT.server = http.createServer(async (req, res) => {
+    const json = (code, data) => {
+      res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(data));
+    };
+    const url = new URL(req.url, "http://127.0.0.1");
+    if (!url.pathname.startsWith("/api/")) return json(404, { error: "Есть только /api/*" });
+    const header = req.headers.authorization || "";
+    const token = header.startsWith("Bearer ") ? header.slice(7) : url.searchParams.get("token") || "";
+    if (token !== AGENT.token) return json(401, { error: "Неверный токен. Возьми его из agent.json." });
+    try {
+      const q = Object.fromEntries(url.searchParams.entries());
+      const body = req.method === "POST" ? await readBody(req) : {};
+      json(200, await agentRoute(url.pathname.replace(/^\/api/, ""), q, body, req.method));
+    } catch (e) {
+      json(400, { error: String(e.message || e) });
+    }
+  });
+  AGENT.server.on("error", (e) => {
+    console.error("мост агента не поднялся:", e.message);
+    AGENT.server = null;
+  });
+  AGENT.server.listen(0, "127.0.0.1", () => {
+    AGENT.port = AGENT.server.address().port;
+    try {
+      fs.mkdirSync(path.dirname(AGENT_FILE), { recursive: true });
+      fs.writeFileSync(AGENT_FILE, JSON.stringify({
+        app: "fly-ideas", port: AGENT.port, token: AGENT.token, pid: process.pid,
+        url: `http://127.0.0.1:${AGENT.port}`, mcp: MCP_SERVER,
+        startedAt: new Date().toISOString(),
+      }, null, 2), { mode: 0o600 });
+    } catch (e) {
+      console.error("не смог записать agent.json:", e.message);
+    }
+  });
+}
+function stopAgentServer() {
+  AGENT.server?.close();
+  AGENT.server = null;
+  AGENT.port = 0;
+  try { fs.rmSync(AGENT_FILE, { force: true }); } catch {}
 }
 
 // ------------------------------------------------------------
@@ -537,7 +866,7 @@ function registerIpc(getWin) {
   });
   ipcMain.handle("fly:readRunFile", async (_e, dir, name) => {
     const p = path.join(dir, path.basename(name));
-    if (!within(DIRS.runs, p)) throw new Error("Файл вне папки прогонов.");
+    if (!withinRuns(p)) throw new Error("Файл вне папки прогонов.");
     const ext = path.extname(name).toLowerCase();
     if ([".png", ".jpg", ".jpeg", ".svg", ".gif"].includes(ext)) {
       const mime = ext === ".svg" ? "image/svg+xml" : ext === ".png" ? "image/png" : ext === ".gif" ? "image/gif" : "image/jpeg";
@@ -549,16 +878,39 @@ function registerIpc(getWin) {
   });
   ipcMain.handle("fly:exportRun", async (_e, dir) => {
     const src = dir;
-    if (!within(DIRS.runs, src)) throw new Error("Папка вне каталога прогонов.");
+    if (!withinRuns(src)) throw new Error("Папка вне каталога прогонов.");
     const dest = await dialog.showOpenDialog(getWin(), { title: "Куда скопировать прогон", properties: ["openDirectory", "createDirectory"] });
     if (dest.canceled || !dest.filePaths[0]) return null;
     const target = path.join(dest.filePaths[0], path.basename(dir));
     await fsp.cp(src, target, { recursive: true });
     return target;
   });
+  ipcMain.handle("fly:syncState", (_e, st) => {
+    AGENT.state = st && typeof st === "object" ? st : null;
+    AGENT.syncedAt = Date.now();
+    writeSnapshot();
+    return true;
+  });
+  ipcMain.handle("fly:agentAck", (_e, reqId, result) => agentAck(reqId, result));
+  ipcMain.handle("fly:agentInfo", () => ({
+    enabled: agentEnabled(), running: !!AGENT.server, port: AGENT.port,
+    url: AGENT.server ? `http://127.0.0.1:${AGENT.port}` : null,
+    file: AGENT_FILE, token: AGENT.token,
+    mcp: MCP_SERVER,
+    syncedAt: AGENT.syncedAt || null,
+    ideas: (state().ideas || []).length, projects: (state().projects || []).length,
+  }));
+  ipcMain.handle("fly:setAgentEnabled", (_e, on) => {
+    const c = readConfig();
+    c.agentEnabled = !!on;
+    writeConfig(c);
+    if (on) startAgentServer();
+    else stopAgentServer();
+    return { enabled: agentEnabled(), running: !!AGENT.server, port: AGENT.port };
+  });
   ipcMain.handle("fly:readRun", async (_e, dir) => {
     const p = dir;
-    if (!within(DIRS.runs, p)) throw new Error("Папка вне каталога прогонов.");
+    if (!withinRuns(p)) throw new Error("Папка вне каталога прогонов.");
     const out = { log: "", summary: null };
     try { out.log = (await fsp.readFile(path.join(p, "log.txt"), "utf8")).slice(-20000); } catch {}
     try { out.summary = JSON.parse(await fsp.readFile(path.join(p, "summary.json"), "utf8")); } catch {}
@@ -591,6 +943,8 @@ app.whenReady().then(() => {
   ensureDirs();
   registerIpc(() => mainWin);
   createWindow();
+  startAgentServer();
   app.on("activate", () => BrowserWindow.getAllWindows().length === 0 && createWindow());
 });
 app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
+app.on("before-quit", () => stopAgentServer());

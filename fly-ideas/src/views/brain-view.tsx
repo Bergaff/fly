@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Idea, Reference } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
-  type DataItem, type EnvInfo, type ExternalSource, type LlmMessage, type LlmProvider,
+  type DataItem, type AgentInfo, type EnvInfo, type ExternalSource, type LlmMessage, type LlmProvider,
   type Paths, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo,
 } from "@/lib/bridge";
 import { parseReferencesFromText } from "@/lib/refparse";
@@ -907,6 +907,7 @@ function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     ["Результат", "внизу появятся графики, summary.json и лог. Кнопка «в журнал идеи» переносит запись в выбранную идею, дополни её в идее на вкладке «Журнал»."],
     ["Код помощником", "справа вставь ключ DeepSeek и напиши задачу словами. Файл из ответа сохраняется в папку проекта сам (галочка «сохранять код из ответа») либо кнопкой «сохранить в проект». Имя задаётся строкой # file: имя.py."],
     ["Литература", "переключи помощника на Perplexity (ключ с perplexity.ai), спроси про литературу и нажми «добавить в библиотеку»: строки с DOI разберутся в источники."],
+    ["Агент извне", "в разделе «Данные и окружение» есть блок «Подключение агента»: он показывает порт, токен и готовые строки для DeepSeek Harness, Claude Code или Codex. Через мост агент видит идеи, журнал, литературу, данные и прогоны, запускает скрипты и может писать в журнал: записи появляются уведомлением справа внизу, а права проверяются в приложении."],
     ["Права", "над колонками видны галочки: создавать файлы, перезаписывать существующие, разрешать запуск. Выключи перезапись, если боишься потерять свои правки."],
   ];
   return (
@@ -1117,6 +1118,97 @@ function DataPanel() {
 }
 
 // ================================================================
+function AgentPanel() {
+  const [info, setInfo] = useState<AgentInfo | null>(null);
+  const [copied, setCopied] = useState("");
+  const refresh = async () => setInfo(await fly!.agentInfo());
+  useEffect(() => {
+    void refresh();
+  }, []);
+  const copy = async (text: string, what: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(what);
+    setTimeout(() => setCopied(""), 1500);
+  };
+  const snippet = info
+    ? [
+        "# в cordis.patch.yml профиля dsh добавь строку плагина MCP:",
+        "# имя инструментов в диалоге будет mcp__fly__*",
+        "- name: '@deepseek-ai/dsh-mcp-client'",
+        "  config:",
+        "    serverName: fly",
+        "    transport: stdio",
+        "    command: node",
+        `    args: ['${info.mcp.replace(/\\/g, "/")}']`,
+      ].join("\n")
+    : "";
+  const claude = info ? `claude mcp add fly -- node "${info.mcp}"` : "";
+
+  return (
+    <section className="border">
+      <div className="flex items-start justify-between gap-3 border-b px-2 py-2">
+        <div>
+          <div className="label">Подключение агента (MCP)</div>
+          <p className="mt-1 max-w-2xl text-[11px] leading-relaxed text-muted-foreground">
+            Внешний агент (DeepSeek Harness, Claude Code, Codex) видит идеи, журнал, литературу, данные и прогоны, запускает
+            скрипты проекта и может писать в журнал. Все действия проходят через это окно: права проверяются здесь, а записи
+            агента всплывают уведомлением. Мост слушает только 127.0.0.1 и требует токен.
+          </p>
+        </div>
+        <label className="flex shrink-0 items-center gap-2 text-[12px]">
+          <input
+            type="checkbox"
+            checked={!!info?.enabled}
+            onChange={async (e) => {
+              await fly!.setAgentEnabled(e.target.checked);
+              await refresh();
+            }}
+          />
+          включён
+        </label>
+      </div>
+      {info && (
+        <div className="flex flex-col gap-2 p-2 text-[12px]">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px]">
+            <span className={info.running ? "text-foreground" : "text-muted-foreground"}>
+              {info.running ? `слушает ${info.url}` : "мост выключен"}
+            </span>
+            <span className="text-muted-foreground">файл: {info.file}</span>
+            <span className="text-muted-foreground">
+              {info.syncedAt ? `состояние синхронизировано ${new Date(info.syncedAt).toLocaleTimeString("ru-RU")}` : "снимок состояния ещё не отправлен"}
+            </span>
+          </div>
+          {info.running && (
+            <>
+              <div>
+                <div className="label">Строка для dsh (cordis.patch.yml)</div>
+                <pre className="mt-1 overflow-x-auto border bg-muted/40 p-2 font-mono text-[11px]">{snippet}</pre>
+                <Button size="sm" variant="outline" className="mt-1" onClick={() => void copy(snippet, "snippet")}>
+                  {copied === "snippet" ? "скопировано" : "Скопировать"}
+                </Button>
+              </div>
+              <div>
+                <div className="label">Для Claude Code и Codex</div>
+                <pre className="mt-1 overflow-x-auto border bg-muted/40 p-2 font-mono text-[11px]">{claude}</pre>
+                <Button size="sm" variant="outline" className="mt-1" onClick={() => void copy(claude, "claude")}>
+                  {copied === "claude" ? "скопировано" : "Скопировать"}
+                </Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Токен лежит рядом с конфигом приложения, в agent.json. Схема плагина MCP у dsh пока в превью: если строка не
+                подхватится, сверь её с документацией dsh по адресу deepseek.com/harness. Инструменты:
+                fly_status, fly_list_ideas, fly_get_idea, fly_search_library, fly_list_scripts, fly_read_script, fly_list_runs,
+                fly_read_run, fly_list_data, fly_run_script, fly_wait_run, fly_kill_run, fly_add_journal_entry, fly_add_idea,
+                fly_update_idea, fly_add_reference.
+              </p>
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function EnvPanel() {
   const [env, setEnv] = useState<EnvInfo | null>(null);
   const [loading, setLoading] = useState(false);
@@ -1142,6 +1234,8 @@ function EnvPanel() {
         </Button>
         <span className="label">{env ? (missing.length ? `не хватает: ${missing.join(", ")}` : "для CPU-модели всё есть") : ""}</span>
       </div>
+
+      <AgentPanel />
 
       {env && (
         <div className="grid gap-3 md:grid-cols-2">

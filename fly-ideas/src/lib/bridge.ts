@@ -36,6 +36,28 @@ export interface ProjectPaths { projectId: string; code: string; runs: string; d
 /** Права помощника на файлы и запуск */
 export interface Permissions { createFiles: boolean; overwriteFiles: boolean; runScripts: boolean }
 
+/** Мост для внешнего агента (MCP): что доступно и куда пишутся его действия */
+export interface AgentInfo {
+  enabled: boolean;
+  running: boolean;
+  port: number;
+  url: string | null;
+  file: string;
+  token: string;
+  mcp: string;
+  syncedAt: number | null;
+  ideas: number;
+  projects: number;
+}
+
+export interface AgentWrite {
+  reqId: string;
+  kind: "journal" | "idea" | "reference" | "ideaPatch";
+  payload: Record<string, unknown>;
+}
+
+export interface AgentNotice { text: string; at: number }
+
 export type DirKind = "data" | "scripts" | "runs" | "exports";
 export interface Paths { workspace: string; data: string; scripts: string; runs: string; exports: string; defaults: Record<DirKind, string>; templates: string }
 export interface ExternalSource { title: string; url: string; note: string }
@@ -81,6 +103,14 @@ export interface FlyBridge {
 
   listRuns(projectId: string): Promise<RunInfo[]>;
   readRun(dir: string): Promise<{ log: string; summary: Record<string, unknown> | null }>;
+
+  // --- мост для внешнего агента (MCP) ---
+  agentInfo(): Promise<AgentInfo>;
+  setAgentEnabled(on: boolean): Promise<{ enabled: boolean; running: boolean; port: number }>;
+  syncState(state: unknown): Promise<boolean>;
+  agentAck(reqId: string, result: unknown): Promise<boolean>;
+  onAgentWrite(cb: (w: AgentWrite) => void): () => void;
+  onAgentNotice(cb: (n: AgentNotice) => void): () => void;
 }
 
 declare global {
