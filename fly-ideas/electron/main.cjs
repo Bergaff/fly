@@ -7,6 +7,7 @@ const { spawn } = require("node:child_process");
 const https = require("node:https");
 const http = require("node:http");
 const crypto = require("node:crypto");
+const { writeAssistantFile } = require("./assistant-files.cjs");
 
 const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
@@ -858,7 +859,7 @@ async function llmChat({ provider, model, messages, temperature }) {
   });
   if (!res.ok) throw new Error(`${provider}: HTTP ${res.status} ${await res.text()}`);
   const j = await res.json();
-  return { content: j.choices?.[0]?.message?.content ?? "", usage: j.usage };
+  return { content: j.choices?.[0]?.message?.content ?? "", usage: j.usage, finishReason: j.choices?.[0]?.finish_reason ?? null };
 }
 
 // ------------------------------------------------------------
@@ -1337,6 +1338,10 @@ function registerIpc(getWin) {
     }
     await fsp.writeFile(file, content, "utf8");
     return { file: path.basename(file), path: file, created: !exists };
+  });
+  ipcMain.handle("fly:writeAssistantScript", (_e, projectId, name, content, opts) => {
+    const ws = projectPaths(projectId);
+    return writeAssistantFile({ codeDir: ws.code, expectedDir: opts?.expectedDir, name, content, permissions: getPermissions, expectedContent: opts?.expectedContent });
   });
   ipcMain.handle("fly:deleteScript", async (_e, projectId, name) => {
     const ws = projectPaths(projectId);

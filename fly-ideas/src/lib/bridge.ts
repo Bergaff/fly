@@ -130,6 +130,7 @@ export interface FlyBridge {
   syncTemplates(projectId: string, opts?: { overwrite?: boolean; all?: boolean }): Promise<{ added: string[]; code: string }>;
   readScript(projectId: string, name: string): Promise<string>;
   writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
+  writeAssistantScript(projectId: string, name: string, content: string, opts: { expectedDir: string; expectedContent?: string }): Promise<{ file: string; path: string; created: boolean; backup?: string }>;
   deleteScript(projectId: string, name: string): Promise<boolean>;
   runScript(projectId: string, name: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   killRun(runId: string): Promise<void>;
@@ -137,7 +138,7 @@ export interface FlyBridge {
 
   getSecret(k: string): Promise<string | null>;
   setSecret(k: string, v: string | null): Promise<boolean>;
-  llmChat(req: { provider: LlmProvider; model?: string; messages: LlmMessage[]; temperature?: number }): Promise<{ content: string; usage?: unknown }>;
+  llmChat(req: { provider: LlmProvider; model?: string; messages: LlmMessage[]; temperature?: number }): Promise<{ content: string; usage?: unknown; finishReason?: string | null }>;
   listApiCalls(workspaceId: string): Promise<ApiCallRecord[]>;
   appendApiCall(workspaceId: string, record: ApiCallRecord): Promise<void>;
 
