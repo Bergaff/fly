@@ -176,7 +176,7 @@ export default function App() {
           activeId={active}
           onSelect={(id) => {
             setActive(id);
-            setTab(id === "all" ? "ideas" : "project");
+            setTab((cur) => (cur === "brain" && id !== "all" ? "brain" : id === "all" ? "ideas" : "project"));
           }}
           onAdd={(n) => store.addProject(n)}
           onRename={(id, name) => store.updateProject(id, { name })}
@@ -200,7 +200,15 @@ export default function App() {
               </div>
             </div>
 
-            <Tabs value={tab} onValueChange={setTab}>
+            <Tabs
+              value={tab}
+              onValueChange={(nextTab) => {
+                setTab(nextTab);
+                if (nextTab === "brain" && active === "all" && state.projects[0]) {
+                  setActive(state.projects[0].id);
+                }
+              }}
+            >
               <TabsList>
                 {(
                   [
@@ -255,7 +263,16 @@ export default function App() {
             </div>
           </header>
 
-          <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-0 overflow-hidden">
+          <Tabs
+            value={tab}
+            onValueChange={(nextTab) => {
+              setTab(nextTab);
+              if (nextTab === "brain" && active === "all" && state.projects[0]) {
+                setActive(state.projects[0].id);
+              }
+            }}
+            className="min-h-0 flex-1 gap-0 overflow-hidden"
+          >
             {activeProject && (
               <TabsContent value="project" className="min-h-0 overflow-hidden">
                 <ProjectView
@@ -308,11 +325,12 @@ export default function App() {
             <TabsContent value="brain" className="min-h-0 overflow-hidden">
               <BrainView
                 ideas={state.ideas}
-                projects={state.projects.map((pr) => ({ id: pr.id, name: pr.name }))}
+                projects={state.projects}
                 activeProject={active}
                 focusIdeaId={brainIdeaId}
                 onClearFocusIdea={() => setBrainIdeaId(null)}
                 onSelectProject={setActive}
+                onAddProject={(name) => store.addProject(name)}
                 onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
                 onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
               />

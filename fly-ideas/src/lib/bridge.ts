@@ -25,7 +25,7 @@ export interface EnvInfo {
 
 export interface ScriptInfo { name: string; doc: string; size: number; mtime: number }
 export interface RunInfo { dir: string; path: string; label: string; summary: Record<string, unknown> | null; files: string[]; mtime: number }
-export interface RunOutput { runId: string; stream: "stdout" | "stderr" | "exit"; text: string; code?: number }
+export interface RunOutput { runId: string; projectId?: string; runDir?: string; stream: "stdout" | "stderr" | "exit"; text: string; code?: number }
 export interface LlmMessage { role: "system" | "user" | "assistant"; content: string }
 
 export type LlmProvider = "deepseek" | "perplexity" | "openai";
@@ -74,6 +74,7 @@ export interface FlyBridge {
   listExternal(): Promise<ExternalSource[]>;
   readRunFile(dir: string, name: string): Promise<{ kind: "image"; dataUrl: string } | { kind: "text"; text: string }>;
   exportRun(dir: string): Promise<string | null>;
+  transferRun(dir: string, targetProjectId: string, opts?: { move?: boolean }): Promise<{ path: string; label: string; projectId: string }>;
 
   projectPaths(projectId: string): Promise<ProjectPaths>;
   chooseProjectFolder(projectId: string, kind: "code" | "runs", title?: string): Promise<ProjectPaths | null>;

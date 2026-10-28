@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld("fly", {
   listExternal: () => ipcRenderer.invoke("fly:listExternal"),
   readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),
   exportRun: (dir) => ipcRenderer.invoke("fly:exportRun", dir),
+  transferRun: (dir, targetProjectId, opts) => ipcRenderer.invoke("fly:transferRun", dir, targetProjectId, opts),
   // --- рабочее место проекта ---
   projectPaths: (projectId) => ipcRenderer.invoke("fly:projectPaths", projectId),
   chooseProjectFolder: (projectId, kind, title) => ipcRenderer.invoke("fly:chooseProjectFolder", projectId, kind, title),

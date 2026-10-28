@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Idea, Reference } from "@/data/types";
+import type { Idea, Project, Reference } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
   type DataItem, type AgentInfo, type EnvInfo, type ExternalSource, type LlmMessage, type LlmProvider,
@@ -12,16 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 interface Props {
   ideas: Idea[];
-  projects: { id: string; name: string }[];
+  projects: Project[];
   activeProject: string | "all";
   focusIdeaId?: string | null;
   onClearFocusIdea?: () => void;
   onSelectProject: (id: string | "all") => void;
+  onAddProject: (name: string) => Project;
   onAddJournalEntry: (ideaId: string, entry: { title: string; params: string; result: string; conclusion: string }) => void;
   onAddReferences: (items: Partial<Reference>[]) => void;
 }
@@ -61,6 +63,7 @@ export function BrainView({
   focusIdeaId,
   onClearFocusIdea,
   onSelectProject,
+  onAddProject,
   onAddJournalEntry,
   onAddReferences,
 }: Props) {
@@ -104,6 +107,7 @@ export function BrainView({
           focusIdeaId={focusIdeaId}
           onClearFocusIdea={onClearFocusIdea}
           onSelectProject={onSelectProject}
+          onAddProject={onAddProject}
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
         />
@@ -164,6 +168,46 @@ function PathStrip({ label, value, onChoose, onOpen, onReset, isDefault }: { lab
 }
 
 // ================================================================
+/** Компактный переключатель проекта прямо в панели кода, результатов и помощника */
+function ProjectInlinePicker({
+  projects,
+  value,
+  onChange,
+  onCreate,
+  className,
+  triggerClassName,
+}: {
+  projects: Project[];
+  value: string;
+  onChange: (projectId: string) => void;
+  onCreate?: () => void;
+  className?: string;
+  triggerClassName?: string;
+}) {
+  return (
+    <div className={cn("flex flex-1 items-center gap-1 sm:flex-initial", className)}>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className={cn("h-6 min-w-[160px] max-w-[235px] text-[11px]", triggerClassName)} title="Проект, в чьи папки идут код и результаты прогонов">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {projects.map((p) => (
+            <SelectItem key={p.id} value={p.id}>
+              <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: p.color }} />
+              {p.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {onCreate && (
+        <Button size="sm" variant="ghost" className="h-6 px-1.5 font-mono text-[10.5px]" onClick={onCreate} title="Создать новый проект со своими папками кода и результатов">
+          + проект
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function Workspace({
   ideas,
   projects,
@@ -171,45 +215,115 @@ function Workspace({
   focusIdeaId,
   onClearFocusIdea,
   onSelectProject,
+  onAddProject,
   onAddJournalEntry,
   onAddReferences,
 }: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
   const pid = activeProject === "all" ? projects[0]?.id ?? "project" : activeProject;
   const [paths, setPaths] = useState<ProjectPaths | null>(null);
   const [perms, setPerms] = useState<Permissions | null>(null);
+  const [showFolderSettings, setShowFolderSettings] = useState(false);
   const [files, setFiles] = useState<ScriptInfo[]>([]);
   const [runs, setRuns] = useState<RunInfo[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [dirty, setDirty] = useState(false);
   const [args, setArgs] = useState("");
-  const [runId, setRunId] = useState<string | null>(null);
-  const [liveLog, setLiveLog] = useState("");
+  const [activeRuns, setActiveRuns] = useState<Record<string, { runId: string; runDir: string } | undefined>>({});
+  const [logsByProject, setLogsByProject] = useState<Record<string, string>>({});
   const [selRun, setSelRun] = useState<RunInfo | null>(null);
   const [detail, setDetail] = useState<{ log: string; summary: Record<string, unknown> | null } | null>(null);
   const [images, setImages] = useState<{ name: string; dataUrl: string }[]>([]);
   const [viewFile, setViewFile] = useState<{ name: string; text: string } | null>(null);
-  const [ideaId, setIdeaId] = useState<string>(ideas[0]?.id ?? "");
+  const [ideaId, setIdeaId] = useState<string>(() => ideas.find((i) => i.projectId === pid)?.id ?? ideas[0]?.id ?? "");
   const [rightTab, setRightTab] = useState<"presets" | "chat">("presets");
-  const [selectedPresetIdea, setSelectedPresetIdea] = useState<string>(focusIdeaId || ideas[0]?.id || TASK_PRESETS[0].ideaId);
+  const [selectedPresetIdea, setSelectedPresetIdea] = useState<string>(
+    focusIdeaId || ideas.find((i) => i.projectId === pid)?.id || ideas[0]?.id || TASK_PRESETS[0].ideaId,
+  );
   const [added, setAdded] = useState(false);
   const [saveNote, setSaveNote] = useState("");
-  const pendingRun = useRef<string | null>(null);
+  const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
+  const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
+  const pidRef = useRef(pid);
+  pidRef.current = pid;
   const logRef = useRef<HTMLDivElement>(null);
 
-  const loadFiles = useCallback(async () => {
-    setPaths(await fly!.projectPaths(pid));
-    setFiles(await fly!.listScripts(pid));
-    return fly!.listRuns(pid);
+  const runId = activeRuns[pid]?.runId ?? null;
+  const liveLog = logsByProject[pid] ?? "";
+  const project = projects.find((p) => p.id === pid);
+  const otherProjects = useMemo(() => projects.filter((p) => p.id !== pid), [projects, pid]);
+
+  const orderedIdeasForJournal = useMemo(() => {
+    const mine = ideas.filter((i) => i.projectId === pid);
+    const rest = ideas.filter((i) => i.projectId !== pid);
+    return [...mine, ...rest];
+  }, [ideas, pid]);
+
+  const loadFiles = useCallback(async (targetPid = pid) => {
+    const bridge = fly;
+    if (!bridge) return [];
+    const p = await bridge.projectPaths(targetPid);
+    const sc = await bridge.listScripts(targetPid);
+    const rn = await bridge.listRuns(targetPid);
+    if (pidRef.current === targetPid) {
+      setPaths(p);
+      setFiles(sc);
+    }
+    return rn;
   }, [pid]);
 
-  const refreshRuns = useCallback(async () => {
-    const r = await fly!.listRuns(pid);
-    setRuns(r);
+  const refreshRuns = useCallback(async (targetPid = pid) => {
+    const bridge = fly;
+    if (!bridge) return [];
+    const r = await bridge.listRuns(targetPid);
+    if (pidRef.current === targetPid) setRuns(r);
     return r;
   }, [pid]);
 
+  function openRun(r: RunInfo) {
+    const bridge = fly;
+    if (!bridge) return;
+    setSelRun(r);
+    setViewFile(null);
+    setImages([]);
+    setDetail(null);
+    void bridge.readRun(r.path).then(setDetail);
+    const imgs = r.files.filter((f) => /\.(png|jpe?g|svg|gif)$/i.test(f));
+    void Promise.all(
+      imgs.map(async (name) => {
+        const res = await bridge.readRunFile(r.path, name);
+        return res.kind === "image" ? { name, dataUrl: res.dataUrl } : null;
+      }),
+    ).then((x) => setImages(x.filter((v): v is { name: string; dataUrl: string } => !!v)));
+  }
+
+  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[]) => {
+    const bridge = fly;
+    if (!bridge) return;
+    setLogsByProject((prev) => ({ ...prev, [targetPid]: "" }));
+    if (pidRef.current === targetPid) {
+      setDetail(null);
+      setImages([]);
+      setViewFile(null);
+    }
+    try {
+      const r = await bridge.runScript(targetPid, scriptName, argList);
+      setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
+      if (pidRef.current === targetPid) setAdded(false);
+      setLogsByProject((prev) => ({
+        ...prev,
+        [targetPid]: `$ python ${scriptName} ${argList.join(" ")}\n-> ${r.runDir}\n\n`,
+      }));
+    } catch (e) {
+      setLogsByProject((prev) => ({
+        ...prev,
+        [targetPid]: `не удалось запустить: ${(e as Error).message}\n`,
+      }));
+    }
+  }, []);
+
   useEffect(() => {
+    let cancelled = false;
     setCurrent(null);
     setCode("");
     setDirty(false);
@@ -217,47 +331,149 @@ function Workspace({
     setDetail(null);
     setImages([]);
     setViewFile(null);
-    setLiveLog("");
-    loadFiles().then(setRuns);
-  }, [loadFiles]);
+    setSaveNote("");
+    setIdeaId((prev) => {
+      const curIdea = ideas.find((i) => i.id === prev);
+      if (curIdea && curIdea.projectId === pid) return prev;
+      return ideas.find((i) => i.projectId === pid)?.id ?? prev ?? ideas[0]?.id ?? "";
+    });
+    void loadFiles(pid).then(async (rn) => {
+      if (cancelled) return;
+      setRuns(rn);
+      if (pendingOpenRun.current && pendingOpenRun.current.pid === pid) {
+        const targetR = rn.find((x) => x.path === pendingOpenRun.current!.runPath) ?? rn[0];
+        pendingOpenRun.current = null;
+        if (targetR) openRun(targetR);
+      }
+      if (pendingOpenScript.current && pendingOpenScript.current.pid === pid) {
+        const req = pendingOpenScript.current;
+        pendingOpenScript.current = null;
+        const bridge = fly;
+        if (bridge) {
+          const txt = await bridge.readScript(pid, req.file);
+          if (!cancelled) {
+            setCurrent(req.file);
+            setCode(txt);
+            setDirty(false);
+            setSaveNote(`открыт в проекте: ${req.file}`);
+            if (req.autoRunArgs !== undefined) {
+              setArgs(req.autoRunArgs);
+              const argList = req.autoRunArgs.split(/\s+/).filter(Boolean);
+              await startScriptInProject(pid, req.file, argList);
+            }
+          }
+        }
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pid, loadFiles]);
 
   useEffect(() => {
-    fly!.getPermissions().then(setPerms);
+    void fly!.getPermissions().then(setPerms);
   }, []);
 
-  useEffect(
-    () =>
-      fly!.onRunOutput((p) => {
-        setLiveLog((l) => (l + p.text).slice(-60000));
-        if (p.stream === "exit") {
-          setRunId(null);
-          refreshRuns().then((list) => {
-            const target = pendingRun.current ? list.find((r) => r.path === pendingRun.current) : null;
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    return bridge.onRunOutput((p) => {
+      const evPid = p.projectId || pidRef.current;
+      setLogsByProject((prev) => ({
+        ...prev,
+        [evPid]: ((prev[evPid] ?? "") + p.text).slice(-60000),
+      }));
+      if (p.stream === "exit") {
+        let finishedDir: string | undefined = p.runDir;
+        setActiveRuns((prev) => {
+          finishedDir = finishedDir || prev[evPid]?.runDir;
+          const next = { ...prev };
+          delete next[evPid];
+          return next;
+        });
+        if (evPid === pidRef.current) {
+          void refreshRuns(evPid).then((list) => {
+            const target = finishedDir ? list.find((r) => r.path === finishedDir) : list[0];
             if (target) openRun(target);
-            pendingRun.current = null;
           });
+        } else {
+          const doneProj = projects.find((pr) => pr.id === evPid);
+          setSaveNote(`прогон завершён в проекте «${doneProj?.name ?? evPid}»`);
         }
-      }),
-    [refreshRuns],
-  );
+      }
+    });
+  }, [refreshRuns, projects]);
+
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [liveLog]);
 
-  function openRun(r: RunInfo) {
-    setSelRun(r);
-    setViewFile(null);
-    setImages([]);
-    setDetail(null);
-    fly!.readRun(r.path).then(setDetail);
-    const imgs = r.files.filter((f) => /\.(png|jpe?g|svg|gif)$/i.test(f));
-    Promise.all(
-      imgs.map(async (name) => {
-        const res = await fly!.readRunFile(r.path, name);
-        return res.kind === "image" ? { name, dataUrl: res.dataUrl } : null;
-      }),
-    ).then((x) => setImages(x.filter((v): v is { name: string; dataUrl: string } => !!v)));
-  }
+  const switchProject = useCallback(
+    async (nextPid: string) => {
+      if (!nextPid || nextPid === pid) return;
+      if (dirty && current && fly) {
+        const shouldSave = confirm(`Сохранить изменения в файле ${current} (проект «${project?.name ?? pid}») перед переключением проекта?`);
+        if (shouldSave) {
+          await fly.writeScript(pid, current, code, { allowOverwrite: true });
+          setDirty(false);
+        }
+      }
+      onSelectProject(nextPid);
+    },
+    [pid, dirty, current, code, project, onSelectProject],
+  );
+
+  const createNewProjectHere = useCallback(async () => {
+    const raw = prompt("Название нового проекта (для него создадутся отдельные папки кода и результатов):", "Новый эксперимент");
+    const trimmed = raw?.trim();
+    if (!trimmed) return;
+    if (dirty && current && fly) {
+      if (confirm(`Сохранить изменения в файле ${current} перед переходом в новый проект?`)) {
+        await fly.writeScript(pid, current, code, { allowOverwrite: true });
+        setDirty(false);
+      }
+    }
+    const created = onAddProject(trimmed);
+    if (fly) await fly.projectPaths(created.id);
+    onSelectProject(created.id);
+  }, [dirty, current, pid, code, onAddProject, onSelectProject]);
+
+  const transferScriptToProject = useCallback(
+    async (targetPid: string, opts: { move?: boolean; autoRun?: boolean }) => {
+      const bridge = fly;
+      if (!bridge || !current) return;
+      const targetProj = projects.find((p) => p.id === targetPid);
+      const r = await bridge.writeScript(targetPid, current, code, { allowOverwrite: true });
+      if (opts.move) {
+        await bridge.deleteScript(pid, current);
+        setDirty(false);
+      }
+      pendingOpenScript.current = {
+        pid: targetPid,
+        file: r.file,
+        autoRunArgs: opts.autoRun ? args : undefined,
+      };
+      onSelectProject(targetPid);
+      setSaveNote(`${opts.move ? "перенесён" : "скопирован"} в «${targetProj?.name ?? targetPid}»`);
+    },
+    [current, code, pid, args, projects, onSelectProject],
+  );
+
+  const transferSelectedRunToProject = useCallback(
+    async (targetPid: string, move: boolean) => {
+      const bridge = fly;
+      if (!bridge || !selRun) return;
+      const targetProj = projects.find((p) => p.id === targetPid);
+      const res = await bridge.transferRun(selRun.path, targetPid, { move });
+      if (move) {
+        pendingOpenRun.current = { pid: targetPid, runPath: res.path };
+        onSelectProject(targetPid);
+      } else {
+        setSaveNote(`прогон скопирован в «${targetProj?.name ?? targetPid}»`);
+      }
+    },
+    [selRun, projects, onSelectProject],
+  );
 
   const openFile = useCallback(async (name: string) => {
     const bridge = fly;
@@ -272,6 +488,22 @@ function Workspace({
       setSelectedPresetIdea(matched.ideaId);
     }
   }, [pid]);
+
+  const handleAssistantSavedScript = useCallback(
+    async (targetPid: string, fileName: string) => {
+      const bridge = fly;
+      if (!bridge) return;
+      if (targetPid === pidRef.current) {
+        setFiles(await bridge.listScripts(targetPid));
+        await openFile(fileName);
+        setSaveNote(`сохранено в проект: ${fileName}`);
+      } else {
+        pendingOpenScript.current = { pid: targetPid, file: fileName };
+        onSelectProject(targetPid);
+      }
+    },
+    [openFile, onSelectProject],
+  );
 
   const syncBuiltInTemplates = useCallback(async () => {
     const bridge = fly;
@@ -299,22 +531,10 @@ function Workspace({
       setSaveNote(`готовый анализ: ${preset.script}`);
       if (autoRun && !runId) {
         const list = modeArgs.split(/\s+/).filter(Boolean);
-        setLiveLog("");
-        setDetail(null);
-        setImages([]);
-        setViewFile(null);
-        try {
-          const r = await bridge.runScript(pid, preset.script, list);
-          pendingRun.current = r.runDir;
-          setRunId(r.runId);
-          setAdded(false);
-          setLiveLog(`$ python ${preset.script} ${list.join(" ")}\n-> ${r.runDir}\n\n`);
-        } catch (e) {
-          setLiveLog(`не удалось запустить: ${(e as Error).message}\n`);
-        }
+        await startScriptInProject(pid, preset.script, list);
       }
     },
-    [pid, runId],
+    [pid, runId, startScriptInProject],
   );
 
   useEffect(() => {
@@ -333,27 +553,27 @@ function Workspace({
     if (!current) return null;
     const r = await fly!.writeScript(pid, current, code, { allowOverwrite: true });
     setDirty(false);
-    if (!opts?.silent) setSaveNote(`сохранено: ${r.file}`);
+    if (!opts?.silent) setSaveNote(`сохранено в «${project?.name ?? pid}»: ${r.file}`);
     setFiles(await fly!.listScripts(pid));
     return r;
   };
   const newFile = async () => {
-    const name = prompt("Имя нового файла:", "my_experiment.py");
+    const name = prompt(`Имя нового файла в проекте «${project?.name ?? pid}»:`, "my_experiment.py");
     if (!name) return;
     const r = await fly!.writeScript(pid, name, '"""Новый эксперимент."""\n\nimport os\n\nRUN_DIR = os.environ["FLY_RUN_DIR"]\n');
-    await setFiles(await fly!.listScripts(pid));
-    openFile(r.file);
+    setFiles(await fly!.listScripts(pid));
+    void openFile(r.file);
   };
   const importFile = async () => {
     const f = await fly!.openFile({ filters: [{ name: "Python", extensions: ["py"] }], kind: "exports" });
     if (!f) return;
     const name = f.path.replace(/^.*[\\/]/, "");
     await fly!.writeScript(pid, name, f.content, { allowOverwrite: true });
-    await setFiles(await fly!.listScripts(pid));
-    openFile(name);
+    setFiles(await fly!.listScripts(pid));
+    void openFile(name);
   };
   const removeFile = async (name: string) => {
-    if (!confirm(`Удалить ${name} из папки проекта?`)) return;
+    if (!confirm(`Удалить ${name} из папки проекта «${project?.name ?? pid}»?`)) return;
     await fly!.deleteScript(pid, name);
     if (current === name) {
       setCurrent(null);
@@ -371,19 +591,7 @@ function Workspace({
     if (!current) return;
     if (dirty) await save({ silent: true });
     const list = args.split(/\s+/).filter(Boolean);
-    setLiveLog("");
-    setDetail(null);
-    setImages([]);
-    setViewFile(null);
-    try {
-      const r = await fly!.runScript(pid, current, list);
-      pendingRun.current = r.runDir;
-      setRunId(r.runId);
-      setAdded(false);
-      setLiveLog(`$ python ${current} ${list.join(" ")}\n→ ${r.runDir}\n\n`);
-    } catch (e) {
-      setLiveLog(`не удалось запустить: ${(e as Error).message}\n`);
-    }
+    await startScriptInProject(pid, current, list);
   };
 
   const setPermission = async (patch: Partial<Permissions>) => {
@@ -395,7 +603,7 @@ function Workspace({
     const summaryArgs = detail?.summary && typeof detail.summary.args === "object" ? JSON.stringify(detail.summary.args) : "";
     onAddJournalEntry(ideaId, {
       title: `Прогон ${selRun.label.replace(/^\S+?_/, "")}`,
-      params: [`run: ${selRun.path}`, summaryArgs && `args: ${summaryArgs}`].filter(Boolean).join("\n"),
+      params: [`проект: ${project?.name ?? pid}`, `run: ${selRun.path}`, summaryArgs && `args: ${summaryArgs}`].filter(Boolean).join("\n"),
       result: [
         detail?.summary ? JSON.stringify(detail.summary, null, 2).slice(0, 1400) : (detail?.log ?? "").slice(-1200),
         images.length ? `графики: ${images.map((i) => i.name).join(", ")}` : "",
@@ -408,84 +616,103 @@ function Workspace({
   };
 
   const otherFiles = selRun ? selRun.files.filter((f) => !/\.(png|jpe?g|svg|gif)$/i.test(f) && f !== "summary.json") : [];
-  const project = projects.find((p) => p.id === pid);
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {/* шапка: проект, папки, права */}
+      {/* шапка: проект, папки кода и результатов, права */}
       <div className="shrink-0 border-b">
         <div className="flex flex-wrap items-center gap-1.5 px-3 py-1.5">
           <span className="label mr-1">проект</span>
-          {projects.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => onSelectProject(p.id)}
-              className={cn(
-                "border px-2 py-0.5 text-[11px] cursor-pointer",
-                p.id === pid ? "border-foreground bg-accent text-foreground" : "border-border text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {p.name}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-col gap-0.5 border-t px-3 py-1.5">
+          {projects.map((p) => {
+            const isRunningHere = !!activeRuns[p.id];
+            return (
+              <button
+                key={p.id}
+                onClick={() => void switchProject(p.id)}
+                className={cn(
+                  "flex items-center gap-1.5 border px-2 py-0.5 text-[11px] cursor-pointer",
+                  p.id === pid ? "border-foreground bg-accent text-foreground" : "border-border text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <span className="size-2 shrink-0" style={{ background: p.color }} />
+                <span>{p.name}</span>
+                {isRunningHere && <span className="font-mono text-[9.5px] text-[var(--chart-2)]">[счёт]</span>}
+              </button>
+            );
+          })}
+          <Button size="sm" variant="ghost" className="h-6 px-2 font-mono text-[11px]" onClick={() => void createNewProjectHere()}>
+            + новый проект
+          </Button>
           {paths && (
-            <>
-              <PathStrip
-                label="папка кода"
-                value={paths.code}
-                isDefault={paths.code === paths.defaults.code}
-                onChoose={async () => {
-                  const r = await fly!.chooseProjectFolder(pid, "code", `Папка кода: ${project?.name ?? pid}`);
-                  if (r) {
-                    setPaths(r);
-                    setFiles(await fly!.listScripts(pid));
-                  }
-                }}
-                onOpen={() => fly!.openPath(paths.code)}
-                onReset={async () => {
-                  setPaths(await fly!.resetProjectFolder(pid, "code"));
-                  setFiles(await fly!.listScripts(pid));
-                }}
-              />
-              <PathStrip
-                label="папка прогонов"
-                value={paths.runs}
-                isDefault={paths.runs === paths.defaults.runs}
-                onChoose={async () => {
-                  const r = await fly!.chooseProjectFolder(pid, "runs", `Папка прогонов: ${project?.name ?? pid}`);
-                  if (r) {
-                    setPaths(r);
-                    await refreshRuns();
-                  }
-                }}
-                onOpen={() => fly!.openPath(paths.runs)}
-                onReset={async () => {
-                  setPaths(await fly!.resetProjectFolder(pid, "runs"));
-                  await refreshRuns();
-                }}
-              />
-            </>
-          )}
-          {perms && (
-            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span className="label">права</span>
-              {(
-                [
-                  ["createFiles", "помощник создаёт файлы"],
-                  ["overwriteFiles", "перезаписывает существующие"],
-                  ["runScripts", "разрешён запуск скриптов"],
-                ] as const
-              ).map(([k, label]) => (
-                <label key={k} className="flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <input type="checkbox" checked={perms[k]} onChange={(e) => setPermission({ [k]: e.target.checked } as Partial<Permissions>)} />
-                  {label}
-                </label>
-              ))}
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <span className="hidden max-w-[360px] truncate font-mono text-[10px] text-muted-foreground xl:inline" title={`Код: ${paths.code}\nПрогоны: ${paths.runs}`}>
+                код: {paths.code} · прогоны: {paths.runs}
+              </span>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => setShowFolderSettings((s) => !s)}>
+                {showFolderSettings ? "скрыть папки и права" : "папки и права"}
+              </Button>
             </div>
           )}
         </div>
+        {showFolderSettings && (
+          <div className="flex flex-col gap-0.5 border-t px-3 py-1.5">
+            {paths && (
+              <>
+                <PathStrip
+                  label="папка кода"
+                  value={paths.code}
+                  isDefault={paths.code === paths.defaults.code}
+                  onChoose={async () => {
+                    const r = await fly!.chooseProjectFolder(pid, "code", `Папка кода: ${project?.name ?? pid}`);
+                    if (r) {
+                      setPaths(r);
+                      setFiles(await fly!.listScripts(pid));
+                    }
+                  }}
+                  onOpen={() => fly!.openPath(paths.code)}
+                  onReset={async () => {
+                    setPaths(await fly!.resetProjectFolder(pid, "code"));
+                    setFiles(await fly!.listScripts(pid));
+                  }}
+                />
+                <PathStrip
+                  label="папка прогонов"
+                  value={paths.runs}
+                  isDefault={paths.runs === paths.defaults.runs}
+                  onChoose={async () => {
+                    const r = await fly!.chooseProjectFolder(pid, "runs", `Папка прогонов: ${project?.name ?? pid}`);
+                    if (r) {
+                      setPaths(r);
+                      await refreshRuns();
+                    }
+                  }}
+                  onOpen={() => fly!.openPath(paths.runs)}
+                  onReset={async () => {
+                    setPaths(await fly!.resetProjectFolder(pid, "runs"));
+                    await refreshRuns();
+                  }}
+                />
+              </>
+            )}
+            {perms && (
+              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span className="label">права</span>
+                {(
+                  [
+                    ["createFiles", "помощник создаёт файлы"],
+                    ["overwriteFiles", "перезаписывает существующие"],
+                    ["runScripts", "разрешён запуск скриптов"],
+                  ] as const
+                ).map(([k, label]) => (
+                  <label key={k} className="flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <input type="checkbox" checked={perms[k]} onChange={(e) => setPermission({ [k]: e.target.checked } as Partial<Permissions>)} />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* три колонки: файлы, код и результаты, готовые задачи / помощник */}
@@ -493,7 +720,7 @@ function Workspace({
         {/* --- слева: проводник --- */}
         <aside className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
           <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-            <span className="label">файлы, .py</span>
+            <span className="label truncate" title={paths?.code}>файлы, .py ({files.length})</span>
             <Button size="sm" variant="ghost" className="ml-auto px-1.5" onClick={() => void syncBuiltInTemplates()} title="Докопировать встроенные скрипты анализа (00..19 и flylib.py)">
               шаблоны
             </Button>
@@ -508,11 +735,11 @@ function Workspace({
             {files.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">Папка пуста.</p>}
             {files.map((f) => (
               <div key={f.name} className={cn("group flex items-center gap-1.5 border-b px-2 py-1", current === f.name && "bg-accent")}>
-                <button onClick={() => openFile(f.name)} className="min-w-0 flex-1 text-left cursor-pointer" title={f.doc || f.name}>
+                <button onClick={() => void openFile(f.name)} className="min-w-0 flex-1 text-left cursor-pointer" title={f.doc || f.name}>
                   <span className="block truncate font-mono text-[11px]">{f.name}</span>
                   <span className="block truncate text-[10px] text-muted-foreground">{f.doc || `${(f.size / 1024).toFixed(1)} КБ`}</span>
                 </button>
-                <button onClick={() => removeFile(f.name)} className="shrink-0 cursor-pointer px-1 text-[11px] text-muted-foreground hover:text-destructive" title="Удалить файл">
+                <button onClick={() => void removeFile(f.name)} className="shrink-0 cursor-pointer px-1 text-[11px] text-muted-foreground hover:text-destructive" title="Удалить файл">
                   ×
                 </button>
               </div>
@@ -520,13 +747,13 @@ function Workspace({
           </div>
 
           <div className="flex shrink-0 items-center gap-1 border-y px-2 py-1.5">
-            <span className="label">прогоны</span>
-            <Button size="sm" variant="ghost" className="ml-auto" onClick={() => refreshRuns()}>
+            <span className="label truncate" title={paths?.runs}>прогоны ({runs.length})</span>
+            <Button size="sm" variant="ghost" className="ml-auto" onClick={() => void refreshRuns()}>
               обновить
             </Button>
           </div>
           <div className="min-h-[100px] flex-1 overflow-y-auto">
-            {runs.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">Ещё ничего не запускалось.</p>}
+            {runs.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">В проекте «{project?.name ?? pid}» ещё нет прогонов.</p>}
             {runs.map((r) => (
               <button
                 key={r.path}
@@ -547,15 +774,51 @@ function Workspace({
         {/* --- центр: код и результат --- */}
         <section className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
           <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b px-2 py-1.5">
+            <span className="label">куда</span>
+            <ProjectInlinePicker
+              projects={projects}
+              value={pid}
+              onChange={(next) => void switchProject(next)}
+              onCreate={() => void createNewProjectHere()}
+            />
             {current ? (
               <>
-                <span className="font-mono text-[11px]">{current}</span>
+                <span className="border-l pl-2 font-mono text-[11px] font-medium">{current}</span>
                 {dirty && <span className="label">не сохранено</span>}
-                <Input value={args} onChange={(e) => setArgs(e.target.value)} placeholder="аргументы: --seed 1 --n-junk 25" className="h-6 w-[240px] font-mono text-[11px]" />
-                <Button size="sm" variant="ghost" onClick={() => save()} disabled={!dirty}>
+                <Input value={args} onChange={(e) => setArgs(e.target.value)} placeholder="аргументы: --synth --seed 1" className="h-6 w-[210px] font-mono text-[11px]" />
+                <Button size="sm" variant="ghost" onClick={() => void save()} disabled={!dirty}>
                   сохранить
                 </Button>
-                <Button size="sm" variant="ghost" onClick={exportFile} title="Сохранить копию в другое место">
+                {otherProjects.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="sm" variant="ghost" title="Скопировать, перенести или сразу запустить этот код в другом проекте">
+                        в другой проект
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-72">
+                      <DropdownMenuLabel>Отправить {current} в проект</DropdownMenuLabel>
+                      {otherProjects.map((p) => (
+                        <div key={p.id}>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => void transferScriptToProject(p.id, { move: false, autoRun: false })}>
+                            <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: p.color }} />
+                            Скопировать в «{p.name}» и открыть
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => void transferScriptToProject(p.id, { move: false, autoRun: true })}>
+                            <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: p.color }} />
+                            Скопировать и запустить в «{p.name}»
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => void transferScriptToProject(p.id, { move: true, autoRun: false })}>
+                            <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: p.color }} />
+                            Перенести в «{p.name}» (убрать отсюда)
+                          </DropdownMenuItem>
+                        </div>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <Button size="sm" variant="ghost" onClick={() => void exportFile()} title="Сохранить копию файла на диск">
                   копия
                 </Button>
                 {runId ? (
@@ -563,14 +826,28 @@ function Workspace({
                     остановить
                   </Button>
                 ) : (
-                  <Button size="sm" onClick={run}>
+                  <Button
+                    size="sm"
+                    onClick={() => void run()}
+                    title={paths ? `Запустить в проекте «${project?.name ?? pid}»\nРезультаты: ${paths.runs}` : undefined}
+                  >
                     запустить
                   </Button>
                 )}
                 <span className="ml-auto truncate font-mono text-[10px] text-muted-foreground">{saveNote}</span>
               </>
             ) : (
-              <span className="label">выбери файл слева или создай новый: помощник тоже умеет их писать</span>
+              <>
+                <Button size="sm" variant="outline" className="h-6 px-2 text-[11px]" onClick={() => void newFile()}>
+                  новый .py
+                </Button>
+                <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => void importFile()}>
+                  импорт .py
+                </Button>
+                <span className="ml-auto truncate font-mono text-[10px] text-muted-foreground">
+                  {saveNote || `код и результаты пойдут в «${project?.name ?? pid}»`}
+                </span>
+              </>
             )}
           </div>
 
@@ -586,19 +863,24 @@ function Workspace({
                 className="h-full w-full resize-none overflow-auto rounded-none border border-input bg-transparent p-2 font-mono text-[12px] leading-relaxed outline-none focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-ring"
               />
             ) : (
-              <div className="flex h-full items-center justify-center border border-dashed">
-                <p className="max-w-[460px] px-4 text-center text-[12px] leading-relaxed text-muted-foreground">
-                  Выбери готовый анализ под задачу справа во вкладке «По задачам (без API)» или открой скрипт слева (00..19, flylib.py). Все основные эксперименты уже написаны и запускаются локально без генерации по API.
+              <div className="flex h-full flex-col items-center justify-center gap-2 border border-dashed px-4 text-center">
+                <p className="max-w-[480px] text-[12px] leading-relaxed text-muted-foreground">
+                  Активный проект: <strong className="font-medium text-foreground">{project?.name ?? pid}</strong>. Переключить проект можно прямо над этим полем, в правой панели или слева: тогда и код, и папка результатов сразу переключатся на нужный проект.
                 </p>
+                {paths && (
+                  <div className="max-w-full truncate font-mono text-[10.5px] text-muted-foreground">
+                    код: {paths.code} · результаты: {paths.runs}
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-2 py-1.5">
-            <span className="label">результат</span>
+            <span className="label">результат · {project?.name ?? pid}</span>
             {selRun ? (
               <>
-                <span className="max-w-[220px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
+                <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
                 <Button size="sm" variant="ghost" onClick={() => fly!.openPath(selRun.path)}>
                   папка
                 </Button>
@@ -612,21 +894,50 @@ function Workspace({
                 >
                   экспорт
                 </Button>
+                {otherProjects.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="sm" variant="ghost" title="Скопировать или перенести папку этого прогона в другой проект">
+                        прогон в проект
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-72">
+                      <DropdownMenuLabel>Отправить результаты прогона</DropdownMenuLabel>
+                      {otherProjects.map((p) => (
+                        <div key={p.id}>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => void transferSelectedRunToProject(p.id, false)}>
+                            <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: p.color }} />
+                            Скопировать прогон в «{p.name}»
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => void transferSelectedRunToProject(p.id, true)}>
+                            <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: p.color }} />
+                            Перенести прогон в «{p.name}» и перейти
+                          </DropdownMenuItem>
+                        </div>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </>
             ) : (
-              <span className="label">прогонов ещё нет</span>
+              <span className="label">прогон не выбран</span>
             )}
             <div className="ml-auto flex items-center gap-1.5">
               <Select value={ideaId} onValueChange={setIdeaId}>
-                <SelectTrigger className="h-6 w-[230px] text-[11px]">
+                <SelectTrigger className="h-6 w-[240px] text-[11px]" title="В лабораторный журнал какой идеи записать результат">
                   <SelectValue placeholder="в какую идею" />
                 </SelectTrigger>
                 <SelectContent>
-                  {ideas.map((i) => (
-                    <SelectItem key={i.id} value={i.id}>
-                      {i.title}
-                    </SelectItem>
-                  ))}
+                  {orderedIdeasForJournal.map((i) => {
+                    const ip = projects.find((pr) => pr.id === i.projectId);
+                    const prefix = i.projectId === pid ? "" : `[${ip?.name ?? i.projectId}] `;
+                    return (
+                      <SelectItem key={i.id} value={i.id}>
+                        {prefix}{i.title}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               <Button size="sm" onClick={toJournal} disabled={!selRun || !ideaId}>
@@ -694,7 +1005,10 @@ function Workspace({
           {rightTab === "presets" ? (
             <PresetsColumn
               ideas={ideas}
+              projects={projects}
               projectId={pid}
+              onSwitchProject={(next) => void switchProject(next)}
+              onCreateProject={() => void createNewProjectHere()}
               selectedIdeaId={selectedPresetIdea}
               onSelectIdea={setSelectedPresetIdea}
               currentScript={current}
@@ -703,7 +1017,17 @@ function Workspace({
               onOpenCompanion={(name) => void openFile(name)}
             />
           ) : (
-            <ChatColumn pid={pid} ideas={ideas} perms={perms} onAddReferences={onAddReferences} />
+            <ChatColumn
+              pid={pid}
+              projects={projects}
+              paths={paths}
+              onSwitchProject={(next) => void switchProject(next)}
+              onCreateProject={() => void createNewProjectHere()}
+              onScriptSaved={handleAssistantSavedScript}
+              ideas={ideas}
+              perms={perms}
+              onAddReferences={onAddReferences}
+            />
           )}
         </aside>
       </div>
@@ -714,7 +1038,10 @@ function Workspace({
 // ================================================================
 function PresetsColumn({
   ideas,
+  projects,
   projectId,
+  onSwitchProject,
+  onCreateProject,
   selectedIdeaId,
   onSelectIdea,
   currentScript,
@@ -723,7 +1050,10 @@ function PresetsColumn({
   onOpenCompanion,
 }: {
   ideas: Idea[];
+  projects: Project[];
   projectId: string;
+  onSwitchProject: (projectId: string) => void;
+  onCreateProject: () => void;
   selectedIdeaId: string;
   onSelectIdea: (ideaId: string) => void;
   currentScript: string | null;
@@ -733,6 +1063,8 @@ function PresetsColumn({
 }) {
   const [scope, setScope] = useState<"project" | "all">("all");
   const ideaMap = useMemo(() => new Map(ideas.map((i) => [i.id, i])), [ideas]);
+  const projectMap = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
+  const activeProject = projectMap.get(projectId);
 
   const visiblePresets = useMemo(() => {
     if (scope === "all") return TASK_PRESETS;
@@ -745,17 +1077,28 @@ function PresetsColumn({
     [visiblePresets, selectedIdeaId],
   );
   const linkedIdea = ideaMap.get(activePreset.ideaId);
+  const linkedIdeaProject = linkedIdea?.projectId ? projectMap.get(linkedIdea.projectId) : undefined;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="shrink-0 border-b px-2.5 py-2">
+        <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+          <span className="label">куда</span>
+          <ProjectInlinePicker
+            projects={projects}
+            value={projectId}
+            onChange={onSwitchProject}
+            onCreate={onCreateProject}
+            triggerClassName="flex-1 min-w-[150px]"
+          />
+        </div>
         <div className="flex items-center justify-between gap-2">
           <span className="label">готовые скрипты под задачи</span>
           <div className="flex items-center gap-1">
             {(
               [
                 ["all", `все (${TASK_PRESETS.length})`],
-                ["project", "проект"],
+                ["project", "этот проект"],
               ] as const
             ).map(([k, l]) => (
               <button
@@ -772,7 +1115,7 @@ function PresetsColumn({
           </div>
         </div>
         <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-          Код анализа уже встроен в приложение (10..19 + общий модуль flylib.py): токены DeepSeek тратить не нужно.
+          Код анализа встроен (10..19 и flylib.py): откроется и запустится в проекте «{activeProject?.name ?? projectId}».
         </p>
       </div>
 
@@ -781,6 +1124,7 @@ function PresetsColumn({
         <div className="border-b">
           {visiblePresets.map((p) => {
             const idea = ideaMap.get(p.ideaId);
+            const ideaProj = idea?.projectId ? projectMap.get(idea.projectId) : undefined;
             const isSelected = p.ideaId === activePreset.ideaId;
             const isOpen = currentScript === p.script;
             return (
@@ -794,7 +1138,15 @@ function PresetsColumn({
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate font-mono text-[10.5px] text-foreground">{p.script}</span>
-                  {isOpen && <span className="label shrink-0">открыт</span>}
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    {ideaProj && (
+                      <span className="flex items-center gap-1 font-mono text-[9.5px] text-muted-foreground" title={`Проект идеи: ${ideaProj.name}`}>
+                        <span className="size-1.5" style={{ background: ideaProj.color }} />
+                        <span className="max-w-[90px] truncate">{ideaProj.name}</span>
+                      </span>
+                    )}
+                    {isOpen && <span className="label shrink-0">открыт</span>}
+                  </div>
                 </div>
                 <span className="line-clamp-1 text-[11.5px] text-muted-foreground">{idea?.title ?? p.shortTitle}</span>
               </button>
@@ -804,6 +1156,17 @@ function PresetsColumn({
 
         {/* Подробная карточка выбранного готового анализа */}
         <div className="flex flex-col gap-2.5 p-2.5 text-[12px]">
+          {linkedIdeaProject && linkedIdeaProject.id !== projectId && (
+            <div className="flex flex-wrap items-center justify-between gap-1.5 border bg-muted/30 px-2 py-1.5 text-[11px]">
+              <span className="text-muted-foreground">
+                Идея относится к проекту <strong className="font-medium text-foreground">«{linkedIdeaProject.name}»</strong>
+              </span>
+              <Button size="sm" variant="outline" className="h-6 px-2 text-[10.5px]" onClick={() => onSwitchProject(linkedIdeaProject.id)}>
+                переключить на него
+              </Button>
+            </div>
+          )}
+
           <div>
             <div className="label">выбранная задача</div>
             <div className="mt-0.5 font-medium leading-snug">{linkedIdea?.title ?? activePreset.shortTitle}</div>
@@ -812,7 +1175,7 @@ function PresetsColumn({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <div className="label">режимы запуска (одной кнопкой)</div>
+            <div className="label">режимы запуска · проект «{activeProject?.name ?? projectId}»</div>
             {activePreset.modes.map((m) => (
               <div key={m.id} className="border p-2">
                 <div className="text-[11.5px] font-medium">{m.label}</div>
@@ -877,7 +1240,27 @@ interface ChatMessage extends LlmMessage {
   actions?: string[];
 }
 
-function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas: Idea[]; perms: Permissions | null; onAddReferences: (items: Partial<Reference>[]) => void }) {
+function ChatColumn({
+  pid,
+  projects,
+  paths,
+  onSwitchProject,
+  onCreateProject,
+  onScriptSaved,
+  ideas,
+  perms,
+  onAddReferences,
+}: {
+  pid: string;
+  projects: Project[];
+  paths: ProjectPaths | null;
+  onSwitchProject: (projectId: string) => void;
+  onCreateProject: () => void;
+  onScriptSaved: (targetPid: string, fileName: string) => Promise<void>;
+  ideas: Idea[];
+  perms: Permissions | null;
+  onAddReferences: (items: Partial<Reference>[]) => void;
+}) {
   const [provider, setProvider] = useState<LlmProvider>("deepseek");
   const [model, setModel] = useState("deepseek-chat");
   const [msgs, setMsgs] = useState<ChatMessage[]>(() => {
@@ -897,6 +1280,7 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
   const endRef = useRef<HTMLDivElement>(null);
 
   const conf = PROVIDERS.find((p) => p.id === provider)!;
+  const activeProject = projects.find((p) => p.id === pid);
 
   useEffect(() => {
     setMsgs((() => {
@@ -924,26 +1308,38 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
     setKeyInput("");
   };
 
-  const writeBlocks = async (blocks: { lang?: string; content: string }[]) => {
+  const writeBlocks = async (blocks: { lang?: string; content: string }[], targetPid: string) => {
     const actions: string[] = [];
+    const targetName = projects.find((p) => p.id === targetPid)?.name ?? targetPid;
+    let lastSaved: string | null = null;
     for (const b of blocks) {
       if (!/^py/i.test(b.lang ?? "")) continue;
       const m = b.content.match(/^#\s*file:\s*([\w.\-]+\.py)/m);
       const stamp = new Date().toISOString().slice(11, 19).replace(/:/g, "");
       const name = m?.[1] ?? `assistant_${stamp}.py`;
       try {
-        const r = await fly!.writeScript(pid, name, b.content);
-        actions.push(`${r.created ? "создан" : "обновлён"} файл ${r.file}`);
+        const r = await fly!.writeScript(targetPid, name, b.content);
+        lastSaved = r.file;
+        actions.push(`${r.created ? "создан" : "обновлён"} ${r.file} в «${targetName}»`);
       } catch (e) {
         actions.push(`не сохранено: ${(e as Error).message}`);
       }
     }
+    if (lastSaved) {
+      await onScriptSaved(targetPid, lastSaved);
+    }
     return actions;
+  };
+
+  const saveBlockToProject = async (codeText: string, name: string, targetPid: string) => {
+    const r = await fly!.writeScript(targetPid, name, codeText, { allowOverwrite: true });
+    await onScriptSaved(targetPid, r.file);
   };
 
   const send = async () => {
     const text = input.trim();
     if (!text || busy) return;
+    const targetPidAtSend = pid;
     const idea = ideas.find((i) => i.id === ctxIdea);
     const ctx =
       idea && provider === "deepseek"
@@ -961,7 +1357,7 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
         messages: [{ role: "system", content: (provider === "deepseek" ? CODE_PROMPT : LIT_PROMPT) + ctx }, ...next.slice(-10).map((m) => ({ role: m.role, content: m.content }))],
       });
       const blocks = [...r.content.matchAll(/```(\w+)?\n([\s\S]*?)```/g)].map((m) => ({ lang: m[1], content: m[2] }));
-      const actions = autoSave && blocks.length && (perms?.createFiles ?? false) ? await writeBlocks(blocks) : [];
+      const actions = autoSave && blocks.length && (perms?.createFiles ?? false) ? await writeBlocks(blocks, targetPidAtSend) : [];
       setMsgs((m) => [...m, { role: "assistant", content: r.content, actions }]);
     } catch (e) {
       setErr((e as Error).message);
@@ -975,6 +1371,17 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="shrink-0 border-b px-2 py-1.5">
+        <div className="mb-1.5 flex flex-wrap items-center gap-1.5" title={paths ? `Папка кода: ${paths.code}` : undefined}>
+          <span className="label">куда код</span>
+          <ProjectInlinePicker
+            projects={projects}
+            value={pid}
+            onChange={onSwitchProject}
+            onCreate={onCreateProject}
+            triggerClassName="flex-1 min-w-[150px]"
+          />
+        </div>
+
         <div className="flex items-center gap-1.5">
           <span className="label">помощник</span>
           <Select
@@ -1053,7 +1460,7 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
           </Select>
           <label className="flex w-full cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground">
             <input type="checkbox" checked={autoSave && (perms?.createFiles ?? false)} disabled={!perms?.createFiles} onChange={(e) => setAutoSave(e.target.checked)} />
-            сохранять код из ответа в папку проекта
+            сохранять код в «{activeProject?.name ?? pid}» и открывать
             {!perms?.createFiles && <span className="text-muted-foreground/70">(выключено в правах)</span>}
           </label>
         </div>
@@ -1064,7 +1471,7 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
           <div className="flex flex-col gap-2 py-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground">
               {provider === "deepseek"
-                ? "Попроси написать скрипт: помощник сохранит его в папку проекта, и файл сразу появится слева."
+                ? `Попроси написать скрипт: помощник сохранит его в проект «${activeProject?.name ?? pid}», обновит список слева и откроет в редакторе.`
                 : "Спроси про литературу: ответ придёт со списком работ, а строки с DOI можно внести в библиотеку."}
             </p>
             {[
@@ -1082,7 +1489,12 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
         {msgs.map((m, i) => (
           <div key={i} className="border-b pb-2 mb-2 last:border-b-0">
             <div className="label mb-1">{m.role === "user" ? "запрос" : "ответ"}</div>
-            <MessageBody content={m.content} onSaveCode={(code, name) => fly!.writeScript(pid, name, code, { allowOverwrite: true }).then(() => null)} />
+            <MessageBody
+              content={m.content}
+              currentPid={pid}
+              projects={projects}
+              onSaveCode={(codeText, name, targetPid) => void saveBlockToProject(codeText, name, targetPid)}
+            />
             {m.actions && m.actions.length > 0 && (
               <ul className="mt-1 flex flex-col gap-0.5">
                 {m.actions.map((a, k) => (
@@ -1137,8 +1549,18 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
   );
 }
 
-/** Текст ответа с блоками кода: у каждого блока кнопка сохранения в проект */
-function MessageBody({ content, onSaveCode }: { content: string; onSaveCode: (code: string, name: string) => void }) {
+/** Текст ответа с блоками кода: у каждого блока кнопка сохранения в текущий или другой проект */
+function MessageBody({
+  content,
+  currentPid,
+  projects,
+  onSaveCode,
+}: {
+  content: string;
+  currentPid: string;
+  projects: Project[];
+  onSaveCode: (code: string, name: string, targetPid: string) => void;
+}) {
   const parts = useMemo(() => {
     const out: { type: "text" | "code"; content: string; lang?: string }[] = [];
     const re = /```(\w+)?\n([\s\S]*?)```/g;
@@ -1153,6 +1575,14 @@ function MessageBody({ content, onSaveCode }: { content: string; onSaveCode: (co
     return out;
   }, [content]);
 
+  const currentProjectName = projects.find((p) => p.id === currentPid)?.name ?? currentPid;
+  const otherProjects = projects.filter((p) => p.id !== currentPid);
+
+  const askFileName = (raw: string) => {
+    const m = raw.match(/^#\s*file:\s*([\w.\-]+\.py)/m);
+    return m?.[1] ?? prompt("Имя файла для скрипта:", "my_experiment.py") ?? "";
+  };
+
   return (
     <div className="text-[12px] leading-relaxed">
       {parts.map((p, i) =>
@@ -1164,18 +1594,43 @@ function MessageBody({ content, onSaveCode }: { content: string; onSaveCode: (co
           <div key={i} className="my-1.5">
             <pre className="max-h-[260px] overflow-auto border bg-muted/40 p-2 font-mono text-[11px]">{p.content}</pre>
             {(p.lang ?? "").match(/^py/i) && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="mt-1"
-                onClick={() => {
-                  const m = p.content.match(/^#\s*file:\s*([\w.\-]+\.py)/m);
-                  const name = m?.[1] ?? prompt("Имя файла для скрипта:", "my_experiment.py") ?? "";
-                  if (name) onSaveCode(p.content, name);
-                }}
-              >
-                сохранить в проект
-              </Button>
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const name = askFileName(p.content);
+                    if (name) onSaveCode(p.content, name, currentPid);
+                  }}
+                >
+                  сохранить в «{currentProjectName}»
+                </Button>
+                {otherProjects.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="sm" variant="ghost">
+                        в другой проект
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-64">
+                      <DropdownMenuLabel>Сохранить и открыть в проекте</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {otherProjects.map((pr) => (
+                        <DropdownMenuItem
+                          key={pr.id}
+                          onClick={() => {
+                            const name = askFileName(p.content);
+                            if (name) onSaveCode(p.content, name, pr.id);
+                          }}
+                        >
+                          <span className="mr-1.5 inline-block size-2 shrink-0" style={{ background: pr.color }} />
+                          {pr.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             )}
           </div>
         ),
@@ -1190,6 +1645,7 @@ function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     ["Данные", "раздел «Данные и окружение»: выбери папку и нажми «Скачать мозг мухи», это около 100 МБ. Для первой пробы данные не нужны: шаблон 02 работает сам по себе."],
     ["Окружение", "там же видно Python и пакеты. Для прогонов модели надёжнее окружение conda: conda env create -f environment.yml в папке приложения, затем conda activate fly-brain. Внутри уже есть Brian2, NAVis и neuprint-python, а numpy держится ниже второй версии, иначе brian2 не импортируется."],
     ["Готовый анализ задач (без API)", "справа открыта вкладка «По задачам (без API)»: там лежат готовые проверенные скрипты 10..19 под все 10 текущих идей (лезии, интерференция, бенчмарк бэкендов, обучение в целом мозге, память ухаживания MaleCNS, тракт в VNC, социальное обучение, индивидуальность, брачная песня, PCI) и общий модуль flylib.py. В каждом есть быстрый режим --synth и полный режим на локальных файлах FLY_DATA."],
+    ["Проекты и маршрутизация", "прямо в строке над редактором кода, в правой панели и в шапке есть селектор «куда» и кнопка «+» для нового проекта. При смене проекта одновременно переключаются папка кода и папка прогонов (несохранённые правки предложат сохраниться). Меню «в другой проект» над кодом и «прогон в проект» над результатом копируют или переносят скрипт и папку прогона между проектами."],
     ["Первый прогон", "слева открой 00_check_env.py и запусти, либо выбери любую задачу справа и нажми «запустить» на режиме --synth. Аргументы видны и редактируются в строке над кодом."],
     ["Посмотреть нейроны", "шаблон 05_neuron_gallery.py рисует морфологию нейронов в трёх проекциях и накладывает активность из прогона: --ids 12781 556329 (скелеты скачаются сами) или --spikes путь_к_spikes.parquet, с флагом --animate получится gif с распространением сигнала."],
     ["Прогон модели", "шаблон 06_brian2_shiu.py считает LIF-сеть на Brian2: сам подбирает фоновый вес под целевую частоту, стимулирует и заглушает заданные нейроны, пишет spikes.parquet, rates_top.csv, raster.png. Проверка без данных: --synth --n 2000 --t 0.5."],

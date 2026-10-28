@@ -411,7 +411,12 @@ async function runScript(win, projectId, name, args) {
   const file = path.join(ws.code, path.basename(name));
   if (!within(ws.code, file)) throw new Error("Скрипт вне папки проекта.");
   const [cmd, ...pre] = py.cmd.split(" ");
-  const runId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + path.basename(name).replace(/\.py$/, "");
+  const baseId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + path.basename(name).replace(/\.py$/, "");
+  let runId = baseId;
+  let seq = 2;
+  while (runs.has(runId) || fs.existsSync(path.join(ws.runs, runId))) {
+    runId = `${baseId}_${seq++}`;
+  }
   const runDir = path.join(ws.runs, runId);
   fs.mkdirSync(runDir, { recursive: true });
   const script = file;
@@ -421,17 +426,17 @@ async function runScript(win, projectId, name, args) {
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
   const send = (stream, text) => {
     log.write(text);
-    win.webContents.send("fly:runOutput", { runId, stream, text });
+    win?.webContents.send("fly:runOutput", { runId, projectId: ws.projectId, runDir, stream, text });
   };
   p.stdout.on("data", (d) => send("stdout", d.toString()));
   p.stderr.on("data", (d) => send("stderr", d.toString()));
   p.on("close", (code) => {
     log.end();
     runs.delete(runId);
-    runStatus.set(runId, { code, dir: runDir, finishedAt: new Date().toISOString() });
-    win.webContents.send("fly:runOutput", { runId, stream: "exit", code, text: `\n[завершено, код ${code}]\n` });
+    runStatus.set(runId, { code, dir: runDir, projectId: ws.projectId, finishedAt: new Date().toISOString() });
+    win?.webContents.send("fly:runOutput", { runId, projectId: ws.projectId, runDir, stream: "exit", code, text: `\n[завершено, код ${code}]\n` });
   });
-  return { runId, runDir };
+  return { runId, runDir, projectId: ws.projectId };
 }
 
 // ------------------------------------------------------------
@@ -962,6 +967,28 @@ function registerIpc(getWin) {
     const target = path.join(dest.filePaths[0], path.basename(dir));
     await fsp.cp(src, target, { recursive: true });
     return target;
+  });
+  ipcMain.handle("fly:transferRun", async (_e, dir, targetProjectId, opts) => {
+    const src = String(dir || "");
+    if (!withinRuns(src)) throw new Error("Папка вне каталога прогонов.");
+    const dstWs = projectPaths(targetProjectId);
+    let baseName = path.basename(src);
+    let target = path.join(dstWs.runs, baseName);
+    if (path.resolve(src) === path.resolve(target)) {
+      return { path: target, label: baseName, projectId: dstWs.projectId };
+    }
+    const origBase = baseName;
+    let copyIdx = 1;
+    while (fs.existsSync(target)) {
+      baseName = copyIdx === 1 ? `${origBase}_copy` : `${origBase}_copy${copyIdx}`;
+      copyIdx++;
+      target = path.join(dstWs.runs, baseName);
+    }
+    await fsp.cp(src, target, { recursive: true });
+    if (opts && opts.move) {
+      await fsp.rm(src, { recursive: true, force: true });
+    }
+    return { path: target, label: baseName, projectId: dstWs.projectId };
   });
   ipcMain.handle("fly:syncState", (_e, st) => {
     AGENT.state = st && typeof st === "object" ? st : null;
