@@ -250,6 +250,7 @@ function Workspace({
     focusIdeaId || ideas.find((i) => i.projectId === pid)?.id || ideas[0]?.id || TASK_PRESETS[0].ideaId,
   );
   const [added, setAdded] = useState(false);
+  const [collapsedTree, setCollapsedTree] = useState<Set<string>>(() => new Set());
   const [saveNote, setSaveNote] = useState("");
   const [logCopied, setLogCopied] = useState(false);
   const [missingPackage, setMissingPackage] = useState<string | null>(null);
@@ -257,6 +258,7 @@ function Workspace({
   const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
   const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
   const pendingPresetIdea = useRef<string | null>(null);
+  const explicitProjectWorkspace = useRef<string | null>(null);
   const lastRunByScope = useRef<Record<string, { scriptName: string; args: string[] } | undefined>>({});
   const project = projects.find((p) => p.id === pid);
   const scopeId = workspaceIdeaId ? `idea:${workspaceIdeaId}` : pid;
@@ -349,6 +351,10 @@ function Workspace({
     if (keepProjectScope) {
       setWorkspaceIdeaId("");
       setIdeaId(ideas.find((i) => i.projectId === pid)?.id ?? "");
+      return;
+    }
+    if (explicitProjectWorkspace.current === pid) {
+      explicitProjectWorkspace.current = null;
       return;
     }
     if (selectedWorkspaceIdea?.projectId === pid) return;
@@ -468,15 +474,35 @@ function Workspace({
     void switchWorkspaceIdea(nextIdeaId);
   }, [switchWorkspaceIdea]);
 
-  const addIdeaInBrain = useCallback(() => {
+  const addIdeaInBrain = useCallback(async (targetProjectId = pid) => {
+    await saveBeforeWorkspaceChange();
     const raw = prompt("Название идеи для отдельного рабочего пространства:", "Новая идея");
     const title = raw?.trim();
     if (!title) return;
-    const created = onAddIdea(pid, title);
+    const created = onAddIdea(targetProjectId, title);
+    if (targetProjectId !== pid) onSelectProject(targetProjectId);
     setWorkspaceIdeaId(created.id);
     setIdeaId(created.id);
     setSelectedPresetIdea(created.id);
-  }, [pid, onAddIdea]);
+  }, [pid, onAddIdea, onSelectProject, saveBeforeWorkspaceChange]);
+
+  const switchProjectWorkspace = useCallback(async (nextPid: string) => {
+    if (!nextPid) return;
+    await saveBeforeWorkspaceChange();
+    explicitProjectWorkspace.current = nextPid;
+    setWorkspaceIdeaId("");
+    setIdeaId(ideas.find((i) => i.projectId === nextPid)?.id ?? "");
+    if (nextPid !== pid) onSelectProject(nextPid);
+  }, [saveBeforeWorkspaceChange, ideas, pid, onSelectProject]);
+
+  const toggleTree = (key: string) => {
+    setCollapsedTree((previous) => {
+      const next = new Set(previous);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const switchProject = useCallback(
     async (nextPid: string) => {
@@ -762,31 +788,18 @@ function Workspace({
       {/* шапка: проект, папки кода и результатов, права */}
       <div className="shrink-0 border-b">
         <div className="flex flex-wrap items-center gap-1.5 px-3 py-1.5">
-          <span className="label mr-1">проект</span>
-          {projects.map((p) => {
-            const isRunningHere = !!activeRuns[p.id] || ideas.some((i) => i.projectId === p.id && !!activeRuns[`idea:${i.id}`]);
-            return (
-              <button
-                key={p.id}
-                onClick={() => void switchProject(p.id)}
-                className={cn(
-                  "flex items-center gap-1.5 border px-2 py-0.5 text-[11px] cursor-pointer",
-                  p.id === pid ? "border-foreground bg-accent text-foreground" : "border-border text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <span className="size-2 shrink-0" style={{ background: p.color }} />
-                <span>{p.name}</span>
-                {isRunningHere && <span className="font-mono text-[9.5px] text-[var(--chart-2)]">[счёт]</span>}
-              </button>
-            );
-          })}
-          <Button size="sm" variant="ghost" className="h-6 px-2 font-mono text-[11px]" onClick={() => void createNewProjectHere()}>
-            + новый проект
-          </Button>
+          <span className="label">ветка</span>
+          <span className="flex min-w-0 items-center gap-1.5 text-[11px]">
+            <span className="size-2 shrink-0" style={{ background: project?.color }} />
+            <span className="truncate font-medium">{project?.name ?? pid}</span>
+            <span className="text-muted-foreground">/</span>
+            <span className="truncate text-muted-foreground">{selectedWorkspaceIdea?.title ?? "Общее пространство"}</span>
+          </span>
+          {runId && <span className="font-mono text-[9.5px] text-[var(--chart-2)]">выполняется</span>}
           {paths && (
             <div className="ml-auto flex flex-wrap items-center gap-2">
-              <span className="hidden max-w-[360px] truncate font-mono text-[10px] text-muted-foreground xl:inline" title={`Код: ${paths.code}\nПрогоны: ${paths.runs}`}>
-                код: {paths.code} · прогоны: {paths.runs}
+              <span className="hidden max-w-[360px] truncate font-mono text-[10px] text-muted-foreground xl:inline" title={`Код: ${paths.code}\nРезультаты: ${paths.runs}`}>
+                код: {paths.code} · результаты: {paths.runs}
               </span>
               <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => setShowFolderSettings((s) => !s)}>
                 {showFolderSettings ? "скрыть папки и права" : "папки и права"}
@@ -856,58 +869,131 @@ function Workspace({
       </div>
 
       {/* три колонки: файлы, код и результаты, готовые задачи / помощник */}
-      <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[245px_minmax(0,1fr)_360px] lg:divide-x">
-        {/* --- слева: проводник --- */}
+      <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)_340px] lg:divide-x">
+        {/* --- слева: дерево проекта и материалы выбранной ветки --- */}
         <aside className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
-          <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-            <span className="label truncate" title={paths?.code}>файлы, .py ({files.length})</span>
-            <Button size="sm" variant="ghost" className="ml-auto px-1.5" onClick={() => void syncBuiltInTemplates()} title="Докопировать встроенные скрипты анализа (00..19 и flylib.py)">
-              шаблоны
-            </Button>
-            <Button size="sm" variant="ghost" className="px-1.5" onClick={newFile}>
-              новый
-            </Button>
-            <Button size="sm" variant="ghost" className="px-1.5" onClick={importFile}>
-              импорт
-            </Button>
+          <div className="shrink-0 border-b px-2 py-1.5">
+            <div className="flex items-center gap-1">
+              <span className="label">проекты и идеи</span>
+              <Button size="sm" variant="ghost" className="ml-auto h-6 px-1.5 text-[10.5px]" onClick={() => void addIdeaInBrain()} title="Новая идея с отдельным кодом и результатами">+ идея</Button>
+              <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10.5px]" onClick={() => void createNewProjectHere()} title="Создать проект">+ проект</Button>
+            </div>
+            <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">Выберите ветку. У каждой идеи свои файлы и прогоны.</p>
           </div>
-          <div className="min-h-[120px] flex-1 overflow-y-auto">
-            {files.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">Папка пуста.</p>}
-            {files.map((f) => (
-              <div key={f.name} className={cn("group flex items-center gap-1.5 border-b px-2 py-1", current === f.name && "bg-accent")}>
-                <button onClick={() => void openFile(f.name)} className="min-w-0 flex-1 text-left cursor-pointer" title={f.doc || f.name}>
-                  <span className="block truncate font-mono text-[11px]">{f.name}</span>
-                  <span className="block truncate text-[10px] text-muted-foreground">{f.doc || `${(f.size / 1024).toFixed(1)} КБ`}</span>
-                </button>
-                <button onClick={() => void removeFile(f.name)} className="shrink-0 cursor-pointer px-1 text-[11px] text-muted-foreground hover:text-destructive" title="Удалить файл">
-                  ×
-                </button>
-              </div>
-            ))}
+          <div className="max-h-[36%] min-h-[132px] shrink-0 overflow-y-auto border-b py-1">
+            {projects.map((treeProject) => {
+              const projectIdeas = ideas.filter((i) => i.projectId === treeProject.id);
+              const projectKey = `project:${treeProject.id}`;
+              const ideasKey = `ideas:${treeProject.id}`;
+              const projectOpen = !collapsedTree.has(projectKey);
+              const ideasOpen = !collapsedTree.has(ideasKey);
+              const isProjectWorkspace = pid === treeProject.id && !workspaceIdeaId;
+              return (
+                <div key={treeProject.id}>
+                  <div className="flex items-center gap-1 px-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleTree(projectKey)}
+                      className="h-6 w-5 shrink-0 cursor-pointer font-mono text-[11px] text-muted-foreground"
+                      aria-label={projectOpen ? `Свернуть ${treeProject.name}` : `Развернуть ${treeProject.name}`}
+                    >{projectOpen ? "−" : "+"}</button>
+                    <button
+                      type="button"
+                      onClick={() => void switchProjectWorkspace(treeProject.id)}
+                      className={cn("flex min-w-0 flex-1 items-center gap-1.5 px-1 py-1 text-left text-[11px] cursor-pointer", isProjectWorkspace && "bg-accent text-foreground", !isProjectWorkspace && "text-foreground hover:bg-accent")}
+                      title={`Проект «${treeProject.name}»`}
+                    >
+                      <span className="size-2 shrink-0" style={{ background: treeProject.color }} />
+                      <span className="truncate font-medium">{treeProject.name}</span>
+                      <span className="ml-auto shrink-0 font-mono text-[9px] text-muted-foreground">{projectIdeas.length}</span>
+                    </button>
+                  </div>
+                  {projectOpen && (
+                    <div className="ml-3 border-l pl-2">
+                      <button
+                        type="button"
+                        onClick={() => void switchProjectWorkspace(treeProject.id)}
+                        className={cn("flex w-full items-center gap-1.5 px-1.5 py-1 text-left text-[10.5px] cursor-pointer", isProjectWorkspace ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground")}
+                      >
+                        <span className="font-mono">[P]</span><span>Общее пространство</span>
+                        {isProjectWorkspace && <span className="ml-auto font-mono text-[9px]">выбрано</span>}
+                      </button>
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => toggleTree(ideasKey)} className="h-6 w-5 shrink-0 cursor-pointer font-mono text-[11px] text-muted-foreground" aria-label={ideasOpen ? "Свернуть идеи" : "Развернуть идеи"}>{ideasOpen ? "−" : "+"}</button>
+                        <button type="button" onClick={() => toggleTree(ideasKey)} className="flex min-w-0 flex-1 items-center gap-1.5 px-1 py-1 text-left text-[10.5px] text-muted-foreground cursor-pointer hover:text-foreground">
+                          <span className="font-mono">[I]</span><span>Идеи</span><span className="font-mono">({projectIdeas.length})</span>
+                        </button>
+                        <Button size="sm" variant="ghost" className="h-5 px-1 text-[10px]" onClick={() => void addIdeaInBrain(treeProject.id)} title={`Добавить идею в «${treeProject.name}»`}>+</Button>
+                      </div>
+                      {ideasOpen && (
+                        <div className="ml-3 border-l pl-2">
+                          {projectIdeas.length === 0 && <p className="px-1.5 py-1 text-[10px] text-muted-foreground">Идей пока нет.</p>}
+                          {projectIdeas.map((treeIdea) => {
+                            const selected = workspaceIdeaId === treeIdea.id;
+                            const running = !!activeRuns[`idea:${treeIdea.id}`];
+                            return (
+                              <button
+                                key={treeIdea.id}
+                                type="button"
+                                onClick={() => void switchWorkspaceIdea(treeIdea.id)}
+                                className={cn("flex w-full min-w-0 items-center gap-1.5 px-1.5 py-1 text-left text-[10.5px] cursor-pointer", selected ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground")}
+                                title={`${treeIdea.title} · отдельные код и результаты`}
+                              >
+                                <span className="font-mono text-[9px]">{selected ? ">" : "·"}</span>
+                                <span className="min-w-0 flex-1 truncate">{treeIdea.title}</span>
+                                {running && <span className="shrink-0 font-mono text-[9px] text-[var(--chart-2)]">запуск</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          <div className="flex shrink-0 items-center gap-1 border-y px-2 py-1.5">
-            <span className="label truncate" title={paths?.runs}>прогоны ({runs.length})</span>
-            <Button size="sm" variant="ghost" className="ml-auto" onClick={() => void refreshRuns()}>
-              обновить
-            </Button>
+          <div className="flex min-h-0 flex-1 flex-col border-b">
+            <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
+              <span className="label truncate" title={paths?.code}>код · {files.length}</span>
+              <span className="ml-auto truncate font-mono text-[9px] text-muted-foreground" title={scopeLabel}>{scopeLabel}</span>
+              <Button size="sm" variant="ghost" className="px-1.5" onClick={() => void syncBuiltInTemplates()} title="Добавить встроенные шаблоны анализа">шаблоны</Button>
+              <Button size="sm" variant="ghost" className="px-1.5" onClick={newFile}>+</Button>
+              <Button size="sm" variant="ghost" className="px-1.5" onClick={importFile}>импорт</Button>
+            </div>
+            <div className="min-h-[90px] flex-1 overflow-y-auto">
+              {files.length === 0 && <p className="px-2 py-3 text-[10.5px] text-muted-foreground">В этой ветке пока нет файлов кода.</p>}
+              {files.map((f) => (
+                <div key={f.name} className={cn("group flex items-center gap-1.5 border-b px-2 py-1", current === f.name && "bg-accent")}>
+                  <button onClick={() => void openFile(f.name)} className="min-w-0 flex-1 text-left cursor-pointer" title={f.doc || f.name}>
+                    <span className="block truncate font-mono text-[10.5px]">{f.name}</span>
+                    <span className="block truncate text-[9.5px] text-muted-foreground">{f.doc || `${(f.size / 1024).toFixed(1)} КБ`}</span>
+                  </button>
+                  <button onClick={() => void removeFile(f.name)} className="shrink-0 cursor-pointer px-1 text-[11px] text-muted-foreground hover:text-destructive" title="Удалить файл">×</button>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="min-h-[100px] flex-1 overflow-y-auto">
-            {runs.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">В пространстве «{scopeLabel}» ещё нет прогонов.</p>}
-            {runs.map((r) => (
-              <button
-                key={r.path}
-                onClick={() => openRun(r)}
-                className={cn("block w-full border-b px-2 py-1 text-left cursor-pointer hover:bg-accent", selRun?.path === r.path && "bg-accent")}
-              >
-                <span className="block truncate font-mono text-[10px]">{r.label}</span>
-                <span className="block font-mono text-[10px] text-muted-foreground">
-                  файлов: {r.files.length}
-                  {r.summary ? " · summary" : ""}
-                  {r.files.some((f) => /\.(png|jpe?g|svg)$/i.test(f)) ? " · графики" : ""}
-                </span>
-              </button>
-            ))}
+
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
+              <span className="label truncate" title={paths?.runs}>результаты · {runs.length}</span>
+              <Button size="sm" variant="ghost" className="ml-auto h-6 px-1.5 text-[10px]" onClick={() => void refreshRuns()}>обновить</Button>
+            </div>
+            <div className="min-h-[90px] flex-1 overflow-y-auto">
+              {runs.length === 0 && <p className="px-2 py-3 text-[10.5px] text-muted-foreground">В этой ветке ещё нет прогонов.</p>}
+              {runs.map((r) => (
+                <button
+                  key={r.path}
+                  onClick={() => openRun(r)}
+                  className={cn("block w-full border-b px-2 py-1 text-left cursor-pointer hover:bg-accent", selRun?.path === r.path && "bg-accent")}
+                >
+                  <span className="block truncate font-mono text-[10px]">{r.label}</span>
+                  <span className="block font-mono text-[9px] text-muted-foreground">файлов: {r.files.length}{r.summary ? " · summary" : ""}{r.files.some((f) => /\.(png|jpe?g|svg)$/i.test(f)) ? " · графики" : ""}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </aside>
 
@@ -934,7 +1020,7 @@ function Workspace({
                 })}
               </SelectContent>
             </Select>
-            <Button size="sm" variant="ghost" className="h-6 px-1.5 font-mono text-[10.5px]" onClick={addIdeaInBrain} title="Создать идею с отдельными папками для кода и прогонов">+ идея</Button>
+            <Button size="sm" variant="ghost" className="h-6 px-1.5 font-mono text-[10.5px]" onClick={() => void addIdeaInBrain()} title="Создать идею с отдельными папками для кода и прогонов">+ идея</Button>
             {selectedWorkspaceIdea && <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10.5px]" onClick={() => onOpenIdeaCard(selectedWorkspaceIdea.id)}>карточка</Button>}
             {current ? (
               <>
