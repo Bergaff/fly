@@ -331,6 +331,8 @@ export default function App() {
                 onClearFocusIdea={() => setBrainIdeaId(null)}
                 onSelectProject={setActive}
                 onAddProject={(name) => store.addProject(name)}
+                onAddIdea={(projectId, title) => store.addIdea(projectId, { title })}
+                onOpenIdeaCard={(id) => setOpenId(id)}
                 onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
                 onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
               />

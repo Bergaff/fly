@@ -1,4 +1,5 @@
 const { app, BrowserWindow, shell, ipcMain, dialog } = require("electron");
+const os = require("node:os");
 const path = require("node:path");
 const fs = require("node:fs");
 const fsp = require("node:fs/promises");
@@ -38,12 +39,28 @@ function getDirs() {
 }
 const DIRS = new Proxy({}, { get: (_t, k) => getDirs()[k] });
 
+/** Стартовый набор скриптов для каждой из 10 базовых идей (в папку идеи кладутся только нужные ей файлы + flylib.py + 00_check_env.py) */
+const IDEA_TEMPLATE_MAP = {
+  "i-lesions": ["10_virtual_lesions.py", "03_shiu_activate.py", "06_brian2_shiu.py"],
+  "i-interference": ["11_mb_interference_connectome.py", "02_mb_toy_interference.py", "04_mb_sweep_heatmap.py", "09_mb_circuit_v783.py"],
+  "i-benchmark": ["12_backend_benchmark.py", "00_check_env.py", "06_brian2_shiu.py"],
+  "i-mb-learning": ["13_whole_brain_mb_learning.py", "09_mb_circuit_v783.py", "06_brian2_shiu.py"],
+  "i-courtship-memory": ["14_malecns_courtship_memory.py", "08_malecns_loader.py", "07_morph_activity_figure.py"],
+  "i-memory-to-action": ["15_memory_to_motor_vnc.py", "08_malecns_loader.py", "05_neuron_gallery.py"],
+  "i-observational": ["16_observational_learning.py", "09_mb_circuit_v783.py"],
+  "i-individuality": ["17_individuality_phenotypes.py", "06_brian2_shiu.py"],
+  "i-song": ["18_courtship_song_ipi.py", "08_malecns_loader.py"],
+  "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
+};
+
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
   const overwrite = !!(opts && opts.overwrite);
+  const filterSet = opts && opts.only ? new Set(opts.only) : null;
   const copied = [];
   for (const f of fs.readdirSync(TEMPLATES)) {
     if (!/\.(py|md|json|yml)$/i.test(f)) continue;
+    if (filterSet && !filterSet.has(f)) continue;
     const src = path.join(TEMPLATES, f);
     if (!fs.statSync(src).isFile()) continue;
     const dst = path.join(scriptsDir, f);
@@ -54,17 +71,87 @@ function copyTemplates(scriptsDir, opts) {
   }
   return copied;
 }
-function syncProjectTemplates(projectId, codeDir, forceMissing = false) {
+
+/** Имя проекта/идеи приводим к безопасному виду: оно становится именем папки */
+function slug(projectId) {
+  const s = String(projectId || "project").replace(/[^A-Za-z0-9._-]/g, "-").replace(/^-+|-+$/g, "");
+  return s || "project";
+}
+
+/** Разбор идентификатора рабочего пространства:
+ *  - "idea:<ideaId>" или "idea__<ideaId>" -> отдельная папка идеи workspace/scripts/ideas/<ideaId> и workspace/runs/ideas/<ideaId>
+ *  - иначе -> общая папка проекта workspace/scripts/<projectId> и workspace/runs/<projectId>
+ */
+function parseScope(scopeOrProjectId) {
+  const raw = String(scopeOrProjectId || "project").trim();
+  const m = raw.match(/^idea(?::|__)(.+)$/);
+  if (m) {
+    const ideaId = slug(m[1]);
+    return {
+      kind: "idea",
+      scopeId: `idea:${ideaId}`,
+      cfgKey: `idea__${ideaId}`,
+      ideaId,
+      defaults: {
+        code: path.join(DIRS.scripts, "ideas", ideaId),
+        runs: path.join(DIRS.runs, "ideas", ideaId),
+      },
+    };
+  }
+  const id = slug(raw);
+  return {
+    kind: "project",
+    scopeId: id,
+    cfgKey: id,
+    ideaId: null,
+    defaults: {
+      code: path.join(DIRS.scripts, id),
+      runs: path.join(DIRS.runs, id),
+    },
+  };
+}
+
+function allowedTemplatesForScope(scope, includeAll = false) {
+  if (includeAll || scope.kind !== "idea") return null;
+  const specific = IDEA_TEMPLATE_MAP[scope.ideaId] || ["01_load_connectome.py"];
+  return new Set(["flylib.py", "00_check_env.py", ...specific]);
+}
+
+function migrateLegacyIdeaScripts(scope, codeDir) {
+  if (scope.kind !== "idea") return;
+  const c = readConfig();
+  c.ideaWorkspaceInitialized = c.ideaWorkspaceInitialized || {};
+  if (c.ideaWorkspaceInitialized[scope.ideaId]) return;
+  const sourceProjectId = scope.ideaId === "i-pci" ? "p-archive" : "p-fly-brain";
+  const sourceOverride = c.projectDirs?.[sourceProjectId]?.code;
+  const sourceDir = typeof sourceOverride === "string" ? sourceOverride : path.join(DIRS.scripts, sourceProjectId);
+  const allow = allowedTemplatesForScope(scope);
+  if (fs.existsSync(sourceDir) && allow) {
+    for (const name of allow) {
+      const from = path.join(sourceDir, name);
+      const to = path.join(codeDir, name);
+      try {
+        if (!fs.existsSync(to) && fs.statSync(from).isFile()) fs.copyFileSync(from, to);
+      } catch {}
+    }
+  }
+  c.ideaWorkspaceInitialized[scope.ideaId] = true;
+  writeConfig(c);
+}
+
+function syncProjectTemplates(scopeOrProjectId, codeDir, forceMissing = false, includeAll = false) {
   if (!fs.existsSync(TEMPLATES)) return [];
-  const id = slug(projectId);
+  const scope = parseScope(scopeOrProjectId);
+  const allowed = allowedTemplatesForScope(scope, includeAll);
   const c = readConfig();
   c.seededTemplates = c.seededTemplates || {};
-  const seeded = new Set(Array.isArray(c.seededTemplates[id]) ? c.seededTemplates[id] : []);
+  const seeded = new Set(Array.isArray(c.seededTemplates[scope.cfgKey]) ? c.seededTemplates[scope.cfgKey] : []);
   const isEmpty = fs.readdirSync(codeDir).length === 0;
   const added = [];
   let changed = false;
   for (const f of fs.readdirSync(TEMPLATES)) {
     if (!/\.(py|md|json|yml)$/i.test(f)) continue;
+    if (allowed && !allowed.has(f)) continue;
     const src = path.join(TEMPLATES, f);
     if (!fs.statSync(src).isFile()) continue;
     const dst = path.join(codeDir, f);
@@ -78,7 +165,7 @@ function syncProjectTemplates(projectId, codeDir, forceMissing = false) {
     }
   }
   if (changed || added.length > 0) {
-    c.seededTemplates[id] = Array.from(seeded);
+    c.seededTemplates[scope.cfgKey] = Array.from(seeded);
     writeConfig(c);
   }
   return added;
@@ -103,40 +190,36 @@ function setPermissions(patch) {
   return c.permissions;
 }
 
-/** Имя проекта приводим к безопасному виду: оно становится именем папки */
-function slug(projectId) {
-  const s = String(projectId || "project").replace(/[^A-Za-z0-9._-]/g, "-").replace(/^-+|-+$/g, "");
-  return s || "project";
-}
 /** Путь внутри родительской папки, не выше её */
 function within(parent, target) {
   const rel = path.relative(parent, target);
   return !!rel && !rel.startsWith("..") && !path.isAbsolute(rel);
 }
 
-/** Рабочие папки проекта: код и прогоны. Можно переназначить через config.json. */
-function projectPaths(projectId) {
-  const id = slug(projectId);
+/** Рабочие папки идеи или проекта: код и прогоны. Можно переназначить через config.json. */
+function projectPaths(scopeOrProjectId) {
+  const scope = parseScope(scopeOrProjectId);
   const cfg = readConfig().projectDirs || {};
-  const over = cfg[id] || {};
-  const defaults = { code: path.join(DIRS.scripts, id), runs: path.join(DIRS.runs, id) };
+  const over = cfg[scope.cfgKey] || {};
+  const defaults = scope.defaults;
   const code = typeof over.code === "string" ? over.code : defaults.code;
   const runs = typeof over.runs === "string" ? over.runs : defaults.runs;
   fs.mkdirSync(code, { recursive: true });
   fs.mkdirSync(runs, { recursive: true });
-  syncProjectTemplates(id, code, false);
-  return { projectId: id, code, runs, defaults };
+  migrateLegacyIdeaScripts(scope, code);
+  syncProjectTemplates(scopeOrProjectId, code, false, false);
+  return { projectId: scope.scopeId, ideaId: scope.ideaId, code, runs, defaults };
 }
-function setProjectDir(projectId, kind, dir) {
-  const id = slug(projectId);
+function setProjectDir(scopeOrProjectId, kind, dir) {
+  const scope = parseScope(scopeOrProjectId);
   const c = readConfig();
   c.projectDirs = c.projectDirs || {};
-  const cur = c.projectDirs[id] || {};
+  const cur = c.projectDirs[scope.cfgKey] || {};
   if (dir) cur[kind] = dir;
   else delete cur[kind];
-  c.projectDirs[id] = cur;
+  c.projectDirs[scope.cfgKey] = cur;
   writeConfig(c);
-  return projectPaths(projectId);
+  return projectPaths(scopeOrProjectId);
 }
 
 // ------------------------------------------------------------
@@ -333,41 +416,177 @@ async function download(win, item, destDirOverride) {
 }
 
 // ------------------------------------------------------------
-// Окружение: python / conda / brian2 / GPU
+// Окружение: python / conda / venv / установка пакетов / GPU
 // ------------------------------------------------------------
 function run(cmd, args, opts = {}) {
   return new Promise((resolve) => {
     let out = "", err = "";
     let p;
+    const useShell = opts.shell !== undefined ? opts.shell : (process.platform === "win32" && !path.isAbsolute(cmd) && /\.(cmd|bat)$/i.test(cmd));
     try {
-      p = spawn(cmd, args, { shell: process.platform === "win32", ...opts });
+      p = spawn(cmd, args, { windowsHide: true, ...opts, shell: useShell });
     } catch (e) {
       return resolve({ ok: false, out: "", err: String(e) });
     }
     p.stdout?.on("data", (d) => (out += d));
     p.stderr?.on("data", (d) => (err += d));
-    p.on("error", (e) => resolve({ ok: false, out, err: String(e) }));
+    p.on("error", (e) => {
+      if (process.platform === "win32" && !useShell && !path.isAbsolute(cmd)) {
+        run(cmd, args, { ...opts, shell: true }).then(resolve);
+        return;
+      }
+      resolve({ ok: false, out, err: String(e) });
+    });
     p.on("close", (code) => resolve({ ok: code === 0, out: out.trim(), err: err.trim(), code }));
   });
 }
 
-async function pickPython() {
-  const cands = process.platform === "win32" ? ["python", "py -3", "python3"] : ["python3", "python"];
-  for (const c of cands) {
-    const [cmd, ...a] = c.split(" ");
-    const r = await run(cmd, [...a, "--version"]);
-    if (r.ok && /Python 3/.test(r.out + r.err)) return { cmd: c, version: (r.out + r.err).trim() };
+function parsePySpec(spec) {
+  const s = String(spec || "").trim();
+  if (s === "py -3") return { cmd: "py", prefix: ["-3"], raw: s };
+  return { cmd: s, prefix: [], raw: s };
+}
+
+function runPy(spec, args, opts = {}) {
+  const { cmd, prefix } = parsePySpec(spec);
+  return run(cmd, [...prefix, ...args], opts);
+}
+
+function venvPythonExe(venvDir) {
+  return process.platform === "win32"
+    ? path.join(venvDir, "Scripts", "python.exe")
+    : path.join(venvDir, "bin", "python");
+}
+
+function condaPythonExe(envDir) {
+  return process.platform === "win32"
+    ? path.join(envDir, "python.exe")
+    : path.join(envDir, "bin", "python");
+}
+
+function discoverPythonCandidates() {
+  const seen = new Set();
+  const list = [];
+  const add = (cmd, source, note, mustExistFile = false) => {
+    if (!cmd) return;
+    const norm = process.platform === "win32" ? cmd.toLowerCase() : cmd;
+    if (seen.has(norm)) return;
+    if (mustExistFile && !fs.existsSync(cmd)) return;
+    seen.add(norm);
+    list.push({ cmd, source, note });
+  };
+
+  const configured = (readConfig().pythonPath || "").trim();
+  if (configured) add(configured, "selected", "выбран вручную", path.isAbsolute(configured));
+
+  add(venvPythonExe(path.join(WS, ".venv")), "venv", "локальное окружение workspace/.venv", true);
+  add(venvPythonExe(path.join(appRoot, ".venv")), "venv", "локальное окружение .venv", true);
+
+  // Conda: сначала ~/.conda/environments.txt (работает на любом диске C:, D:, E:), затем типовые папки
+  const home = os.homedir();
+  const envsTxt = path.join(home, ".conda", "environments.txt");
+  if (fs.existsSync(envsTxt)) {
+    try {
+      const lines = fs.readFileSync(envsTxt, "utf8").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      const flyEnvs = lines.filter((l) => /fly[-_]?brain/i.test(path.basename(l)));
+      const otherEnvs = lines.filter((l) => !/fly[-_]?brain/i.test(path.basename(l)));
+      for (const dir of [...flyEnvs, ...otherEnvs]) {
+        add(condaPythonExe(dir), "conda", `conda (${path.basename(dir)})`, true);
+      }
+    } catch {}
   }
-  return null;
+
+  const condaRoots = [
+    path.join(home, "miniconda3"),
+    path.join(home, "anaconda3"),
+    path.join(home, "miniforge3"),
+    path.join(home, "mambaforge"),
+    path.join(home, ".conda"),
+    ...(process.env.LOCALAPPDATA ? [path.join(process.env.LOCALAPPDATA, "miniconda3"), path.join(process.env.LOCALAPPDATA, "anaconda3"), path.join(process.env.LOCALAPPDATA, "miniforge3")] : []),
+    ...(process.env.PROGRAMDATA ? [path.join(process.env.PROGRAMDATA, "miniconda3"), path.join(process.env.PROGRAMDATA, "anaconda3")] : []),
+    ...(process.platform === "win32" ? ["C:\\miniconda3", "D:\\miniconda3", "E:\\miniconda3", "C:\\anaconda3", "D:\\anaconda3", "E:\\anaconda3"] : []),
+  ];
+  for (const root of condaRoots) {
+    add(condaPythonExe(path.join(root, "envs", "fly-brain")), "conda", "conda (fly-brain)", true);
+  }
+  for (const root of condaRoots) {
+    add(condaPythonExe(root), "conda", `conda (${path.basename(root)})`, true);
+  }
+
+  const sysCands = process.platform === "win32" ? ["python", "py -3", "python3"] : ["python3", "python"];
+  for (const c of sysCands) add(c, "system", "системный PATH", false);
+  return list;
+}
+
+const QUICK_PROBE_CODE = [
+  "import sys, json",
+  "from importlib.util import find_spec",
+  "mods = {}",
+  "for m in ('numpy','pandas','scipy','matplotlib','pyarrow','brian2'):",
+  "    try:",
+  "        mods[m] = find_spec(m) is not None",
+  "    except Exception:",
+  "        mods[m] = False",
+  "print(json.dumps({'ver': sys.version.split()[0], 'mm': list(sys.version_info[:2]), 'exe': sys.executable, 'ok': mods}))",
+].join("\n");
+
+async function probePythonCandidate(cand) {
+  const r = await runPy(cand.cmd, ["-c", QUICK_PROBE_CODE]);
+  if (!r.ok || !r.out) return null;
+  try {
+    const j = JSON.parse(r.out.split(/\r?\n/).pop());
+    if (!Array.isArray(j.mm) || j.mm[0] < 3) return null;
+    const hasCore = !!(j.ok && j.ok.numpy && j.ok.pandas && j.ok.matplotlib);
+    return {
+      cmd: cand.cmd,
+      exe: j.exe || cand.cmd,
+      version: `Python ${j.ver}`,
+      majorMinor: j.mm,
+      hasCore,
+      okMap: j.ok || {},
+      source: cand.source,
+      note: cand.note,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function listPythons() {
+  const cands = discoverPythonCandidates();
+  const seenExe = new Set();
+  const found = [];
+  for (const c of cands) {
+    const p = await probePythonCandidate(c);
+    if (!p) continue;
+    const key = process.platform === "win32" ? p.exe.toLowerCase() : p.exe;
+    if (seenExe.has(key) && c.source !== "selected") continue;
+    seenExe.add(key);
+    found.push(p);
+  }
+  return found;
+}
+
+async function pickPython() {
+  const cands = discoverPythonCandidates();
+  let fallback = null;
+  for (const c of cands) {
+    const p = await probePythonCandidate(c);
+    if (!p) continue;
+    if (c.source === "selected") return p;
+    if (p.hasCore) return p;
+    if (!fallback) fallback = p;
+  }
+  return fallback;
 }
 
 async function checkEnv() {
   const py = await pickPython();
-  const result = { python: py, conda: null, packages: {}, gpu: null };
-  const conda = await run("conda", ["--version"]);
+  const configured = (readConfig().pythonPath || "").trim() || null;
+  const result = { python: py, configuredPython: configured, conda: null, packages: {}, gpu: null, venvPath: path.join(WS, ".venv") };
+  const conda = await run("conda", ["--version"], { shell: process.platform === "win32" });
   if (conda.ok) result.conda = conda.out;
   if (py) {
-    const [cmd, ...a] = py.cmd.split(" ");
     const probe = `
 import json, importlib
 mods = ["numpy","pandas","pyarrow","brian2","torch","matplotlib","scipy"]
@@ -375,7 +594,7 @@ out = {}
 for m in mods:
     try:
         mod = importlib.import_module(m); out[m] = getattr(mod, "__version__", "ok")
-    except Exception as e:
+    except Exception:
         out[m] = None
 try:
     import torch; out["cuda"] = torch.cuda.is_available() and torch.cuda.get_device_name(0)
@@ -383,10 +602,10 @@ except Exception:
     out["cuda"] = None
 print(json.dumps(out))
 `;
-    const r = await run(cmd, [...a, "-c", probe]);
+    const r = await runPy(py.cmd, ["-c", probe]);
     if (r.ok) {
       try {
-        const j = JSON.parse(r.out.split("\n").pop());
+        const j = JSON.parse(r.out.split(/\r?\n/).pop());
         result.gpu = j.cuda || null;
         delete j.cuda;
         result.packages = j;
@@ -398,6 +617,102 @@ print(json.dumps(out))
   return result;
 }
 
+let envSetupBusy = false;
+async function setupPythonEnv(win, mode = "core") {
+  if (envSetupBusy) throw new Error("Установка пакетов уже выполняется, подожди завершения.");
+  envSetupBusy = true;
+  const emit = (text, extra = {}) => {
+    win?.webContents.send("fly:envSetupOutput", { text, done: false, ...extra });
+  };
+  const runStreamed = (exe, args, envExtra = {}) =>
+    new Promise((resolve) => {
+      let codeOut = 1;
+      let errMsg = "";
+      let p;
+      try {
+        p = spawn(exe, args, {
+          windowsHide: true,
+          shell: false,
+          env: { ...process.env, PYTHONIOENCODING: "utf-8", PIP_DISABLE_PIP_VERSION_CHECK: "1", ...envExtra },
+        });
+      } catch (e) {
+        emit(`\n[ошибка запуска ${exe}: ${e.message || e}]\n`);
+        return resolve({ ok: false, code: 1 });
+      }
+      p.stdout?.on("data", (d) => emit(d.toString()));
+      p.stderr?.on("data", (d) => emit(d.toString()));
+      p.on("error", (e) => {
+        errMsg = String(e.message || e);
+        emit(`\n[ошибка процесса: ${errMsg}]\n`);
+        resolve({ ok: false, code: 1 });
+      });
+      p.on("close", (code) => {
+        codeOut = code ?? 1;
+        resolve({ ok: codeOut === 0, code: codeOut });
+      });
+    });
+
+  try {
+    const basePy = await pickPython();
+    if (!basePy) {
+      throw new Error("Python 3 не найден в системе. Сначала установи Python 3.11/3.12 с python.org (с галочкой Add Python to PATH) или Miniconda.");
+    }
+
+    const venvDir = path.join(WS, ".venv");
+    const venvExe = venvPythonExe(venvDir);
+    let targetExe = venvExe;
+    let useUserFlag = false;
+
+    if (!fs.existsSync(venvExe)) {
+      emit(`[1/3] Создаю изолированное окружение Python в ${venvDir} ...\n`);
+      fs.mkdirSync(path.dirname(venvDir), { recursive: true });
+      const baseSpec = parsePySpec(basePy.exe || basePy.cmd);
+      const mk = await runStreamed(baseSpec.cmd, [...baseSpec.prefix, "-m", "venv", venvDir]);
+      if (!mk.ok || !fs.existsSync(venvExe)) {
+        emit("[предупреждение] Не удалось создать venv, ставлю пакеты напрямую с флагом --user...\n");
+        targetExe = basePy.exe || parsePySpec(basePy.cmd).cmd;
+        useUserFlag = true;
+      }
+    } else {
+      emit(`[1/3] Использую окружение ${venvExe}\n`);
+    }
+
+    const targetProbe = await probePythonCandidate({ cmd: targetExe, source: "venv", note: "" });
+    const mm = targetProbe?.majorMinor || basePy.majorMinor || [3, 12];
+    const isPy313Plus = mm[0] > 3 || (mm[0] === 3 && mm[1] >= 13);
+
+    const corePkgs = isPy313Plus
+      ? ["numpy", "pyarrow", "pandas", "scipy", "matplotlib"]
+      : ["numpy<2", "pyarrow<19", "pandas", "scipy", "matplotlib"];
+    const extraPkgs = isPy313Plus
+      ? ["brian2", "networkx", "joblib", "requests", "tqdm", "pillow"]
+      : ["brian2==2.9.0", "networkx", "joblib", "requests", "tqdm", "pillow"];
+    const pkgs = mode === "full" ? [...corePkgs, ...extraPkgs] : corePkgs;
+
+    emit(`[2/3] Ставлю пакеты для Python ${mm[0]}.${mm[1]}: ${pkgs.join(", ")}\n`);
+    const pipArgs = ["-m", "pip", "install", "--prefer-binary", ...(useUserFlag ? ["--user"] : []), ...pkgs];
+    const inst = await runStreamed(targetExe, pipArgs);
+    if (!inst.ok) {
+      emit(`\n[ошибка: pip завершился с кодом ${inst.code}]\n`, { done: true, ok: false });
+      throw new Error(`Установка пакетов завершилась с кодом ${inst.code}. Проверь подключение к интернету и лог установки.`);
+    }
+
+    emit("[3/3] Проверяю импорт установленных библиотек...\n");
+    const c = readConfig();
+    c.pythonPath = targetExe;
+    writeConfig(c);
+
+    const env = await checkEnv();
+    emit(`\n[готово] Активный интерпретатор: ${env.python?.exe || targetExe}\nТеперь можно нажимать «запустить».\n`, { done: true, ok: true });
+    return env;
+  } catch (e) {
+    emit(`\n[ошибка] ${e.message || e}\n`, { done: true, ok: false });
+    throw e;
+  } finally {
+    envSetupBusy = false;
+  }
+}
+
 // ------------------------------------------------------------
 // Запуск скриптов
 // ------------------------------------------------------------
@@ -405,31 +720,45 @@ const runs = new Map();
 
 async function runScript(win, projectId, name, args) {
   const py = await pickPython();
-  if (!py) throw new Error("Python 3 не найден. Установи Miniconda или python.org (галочка «Add to PATH»).");
+  if (!py) throw new Error("Python 3 не найден. Установи Miniconda или Python 3.11/3.12 с python.org (галочка «Add to PATH»).");
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
   const file = path.join(ws.code, path.basename(name));
-  if (!within(ws.code, file)) throw new Error("Скрипт вне папки проекта.");
-  const [cmd, ...pre] = py.cmd.split(" ");
+  if (!within(ws.code, file)) throw new Error("Скрипт вне папки рабочего пространства.");
+  const { cmd, prefix } = parsePySpec(py.exe || py.cmd);
   const baseId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + path.basename(name).replace(/\.py$/, "");
   let runId = baseId;
   let seq = 2;
-  while (runs.has(runId) || fs.existsSync(path.join(ws.runs, runId))) {
+  while (runs.has(runId) || runStatus.has(runId) || fs.existsSync(path.join(ws.runs, runId))) {
     runId = `${baseId}_${seq++}`;
   }
   const runDir = path.join(ws.runs, runId);
   fs.mkdirSync(runDir, { recursive: true });
   const script = file;
-  const env = { ...process.env, FLY_DATA: DIRS.data, FLY_RUN_DIR: runDir, FLY_SCRIPTS: ws.code, FLY_PROJECT: ws.projectId, PYTHONUNBUFFERED: "1", PYTHONIOENCODING: "utf-8" };
-  const p = spawn(cmd, [...pre, script, ...(args || [])], { cwd: ws.code, env, shell: process.platform === "win32" });
+  const pyPath = [ws.code, TEMPLATES, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter);
+  const env = {
+    ...process.env,
+    FLY_DATA: DIRS.data,
+    FLY_RUN_DIR: runDir,
+    FLY_SCRIPTS: ws.code,
+    FLY_PROJECT: ws.projectId,
+    ...(ws.ideaId ? { FLY_IDEA: ws.ideaId } : {}),
+    PYTHONPATH: pyPath,
+    PYTHONUNBUFFERED: "1",
+    PYTHONIOENCODING: "utf-8",
+  };
+  const useShell = process.platform === "win32" && !path.isAbsolute(cmd) && /\.(cmd|bat)$/i.test(cmd);
+  const p = spawn(cmd, [...prefix, script, ...(args || [])], { cwd: ws.code, env, windowsHide: true, shell: useShell });
   runs.set(runId, p);
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
   const send = (stream, text) => {
     log.write(text);
     win?.webContents.send("fly:runOutput", { runId, projectId: ws.projectId, runDir, stream, text });
   };
+  send("stdout", `[python] ${py.exe || py.cmd} (${py.version})\n`);
   p.stdout.on("data", (d) => send("stdout", d.toString()));
   p.stderr.on("data", (d) => send("stderr", d.toString()));
+  p.on("error", (e) => send("stderr", `\n[ошибка запуска Python: ${e.message || e}]\n`));
   p.on("close", (code) => {
     log.end();
     runs.delete(runId);
@@ -846,6 +1175,30 @@ function registerIpc(getWin) {
     return { path: r.filePaths[0], content: await fsp.readFile(r.filePaths[0], "utf8") };
   });
   ipcMain.handle("fly:checkEnv", () => checkEnv());
+  ipcMain.handle("fly:listPythons", () => listPythons());
+  ipcMain.handle("fly:setPython", async (_e, pyCmd) => {
+    const c = readConfig();
+    if (pyCmd && String(pyCmd).trim()) c.pythonPath = String(pyCmd).trim();
+    else delete c.pythonPath;
+    writeConfig(c);
+    return checkEnv();
+  });
+  ipcMain.handle("fly:pickPythonExe", async () => {
+    const r = await dialog.showOpenDialog(getWin(), {
+      title: "Выбери интерпретатор Python (python.exe)",
+      filters: process.platform === "win32" ? [{ name: "Python", extensions: ["exe"] }] : [{ name: "Все файлы", extensions: ["*"] }],
+      properties: ["openFile"],
+    });
+    if (r.canceled || !r.filePaths[0]) return null;
+    const chosen = r.filePaths[0];
+    const probed = await probePythonCandidate({ cmd: chosen, source: "selected", note: "выбран вручную" });
+    if (!probed) throw new Error("Выбранный файл не является рабочим интерпретатором Python 3.");
+    const c = readConfig();
+    c.pythonPath = chosen;
+    writeConfig(c);
+    return checkEnv();
+  });
+  ipcMain.handle("fly:setupPythonEnv", (_e, mode) => setupPythonEnv(getWin(), mode || "core"));
   ipcMain.handle("fly:openPath", (_e, p) => shell.openPath(p));
   ipcMain.handle("fly:openExternal", (_e, url) => shell.openExternal(url));
 
@@ -892,11 +1245,14 @@ function registerIpc(getWin) {
   });
   ipcMain.handle("fly:syncTemplates", (_e, projectId, opts) => {
     const ws = projectPaths(projectId);
+    const includeAll = !!(opts && opts.all);
     if (opts && opts.overwrite) {
-      const copied = copyTemplates(ws.code, { overwrite: true });
+      const scope = parseScope(projectId);
+      const allowed = allowedTemplatesForScope(scope, includeAll);
+      const copied = copyTemplates(ws.code, { overwrite: true, only: allowed ? Array.from(allowed) : null });
       return { added: copied, code: ws.code };
     }
-    const added = syncProjectTemplates(projectId, ws.code, true);
+    const added = syncProjectTemplates(projectId, ws.code, true, includeAll);
     return { added, code: ws.code };
   });
   ipcMain.handle("fly:readScript", (_e, projectId, name) => {
@@ -908,7 +1264,7 @@ function registerIpc(getWin) {
   ipcMain.handle("fly:writeScript", async (_e, projectId, name, content, opts) => {
     const ws = projectPaths(projectId);
     const perms = getPermissions();
-    const base = path.basename(name).replace(/[^\w.\-]+/g, "_");
+    const base = path.basename(name).replace(/[^\w.-]+/g, "_");
     const file = path.join(ws.code, base.endsWith(".py") ? base : base + ".py");
     if (!within(ws.code, file)) throw new Error("Файл вне папки проекта.");
     const exists = fs.existsSync(file);

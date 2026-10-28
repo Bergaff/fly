@@ -16,11 +16,30 @@ export interface DataItem {
   present: boolean;
 }
 
+export interface PythonCandidate {
+  cmd: string;
+  exe: string;
+  version: string;
+  majorMinor: [number, number];
+  hasCore: boolean;
+  okMap: Record<string, boolean>;
+  source: string;
+  note: string;
+}
+
 export interface EnvInfo {
-  python: { cmd: string; version: string } | null;
+  python: PythonCandidate | null;
+  configuredPython?: string | null;
+  venvPath?: string;
   conda: string | null;
   packages: Record<string, string | null>;
   gpu: string | null;
+}
+
+export interface EnvSetupOutput {
+  text: string;
+  done: boolean;
+  ok?: boolean;
 }
 
 export interface ScriptInfo { name: string; doc: string; size: number; mtime: number }
@@ -30,8 +49,8 @@ export interface LlmMessage { role: "system" | "user" | "assistant"; content: st
 
 export type LlmProvider = "deepseek" | "perplexity" | "openai";
 
-/** Рабочее место проекта: где лежит код и куда падают прогоны */
-export interface ProjectPaths { projectId: string; code: string; runs: string; defaults: { code: string; runs: string } }
+/** Рабочее место идеи или проекта: где лежит код и куда падают прогоны */
+export interface ProjectPaths { projectId: string; ideaId?: string | null; code: string; runs: string; defaults: { code: string; runs: string } }
 
 /** Права помощника на файлы и запуск */
 export interface Permissions { createFiles: boolean; overwriteFiles: boolean; runScripts: boolean }
@@ -83,6 +102,11 @@ export interface FlyBridge {
   setPermissions(patch: Partial<Permissions>): Promise<Permissions>;
 
   checkEnv(): Promise<EnvInfo>;
+  listPythons(): Promise<PythonCandidate[]>;
+  setPython(pyCmd: string | null): Promise<EnvInfo>;
+  pickPythonExe(): Promise<EnvInfo | null>;
+  setupPythonEnv(mode?: "core" | "full"): Promise<EnvInfo>;
+  onEnvSetupOutput(cb: (p: EnvSetupOutput) => void): () => void;
   openPath(p: string): Promise<string>;
   openExternal(url: string): Promise<void>;
   listData(): Promise<DataItem[]>;
@@ -91,7 +115,7 @@ export interface FlyBridge {
   onDownloadProgress(cb: (p: { id: string; got: number; total: number }) => void): () => void;
 
   listScripts(projectId: string): Promise<ScriptInfo[]>;
-  syncTemplates(projectId: string, opts?: { overwrite?: boolean }): Promise<{ added: string[]; code: string }>;
+  syncTemplates(projectId: string, opts?: { overwrite?: boolean; all?: boolean }): Promise<{ added: string[]; code: string }>;
   readScript(projectId: string, name: string): Promise<string>;
   writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
   deleteScript(projectId: string, name: string): Promise<boolean>;

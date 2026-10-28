@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Idea, Project, Reference } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
-  type DataItem, type AgentInfo, type EnvInfo, type ExternalSource, type LlmMessage, type LlmProvider,
+  type DataItem, type AgentInfo, type EnvInfo, type EnvSetupOutput, type PythonCandidate, type ExternalSource, type LlmMessage, type LlmProvider,
   type Paths, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo,
 } from "@/lib/bridge";
 import { parseReferencesFromText } from "@/lib/refparse";
@@ -24,6 +24,8 @@ interface Props {
   onClearFocusIdea?: () => void;
   onSelectProject: (id: string | "all") => void;
   onAddProject: (name: string) => Project;
+  onAddIdea: (projectId: string, title: string) => Idea;
+  onOpenIdeaCard: (ideaId: string) => void;
   onAddJournalEntry: (ideaId: string, entry: { title: string; params: string; result: string; conclusion: string }) => void;
   onAddReferences: (items: Partial<Reference>[]) => void;
 }
@@ -64,6 +66,8 @@ export function BrainView({
   onClearFocusIdea,
   onSelectProject,
   onAddProject,
+  onAddIdea,
+  onOpenIdeaCard,
   onAddJournalEntry,
   onAddReferences,
 }: Props) {
@@ -108,6 +112,8 @@ export function BrainView({
           onClearFocusIdea={onClearFocusIdea}
           onSelectProject={onSelectProject}
           onAddProject={onAddProject}
+          onAddIdea={onAddIdea}
+          onOpenIdeaCard={onOpenIdeaCard}
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
         />
@@ -216,6 +222,8 @@ function Workspace({
   onClearFocusIdea,
   onSelectProject,
   onAddProject,
+  onAddIdea,
+  onOpenIdeaCard,
   onAddJournalEntry,
   onAddReferences,
 }: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
@@ -236,21 +244,28 @@ function Workspace({
   const [images, setImages] = useState<{ name: string; dataUrl: string }[]>([]);
   const [viewFile, setViewFile] = useState<{ name: string; text: string } | null>(null);
   const [ideaId, setIdeaId] = useState<string>(() => ideas.find((i) => i.projectId === pid)?.id ?? ideas[0]?.id ?? "");
+  const [workspaceIdeaId, setWorkspaceIdeaId] = useState<string>(() => focusIdeaId || ideas.find((i) => i.projectId === pid)?.id || "");
   const [rightTab, setRightTab] = useState<"presets" | "chat">("presets");
   const [selectedPresetIdea, setSelectedPresetIdea] = useState<string>(
     focusIdeaId || ideas.find((i) => i.projectId === pid)?.id || ideas[0]?.id || TASK_PRESETS[0].ideaId,
   );
   const [added, setAdded] = useState(false);
   const [saveNote, setSaveNote] = useState("");
+  const [logCopied, setLogCopied] = useState(false);
   const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
   const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
-  const pidRef = useRef(pid);
-  pidRef.current = pid;
+  const pendingPresetIdea = useRef<string | null>(null);
+  const project = projects.find((p) => p.id === pid);
+  const scopeId = workspaceIdeaId ? `idea:${workspaceIdeaId}` : pid;
+  const selectedWorkspaceIdea = ideas.find((i) => i.id === workspaceIdeaId);
+  const scopeLabel = selectedWorkspaceIdea?.title ?? project?.name ?? pid;
+  const pidRef = useRef(scopeId);
+  pidRef.current = scopeId;
   const logRef = useRef<HTMLDivElement>(null);
 
-  const runId = activeRuns[pid]?.runId ?? null;
-  const liveLog = logsByProject[pid] ?? "";
-  const project = projects.find((p) => p.id === pid);
+  const runId = activeRuns[scopeId]?.runId ?? null;
+  const liveLog = logsByProject[scopeId] ?? "";
+  const displayLog = runId ? liveLog : selRun ? detail?.log ?? liveLog : liveLog;
   const otherProjects = useMemo(() => projects.filter((p) => p.id !== pid), [projects, pid]);
 
   const orderedIdeasForJournal = useMemo(() => {
@@ -259,7 +274,7 @@ function Workspace({
     return [...mine, ...rest];
   }, [ideas, pid]);
 
-  const loadFiles = useCallback(async (targetPid = pid) => {
+  const loadFiles = useCallback(async (targetPid = scopeId) => {
     const bridge = fly;
     if (!bridge) return [];
     const p = await bridge.projectPaths(targetPid);
@@ -270,15 +285,15 @@ function Workspace({
       setFiles(sc);
     }
     return rn;
-  }, [pid]);
+  }, [scopeId]);
 
-  const refreshRuns = useCallback(async (targetPid = pid) => {
+  const refreshRuns = useCallback(async (targetPid = scopeId) => {
     const bridge = fly;
     if (!bridge) return [];
     const r = await bridge.listRuns(targetPid);
     if (pidRef.current === targetPid) setRuns(r);
     return r;
-  }, [pid]);
+  }, [scopeId]);
 
   function openRun(r: RunInfo) {
     const bridge = fly;
@@ -300,8 +315,8 @@ function Workspace({
   const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[]) => {
     const bridge = fly;
     if (!bridge) return;
-    setLogsByProject((prev) => ({ ...prev, [targetPid]: "" }));
-    if (pidRef.current === targetPid) {
+      setLogsByProject((prev) => ({ ...prev, [targetPid]: "" }));
+      if (pidRef.current === targetPid) {
       setDetail(null);
       setImages([]);
       setViewFile(null);
@@ -323,6 +338,21 @@ function Workspace({
   }, []);
 
   useEffect(() => {
+    const keepProjectScope =
+      (pendingOpenScript.current?.pid === pid && !pendingOpenScript.current.pid.startsWith("idea:")) ||
+      (pendingOpenRun.current?.pid === pid && !pendingOpenRun.current.pid.startsWith("idea:"));
+    if (keepProjectScope) {
+      setWorkspaceIdeaId("");
+      setIdeaId(ideas.find((i) => i.projectId === pid)?.id ?? "");
+      return;
+    }
+    if (selectedWorkspaceIdea?.projectId === pid) return;
+    const inProject = ideas.find((i) => i.projectId === pid);
+    setWorkspaceIdeaId(inProject?.id ?? "");
+    setIdeaId(inProject?.id ?? "");
+  }, [pid, selectedWorkspaceIdea?.projectId, ideas]);
+
+  useEffect(() => {
     let cancelled = false;
     setCurrent(null);
     setCode("");
@@ -332,34 +362,29 @@ function Workspace({
     setImages([]);
     setViewFile(null);
     setSaveNote("");
-    setIdeaId((prev) => {
-      const curIdea = ideas.find((i) => i.id === prev);
-      if (curIdea && curIdea.projectId === pid) return prev;
-      return ideas.find((i) => i.projectId === pid)?.id ?? prev ?? ideas[0]?.id ?? "";
-    });
-    void loadFiles(pid).then(async (rn) => {
+    void loadFiles(scopeId).then(async (rn) => {
       if (cancelled) return;
       setRuns(rn);
-      if (pendingOpenRun.current && pendingOpenRun.current.pid === pid) {
+      if (pendingOpenRun.current && pendingOpenRun.current.pid === scopeId) {
         const targetR = rn.find((x) => x.path === pendingOpenRun.current!.runPath) ?? rn[0];
         pendingOpenRun.current = null;
         if (targetR) openRun(targetR);
       }
-      if (pendingOpenScript.current && pendingOpenScript.current.pid === pid) {
+      if (pendingOpenScript.current && pendingOpenScript.current.pid === scopeId) {
         const req = pendingOpenScript.current;
         pendingOpenScript.current = null;
         const bridge = fly;
         if (bridge) {
-          const txt = await bridge.readScript(pid, req.file);
+          const txt = await bridge.readScript(scopeId, req.file);
           if (!cancelled) {
             setCurrent(req.file);
             setCode(txt);
             setDirty(false);
-            setSaveNote(`открыт в проекте: ${req.file}`);
+            setSaveNote(`открыт в рабочем пространстве: ${req.file}`);
             if (req.autoRunArgs !== undefined) {
               setArgs(req.autoRunArgs);
               const argList = req.autoRunArgs.split(/\s+/).filter(Boolean);
-              await startScriptInProject(pid, req.file, argList);
+              await startScriptInProject(scopeId, req.file, argList);
             }
           }
         }
@@ -368,7 +393,7 @@ function Workspace({
     return () => {
       cancelled = true;
     };
-  }, [pid, loadFiles]);
+  }, [scopeId, loadFiles, workspaceIdeaId, startScriptInProject]);
 
   useEffect(() => {
     void fly!.getPermissions().then(setPerms);
@@ -379,6 +404,8 @@ function Workspace({
     if (!bridge) return;
     return bridge.onRunOutput((p) => {
       const evPid = p.projectId || pidRef.current;
+      const missingModule = p.stream === "stderr" ? p.text.match(/No module named ["']([^"']+)["']/)?.[1] : null;
+      if (missingModule) setSaveNote(`Python-пакет ${missingModule} не установлен. Открой «Данные и окружение» и нажми «установить пакеты для анализов».`);
       setLogsByProject((prev) => ({
         ...prev,
         [evPid]: ((prev[evPid] ?? "") + p.text).slice(-60000),
@@ -398,15 +425,49 @@ function Workspace({
           });
         } else {
           const doneProj = projects.find((pr) => pr.id === evPid);
-          setSaveNote(`прогон завершён в проекте «${doneProj?.name ?? evPid}»`);
+          const doneIdea = evPid.startsWith("idea:") ? ideas.find((item) => item.id === evPid.slice(5)) : undefined;
+          setSaveNote(`прогон завершён в «${doneIdea?.title ?? doneProj?.name ?? evPid}»`);
         }
       }
     });
-  }, [refreshRuns, projects]);
+  }, [refreshRuns, projects, ideas]);
 
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [liveLog]);
+
+  const saveBeforeWorkspaceChange = useCallback(async () => {
+    if (!dirty || !current || !fly) return true;
+    const shouldSave = confirm(`Сохранить изменения в файле ${current} перед переключением рабочего пространства?`);
+    if (!shouldSave) return true;
+    await fly.writeScript(scopeId, current, code, { allowOverwrite: true });
+    setDirty(false);
+    return true;
+  }, [dirty, current, scopeId, code]);
+
+  const switchWorkspaceIdea = useCallback(async (nextIdeaId: string) => {
+    if (nextIdeaId === workspaceIdeaId) return;
+    await saveBeforeWorkspaceChange();
+    const nextIdea = ideas.find((i) => i.id === nextIdeaId);
+    if (nextIdea && nextIdea.projectId !== pid) onSelectProject(nextIdea.projectId);
+    setWorkspaceIdeaId(nextIdeaId);
+    setIdeaId(nextIdeaId || ideas.find((i) => i.projectId === pid)?.id || "");
+  }, [workspaceIdeaId, saveBeforeWorkspaceChange, ideas, pid, onSelectProject]);
+
+  const selectPresetIdea = useCallback((nextIdeaId: string) => {
+    if (presetForIdea(nextIdeaId)) setSelectedPresetIdea(nextIdeaId);
+    void switchWorkspaceIdea(nextIdeaId);
+  }, [switchWorkspaceIdea]);
+
+  const addIdeaInBrain = useCallback(() => {
+    const raw = prompt("Название идеи для отдельного рабочего пространства:", "Новая идея");
+    const title = raw?.trim();
+    if (!title) return;
+    const created = onAddIdea(pid, title);
+    setWorkspaceIdeaId(created.id);
+    setIdeaId(created.id);
+    setSelectedPresetIdea(created.id);
+  }, [pid, onAddIdea]);
 
   const switchProject = useCallback(
     async (nextPid: string) => {
@@ -414,13 +475,13 @@ function Workspace({
       if (dirty && current && fly) {
         const shouldSave = confirm(`Сохранить изменения в файле ${current} (проект «${project?.name ?? pid}») перед переключением проекта?`);
         if (shouldSave) {
-          await fly.writeScript(pid, current, code, { allowOverwrite: true });
+          await fly.writeScript(scopeId, current, code, { allowOverwrite: true });
           setDirty(false);
         }
       }
       onSelectProject(nextPid);
     },
-    [pid, dirty, current, code, project, onSelectProject],
+    [pid, scopeId, dirty, current, code, project, onSelectProject],
   );
 
   const createNewProjectHere = useCallback(async () => {
@@ -429,14 +490,14 @@ function Workspace({
     if (!trimmed) return;
     if (dirty && current && fly) {
       if (confirm(`Сохранить изменения в файле ${current} перед переходом в новый проект?`)) {
-        await fly.writeScript(pid, current, code, { allowOverwrite: true });
+        await fly.writeScript(scopeId, current, code, { allowOverwrite: true });
         setDirty(false);
       }
     }
     const created = onAddProject(trimmed);
     if (fly) await fly.projectPaths(created.id);
     onSelectProject(created.id);
-  }, [dirty, current, pid, code, onAddProject, onSelectProject]);
+  }, [dirty, current, pid, scopeId, code, onAddProject, onSelectProject]);
 
   const transferScriptToProject = useCallback(
     async (targetPid: string, opts: { move?: boolean; autoRun?: boolean }) => {
@@ -445,7 +506,7 @@ function Workspace({
       const targetProj = projects.find((p) => p.id === targetPid);
       const r = await bridge.writeScript(targetPid, current, code, { allowOverwrite: true });
       if (opts.move) {
-        await bridge.deleteScript(pid, current);
+        await bridge.deleteScript(scopeId, current);
         setDirty(false);
       }
       pendingOpenScript.current = {
@@ -453,10 +514,11 @@ function Workspace({
         file: r.file,
         autoRunArgs: opts.autoRun ? args : undefined,
       };
+      setWorkspaceIdeaId("");
       onSelectProject(targetPid);
       setSaveNote(`${opts.move ? "перенесён" : "скопирован"} в «${targetProj?.name ?? targetPid}»`);
     },
-    [current, code, pid, args, projects, onSelectProject],
+    [current, code, pid, scopeId, args, projects, onSelectProject],
   );
 
   const transferSelectedRunToProject = useCallback(
@@ -467,6 +529,7 @@ function Workspace({
       const res = await bridge.transferRun(selRun.path, targetPid, { move });
       if (move) {
         pendingOpenRun.current = { pid: targetPid, runPath: res.path };
+        setWorkspaceIdeaId("");
         onSelectProject(targetPid);
       } else {
         setSaveNote(`прогон скопирован в «${targetProj?.name ?? targetPid}»`);
@@ -479,7 +542,7 @@ function Workspace({
     const bridge = fly;
     if (!bridge) return;
     setCurrent(name);
-    setCode(await bridge.readScript(pid, name));
+    setCode(await bridge.readScript(scopeId, name));
     setDirty(false);
     setSaveNote("");
     const matched = presetForScript(name);
@@ -487,7 +550,7 @@ function Workspace({
       setIdeaId(matched.ideaId);
       setSelectedPresetIdea(matched.ideaId);
     }
-  }, [pid]);
+  }, [scopeId]);
 
   const handleAssistantSavedScript = useCallback(
     async (targetPid: string, fileName: string) => {
@@ -496,32 +559,40 @@ function Workspace({
       if (targetPid === pidRef.current) {
         setFiles(await bridge.listScripts(targetPid));
         await openFile(fileName);
-        setSaveNote(`сохранено в проект: ${fileName}`);
+        setSaveNote(`сохранено в рабочее пространство: ${fileName}`);
       } else {
+        const targetIdea = targetPid.startsWith("idea:") ? ideas.find((i) => i.id === targetPid.slice(5)) : undefined;
         pendingOpenScript.current = { pid: targetPid, file: fileName };
-        onSelectProject(targetPid);
+        if (targetIdea) {
+          setWorkspaceIdeaId(targetIdea.id);
+          setIdeaId(targetIdea.id);
+          onSelectProject(targetIdea.projectId);
+        } else {
+          setWorkspaceIdeaId("");
+          onSelectProject(targetPid);
+        }
       }
     },
-    [openFile, onSelectProject],
+    [openFile, onSelectProject, ideas],
   );
 
   const syncBuiltInTemplates = useCallback(async () => {
     const bridge = fly;
     if (!bridge) return;
-    const res = await bridge.syncTemplates(pid);
-    const updated = await bridge.listScripts(pid);
+    const res = await bridge.syncTemplates(scopeId);
+    const updated = await bridge.listScripts(scopeId);
     setFiles(updated);
     setSaveNote(res.added.length ? `добавлено шаблонов: ${res.added.length}` : "все шаблоны на месте");
-  }, [pid]);
+  }, [scopeId]);
 
   const applyPreset = useCallback(
     async (preset: TaskPreset, modeArgs: string, autoRun = false) => {
       const bridge = fly;
       if (!bridge) return;
-      await bridge.syncTemplates(pid);
-      const updated = await bridge.listScripts(pid);
+      await bridge.syncTemplates(scopeId);
+      const updated = await bridge.listScripts(scopeId);
       setFiles(updated);
-      const txt = await bridge.readScript(pid, preset.script);
+      const txt = await bridge.readScript(scopeId, preset.script);
       setCurrent(preset.script);
       setCode(txt);
       setDirty(false);
@@ -531,10 +602,10 @@ function Workspace({
       setSaveNote(`готовый анализ: ${preset.script}`);
       if (autoRun && !runId) {
         const list = modeArgs.split(/\s+/).filter(Boolean);
-        await startScriptInProject(pid, preset.script, list);
+        await startScriptInProject(scopeId, preset.script, list);
       }
     },
-    [pid, runId, startScriptInProject],
+    [scopeId, runId, startScriptInProject],
   );
 
   useEffect(() => {
@@ -542,44 +613,54 @@ function Workspace({
     setRightTab("presets");
     setIdeaId(focusIdeaId);
     setSelectedPresetIdea(focusIdeaId);
-    const preset = presetForIdea(focusIdeaId);
-    if (preset) {
-      void applyPreset(preset, preset.modes[0]?.args ?? "--synth", false);
+    pendingPresetIdea.current = focusIdeaId;
+    setWorkspaceIdeaId(focusIdeaId);
+    if (workspaceIdeaId === focusIdeaId) {
+      const preset = presetForIdea(focusIdeaId);
+      pendingPresetIdea.current = null;
+      if (preset) void applyPreset(preset, preset.modes[0]?.args ?? "--synth", false);
     }
     onClearFocusIdea?.();
-  }, [focusIdeaId, applyPreset, onClearFocusIdea]);
+  }, [focusIdeaId, workspaceIdeaId, applyPreset, onClearFocusIdea]);
+
+  useEffect(() => {
+    if (!workspaceIdeaId || pendingPresetIdea.current !== workspaceIdeaId) return;
+    const preset = presetForIdea(workspaceIdeaId);
+    pendingPresetIdea.current = null;
+    if (preset) void applyPreset(preset, preset.modes[0]?.args ?? "--synth", false);
+  }, [workspaceIdeaId, applyPreset]);
 
   const save = async (opts?: { silent?: boolean }) => {
     if (!current) return null;
-    const r = await fly!.writeScript(pid, current, code, { allowOverwrite: true });
+    const r = await fly!.writeScript(scopeId, current, code, { allowOverwrite: true });
     setDirty(false);
     if (!opts?.silent) setSaveNote(`сохранено в «${project?.name ?? pid}»: ${r.file}`);
-    setFiles(await fly!.listScripts(pid));
+    setFiles(await fly!.listScripts(scopeId));
     return r;
   };
   const newFile = async () => {
     const name = prompt(`Имя нового файла в проекте «${project?.name ?? pid}»:`, "my_experiment.py");
     if (!name) return;
-    const r = await fly!.writeScript(pid, name, '"""Новый эксперимент."""\n\nimport os\n\nRUN_DIR = os.environ["FLY_RUN_DIR"]\n');
-    setFiles(await fly!.listScripts(pid));
+    const r = await fly!.writeScript(scopeId, name, '"""Новый эксперимент."""\n\nimport os\n\nRUN_DIR = os.environ["FLY_RUN_DIR"]\n');
+    setFiles(await fly!.listScripts(scopeId));
     void openFile(r.file);
   };
   const importFile = async () => {
     const f = await fly!.openFile({ filters: [{ name: "Python", extensions: ["py"] }], kind: "exports" });
     if (!f) return;
     const name = f.path.replace(/^.*[\\/]/, "");
-    await fly!.writeScript(pid, name, f.content, { allowOverwrite: true });
-    setFiles(await fly!.listScripts(pid));
+    await fly!.writeScript(scopeId, name, f.content, { allowOverwrite: true });
+    setFiles(await fly!.listScripts(scopeId));
     void openFile(name);
   };
   const removeFile = async (name: string) => {
     if (!confirm(`Удалить ${name} из папки проекта «${project?.name ?? pid}»?`)) return;
-    await fly!.deleteScript(pid, name);
+    await fly!.deleteScript(scopeId, name);
     if (current === name) {
       setCurrent(null);
       setCode("");
     }
-    setFiles(await fly!.listScripts(pid));
+    setFiles(await fly!.listScripts(scopeId));
   };
   const exportFile = async () => {
     if (!current) return;
@@ -591,7 +672,7 @@ function Workspace({
     if (!current) return;
     if (dirty) await save({ silent: true });
     const list = args.split(/\s+/).filter(Boolean);
-    await startScriptInProject(pid, current, list);
+    await startScriptInProject(scopeId, current, list);
   };
 
   const setPermission = async (patch: Partial<Permissions>) => {
@@ -603,7 +684,7 @@ function Workspace({
     const summaryArgs = detail?.summary && typeof detail.summary.args === "object" ? JSON.stringify(detail.summary.args) : "";
     onAddJournalEntry(ideaId, {
       title: `Прогон ${selRun.label.replace(/^\S+?_/, "")}`,
-      params: [`проект: ${project?.name ?? pid}`, `run: ${selRun.path}`, summaryArgs && `args: ${summaryArgs}`].filter(Boolean).join("\n"),
+      params: [`проект: ${project?.name ?? pid}`, `идея: ${scopeLabel}`, `run: ${selRun.path}`, summaryArgs && `args: ${summaryArgs}`].filter(Boolean).join("\n"),
       result: [
         detail?.summary ? JSON.stringify(detail.summary, null, 2).slice(0, 1400) : (detail?.log ?? "").slice(-1200),
         images.length ? `графики: ${images.map((i) => i.name).join(", ")}` : "",
@@ -616,6 +697,26 @@ function Workspace({
   };
 
   const otherFiles = selRun ? selRun.files.filter((f) => !/\.(png|jpe?g|svg|gif)$/i.test(f) && f !== "summary.json") : [];
+  const copyLogs = async () => {
+    const text = displayLog || "";
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setLogCopied(true);
+      window.setTimeout(() => setLogCopied(false), 1500);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+      setLogCopied(true);
+      window.setTimeout(() => setLogCopied(false), 1500);
+    }
+  };
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -624,7 +725,7 @@ function Workspace({
         <div className="flex flex-wrap items-center gap-1.5 px-3 py-1.5">
           <span className="label mr-1">проект</span>
           {projects.map((p) => {
-            const isRunningHere = !!activeRuns[p.id];
+            const isRunningHere = !!activeRuns[p.id] || ideas.some((i) => i.projectId === p.id && !!activeRuns[`idea:${i.id}`]);
             return (
               <button
                 key={p.id}
@@ -663,16 +764,16 @@ function Workspace({
                   value={paths.code}
                   isDefault={paths.code === paths.defaults.code}
                   onChoose={async () => {
-                    const r = await fly!.chooseProjectFolder(pid, "code", `Папка кода: ${project?.name ?? pid}`);
+                    const r = await fly!.chooseProjectFolder(scopeId, "code", `Папка кода: ${scopeLabel}`);
                     if (r) {
                       setPaths(r);
-                      setFiles(await fly!.listScripts(pid));
+                      setFiles(await fly!.listScripts(scopeId));
                     }
                   }}
                   onOpen={() => fly!.openPath(paths.code)}
                   onReset={async () => {
-                    setPaths(await fly!.resetProjectFolder(pid, "code"));
-                    setFiles(await fly!.listScripts(pid));
+                    setPaths(await fly!.resetProjectFolder(scopeId, "code"));
+                    setFiles(await fly!.listScripts(scopeId));
                   }}
                 />
                 <PathStrip
@@ -680,7 +781,7 @@ function Workspace({
                   value={paths.runs}
                   isDefault={paths.runs === paths.defaults.runs}
                   onChoose={async () => {
-                    const r = await fly!.chooseProjectFolder(pid, "runs", `Папка прогонов: ${project?.name ?? pid}`);
+                    const r = await fly!.chooseProjectFolder(scopeId, "runs", `Папка прогонов: ${scopeLabel}`);
                     if (r) {
                       setPaths(r);
                       await refreshRuns();
@@ -688,7 +789,7 @@ function Workspace({
                   }}
                   onOpen={() => fly!.openPath(paths.runs)}
                   onReset={async () => {
-                    setPaths(await fly!.resetProjectFolder(pid, "runs"));
+                    setPaths(await fly!.resetProjectFolder(scopeId, "runs"));
                     await refreshRuns();
                   }}
                 />
@@ -753,7 +854,7 @@ function Workspace({
             </Button>
           </div>
           <div className="min-h-[100px] flex-1 overflow-y-auto">
-            {runs.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">В проекте «{project?.name ?? pid}» ещё нет прогонов.</p>}
+            {runs.length === 0 && <p className="px-2 py-3 text-[11px] text-muted-foreground">В пространстве «{scopeLabel}» ещё нет прогонов.</p>}
             {runs.map((r) => (
               <button
                 key={r.path}
@@ -774,13 +875,28 @@ function Workspace({
         {/* --- центр: код и результат --- */}
         <section className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
           <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b px-2 py-1.5">
-            <span className="label">куда</span>
+            <span className="label">проект</span>
             <ProjectInlinePicker
               projects={projects}
               value={pid}
               onChange={(next) => void switchProject(next)}
               onCreate={() => void createNewProjectHere()}
             />
+            <span className="label border-l pl-2">идея</span>
+            <Select value={workspaceIdeaId || "__project__"} onValueChange={(value) => void switchWorkspaceIdea(value === "__project__" ? "" : value)}>
+              <SelectTrigger className="h-6 min-w-[170px] max-w-[280px] text-[11px]" title="Отдельные папки кода, логов и прогонов для каждой идеи">
+                <SelectValue placeholder="общее пространство проекта" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__project__">Общее пространство проекта</SelectItem>
+                {ideas.map((i) => {
+                  const ip = projects.find((p) => p.id === i.projectId);
+                  return <SelectItem key={i.id} value={i.id}>{ip?.id === pid ? "" : `[${ip?.name ?? i.projectId}] `}{i.title}</SelectItem>;
+                })}
+              </SelectContent>
+            </Select>
+            <Button size="sm" variant="ghost" className="h-6 px-1.5 font-mono text-[10.5px]" onClick={addIdeaInBrain} title="Создать идею с отдельными папками для кода и прогонов">+ идея</Button>
+            {selectedWorkspaceIdea && <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10.5px]" onClick={() => onOpenIdeaCard(selectedWorkspaceIdea.id)}>карточка</Button>}
             {current ? (
               <>
                 <span className="border-l pl-2 font-mono text-[11px] font-medium">{current}</span>
@@ -829,7 +945,7 @@ function Workspace({
                   <Button
                     size="sm"
                     onClick={() => void run()}
-                    title={paths ? `Запустить в проекте «${project?.name ?? pid}»\nРезультаты: ${paths.runs}` : undefined}
+                    title={paths ? `Запустить в пространстве «${scopeLabel}»\nРезультаты: ${paths.runs}` : undefined}
                   >
                     запустить
                   </Button>
@@ -877,7 +993,7 @@ function Workspace({
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-2 py-1.5">
-            <span className="label">результат · {project?.name ?? pid}</span>
+            <span className="label">результат · {scopeLabel}</span>
             {selRun ? (
               <>
                 <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
@@ -947,6 +1063,12 @@ function Workspace({
           </div>
 
           <div ref={logRef} className="max-h-[40%] min-h-[130px] shrink-0 overflow-y-auto p-2">
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <span className="label">лог выполнения · {scopeLabel}</span>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-[10.5px]" onClick={() => void copyLogs()} disabled={!displayLog}>
+                {logCopied ? "скопировано" : "копировать лог"}
+              </Button>
+            </div>
             {images.length > 0 && (
               <div className="mb-2 grid gap-2 md:grid-cols-2">
                 {images.map((im) => (
@@ -976,7 +1098,7 @@ function Workspace({
             {viewFile && <pre className="mb-2 max-h-[240px] overflow-auto border bg-muted/40 p-2 font-mono text-[11px] whitespace-pre-wrap">{viewFile.text}</pre>}
             {detail?.summary && <pre className="mb-2 max-h-[240px] overflow-auto border bg-muted/40 p-2 font-mono text-[11px]">{JSON.stringify(detail.summary, null, 2)}</pre>}
             <pre className="overflow-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-muted-foreground">
-              {liveLog || detail?.log || "лог появится здесь после запуска"}
+              {displayLog || "лог появится здесь после запуска"}
             </pre>
           </div>
         </section>
@@ -1010,7 +1132,9 @@ function Workspace({
               onSwitchProject={(next) => void switchProject(next)}
               onCreateProject={() => void createNewProjectHere()}
               selectedIdeaId={selectedPresetIdea}
-              onSelectIdea={setSelectedPresetIdea}
+              workspaceIdeaId={workspaceIdeaId}
+              onOpenIdeaCard={onOpenIdeaCard}
+              onSelectIdea={selectPresetIdea}
               currentScript={current}
               running={!!runId}
               onApplyPreset={(preset, modeArgs, autoRun) => void applyPreset(preset, modeArgs, autoRun)}
@@ -1019,6 +1143,8 @@ function Workspace({
           ) : (
             <ChatColumn
               pid={pid}
+              workspaceId={scopeId}
+              workspaceLabel={scopeLabel}
               projects={projects}
               paths={paths}
               onSwitchProject={(next) => void switchProject(next)}
@@ -1043,6 +1169,8 @@ function PresetsColumn({
   onSwitchProject,
   onCreateProject,
   selectedIdeaId,
+  workspaceIdeaId,
+  onOpenIdeaCard,
   onSelectIdea,
   currentScript,
   running,
@@ -1055,6 +1183,8 @@ function PresetsColumn({
   onSwitchProject: (projectId: string) => void;
   onCreateProject: () => void;
   selectedIdeaId: string;
+  workspaceIdeaId: string;
+  onOpenIdeaCard: (ideaId: string) => void;
   onSelectIdea: (ideaId: string) => void;
   currentScript: string | null;
   running: boolean;
@@ -1078,6 +1208,7 @@ function PresetsColumn({
   );
   const linkedIdea = ideaMap.get(activePreset.ideaId);
   const linkedIdeaProject = linkedIdea?.projectId ? projectMap.get(linkedIdea.projectId) : undefined;
+  const [showIdeaIndex, setShowIdeaIndex] = useState(false);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -1119,13 +1250,41 @@ function PresetsColumn({
         </p>
       </div>
 
+      <div className="shrink-0 border-b">
+        <button className="flex w-full items-center justify-between px-2.5 py-1.5 text-left cursor-pointer hover:bg-accent/40" onClick={() => setShowIdeaIndex((v) => !v)}>
+          <span className="label">идеи в мозге · отдельные рабочие пространства ({ideas.length})</span>
+          <span className="font-mono text-[10px] text-muted-foreground">{showIdeaIndex ? "свернуть" : "показать"}</span>
+        </button>
+        {showIdeaIndex && (
+          <div className="max-h-[170px] overflow-y-auto border-t">
+            {ideas.map((idea) => {
+              const ideaProject = projectMap.get(idea.projectId);
+              const selected = idea.id === workspaceIdeaId;
+              return (
+                <div key={idea.id} className={cn("flex items-center gap-1 border-b px-2 py-1 last:border-b-0", selected && "bg-accent/60")}>
+                  <button className="min-w-0 flex-1 text-left cursor-pointer" onClick={() => onSelectIdea(idea.id)} title={`Открыть отдельные код, логи и прогоны для идеи «${idea.title}»`}>
+                    <span className="flex items-center gap-1 truncate text-[11px]">
+                      {ideaProject && <span className="size-1.5 shrink-0" style={{ background: ideaProject.color }} />}
+                      <span className="truncate">{idea.title}</span>
+                    </span>
+                    <span className="block truncate font-mono text-[9.5px] text-muted-foreground">{ideaProject?.name ?? idea.projectId} · {idea.status}</span>
+                  </button>
+                  {selected && <span className="label shrink-0">открыта</span>}
+                  <Button size="sm" variant="ghost" className="h-6 shrink-0 px-1.5 text-[10px]" onClick={() => onOpenIdeaCard(idea.id)}>карточка</Button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="min-h-0 flex-1 overflow-y-auto">
         {/* Список задач (компактный переключатель) */}
         <div className="border-b">
           {visiblePresets.map((p) => {
             const idea = ideaMap.get(p.ideaId);
             const ideaProj = idea?.projectId ? projectMap.get(idea.projectId) : undefined;
-            const isSelected = p.ideaId === activePreset.ideaId;
+            const isSelected = p.ideaId === selectedIdeaId;
             const isOpen = currentScript === p.script;
             return (
               <button
@@ -1139,6 +1298,7 @@ function PresetsColumn({
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate font-mono text-[10.5px] text-foreground">{p.script}</span>
                   <div className="flex shrink-0 items-center gap-1.5">
+                    {p.ideaId === workspaceIdeaId && <span className="label">рабочая идея</span>}
                     {ideaProj && (
                       <span className="flex items-center gap-1 font-mono text-[9.5px] text-muted-foreground" title={`Проект идеи: ${ideaProj.name}`}>
                         <span className="size-1.5" style={{ background: ideaProj.color }} />
@@ -1168,9 +1328,12 @@ function PresetsColumn({
           )}
 
           <div>
-            <div className="label">выбранная задача</div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="label">выбранная готовая задача</div>
+              {linkedIdea && <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px]" onClick={() => onOpenIdeaCard(linkedIdea.id)}>карточка идеи</Button>}
+            </div>
             <div className="mt-0.5 font-medium leading-snug">{linkedIdea?.title ?? activePreset.shortTitle}</div>
-            <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">скрипт: {activePreset.script}</div>
+            <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">отдельные код, логи и прогоны · {activePreset.script}</div>
             <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted-foreground">{activePreset.summary}</p>
           </div>
 
@@ -1242,6 +1405,8 @@ interface ChatMessage extends LlmMessage {
 
 function ChatColumn({
   pid,
+  workspaceId,
+  workspaceLabel,
   projects,
   paths,
   onSwitchProject,
@@ -1252,6 +1417,8 @@ function ChatColumn({
   onAddReferences,
 }: {
   pid: string;
+  workspaceId: string;
+  workspaceLabel: string;
   projects: Project[];
   paths: ProjectPaths | null;
   onSwitchProject: (projectId: string) => void;
@@ -1265,7 +1432,7 @@ function ChatColumn({
   const [model, setModel] = useState("deepseek-chat");
   const [msgs, setMsgs] = useState<ChatMessage[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem(`fly-ideas:chat:${pid}`) ?? "[]") as ChatMessage[];
+      return JSON.parse(localStorage.getItem(`fly-ideas:chat:${workspaceId}`) ?? "[]") as ChatMessage[];
     } catch {
       return [];
     }
@@ -1280,23 +1447,27 @@ function ChatColumn({
   const endRef = useRef<HTMLDivElement>(null);
 
   const conf = PROVIDERS.find((p) => p.id === provider)!;
-  const activeProject = projects.find((p) => p.id === pid);
+
+  useEffect(() => {
+    const nextIdea = workspaceId.startsWith("idea:") ? workspaceId.slice(5) : "none";
+    setCtxIdea(ideas.some((i) => i.id === nextIdea) ? nextIdea : "none");
+  }, [workspaceId, ideas]);
 
   useEffect(() => {
     setMsgs((() => {
       try {
-        return JSON.parse(localStorage.getItem(`fly-ideas:chat:${pid}`) ?? "[]") as ChatMessage[];
+        return JSON.parse(localStorage.getItem(`fly-ideas:chat:${workspaceId}`) ?? "[]") as ChatMessage[];
       } catch {
         return [];
       }
     })());
     fly!.getSecret("deepseek").then((k) => setKeys((s) => ({ ...s, deepseek: !!k })));
     fly!.getSecret("perplexity").then((k) => setKeys((s) => ({ ...s, perplexity: !!k })));
-  }, [pid]);
+  }, [workspaceId, pid]);
 
   useEffect(() => {
-    localStorage.setItem(`fly-ideas:chat:${pid}`, JSON.stringify(msgs.slice(-60)));
-  }, [msgs, pid]);
+    localStorage.setItem(`fly-ideas:chat:${workspaceId}`, JSON.stringify(msgs.slice(-60)));
+  }, [msgs, workspaceId]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
@@ -1310,11 +1481,12 @@ function ChatColumn({
 
   const writeBlocks = async (blocks: { lang?: string; content: string }[], targetPid: string) => {
     const actions: string[] = [];
-    const targetName = projects.find((p) => p.id === targetPid)?.name ?? targetPid;
+      const targetIdea = targetPid.startsWith("idea:") ? ideas.find((i) => i.id === targetPid.slice(5)) : undefined;
+      const targetName = targetPid === workspaceId ? workspaceLabel : targetIdea?.title ?? projects.find((p) => p.id === targetPid)?.name ?? targetPid;
     let lastSaved: string | null = null;
     for (const b of blocks) {
       if (!/^py/i.test(b.lang ?? "")) continue;
-      const m = b.content.match(/^#\s*file:\s*([\w.\-]+\.py)/m);
+      const m = b.content.match(/^#\s*file:\s*([\w.-]+\.py)/m);
       const stamp = new Date().toISOString().slice(11, 19).replace(/:/g, "");
       const name = m?.[1] ?? `assistant_${stamp}.py`;
       try {
@@ -1332,14 +1504,16 @@ function ChatColumn({
   };
 
   const saveBlockToProject = async (codeText: string, name: string, targetPid: string) => {
-    const r = await fly!.writeScript(targetPid, name, codeText, { allowOverwrite: true });
-    await onScriptSaved(targetPid, r.file);
+    const targetIdea = ideas.find((i) => i.projectId === targetPid);
+    const targetWorkspace = targetPid === pid ? workspaceId : targetIdea ? `idea:${targetIdea.id}` : targetPid;
+    const r = await fly!.writeScript(targetWorkspace, name, codeText, { allowOverwrite: true });
+    await onScriptSaved(targetWorkspace, r.file);
   };
 
   const send = async () => {
     const text = input.trim();
     if (!text || busy) return;
-    const targetPidAtSend = pid;
+    const targetPidAtSend = workspaceId;
     const idea = ideas.find((i) => i.id === ctxIdea);
     const ctx =
       idea && provider === "deepseek"
@@ -1460,7 +1634,7 @@ function ChatColumn({
           </Select>
           <label className="flex w-full cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground">
             <input type="checkbox" checked={autoSave && (perms?.createFiles ?? false)} disabled={!perms?.createFiles} onChange={(e) => setAutoSave(e.target.checked)} />
-            сохранять код в «{activeProject?.name ?? pid}» и открывать
+            сохранять код в идею «{workspaceLabel}» и открывать
             {!perms?.createFiles && <span className="text-muted-foreground/70">(выключено в правах)</span>}
           </label>
         </div>
@@ -1471,7 +1645,7 @@ function ChatColumn({
           <div className="flex flex-col gap-2 py-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground">
               {provider === "deepseek"
-                ? `Попроси написать скрипт: помощник сохранит его в проект «${activeProject?.name ?? pid}», обновит список слева и откроет в редакторе.`
+                ? `Попроси написать скрипт: помощник сохранит его в отдельную папку идеи «${workspaceLabel}», обновит список файлов и откроет в редакторе.`
                 : "Спроси про литературу: ответ придёт со списком работ, а строки с DOI можно внести в библиотеку."}
             </p>
             {[
@@ -1579,7 +1753,7 @@ function MessageBody({
   const otherProjects = projects.filter((p) => p.id !== currentPid);
 
   const askFileName = (raw: string) => {
-    const m = raw.match(/^#\s*file:\s*([\w.\-]+\.py)/m);
+    const m = raw.match(/^#\s*file:\s*([\w.-]+\.py)/m);
     return m?.[1] ?? prompt("Имя файла для скрипта:", "my_experiment.py") ?? "";
   };
 
@@ -1643,9 +1817,10 @@ function MessageBody({
 function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const steps: [string, string][] = [
     ["Данные", "раздел «Данные и окружение»: выбери папку и нажми «Скачать мозг мухи», это около 100 МБ. Для первой пробы данные не нужны: шаблон 02 работает сам по себе."],
-    ["Окружение", "там же видно Python и пакеты. Для прогонов модели надёжнее окружение conda: conda env create -f environment.yml в папке приложения, затем conda activate fly-brain. Внутри уже есть Brian2, NAVis и neuprint-python, а numpy держится ниже второй версии, иначе brian2 не импортируется."],
+    ["Окружение", "во вкладке «Данные и окружение» видны Python и пакеты. Если не хватает pandas или других основных библиотек, нажми «установить пакеты для анализов»: программа создаст workspace/.venv и настроит запуски на него. Brian2 можно установить отдельной кнопкой."],
     ["Готовый анализ задач (без API)", "справа открыта вкладка «По задачам (без API)»: там лежат готовые проверенные скрипты 10..19 под все 10 текущих идей (лезии, интерференция, бенчмарк бэкендов, обучение в целом мозге, память ухаживания MaleCNS, тракт в VNC, социальное обучение, индивидуальность, брачная песня, PCI) и общий модуль flylib.py. В каждом есть быстрый режим --synth и полный режим на локальных файлах FLY_DATA."],
-    ["Проекты и маршрутизация", "прямо в строке над редактором кода, в правой панели и в шапке есть селектор «куда» и кнопка «+» для нового проекта. При смене проекта одновременно переключаются папка кода и папка прогонов (несохранённые правки предложат сохраниться). Меню «в другой проект» над кодом и «прогон в проект» над результатом копируют или переносят скрипт и папку прогона между проектами."],
+    ["Идеи и рабочие пространства", "В центре выбери проект и идею. У каждой идеи свои папки кода, логов и прогонов; список «идеи в мозге» справа позволяет быстро переключаться и открывать карточку идеи. При переходе несохранённый код можно сохранить. Проектное общее пространство доступно отдельным пунктом."],
+    ["Копирование логов", "Внизу панели результатов нажми «копировать лог», чтобы перенести вывод текущего запуска в буфер обмена."],
     ["Первый прогон", "слева открой 00_check_env.py и запусти, либо выбери любую задачу справа и нажми «запустить» на режиме --synth. Аргументы видны и редактируются в строке над кодом."],
     ["Посмотреть нейроны", "шаблон 05_neuron_gallery.py рисует морфологию нейронов в трёх проекциях и накладывает активность из прогона: --ids 12781 556329 (скелеты скачаются сами) или --spikes путь_к_spikes.parquet, с флагом --animate получится gif с распространением сигнала."],
     ["Прогон модели", "шаблон 06_brian2_shiu.py считает LIF-сеть на Brian2: сам подбирает фоновый вес под целевую частоту, стимулирует и заглушает заданные нейроны, пишет spikes.parquet, rates_top.csv, raster.png. Проверка без данных: --synth --n 2000 --t 0.5."],
@@ -1959,44 +2134,141 @@ function AgentPanel() {
 
 function EnvPanel() {
   const [env, setEnv] = useState<EnvInfo | null>(null);
+  const [pythons, setPythons] = useState<PythonCandidate[]>([]);
   const [loading, setLoading] = useState(false);
+  const [settingUp, setSettingUp] = useState(false);
+  const [setupLog, setSetupLog] = useState("");
+  const [setupError, setSetupError] = useState("");
+
   const check = async () => {
     setLoading(true);
     try {
-      setEnv(await fly!.checkEnv());
+      const [nextEnv, found] = await Promise.all([fly!.checkEnv(), fly!.listPythons()]);
+      setEnv(nextEnv);
+      setPythons(found);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    check();
+    void check();
+    return fly!.onEnvSetupOutput((p: EnvSetupOutput) => {
+      setSetupLog((prev) => (prev + p.text).slice(-30000));
+      if (p.done && !p.ok) setSetupError("Установка не завершилась. Подробности есть в логе ниже.");
+    });
   }, []);
-  const need = ["numpy", "pandas", "pyarrow", "brian2"];
-  const missing = env ? need.filter((m) => !env.packages[m]) : [];
+
+  const need = ["numpy", "pandas", "scipy", "matplotlib", "pyarrow"];
+  const missing = env ? need.filter((m) => !env.packages[m]) : need;
+  const setup = async (mode: "core" | "full" = "core") => {
+    setSettingUp(true);
+    setSetupError("");
+    setSetupLog("");
+    try {
+      const result = await fly!.setupPythonEnv(mode);
+      setEnv(result);
+      setPythons(await fly!.listPythons());
+    } catch (e) {
+      setSetupError((e as Error).message);
+    } finally {
+      setSettingUp(false);
+    }
+  };
+
+  const selectPython = async (value: string) => {
+    try {
+      if (value === "__auto__") {
+        setEnv(await fly!.setPython(null));
+      } else {
+        const selected = pythons.find((p) => p.exe === value);
+        if (selected) setEnv(await fly!.setPython(selected.exe));
+      }
+    } catch (e) {
+      setSetupError((e as Error).message);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-2">
-        <Button variant="outline" onClick={check} disabled={loading}>
-          {loading ? "проверяю…" : "Проверить снова"}
-        </Button>
-        <span className="label">{env ? (missing.length ? `не хватает: ${missing.join(", ")}` : "для CPU-модели всё есть") : ""}</span>
-      </div>
+      <section className="border">
+        <div className="flex flex-wrap items-center gap-2 border-b px-2 py-1.5">
+          <div className="label mr-auto">Python для всех идей</div>
+          <Button variant="outline" size="sm" onClick={check} disabled={loading || settingUp}>
+            {loading ? "проверяю…" : "проверить снова"}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={async () => {
+            try {
+              const result = await fly!.pickPythonExe();
+              if (result) {
+                setEnv(result);
+                setPythons(await fly!.listPythons());
+              }
+            } catch (e) {
+              setSetupError((e as Error).message);
+            }
+          }} disabled={settingUp}>
+            выбрать python.exe
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-2 p-2">
+          {env?.python ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="label shrink-0">интерпретатор</span>
+              <Select value={env.configuredPython || env.python.exe} onValueChange={(v) => void selectPython(v)}>
+                <SelectTrigger className="h-7 min-w-[260px] flex-1 font-mono text-[10px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__auto__">автоматический выбор</SelectItem>
+                  {pythons.map((p) => (
+                    <SelectItem key={`${p.exe}-${p.source}`} value={p.exe}>
+                      {p.version} · {p.source} · {p.exe}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <p className="text-[11px] text-destructive">Python 3 не найден. Установи Python 3.11 или 3.12 с python.org и отметь Add Python to PATH, затем перезапусти программу.</p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={() => void setup("core")} disabled={settingUp || !env?.python || missing.length === 0}>
+              {settingUp ? "устанавливаю…" : missing.length ? "установить пакеты для анализов" : "основные пакеты установлены"}
+            </Button>
+            {!!env?.python && !env.packages.brian2 && (
+              <Button variant="outline" onClick={() => void setup("full")} disabled={settingUp}>
+                установить Brian2
+              </Button>
+            )}
+            <span className="label">
+              {env ? (missing.length ? `не хватает: ${missing.join(", ")}` : "numpy, pandas, scipy, matplotlib и pyarrow доступны") : "проверка Python…"}
+            </span>
+          </div>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Установка создаёт отдельное окружение <code className="font-mono">workspace/.venv</code> и ставит в него pandas и остальные пакеты. Запуски автоматически используют это окружение, не меняя системный Python.
+          </p>
+          {setupError && <p className="text-[11px] text-destructive">{setupError}</p>}
+          {setupLog && <pre className="max-h-[220px] overflow-auto border bg-muted/40 p-2 font-mono text-[10px] leading-relaxed whitespace-pre-wrap">{setupLog}</pre>}
+        </div>
+      </section>
 
       <AgentPanel />
 
       {env && (
         <div className="grid gap-3 md:grid-cols-2">
           <section className="border">
-            <div className="label border-b px-2 py-1.5">Python и GPU</div>
+            <div className="label border-b px-2 py-1.5">Интерпретатор и GPU</div>
             <div className="flex flex-col p-2">
-              <Row ok={!!env.python} label="Python 3" value={env.python ? `${env.python.version} (${env.python.cmd})` : "не найден"} />
-              <Row ok={!!env.conda} label="conda" value={env.conda ?? "нет, не обязательно"} soft />
-              <Row ok={!!env.gpu} label="GPU (CUDA)" value={env.gpu ?? "нет, CPU-запуски Brian2 работают и так"} soft />
+              <Row ok={!!env.python} label="Python 3" value={env.python ? `${env.python.version} (${env.python.exe})` : "не найден"} />
+              <Row ok={!!env.conda} label="conda" value={env.conda ?? "не найдена, не обязательна"} soft />
+              <Row ok={!!env.gpu} label="GPU (CUDA)" value={env.gpu ?? "CPU доступен"} soft />
             </div>
           </section>
           <section className="border">
-            <div className="label border-b px-2 py-1.5">Пакеты</div>
+            <div className="label border-b px-2 py-1.5">Пакеты в выбранном Python</div>
             <div className="flex flex-col p-2">
               {Object.entries(env.packages).map(([k, v]) => (
                 <Row key={k} ok={!!v} label={k} value={v ?? "не установлен"} soft={!need.includes(k)} />
@@ -2007,35 +2279,9 @@ function EnvPanel() {
       )}
 
       <section className="border">
-        <div className="label border-b px-2 py-1.5">как поставить недостающее</div>
-        <div className="flex flex-col gap-2 p-2 text-[12px]">
-          {!env?.python && (
-            <div>
-              <div className="font-medium">1. Python</div>
-              <p className="text-muted-foreground">
-                Проще всего поставить{" "}
-                <a className="underline" href="https://docs.anaconda.com/miniconda/" target="_blank" rel="noreferrer">
-                  Miniconda
-                </a>{" "}
-                (Windows 64-bit), при установке отметить «Add to PATH», затем перезапустить программу.
-              </p>
-            </div>
-          )}
-          <div>
-            <div className="font-medium">{env?.python ? "1" : "2"}. Пакеты для CPU-модели</div>
-            <p className="text-muted-foreground">
-              Каждое окружение отдельно: <code className="bg-muted px-1">conda env create -f environment.yml</code> ставит
-              fly-brain целиком (Brian2, NAVis, neuprint-python, cloud-volume). Быстрый путь без conda:{" "}
-              <code className="bg-muted px-1">pip install "numpy&lt;2" "pyarrow&lt;19" pandas scipy matplotlib brian2</code>. Версии numpy и pyarrow важны:
-              в numpy 2 убрали ndarray.ptp (падает brian2), а pyarrow 20+ требует numpy 2.
-            </p>
-          </div>
-          <div>
-            <div className="font-medium">{env?.python ? "2" : "3"}. GPU-бэкенды, потом</div>
-            <p className="text-muted-foreground">
-              PyTorch с CUDA: <code className="bg-muted px-1">pip install torch --index-url https://download.pytorch.org/whl/cu124</code>. Brian2CUDA и GeNN ставятся через WSL2, скрипт лежит в репозитории Eon.
-            </p>
-          </div>
+        <div className="label border-b px-2 py-1.5">Дополнительное окружение conda</div>
+        <div className="p-2 text-[11px] leading-relaxed text-muted-foreground">
+          Для анализа MaleCNS, нейроморфологии и остальных дополнительных инструментов можно поставить полный набор из <code className="font-mono">environment.yml</code>. Для ошибки pandas нажми «установить недостающие пакеты» выше: команда в консоли не нужна.
         </div>
       </section>
     </div>

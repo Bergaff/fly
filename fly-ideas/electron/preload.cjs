@@ -5,6 +5,15 @@ contextBridge.exposeInMainWorld("fly", {
   // --- пути / окружение ---
   getPaths: () => ipcRenderer.invoke("fly:getPaths"),
   checkEnv: () => ipcRenderer.invoke("fly:checkEnv"),
+  listPythons: () => ipcRenderer.invoke("fly:listPythons"),
+  setPython: (pyCmd) => ipcRenderer.invoke("fly:setPython", pyCmd),
+  pickPythonExe: () => ipcRenderer.invoke("fly:pickPythonExe"),
+  setupPythonEnv: (mode) => ipcRenderer.invoke("fly:setupPythonEnv", mode),
+  onEnvSetupOutput: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:envSetupOutput", h);
+    return () => ipcRenderer.removeListener("fly:envSetupOutput", h);
+  },
   openPath: (p) => ipcRenderer.invoke("fly:openPath", p),
   openExternal: (url) => ipcRenderer.invoke("fly:openExternal", url),
   chooseFolder: (kind, title) => ipcRenderer.invoke("fly:chooseFolder", kind, title),
