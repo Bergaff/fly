@@ -252,9 +252,12 @@ function Workspace({
   const [added, setAdded] = useState(false);
   const [saveNote, setSaveNote] = useState("");
   const [logCopied, setLogCopied] = useState(false);
+  const [missingPackage, setMissingPackage] = useState<string | null>(null);
+  const [installingPackages, setInstallingPackages] = useState(false);
   const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
   const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
   const pendingPresetIdea = useRef<string | null>(null);
+  const lastRunByScope = useRef<Record<string, { scriptName: string; args: string[] } | undefined>>({});
   const project = projects.find((p) => p.id === pid);
   const scopeId = workspaceIdeaId ? `idea:${workspaceIdeaId}` : pid;
   const selectedWorkspaceIdea = ideas.find((i) => i.id === workspaceIdeaId);
@@ -321,6 +324,8 @@ function Workspace({
       setImages([]);
       setViewFile(null);
     }
+    lastRunByScope.current[targetPid] = { scriptName, args: argList };
+    if (pidRef.current === targetPid) setMissingPackage(null);
     try {
       const r = await bridge.runScript(targetPid, scriptName, argList);
       setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
@@ -362,6 +367,7 @@ function Workspace({
     setImages([]);
     setViewFile(null);
     setSaveNote("");
+    setMissingPackage(null);
     void loadFiles(scopeId).then(async (rn) => {
       if (cancelled) return;
       setRuns(rn);
@@ -405,7 +411,10 @@ function Workspace({
     return bridge.onRunOutput((p) => {
       const evPid = p.projectId || pidRef.current;
       const missingModule = p.stream === "stderr" ? p.text.match(/No module named ["']([^"']+)["']/)?.[1] : null;
-      if (missingModule) setSaveNote(`Python-пакет ${missingModule} не установлен. Открой «Данные и окружение» и нажми «установить пакеты для анализов».`);
+      if (missingModule && evPid === pidRef.current) {
+        setMissingPackage(missingModule);
+        setSaveNote(`Python-пакет ${missingModule} не установлен. Его можно установить и повторить запуск кнопкой рядом с логом.`);
+      }
       setLogsByProject((prev) => ({
         ...prev,
         [evPid]: ((prev[evPid] ?? "") + p.text).slice(-60000),
@@ -715,6 +724,36 @@ function Workspace({
       area.remove();
       setLogCopied(true);
       window.setTimeout(() => setLogCopied(false), 1500);
+    }
+  };
+
+  const installPackageAndRetry = async () => {
+    const bridge = fly;
+    const failedRun = lastRunByScope.current[scopeId];
+    if (!bridge || !missingPackage || installingPackages) return;
+    setInstallingPackages(true);
+    setSaveNote(`устанавливаю ${missingPackage} в локальное окружение Python...`);
+    const off = bridge.onEnvSetupOutput((p) => {
+      setLogsByProject((prev) => ({
+        ...prev,
+        [scopeId]: ((prev[scopeId] ?? "") + p.text).slice(-60000),
+      }));
+    });
+    try {
+      await bridge.setupPythonEnv(missingPackage === "brian2" ? "full" : "core");
+      setMissingPackage(null);
+      setSaveNote(`пакеты установлены, повторяю ${failedRun?.scriptName ?? "скрипт"}`);
+      if (failedRun) await startScriptInProject(scopeId, failedRun.scriptName, failedRun.args);
+    } catch (e) {
+      const message = (e as Error).message;
+      setSaveNote(`не удалось установить пакеты: ${message}`);
+      setLogsByProject((prev) => ({
+        ...prev,
+        [scopeId]: `${prev[scopeId] ?? ""}\n\n[ошибка установки] ${message}\n`,
+      }));
+    } finally {
+      off();
+      setInstallingPackages(false);
     }
   };
 
@@ -1063,11 +1102,18 @@ function Workspace({
           </div>
 
           <div ref={logRef} className="max-h-[40%] min-h-[130px] shrink-0 overflow-y-auto p-2">
-            <div className="mb-1 flex items-center justify-between gap-2">
+            <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
               <span className="label">лог выполнения · {scopeLabel}</span>
-              <Button size="sm" variant="ghost" className="h-6 px-2 text-[10.5px]" onClick={() => void copyLogs()} disabled={!displayLog}>
-                {logCopied ? "скопировано" : "копировать лог"}
-              </Button>
+              <div className="flex items-center gap-1">
+                {missingPackage && (
+                  <Button size="sm" variant="outline" className="h-6 px-2 text-[10.5px]" onClick={() => void installPackageAndRetry()} disabled={installingPackages}>
+                    {installingPackages ? "устанавливаю…" : `установить ${missingPackage} и повторить`}
+                  </Button>
+                )}
+                <Button size="sm" variant="ghost" className="h-6 px-2 text-[10.5px]" onClick={() => void copyLogs()} disabled={!displayLog}>
+                  {logCopied ? "скопировано" : "копировать лог"}
+                </Button>
+              </div>
             </div>
             {images.length > 0 && (
               <div className="mb-2 grid gap-2 md:grid-cols-2">
