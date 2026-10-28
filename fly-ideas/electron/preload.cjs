@@ -58,6 +58,8 @@ contextBridge.exposeInMainWorld("fly", {
   setSecret: (k, v) => ipcRenderer.invoke("fly:setSecret", k, v),
   // --- LLM-прокси: ключ не покидает main-процесс ---
   llmChat: (req) => ipcRenderer.invoke("fly:llmChat", req),
+  listApiCalls: (workspaceId) => ipcRenderer.invoke("fly:listApiCalls", workspaceId),
+  appendApiCall: (workspaceId, record) => ipcRenderer.invoke("fly:appendApiCall", workspaceId, record),
   // --- мост для внешнего агента (MCP): локальный HTTP, приложение источник правды ---
   agentInfo: () => ipcRenderer.invoke("fly:agentInfo"),
   setAgentEnabled: (on) => ipcRenderer.invoke("fly:setAgentEnabled", on),

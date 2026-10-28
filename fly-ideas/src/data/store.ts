@@ -97,6 +97,17 @@ export function useStore() {
  }));
  }, []);
 
+ const completeStages = useCallback((ideaId: string, stageIds: string[]) => {
+ setState((s) => ({
+ ...s,
+ ideas: s.ideas.map((idea) => idea.id !== ideaId ? idea : {
+ ...idea,
+ updatedAt: stamp(),
+ checklist: idea.checklist.map((step) => stageIds.includes(step.id) && !step.done ? { ...step, done: true, doneAt: stamp() } : step),
+ }),
+ }));
+ }, []);
+
  const deleteIdea = useCallback((id: string) => {
  setState((s) => ({
  ...s,
@@ -243,8 +254,8 @@ export function useStore() {
  const reset = useCallback(() => setState(structuredClone(SEED_STATE)), []);
 
  const api = useMemo(
- () => ({ addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
- [addIdea, updateIdea, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset],
+ () => ({ addIdea, updateIdea, completeStages, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
+ [addIdea, updateIdea, completeStages, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset],
  );
 
  return { state, ...api };

@@ -3,7 +3,6 @@ import { BrainView } from "@/views/brain-view";
 import { useTheme } from "@/lib/theme";
 import { fly, isElectron } from "@/lib/bridge";
 import { useStore } from "@/data/store";
-import { ProjectSidebar } from "@/components/project-sidebar";
 import { IdeaDialog } from "@/components/idea-dialog";
 import { IdeasView } from "@/views/ideas-view";
 import { ProjectView } from "@/views/project-view";
@@ -170,26 +169,6 @@ export default function App() {
   return (
     <TooltipProvider>
       <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
-        <ProjectSidebar
-          projects={state.projects}
-          ideas={state.ideas}
-          activeId={active}
-          onSelect={(id) => {
-            setActive(id);
-            setTab((cur) => (cur === "brain" && id !== "all" ? "brain" : id === "all" ? "ideas" : "project"));
-          }}
-          onAdd={(n) => store.addProject(n)}
-          onRename={(id, name) => store.updateProject(id, { name })}
-          onDelete={(id) => {
-            store.deleteProject(id);
-            if (active === id) {
-              setActive("all");
-              setTab("ideas");
-            }
-          }}
-          onDropIdea={store.moveIdea}
-        />
-
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b px-4 py-2">
             <div className="flex items-center gap-2.5">
@@ -199,6 +178,43 @@ export default function App() {
                 <div className="label">{activeProject ? activeProject.name : `все проекты, идей: ${state.ideas.length}`}</div>
               </div>
             </div>
+
+            {tab !== "brain" && <div className="flex items-center gap-1.5">
+              <label htmlFor="active-project" className="label">проект</label>
+              <select
+                id="active-project"
+                value={active}
+                onChange={(event) => {
+                  const id = event.target.value;
+                  setActive(id);
+                  setTab((cur) => (cur === "brain" && id !== "all" ? "brain" : id === "all" ? "ideas" : "project"));
+                }}
+                className="h-7 max-w-[200px] border bg-background px-1.5 text-[11px]"
+              >
+                <option value="all">Все идеи</option>
+                {state.projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+              </select>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" title="Управление проектами">···</Button></DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => {
+                    const name = prompt("Название проекта:");
+                    if (name?.trim()) setActive(store.addProject(name.trim()).id);
+                  }}>Новый проект</DropdownMenuItem>
+                  {activeProject && <DropdownMenuItem onClick={() => {
+                    const name = prompt("Название проекта:", activeProject.name);
+                    if (name?.trim()) store.updateProject(activeProject.id, { name: name.trim() });
+                  }}>Переименовать проект</DropdownMenuItem>}
+                  {activeProject && <DropdownMenuItem variant="destructive" disabled={state.projects.length <= 1} onClick={() => {
+                    if (confirm(`Удалить проект «${activeProject.name}»? Идеи переедут в другой проект.`)) {
+                      store.deleteProject(activeProject.id);
+                      setActive("all");
+                      setTab("ideas");
+                    }
+                  }}>Удалить проект</DropdownMenuItem>}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>}
 
             <Tabs
               value={tab}
@@ -333,6 +349,8 @@ export default function App() {
                 onAddProject={(name) => store.addProject(name)}
                 onAddIdea={(projectId, title) => store.addIdea(projectId, { title })}
                 onOpenIdeaCard={(id) => setOpenId(id)}
+                onUpdateIdea={store.updateIdea}
+                onCompleteStages={store.completeStages}
                 onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
                 onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
               />

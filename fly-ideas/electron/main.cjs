@@ -22,6 +22,8 @@ const DEFAULT_DIRS = { data: path.join(WS, "data"), scripts: path.join(WS, "scri
 const TEMPLATES = isDev ? path.join(__dirname, "..", "experiments", "templates") : path.join(process.resourcesPath, "templates");
 const SECRETS = path.join(app.getPath("userData"), "secrets.json");
 const CONFIG = path.join(app.getPath("userData"), "config.json");
+const API_CALLS_FILE = path.join(app.getPath("userData"), "api-calls.json");
+let apiCallWriteQueue = Promise.resolve();
 
 function readConfig() {
   try { return JSON.parse(fs.readFileSync(CONFIG, "utf8")); } catch { return {}; }
@@ -786,6 +788,60 @@ function writeSecrets(s) {
   fs.writeFileSync(SECRETS, JSON.stringify(s, null, 2), { mode: 0o600 });
 }
 
+function readApiCallStore() {
+  try {
+    const store = JSON.parse(fs.readFileSync(API_CALLS_FILE, "utf8"));
+    if (!store || typeof store !== "object" || Array.isArray(store)) throw new Error("Неверный формат журнала API.");
+    return store;
+  } catch (error) {
+    if (error.code === "ENOENT") return {};
+    throw new Error(`Не удалось прочитать журнал API (${API_CALLS_FILE}): ${error.message}`);
+  }
+}
+
+async function listApiCalls(workspaceId) {
+  await apiCallWriteQueue;
+  const store = readApiCallStore();
+  if (workspaceId === "__all__") {
+    return Object.values(store).flatMap((items) => Array.isArray(items) ? items : []).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  }
+  const key = crypto.createHash("sha256").update(String(workspaceId)).digest("hex");
+  return Array.isArray(store[key]) ? store[key] : [];
+}
+
+function appendApiCall(workspaceId, record) {
+  const write = apiCallWriteQueue.then(async () => {
+    if (!record || typeof record !== "object") throw new Error("Некорректная запись API-вызова.");
+    const provider = ["deepseek", "perplexity", "openai"].includes(record.provider) ? record.provider : "deepseek";
+    const usage = record.usage && typeof record.usage === "object" ? {
+      inputTokens: Number.isFinite(record.usage.inputTokens) ? Math.max(0, Math.floor(record.usage.inputTokens)) : null,
+      outputTokens: Number.isFinite(record.usage.outputTokens) ? Math.max(0, Math.floor(record.usage.outputTokens)) : null,
+      totalTokens: Number.isFinite(record.usage.totalTokens) ? Math.max(0, Math.floor(record.usage.totalTokens)) : null,
+    } : null;
+    const safeRecord = {
+      id: String(record.id || crypto.randomUUID()).slice(0, 100),
+      workspaceId: String(workspaceId),
+      at: String(record.at || new Date().toISOString()).slice(0, 40),
+      provider,
+      model: String(record.model || "unknown").slice(0, 120),
+      question: String(record.question || ""),
+      answer: String(record.answer || ""),
+      usage,
+      status: record.status === "ok" ? "ok" : "error",
+    };
+    const key = crypto.createHash("sha256").update(String(workspaceId)).digest("hex");
+    const store = readApiCallStore();
+    const list = Array.isArray(store[key]) ? store[key] : [];
+    store[key] = [...list, safeRecord];
+    await fsp.mkdir(path.dirname(API_CALLS_FILE), { recursive: true });
+    const tempFile = `${API_CALLS_FILE}.${process.pid}.tmp`;
+    await fsp.writeFile(tempFile, JSON.stringify(store), { encoding: "utf8", mode: 0o600 });
+    await fsp.rename(tempFile, API_CALLS_FILE);
+  });
+  apiCallWriteQueue = write.catch(() => {});
+  return write;
+}
+
 async function llmChat({ provider, model, messages, temperature }) {
   const secrets = readSecrets();
   const cfg = {
@@ -1295,6 +1351,8 @@ function registerIpc(getWin) {
   ipcMain.handle("fly:getSecret", (_e, k) => { const s = readSecrets(); return s[k] ? `${s[k].slice(0, 6)}…${s[k].slice(-4)}` : null; });
   ipcMain.handle("fly:setSecret", (_e, k, v) => { const s = readSecrets(); if (v) s[k] = v; else delete s[k]; writeSecrets(s); return true; });
   ipcMain.handle("fly:llmChat", (_e, req) => llmChat(req));
+  ipcMain.handle("fly:listApiCalls", (_e, workspaceId) => listApiCalls(workspaceId));
+  ipcMain.handle("fly:appendApiCall", (_e, workspaceId, record) => appendApiCall(workspaceId, record));
 
   ipcMain.handle("fly:listRuns", async (_e, projectId) => {
     const ws = projectPaths(projectId);

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Idea, Project, Reference } from "@/data/types";
+import { checklistProgress } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
   type DataItem, type AgentInfo, type EnvInfo, type EnvSetupOutput, type PythonCandidate, type ExternalSource, type LlmMessage, type LlmProvider,
-  type Paths, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo,
+  type Paths, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage,
 } from "@/lib/bridge";
+import { normalizeUsage } from "@/lib/api-usage";
 import { parseReferencesFromText } from "@/lib/refparse";
 import { TASK_PRESETS, presetForIdea, presetForScript, type TaskPreset } from "@/lib/task-presets";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, uid } from "@/lib/utils";
 
 interface Props {
   ideas: Idea[];
@@ -26,6 +28,8 @@ interface Props {
   onAddProject: (name: string) => Project;
   onAddIdea: (projectId: string, title: string) => Idea;
   onOpenIdeaCard: (ideaId: string) => void;
+  onUpdateIdea: (ideaId: string, patch: Partial<Idea>) => void;
+  onCompleteStages: (ideaId: string, stageIds: string[]) => void;
   onAddJournalEntry: (ideaId: string, entry: { title: string; params: string; result: string; conclusion: string }) => void;
   onAddReferences: (items: Partial<Reference>[]) => void;
 }
@@ -68,6 +72,8 @@ export function BrainView({
   onAddProject,
   onAddIdea,
   onOpenIdeaCard,
+  onUpdateIdea,
+  onCompleteStages,
   onAddJournalEntry,
   onAddReferences,
 }: Props) {
@@ -114,6 +120,8 @@ export function BrainView({
           onAddProject={onAddProject}
           onAddIdea={onAddIdea}
           onOpenIdeaCard={onOpenIdeaCard}
+          onUpdateIdea={onUpdateIdea}
+          onCompleteStages={onCompleteStages}
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
         />
@@ -224,6 +232,8 @@ function Workspace({
   onAddProject,
   onAddIdea,
   onOpenIdeaCard,
+  onUpdateIdea,
+  onCompleteStages,
   onAddJournalEntry,
   onAddReferences,
 }: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
@@ -266,6 +276,8 @@ function Workspace({
   const scopeLabel = selectedWorkspaceIdea?.title ?? project?.name ?? pid;
   const pidRef = useRef(scopeId);
   pidRef.current = scopeId;
+  const runRequest = useRef(0);
+  const fileRequest = useRef(0);
   const logRef = useRef<HTMLDivElement>(null);
 
   const runId = activeRuns[scopeId]?.runId ?? null;
@@ -302,19 +314,41 @@ function Workspace({
 
   function openRun(r: RunInfo) {
     const bridge = fly;
-    if (!bridge) return;
+    if (!bridge) return 0;
+    const request = ++runRequest.current;
+    const targetScope = pidRef.current;
+    const isCurrent = () => runRequest.current === request && pidRef.current === targetScope;
     setSelRun(r);
     setViewFile(null);
     setImages([]);
     setDetail(null);
-    void bridge.readRun(r.path).then(setDetail);
+    void bridge.readRun(r.path).then((result) => { if (isCurrent()) setDetail(result); }).catch((e) => { if (isCurrent()) setSaveNote(`Не удалось открыть прогон: ${(e as Error).message}`); });
     const imgs = r.files.filter((f) => /\.(png|jpe?g|svg|gif)$/i.test(f));
-    void Promise.all(
-      imgs.map(async (name) => {
-        const res = await bridge.readRunFile(r.path, name);
-        return res.kind === "image" ? { name, dataUrl: res.dataUrl } : null;
-      }),
-    ).then((x) => setImages(x.filter((v): v is { name: string; dataUrl: string } => !!v)));
+    void Promise.all(imgs.map(async (name) => {
+      const res = await bridge.readRunFile(r.path, name);
+      return res.kind === "image" ? { name, dataUrl: res.dataUrl } : null;
+    })).then((items) => {
+      if (isCurrent()) setImages(items.filter((v): v is { name: string; dataUrl: string } => !!v));
+    }).catch((e) => { if (isCurrent()) setSaveNote(`Не удалось открыть изображения: ${(e as Error).message}`); });
+    return request;
+  }
+
+  async function openRunArtifact(r: RunInfo, name: string) {
+    const targetScope = pidRef.current;
+    const request = openRun(r);
+    if (/\.(png|jpe?g|svg|gif)$/i.test(name)) return;
+    try {
+      if (/\.(parquet|xlsx)$/i.test(name)) {
+        const separator = r.path.includes("\\") ? "\\" : "/";
+        const error = await fly!.openPath(`${r.path}${separator}${name}`);
+        if (error && runRequest.current === request && pidRef.current === targetScope) setSaveNote(`Не удалось открыть файл: ${error}`);
+        return;
+      }
+      const res = await fly!.readRunFile(r.path, name);
+      if (res.kind === "text" && runRequest.current === request && pidRef.current === targetScope) setViewFile({ name, text: res.text });
+    } catch (e) {
+      if (runRequest.current === request && pidRef.current === targetScope) setSaveNote(`Не удалось открыть файл: ${(e as Error).message}`);
+    }
   }
 
   const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[]) => {
@@ -365,6 +399,11 @@ function Workspace({
 
   useEffect(() => {
     let cancelled = false;
+    runRequest.current += 1;
+    fileRequest.current += 1;
+    setFiles([]);
+    setRuns([]);
+    setPaths(null);
     setCurrent(null);
     setCode("");
     setDirty(false);
@@ -576,14 +615,18 @@ function Workspace({
   const openFile = useCallback(async (name: string) => {
     const bridge = fly;
     if (!bridge) return;
-    setCurrent(name);
-    setCode(await bridge.readScript(scopeId, name));
-    setDirty(false);
-    setSaveNote("");
-    const matched = presetForScript(name);
-    if (matched) {
-      setIdeaId(matched.ideaId);
-      setSelectedPresetIdea(matched.ideaId);
+    const request = ++fileRequest.current;
+    try {
+      const content = await bridge.readScript(scopeId, name);
+      if (pidRef.current !== scopeId || request !== fileRequest.current) return;
+      setCurrent(name);
+      setCode(content);
+      setDirty(false);
+      setSaveNote("");
+      const matched = presetForScript(name);
+      if (matched) setSelectedPresetIdea(matched.ideaId);
+    } catch (e) {
+      if (pidRef.current === scopeId && request === fileRequest.current) setSaveNote(`Не удалось открыть файл: ${(e as Error).message}`);
     }
   }, [scopeId]);
 
@@ -616,6 +659,7 @@ function Workspace({
     if (!bridge) return;
     const res = await bridge.syncTemplates(scopeId);
     const updated = await bridge.listScripts(scopeId);
+    if (pidRef.current !== scopeId) return;
     setFiles(updated);
     setSaveNote(res.added.length ? `добавлено шаблонов: ${res.added.length}` : "все шаблоны на месте");
   }, [scopeId]);
@@ -626,13 +670,15 @@ function Workspace({
       if (!bridge) return;
       await bridge.syncTemplates(scopeId);
       const updated = await bridge.listScripts(scopeId);
-      setFiles(updated);
       const txt = await bridge.readScript(scopeId, preset.script);
+      if (pidRef.current !== scopeId) return;
+      setFiles(updated);
+      fileRequest.current += 1;
       setCurrent(preset.script);
       setCode(txt);
       setDirty(false);
       setArgs(modeArgs);
-      setIdeaId(preset.ideaId);
+      setIdeaId(workspaceIdeaId || preset.ideaId);
       setSelectedPresetIdea(preset.ideaId);
       setSaveNote(`готовый анализ: ${preset.script}`);
       if (autoRun && !runId) {
@@ -640,7 +686,7 @@ function Workspace({
         await startScriptInProject(scopeId, preset.script, list);
       }
     },
-    [scopeId, runId, startScriptInProject],
+    [scopeId, workspaceIdeaId, runId, startScriptInProject],
   );
 
   useEffect(() => {
@@ -869,136 +915,122 @@ function Workspace({
       </div>
 
       {/* три колонки: файлы, код и результаты, готовые задачи / помощник */}
-      <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)_340px] lg:divide-x">
-        {/* --- слева: дерево проекта и материалы выбранной ветки --- */}
-        <aside className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
-          <div className="shrink-0 border-b px-2 py-1.5">
-            <div className="flex items-center gap-1">
-              <span className="label">проекты и идеи</span>
-              <Button size="sm" variant="ghost" className="ml-auto h-6 px-1.5 text-[10.5px]" onClick={() => void addIdeaInBrain()} title="Новая идея с отдельным кодом и результатами">+ идея</Button>
-              <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10.5px]" onClick={() => void createNewProjectHere()} title="Создать проект">+ проект</Button>
-            </div>
-            <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">Выберите ветку. У каждой идеи свои файлы и прогоны.</p>
+      <div className="grid min-h-0 flex-1 overflow-y-auto lg:overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)_340px] lg:divide-x">
+        {/* --- слева: дерево выбранной идеи --- */}
+        <aside className="flex min-h-[240px] flex-col overflow-hidden border-b lg:min-h-0 lg:border-b-0">
+          <div className="flex shrink-0 items-center gap-1.5 border-b px-2 py-1.5">
+            <span className="label">ветка идеи</span>
+            <span className="min-w-0 flex-1 truncate text-[11px] font-medium" title={scopeLabel}>{scopeLabel}</span>
+            {paths && <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[10px]" onClick={() => void fly!.openPath(paths.code)} title="Открыть папку этой идеи на диске">папка</Button>}
           </div>
-          <div className="max-h-[36%] min-h-[132px] shrink-0 overflow-y-auto border-b py-1">
-            {projects.map((treeProject) => {
-              const projectIdeas = ideas.filter((i) => i.projectId === treeProject.id);
-              const projectKey = `project:${treeProject.id}`;
-              const ideasKey = `ideas:${treeProject.id}`;
-              const projectOpen = !collapsedTree.has(projectKey);
-              const ideasOpen = !collapsedTree.has(ideasKey);
-              const isProjectWorkspace = pid === treeProject.id && !workspaceIdeaId;
-              return (
-                <div key={treeProject.id}>
-                  <div className="flex items-center gap-1 px-1">
-                    <button
-                      type="button"
-                      onClick={() => toggleTree(projectKey)}
-                      className="h-6 w-5 shrink-0 cursor-pointer font-mono text-[11px] text-muted-foreground"
-                      aria-label={projectOpen ? `Свернуть ${treeProject.name}` : `Развернуть ${treeProject.name}`}
-                    >{projectOpen ? "−" : "+"}</button>
-                    <button
-                      type="button"
-                      onClick={() => void switchProjectWorkspace(treeProject.id)}
-                      className={cn("flex min-w-0 flex-1 items-center gap-1.5 px-1 py-1 text-left text-[11px] cursor-pointer", isProjectWorkspace && "bg-accent text-foreground", !isProjectWorkspace && "text-foreground hover:bg-accent")}
-                      title={`Проект «${treeProject.name}»`}
-                    >
-                      <span className="size-2 shrink-0" style={{ background: treeProject.color }} />
-                      <span className="truncate font-medium">{treeProject.name}</span>
-                      <span className="ml-auto shrink-0 font-mono text-[9px] text-muted-foreground">{projectIdeas.length}</span>
+          <div className="min-h-0 flex-1 overflow-y-auto py-1.5">
+            <button
+              type="button"
+              onClick={() => selectedWorkspaceIdea && onOpenIdeaCard(selectedWorkspaceIdea.id)}
+              className="flex w-full items-center gap-1.5 border-b px-2 py-1.5 text-left hover:bg-accent cursor-pointer"
+              title={selectedWorkspaceIdea ? "Открыть карточку идеи" : `Общее пространство проекта «${project?.name ?? pid}»`}
+            >
+              <span className="font-mono text-[10px] text-muted-foreground">{selectedWorkspaceIdea ? "IDEA" : "PROJECT"}</span>
+              <span className="min-w-0 flex-1 truncate text-[11px] font-semibold">{selectedWorkspaceIdea?.title ?? project?.name ?? pid}</span>
+              <span className="size-2 shrink-0" style={{ background: project?.color }} />
+            </button>
+
+            <div className="ml-3 border-l pl-2">
+              <div className="border-b py-1">
+                <button type="button" onClick={() => toggleTree(`source:${scopeId}`)} className="flex w-full items-center gap-1.5 px-1 py-1 text-left text-[10.5px] cursor-pointer hover:bg-accent">
+                  <span className="w-3 font-mono text-muted-foreground">{collapsedTree.has(`source:${scopeId}`) ? "+" : "−"}</span>
+                  <span className="font-mono text-muted-foreground">01</span><span className="flex-1 font-medium">Исходное</span>
+                  {selectedWorkspaceIdea && <span className="font-mono text-[9px] text-muted-foreground">вопрос</span>}
+                </button>
+                {!collapsedTree.has(`source:${scopeId}`) && selectedWorkspaceIdea && (
+                  <div className="ml-4 border-l pl-2">
+                    <button type="button" onClick={() => onOpenIdeaCard(selectedWorkspaceIdea.id)} className="block w-full truncate px-1.5 py-1 text-left text-[10px] text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer" title={selectedWorkspaceIdea.question || "Вопрос ещё не записан"}>
+                      вопрос: {selectedWorkspaceIdea.question || "не задан"}
+                    </button>
+                    <button type="button" onClick={() => onOpenIdeaCard(selectedWorkspaceIdea.id)} className="block w-full truncate px-1.5 py-1 text-left text-[10px] text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer" title={selectedWorkspaceIdea.method || "Метод ещё не записан"}>
+                      метод: {selectedWorkspaceIdea.method || "не задан"}
+                    </button>
+                    <button type="button" onClick={() => onOpenIdeaCard(selectedWorkspaceIdea.id)} className="block w-full truncate px-1.5 py-1 text-left text-[10px] text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer" title={selectedWorkspaceIdea.validation || "Проверка ещё не записана"}>
+                      проверка: {selectedWorkspaceIdea.validation || "не задана"}
+                    </button>
+                    <button type="button" onClick={() => onOpenIdeaCard(selectedWorkspaceIdea.id)} className="block w-full truncate px-1.5 py-1 text-left text-[10px] text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer">
+                      ссылки и источники: {selectedWorkspaceIdea.citations.length + selectedWorkspaceIdea.links.length}
                     </button>
                   </div>
-                  {projectOpen && (
-                    <div className="ml-3 border-l pl-2">
-                      <button
-                        type="button"
-                        onClick={() => void switchProjectWorkspace(treeProject.id)}
-                        className={cn("flex w-full items-center gap-1.5 px-1.5 py-1 text-left text-[10.5px] cursor-pointer", isProjectWorkspace ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground")}
-                      >
-                        <span className="font-mono">[P]</span><span>Общее пространство</span>
-                        {isProjectWorkspace && <span className="ml-auto font-mono text-[9px]">выбрано</span>}
-                      </button>
-                      <div className="flex items-center gap-1">
-                        <button type="button" onClick={() => toggleTree(ideasKey)} className="h-6 w-5 shrink-0 cursor-pointer font-mono text-[11px] text-muted-foreground" aria-label={ideasOpen ? "Свернуть идеи" : "Развернуть идеи"}>{ideasOpen ? "−" : "+"}</button>
-                        <button type="button" onClick={() => toggleTree(ideasKey)} className="flex min-w-0 flex-1 items-center gap-1.5 px-1 py-1 text-left text-[10.5px] text-muted-foreground cursor-pointer hover:text-foreground">
-                          <span className="font-mono">[I]</span><span>Идеи</span><span className="font-mono">({projectIdeas.length})</span>
-                        </button>
-                        <Button size="sm" variant="ghost" className="h-5 px-1 text-[10px]" onClick={() => void addIdeaInBrain(treeProject.id)} title={`Добавить идею в «${treeProject.name}»`}>+</Button>
-                      </div>
-                      {ideasOpen && (
-                        <div className="ml-3 border-l pl-2">
-                          {projectIdeas.length === 0 && <p className="px-1.5 py-1 text-[10px] text-muted-foreground">Идей пока нет.</p>}
-                          {projectIdeas.map((treeIdea) => {
-                            const selected = workspaceIdeaId === treeIdea.id;
-                            const running = !!activeRuns[`idea:${treeIdea.id}`];
-                            return (
-                              <button
-                                key={treeIdea.id}
-                                type="button"
-                                onClick={() => void switchWorkspaceIdea(treeIdea.id)}
-                                className={cn("flex w-full min-w-0 items-center gap-1.5 px-1.5 py-1 text-left text-[10.5px] cursor-pointer", selected ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground")}
-                                title={`${treeIdea.title} · отдельные код и результаты`}
-                              >
-                                <span className="font-mono text-[9px]">{selected ? ">" : "·"}</span>
-                                <span className="min-w-0 flex-1 truncate">{treeIdea.title}</span>
-                                {running && <span className="shrink-0 font-mono text-[9px] text-[var(--chart-2)]">запуск</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                )}
+                {!collapsedTree.has(`source:${scopeId}`) && !selectedWorkspaceIdea && <p className="px-5 py-1 text-[10px] text-muted-foreground">Выберите идею в поле над редактором. Общее пространство проекта не привязано к идее.</p>}
+              </div>
 
-          <div className="flex min-h-0 flex-1 flex-col border-b">
-            <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-              <span className="label truncate" title={paths?.code}>код · {files.length}</span>
-              <span className="ml-auto truncate font-mono text-[9px] text-muted-foreground" title={scopeLabel}>{scopeLabel}</span>
-              <Button size="sm" variant="ghost" className="px-1.5" onClick={() => void syncBuiltInTemplates()} title="Добавить встроенные шаблоны анализа">шаблоны</Button>
-              <Button size="sm" variant="ghost" className="px-1.5" onClick={newFile}>+</Button>
-              <Button size="sm" variant="ghost" className="px-1.5" onClick={importFile}>импорт</Button>
-            </div>
-            <div className="min-h-[90px] flex-1 overflow-y-auto">
-              {files.length === 0 && <p className="px-2 py-3 text-[10.5px] text-muted-foreground">В этой ветке пока нет файлов кода.</p>}
-              {files.map((f) => (
-                <div key={f.name} className={cn("group flex items-center gap-1.5 border-b px-2 py-1", current === f.name && "bg-accent")}>
-                  <button onClick={() => void openFile(f.name)} className="min-w-0 flex-1 text-left cursor-pointer" title={f.doc || f.name}>
-                    <span className="block truncate font-mono text-[10.5px]">{f.name}</span>
-                    <span className="block truncate text-[9.5px] text-muted-foreground">{f.doc || `${(f.size / 1024).toFixed(1)} КБ`}</span>
+              <div className="border-b py-1">
+                <div className="flex items-center gap-1">
+                  <button type="button" onClick={() => toggleTree(`code:${scopeId}`)} className="flex min-w-0 flex-1 items-center gap-1.5 px-1 py-1 text-left text-[10.5px] cursor-pointer hover:bg-accent">
+                    <span className="w-3 font-mono text-muted-foreground">{collapsedTree.has(`code:${scopeId}`) ? "+" : "−"}</span>
+                    <span className="font-mono text-muted-foreground">02</span><span className="flex-1 font-medium">Файлы расчёта</span><span className="font-mono text-[9px] text-muted-foreground">{files.length}</span>
                   </button>
-                  <button onClick={() => void removeFile(f.name)} className="shrink-0 cursor-pointer px-1 text-[11px] text-muted-foreground hover:text-destructive" title="Удалить файл">×</button>
+                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9.5px]" onClick={() => void syncBuiltInTemplates()} title="Добавить шаблоны анализа">шаблоны</Button>
+                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[10px]" onClick={() => void newFile()} title="Новый файл Python">+</Button>
+                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9.5px]" onClick={() => void importFile()}>импорт</Button>
                 </div>
-              ))}
-            </div>
-          </div>
+                {!collapsedTree.has(`code:${scopeId}`) && (
+                  <div className="ml-4 border-l pl-2">
+                    {files.length === 0 && <p className="px-1.5 py-1 text-[10px] text-muted-foreground">Файлов пока нет.</p>}
+                    {files.map((f) => (
+                      <div key={f.name} className={cn("group flex min-w-0 items-center gap-1 border-b border-border/60 px-1 py-1", current === f.name && "bg-accent")}>
+                        <button onClick={() => void openFile(f.name)} className="min-w-0 flex-1 truncate text-left font-mono text-[10px] cursor-pointer" title={f.doc || f.name}>{f.name}</button>
+                        <span className="shrink-0 font-mono text-[9px] text-muted-foreground">{fmtBytes(f.size)}</span>
+                        <button onClick={() => void removeFile(f.name)} className="shrink-0 cursor-pointer px-1 font-mono text-[10px] text-muted-foreground hover:text-destructive" title="Удалить файл">×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-          <div className="flex min-h-0 flex-1 flex-col">
-            <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-              <span className="label truncate" title={paths?.runs}>результаты · {runs.length}</span>
-              <Button size="sm" variant="ghost" className="ml-auto h-6 px-1.5 text-[10px]" onClick={() => void refreshRuns()}>обновить</Button>
-            </div>
-            <div className="min-h-[90px] flex-1 overflow-y-auto">
-              {runs.length === 0 && <p className="px-2 py-3 text-[10.5px] text-muted-foreground">В этой ветке ещё нет прогонов.</p>}
-              {runs.map((r) => (
-                <button
-                  key={r.path}
-                  onClick={() => openRun(r)}
-                  className={cn("block w-full border-b px-2 py-1 text-left cursor-pointer hover:bg-accent", selRun?.path === r.path && "bg-accent")}
-                >
-                  <span className="block truncate font-mono text-[10px]">{r.label}</span>
-                  <span className="block font-mono text-[9px] text-muted-foreground">файлов: {r.files.length}{r.summary ? " · summary" : ""}{r.files.some((f) => /\.(png|jpe?g|svg)$/i.test(f)) ? " · графики" : ""}</span>
-                </button>
-              ))}
+              <div className="py-1">
+                <div className="flex items-center gap-1">
+                  <button type="button" onClick={() => toggleTree(`results:${scopeId}`)} className="flex min-w-0 flex-1 items-center gap-1.5 px-1 py-1 text-left text-[10.5px] cursor-pointer hover:bg-accent">
+                    <span className="w-3 font-mono text-muted-foreground">{collapsedTree.has(`results:${scopeId}`) ? "+" : "−"}</span>
+                    <span className="font-mono text-muted-foreground">03</span><span className="flex-1 font-medium">Результаты</span><span className="font-mono text-[9px] text-muted-foreground">{runs.length}</span>
+                  </button>
+                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9.5px]" onClick={() => void refreshRuns()}>обновить</Button>
+                </div>
+                {!collapsedTree.has(`results:${scopeId}`) && (
+                  <div className="ml-4 border-l pl-2">
+                    {runs.length === 0 && <p className="px-1.5 py-1 text-[10px] text-muted-foreground">После запуска здесь появятся прогоны.</p>}
+                    {runs.map((r) => {
+                      const runKey = `run:${scopeId}:${r.path}`;
+                      const runOpen = !collapsedTree.has(runKey);
+                      return (
+                        <div key={r.path} className="border-b border-border/60">
+                          <div className="flex min-w-0 items-center gap-1">
+                            <button type="button" onClick={() => toggleTree(runKey)} className="w-4 shrink-0 cursor-pointer font-mono text-[10px] text-muted-foreground" aria-label={runOpen ? "Свернуть файлы результата" : "Показать файлы результата"}>{runOpen ? "−" : "+"}</button>
+                            <button type="button" onClick={() => openRun(r)} className={cn("min-w-0 flex-1 truncate py-1 text-left font-mono text-[9.5px] cursor-pointer hover:bg-accent", selRun?.path === r.path && "bg-accent")} title={r.path}>{r.label}</button>
+                            <span className="shrink-0 font-mono text-[8.5px] text-muted-foreground">{r.files.length}</span>
+                          </div>
+                          {runOpen && r.files.length > 0 && (
+                            <div className="ml-3 border-l pl-1.5">
+                              {r.files.map((name) => {
+                                const ext = name.split(".").pop()?.toLowerCase() ?? "";
+                                const kind = ["png", "jpg", "jpeg", "svg", "gif"].includes(ext) ? "график" : ["csv", "tsv", "parquet", "xlsx"].includes(ext) ? "таблица" : ext === "json" ? "метрики" : "файл";
+                                return (
+                                  <button key={name} type="button" onClick={() => void openRunArtifact(r, name)} className="flex w-full min-w-0 items-center gap-1.5 px-1 py-0.5 text-left text-[9.5px] text-muted-foreground cursor-pointer hover:bg-accent hover:text-foreground" title={`${kind}: ${name}`}>
+                                    <span className="w-9 shrink-0 font-mono text-[8px]">{kind}</span><span className="min-w-0 flex-1 truncate font-mono">{name}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </aside>
 
         {/* --- центр: код и результат --- */}
-        <section className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
+        <section className="flex min-h-[500px] flex-col overflow-hidden border-b lg:min-h-0 lg:border-b-0">
           <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b px-2 py-1.5">
             <span className="label">проект</span>
             <ProjectInlinePicker
@@ -1008,7 +1040,7 @@ function Workspace({
               onCreate={() => void createNewProjectHere()}
             />
             <span className="label border-l pl-2">идея</span>
-            <Select value={workspaceIdeaId || "__project__"} onValueChange={(value) => void switchWorkspaceIdea(value === "__project__" ? "" : value)}>
+            <Select value={workspaceIdeaId || "__project__"} onValueChange={(value) => { if (value === "__project__") void switchProjectWorkspace(pid); else void switchWorkspaceIdea(value); }}>
               <SelectTrigger className="h-6 min-w-[170px] max-w-[280px] text-[11px]" title="Отдельные папки кода, логов и прогонов для каждой идеи">
                 <SelectValue placeholder="общее пространство проекта" />
               </SelectTrigger>
@@ -1106,7 +1138,7 @@ function Workspace({
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-2 border border-dashed px-4 text-center">
                 <p className="max-w-[480px] text-[12px] leading-relaxed text-muted-foreground">
-                  Активный проект: <strong className="font-medium text-foreground">{project?.name ?? pid}</strong>. Переключить проект можно прямо над этим полем, в правой панели или слева: тогда и код, и папка результатов сразу переключатся на нужный проект.
+                  Рабочее пространство: <strong className="font-medium text-foreground">{scopeLabel}</strong>. Выберите идею над редактором: дерево, папка кода и результаты переключатся на неё.
                 </p>
                 {paths && (
                   <div className="max-w-full truncate font-mono text-[10.5px] text-muted-foreground">
@@ -1216,10 +1248,7 @@ function Workspace({
                 {otherFiles.map((f) => (
                   <button
                     key={f}
-                    onClick={async () => {
-                      const r = await fly!.readRunFile(selRun!.path, f);
-                      if (r.kind === "text") setViewFile({ name: f, text: r.text });
-                    }}
+                    onClick={() => void openRunArtifact(selRun!, f)}
                     className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", viewFile?.name === f && "bg-accent")}
                   >
                     {f}
@@ -1227,7 +1256,14 @@ function Workspace({
                 ))}
               </div>
             )}
-            {viewFile && <pre className="mb-2 max-h-[240px] overflow-auto border bg-muted/40 p-2 font-mono text-[11px] whitespace-pre-wrap">{viewFile.text}</pre>}
+            {viewFile && ((!viewFile.text.startsWith("(файл ") && (/\.csv$/i.test(viewFile.name) || /\.tsv$/i.test(viewFile.name))) ? (
+              <DelimitedTable name={viewFile.name} text={viewFile.text} delimiter={/\.tsv$/i.test(viewFile.name) ? "\t" : ","} />
+            ) : (
+              <div className="mb-2 border">
+                <div className="border-b px-2 py-1 font-mono text-[10px] text-muted-foreground">{viewFile.name}</div>
+                <pre className="max-h-[240px] overflow-auto bg-muted/40 p-2 font-mono text-[11px] whitespace-pre-wrap">{viewFile.text}</pre>
+              </div>
+            ))}
             {detail?.summary && <pre className="mb-2 max-h-[240px] overflow-auto border bg-muted/40 p-2 font-mono text-[11px]">{JSON.stringify(detail.summary, null, 2)}</pre>}
             <pre className="overflow-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-muted-foreground">
               {displayLog || "лог появится здесь после запуска"}
@@ -1236,7 +1272,7 @@ function Workspace({
         </section>
 
         {/* --- справа: готовый анализ по задачам (без API) или помощник --- */}
-        <aside className="flex min-h-0 flex-col overflow-hidden">
+        <aside className="flex min-h-[450px] flex-col overflow-hidden lg:min-h-0">
           <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1">
             {(
               [
@@ -1274,6 +1310,7 @@ function Workspace({
             />
           ) : (
             <ChatColumn
+              key={scopeId}
               pid={pid}
               workspaceId={scopeId}
               workspaceLabel={scopeLabel}
@@ -1285,6 +1322,9 @@ function Workspace({
               ideas={ideas}
               perms={perms}
               onAddReferences={onAddReferences}
+              activeIdea={selectedWorkspaceIdea ?? null}
+              onUpdateIdea={onUpdateIdea}
+              onCompleteStages={onCompleteStages}
             />
           )}
         </aside>
@@ -1535,6 +1575,17 @@ interface ChatMessage extends LlmMessage {
   actions?: string[];
 }
 
+
+function tokenCount(value: number | null | undefined): string {
+  return value == null ? "н/д" : new Intl.NumberFormat("ru-RU").format(value);
+}
+
+function apiCallLabel(call: ApiCallRecord): string {
+  const time = new Date(call.at).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const total = call.usage?.totalTokens == null ? "токены н/д" : `${tokenCount(call.usage.totalTokens)} токенов`;
+  return `${time} · ${call.provider}/${call.model} · ${total}${call.status === "error" ? " · ошибка" : ""}`;
+}
+
 function ChatColumn({
   pid,
   workspaceId,
@@ -1547,6 +1598,9 @@ function ChatColumn({
   ideas,
   perms,
   onAddReferences,
+  activeIdea,
+  onUpdateIdea,
+  onCompleteStages,
 }: {
   pid: string;
   workspaceId: string;
@@ -1559,6 +1613,9 @@ function ChatColumn({
   ideas: Idea[];
   perms: Permissions | null;
   onAddReferences: (items: Partial<Reference>[]) => void;
+  activeIdea: Idea | null;
+  onUpdateIdea: (ideaId: string, patch: Partial<Idea>) => void;
+  onCompleteStages: (ideaId: string, stageIds: string[]) => void;
 }) {
   const [provider, setProvider] = useState<LlmProvider>("deepseek");
   const [model, setModel] = useState("deepseek-chat");
@@ -1570,6 +1627,16 @@ function ChatColumn({
     }
   });
   const [input, setInput] = useState("");
+  const [apiCalls, setApiCalls] = useState<ApiCallRecord[]>([]);
+  const [apiScope, setApiScope] = useState<"workspace" | "all">("workspace");
+  const [rates, setRates] = useState<Record<string, { input: string; output: string }>>(() => {
+    try { return JSON.parse(localStorage.getItem("fly-ideas:api-rates") ?? "{}"); } catch { return {}; }
+  });
+  const workspaceRef = useRef(workspaceId);
+  useEffect(() => {
+    workspaceRef.current = workspaceId;
+    return () => { workspaceRef.current = ""; };
+  }, [workspaceId]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [keyInput, setKeyInput] = useState("");
@@ -1602,6 +1669,16 @@ function ChatColumn({
   }, [msgs, workspaceId]);
 
   useEffect(() => {
+    let cancelled = false;
+    void fly!.listApiCalls(apiScope === "all" ? "__all__" : workspaceId).then((calls) => {
+      if (!cancelled) setApiCalls(calls);
+    }).catch((e) => {
+      if (!cancelled) setErr(`Не удалось прочитать журнал API: ${(e as Error).message}`);
+    });
+    return () => { cancelled = true; };
+  }, [workspaceId, apiScope]);
+
+  useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [msgs, busy]);
 
@@ -1629,15 +1706,14 @@ function ChatColumn({
         actions.push(`не сохранено: ${(e as Error).message}`);
       }
     }
-    if (lastSaved) {
+    if (lastSaved && workspaceRef.current === targetPid) {
       await onScriptSaved(targetPid, lastSaved);
     }
     return actions;
   };
 
   const saveBlockToProject = async (codeText: string, name: string, targetPid: string) => {
-    const targetIdea = ideas.find((i) => i.projectId === targetPid);
-    const targetWorkspace = targetPid === pid ? workspaceId : targetIdea ? `idea:${targetIdea.id}` : targetPid;
+    const targetWorkspace = targetPid === pid ? workspaceId : targetPid;
     const r = await fly!.writeScript(targetWorkspace, name, codeText, { allowOverwrite: true });
     await onScriptSaved(targetWorkspace, r.file);
   };
@@ -1645,34 +1721,111 @@ function ChatColumn({
   const send = async () => {
     const text = input.trim();
     if (!text || busy) return;
-    const targetPidAtSend = workspaceId;
-    const idea = ideas.find((i) => i.id === ctxIdea);
-    const ctx =
-      idea && provider === "deepseek"
-        ? `\n\nКонтекст: идея пользователя «${idea.title}». Вопрос: ${idea.question || "не сформулирован"}. Метод: ${idea.method || "не описан"}.`
-        : "";
+    const targetWorkspace = workspaceId;
+    const trackedIdea = activeIdea;
+    const contextIdea = ideas.find((i) => i.id === ctxIdea);
+    const ctx = contextIdea && provider === "deepseek"
+      ? `\n\nКонтекст идеи «${contextIdea.title}». Вопрос: ${contextIdea.question || "не сформулирован"}. Метод: ${contextIdea.method || "не описан"}.`
+      : "";
+    const stageContext = provider === "deepseek" && trackedIdea
+      ? `\n\nУЧЁТ ЭТАПОВ ИДЕИ «${trackedIdea.title}». Текущие этапы:\n${trackedIdea.checklist.map((step) => `- id=${step.id}; ${step.done ? "ГОТОВО" : "НЕ ГОТОВО"}; ${step.text}`).join("\n")}\nЕсли пользователь прямо сообщает, что конкретный этап уже выполнен, добавь в самый конец ответа отдельный технический маркер [[FLY_STAGE_DONE:id]] для этого этапа. Не закрывай этап из-за плана, совета или кода, который ты только что предложил. Маркер не объясняй и не показывай как обычный текст.`
+      : "";
     const next: ChatMessage[] = [...msgs, { role: "user", content: text }];
     setMsgs(next);
     setInput("");
     setBusy(true);
     setErr("");
+
+    let result: { content: string; usage?: unknown };
     try {
-      const r = await fly!.llmChat({
+      result = await fly!.llmChat({
         provider,
         model,
-        messages: [{ role: "system", content: (provider === "deepseek" ? CODE_PROMPT : LIT_PROMPT) + ctx }, ...next.slice(-10).map((m) => ({ role: m.role, content: m.content }))],
+        messages: [{ role: "system", content: (provider === "deepseek" ? CODE_PROMPT : LIT_PROMPT) + ctx + stageContext }, ...next.slice(-10).map((m) => ({ role: m.role, content: m.content }))],
       });
-      const blocks = [...r.content.matchAll(/```(\w+)?\n([\s\S]*?)```/g)].map((m) => ({ lang: m[1], content: m[2] }));
-      const actions = autoSave && blocks.length && (perms?.createFiles ?? false) ? await writeBlocks(blocks, targetPidAtSend) : [];
-      setMsgs((m) => [...m, { role: "assistant", content: r.content, actions }]);
     } catch (e) {
-      setErr((e as Error).message);
-    } finally {
+      const errorText = (e as Error).message;
+      const failedCall: ApiCallRecord = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        at: new Date().toISOString(), workspaceId: targetWorkspace, provider, model, question: text, answer: errorText, usage: null, status: "error",
+      };
+      try {
+        await fly!.appendApiCall(targetWorkspace, failedCall);
+        if (workspaceRef.current === targetWorkspace) setApiCalls((calls) => [...calls, failedCall]);
+      } catch (saveError) {
+        setErr(`Вызов завершился ошибкой, журнал не записан: ${(saveError as Error).message}`);
+      }
+      if (workspaceRef.current === targetWorkspace) {
+        setMsgs((messages) => [...messages, { role: "assistant", content: `Ошибка API: ${errorText}` }]);
+      }
       setBusy(false);
+      return;
     }
+
+    const markerIds = [...new Set([...result.content.matchAll(/\[\[FLY_STAGE_DONE:([^\]]+)\]\]/g)].map((m) => m[1]))];
+    const visibleContent = result.content.replace(/\s*\[\[FLY_STAGE_DONE:[^\]]+\]\]/g, "").trim();
+    const usage = normalizeUsage(result.usage);
+    const call: ApiCallRecord = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      at: new Date().toISOString(), workspaceId: targetWorkspace, provider, model, question: text, answer: visibleContent, usage, status: "ok",
+    };
+    try {
+      await fly!.appendApiCall(targetWorkspace, call);
+      if (workspaceRef.current === targetWorkspace) setApiCalls((calls) => [...calls, call]);
+    } catch (e) {
+      setErr(`Ответ получен, но запись учёта API не сохранилась: ${(e as Error).message}`);
+    }
+
+    const actions: string[] = [];
+    if (trackedIdea && markerIds.length) {
+      const marked = trackedIdea.checklist.filter((step) => markerIds.includes(step.id) && !step.done);
+      if (marked.length) {
+        onCompleteStages(trackedIdea.id, marked.map((step) => step.id));
+        actions.push(`Учёт этапов обновлён: ${marked.map((step) => step.text).join("; ")}. Изменение видно на Дашборде.`);
+      }
+    }
+
+    const blocks = [...visibleContent.matchAll(/```(\w+)?\n([\s\S]*?)```/g)].map((m) => ({ lang: m[1], content: m[2] }));
+    if (autoSave && blocks.length && (perms?.createFiles ?? false)) {
+      try {
+        actions.push(...await writeBlocks(blocks, targetWorkspace));
+      } catch (e) {
+        actions.push(`ответ получен, но файл не сохранён: ${(e as Error).message}`);
+      }
+    }
+    if (workspaceRef.current === targetWorkspace) {
+      setMsgs((messages) => [...messages, { role: "assistant", content: visibleContent, actions }]);
+    }
+    setBusy(false);
   };
 
   const found = provider === "perplexity" && msgs.length ? parseReferencesFromText(msgs[msgs.length - 1].content) : [];
+  const usageTotals = apiCalls.reduce((totals, call) => ({
+    input: totals.input + (call.usage?.inputTokens ?? 0),
+    output: totals.output + (call.usage?.outputTokens ?? 0),
+    total: totals.total + (call.usage?.totalTokens ?? 0),
+  }), { input: 0, output: 0, total: 0 });
+  const knownUsageCalls = apiCalls.filter((call) => call.usage).length;
+  const usageLabel = (field: keyof LlmUsage, total: number) => {
+    const reported = apiCalls.filter((call) => call.usage?.[field] != null).length;
+    return `${tokenCount(reported ? total : null)}${reported < apiCalls.length && reported > 0 ? "*" : ""}`;
+  };
+  const selectedRate = rates[`${provider}:${model}`] ?? { input: "", output: "" };
+  const setRate = (key: "input" | "output", value: string) => {
+    const next = { ...rates, [`${provider}:${model}`]: { ...selectedRate, [key]: value } };
+    setRates(next);
+    localStorage.setItem("fly-ideas:api-rates", JSON.stringify(next));
+  };
+  const estimateCall = (call: ApiCallRecord): number | null => {
+    const rate = rates[`${call.provider}:${call.model}`];
+    if (!rate || rate.input === "" || rate.output === "" || call.usage?.inputTokens == null || call.usage.outputTokens == null) return null;
+    const input = Number(rate.input), output = Number(rate.output);
+    if (!Number.isFinite(input) || !Number.isFinite(output) || input < 0 || output < 0) return null;
+    return (call.usage.inputTokens * input + call.usage.outputTokens * output) / 1_000_000;
+  };
+  const estimatedCalls = apiCalls.filter((call) => estimateCall(call) !== null);
+  const estimate = estimatedCalls.reduce((sum, call) => sum + (estimateCall(call) ?? 0), 0);
+  const stageProgress = activeIdea ? checklistProgress(activeIdea) : null;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -1773,6 +1926,44 @@ function ChatColumn({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
+        <details className="mb-2 border-b pb-1">
+          <summary className="cursor-pointer list-none px-1 py-1 text-[10px] text-muted-foreground">
+            <span className="font-medium text-foreground">Учёт API</span>
+            <span className="ml-2 font-mono">вызовов {apiCalls.length}</span>
+            <span className="ml-2 font-mono">токены: {usageLabel("inputTokens", usageTotals.input)} вход · {usageLabel("outputTokens", usageTotals.output)} выход · {usageLabel("totalTokens", usageTotals.total)} всего</span>
+            {knownUsageCalls < apiCalls.length && <span className="ml-2">usage получен для {knownUsageCalls}/{apiCalls.length}</span>}
+          </summary>
+          <div className="border-t px-1 py-1.5">
+            <div className="mb-1 flex gap-1">
+              <Button size="sm" variant={apiScope === "workspace" ? "secondary" : "ghost"} onClick={() => setApiScope("workspace")}>эта идея</Button>
+              <Button size="sm" variant={apiScope === "all" ? "secondary" : "ghost"} onClick={() => setApiScope("all")}>все вызовы</Button>
+            </div>
+            <div className="text-[10px] text-muted-foreground">Тариф {provider} / {model}, USD за 1 млн токенов</div>
+            <div className="mt-1 flex items-center gap-1.5">
+              <Input type="number" min="0" step="any" value={selectedRate.input} onChange={(e) => setRate("input", e.target.value)} placeholder="вход" aria-label="Тариф входных токенов" className="h-6 w-20 font-mono text-[10px]" />
+              <Input type="number" min="0" step="any" value={selectedRate.output} onChange={(e) => setRate("output", e.target.value)} placeholder="выход" aria-label="Тариф выходных токенов" className="h-6 w-20 font-mono text-[10px]" />
+              <span className="font-mono text-[10px]">оценка: {estimatedCalls.length ? `$${estimate.toFixed(6)}` : "н/д"}</span>
+            </div>
+            <p className="mt-1 text-[9px] text-muted-foreground">* Сумма только по вызовам, где провайдер вернул эти данные. Оценка по введённым тарифам, без кэша и дополнительных сборов: {estimatedCalls.length}/{apiCalls.length}. Журнал хранится локально.</p>
+          </div>
+          <div className="max-h-[300px] overflow-y-auto border-t">
+            {apiCalls.length === 0 ? (
+              <p className="px-2 py-2 text-[10px] text-muted-foreground">Вызовов пока нет. Здесь сохраняются вопросы, ответы и статистика токенов провайдера.</p>
+            ) : (
+              [...apiCalls].reverse().map((call) => (
+                <details key={call.id} className="border-b px-1 py-1 last:border-b-0">
+                  <summary className="cursor-pointer list-none font-mono text-[9px] text-muted-foreground">{apiCallLabel(call)}{apiScope === "all" && ` · ${call.workspaceId === "__literature__" ? "поиск литературы" : ideas.find((idea) => `idea:${idea.id}` === call.workspaceId)?.title ?? projects.find((project) => project.id === call.workspaceId)?.name ?? call.workspaceId}`}</summary>
+                  <div className="flex flex-col gap-1.5 px-1 py-2 text-[10px]">
+                    <div><span className="label">вопрос</span><p className="mt-0.5 whitespace-pre-wrap break-words">{call.question}</p></div>
+                    <div><span className="label">ответ</span><p className="mt-0.5 whitespace-pre-wrap break-words">{call.answer}</p></div>
+                    {call.usage && <div className="font-mono text-[9px] text-muted-foreground">вход {tokenCount(call.usage.inputTokens)} · выход {tokenCount(call.usage.outputTokens)} · всего {tokenCount(call.usage.totalTokens)} · оценка {estimateCall(call) === null ? "н/д" : `$${estimateCall(call)!.toFixed(6)}`}</div>}
+                  </div>
+                </details>
+              ))
+            )}
+          </div>
+        </details>
+
         {msgs.length === 0 && (
           <div className="flex flex-col gap-2 py-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground">
@@ -1827,6 +2018,20 @@ function ChatColumn({
         <div ref={endRef} />
       </div>
 
+      {activeIdea && stageProgress && (
+        <details className="shrink-0 border-t">
+          <summary className="cursor-pointer list-none px-2 py-1.5 text-[10.5px]">
+            <span className="font-medium">Этапы идеи</span>
+            <span className="ml-2 font-mono text-muted-foreground">{stageProgress.done}/{stageProgress.total} · {stageProgress.pct}%</span>
+            <span className="ml-2 text-[9.5px] text-muted-foreground">учёт общий с Дашбордом</span>
+          </summary>
+          <div className="max-h-[220px] overflow-y-auto border-t p-2">
+            <p className="mb-1.5 text-[10px] text-muted-foreground">DeepSeek может отметить этап по вашему сообщению о завершении. Проверьте результат, статус можно изменить вручную.</p>
+            <BrainStages key={activeIdea.id} idea={activeIdea} onUpdateIdea={onUpdateIdea} />
+          </div>
+        </details>
+      )}
+
       <div className="shrink-0 border-t p-2">
         <Textarea
           value={input}
@@ -1850,6 +2055,80 @@ function ChatColumn({
           </Button>
           {!keys[provider] && <span className="label ml-auto">сначала вставь ключ {provider}</span>}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function BrainStages({ idea, onUpdateIdea }: { idea: Idea; onUpdateIdea: (ideaId: string, patch: Partial<Idea>) => void }) {
+  const [newStage, setNewStage] = useState("");
+  const update = (checklist: Idea["checklist"]) => onUpdateIdea(idea.id, { checklist });
+  const add = () => {
+    const text = newStage.trim();
+    if (!text) return;
+    update([...idea.checklist, { id: uid("c"), text, done: false, doneAt: null }]);
+    setNewStage("");
+  };
+  return (
+    <div>
+      <div className="border-t">
+        {idea.checklist.map((stage, index) => (
+          <div key={stage.id} className="flex items-center gap-1 border-b py-1">
+            <span className="w-4 shrink-0 text-right font-mono text-[9px] text-muted-foreground">{index + 1}</span>
+            <button type="button" onClick={() => update(idea.checklist.map((item) => item.id === stage.id ? { ...item, done: !item.done, doneAt: !item.done ? new Date().toISOString() : null } : item))} className="w-16 shrink-0 border px-1 py-0.5 font-mono text-[9px] cursor-pointer hover:bg-accent" title="Изменить статус этапа">{stage.done ? "готово" : "не готов"}</button>
+            <input value={stage.text} aria-label={`Этап ${index + 1}`} onChange={(event) => update(idea.checklist.map((item) => item.id === stage.id ? { ...item, text: event.target.value } : item))} className="min-w-0 flex-1 bg-transparent text-[10px] outline-none" />
+            <button type="button" onClick={() => update(idea.checklist.filter((item) => item.id !== stage.id))} className="shrink-0 px-1 font-mono text-[10px] text-muted-foreground cursor-pointer" title="Удалить этап">×</button>
+          </div>
+        ))}
+      </div>
+      <div className="mt-1.5 flex gap-1">
+        <Input value={newStage} onChange={(event) => setNewStage(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); add(); } }} placeholder="Новый этап" className="h-6 text-[10px]" />
+        <Button size="sm" variant="outline" className="h-6" onClick={add} disabled={!newStage.trim()}>добавить</Button>
+      </div>
+    </div>
+  );
+}
+
+function parseDelimited(text: string, delimiter: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    if (quoted) {
+      if (char === '"' && text[i + 1] === '"') { cell += '"'; i += 1; }
+      else if (char === '"') quoted = false;
+      else cell += char;
+    } else if (char === '"' && cell.length === 0) quoted = true;
+    else if (char === delimiter) { row.push(cell); cell = ""; }
+    else if (char === "\n") { row.push(cell.replace(/\r$/, "")); rows.push(row); row = []; cell = ""; }
+    else cell += char;
+  }
+  if (cell.length || row.length) { row.push(cell.replace(/\r$/, "")); rows.push(row); }
+  return rows.filter((r) => r.some((value) => value.length > 0));
+}
+
+function DelimitedTable({ name, text, delimiter }: { name: string; text: string; delimiter: string }) {
+  const rows = useMemo(() => parseDelimited(text, delimiter), [text, delimiter]);
+  const columns = Math.min(32, rows.reduce((max, row) => Math.max(max, row.length), 0));
+  const visibleRows = rows.slice(0, 201);
+  return (
+    <div className="mb-2 border">
+      <div className="flex items-center justify-between gap-2 border-b px-2 py-1">
+        <span className="font-mono text-[10px] text-muted-foreground">{name}</span>
+        <span className="font-mono text-[9px] text-muted-foreground">таблица · {rows.length} строк</span>
+      </div>
+      <div className="max-h-[300px] overflow-auto">
+        <table className="w-full border-collapse font-mono text-[10px]">
+          {rows.length > 0 && <thead className="sticky top-0 bg-muted"><tr>{Array.from({ length: columns }, (_, col) => <th key={col} className="max-w-[260px] border-b border-r px-2 py-1 text-left font-medium">{rows[0]?.[col] ?? ""}</th>)}</tr></thead>}
+          <tbody>
+            {visibleRows.slice(rows.length > 0 ? 1 : 0).map((row, ri) => (
+              <tr key={ri} className="border-b last:border-b-0">{Array.from({ length: columns }, (_, col) => <td key={col} className="max-w-[260px] truncate border-r px-2 py-1">{row[col] ?? ""}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+        {rows.length > 201 && <p className="border-t px-2 py-1 text-[9px] text-muted-foreground">Показаны первые 200 строк из {rows.length}.</p>}
       </div>
     </div>
   );

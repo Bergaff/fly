@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { Reference } from "@/data/types";
 import { parseReferencesFromText } from "@/lib/refparse";
-import { fly, isElectron } from "@/lib/bridge";
+import { fly, isElectron, type ApiCallRecord } from "@/lib/bridge";
+import { normalizeUsage } from "@/lib/api-usage";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,12 +45,22 @@ export function LiteratureSearchDialog({ open, defaultQuery = "", onClose, onAdd
     setErr("");
     setAnswer("");
     setPicked(new Set());
+    const at = new Date().toISOString();
+    let record: ApiCallRecord;
     try {
       const r = await fly.llmChat({ provider: "perplexity", model, messages: [{ role: "system", content: SYSTEM }, { role: "user", content: text }] });
       setAnswer(r.content);
       setPicked(new Set(parseReferencesFromText(r.content).map((_, i) => i)));
+      record = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`, at, workspaceId: "__literature__", provider: "perplexity", model, question: text, answer: r.content, usage: normalizeUsage(r.usage), status: "ok" };
     } catch (e) {
-      setErr((e as Error).message);
+      const message = (e as Error).message;
+      setErr(message);
+      record = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`, at, workspaceId: "__literature__", provider: "perplexity", model, question: text, answer: message, usage: null, status: "error" };
+    }
+    try {
+      await fly.appendApiCall("__literature__", record);
+    } catch (e) {
+      setErr((previous) => `${previous ? `${previous} ` : ""}Запись учёта API не сохранилась: ${(e as Error).message}`);
     } finally {
       setBusy(false);
     }
@@ -67,7 +78,7 @@ export function LiteratureSearchDialog({ open, defaultQuery = "", onClose, onAdd
         <DialogHeader>
           <DialogTitle>Поиск литературы</DialogTitle>
           <DialogDescription>
-            Запрос уходит в Perplexity (модель sonar). Из ответа автоматически вытаскиваются строки с DOI и годом: отметь нужные и добавь в базу.
+            Запрос уходит в Perplexity. Ответы и токены сохраняются локально в учёте API: «Мозг», «Помощник API», «все вызовы». Строки с DOI и годом можно добавить в базу.
           </DialogDescription>
         </DialogHeader>
 

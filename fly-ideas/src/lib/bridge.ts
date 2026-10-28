@@ -46,6 +46,18 @@ export interface ScriptInfo { name: string; doc: string; size: number; mtime: nu
 export interface RunInfo { dir: string; path: string; label: string; summary: Record<string, unknown> | null; files: string[]; mtime: number }
 export interface RunOutput { runId: string; projectId?: string; runDir?: string; stream: "stdout" | "stderr" | "exit"; text: string; code?: number }
 export interface LlmMessage { role: "system" | "user" | "assistant"; content: string }
+export interface LlmUsage { inputTokens: number | null; outputTokens: number | null; totalTokens: number | null }
+export interface ApiCallRecord {
+  id: string;
+  at: string;
+  workspaceId: string;
+  provider: LlmProvider;
+  model: string;
+  question: string;
+  answer: string;
+  usage: LlmUsage | null;
+  status: "ok" | "error";
+}
 
 export type LlmProvider = "deepseek" | "perplexity" | "openai";
 
@@ -126,6 +138,8 @@ export interface FlyBridge {
   getSecret(k: string): Promise<string | null>;
   setSecret(k: string, v: string | null): Promise<boolean>;
   llmChat(req: { provider: LlmProvider; model?: string; messages: LlmMessage[]; temperature?: number }): Promise<{ content: string; usage?: unknown }>;
+  listApiCalls(workspaceId: string): Promise<ApiCallRecord[]>;
+  appendApiCall(workspaceId: string, record: ApiCallRecord): Promise<void>;
 
   listRuns(projectId: string): Promise<RunInfo[]>;
   readRun(dir: string): Promise<{ log: string; summary: Record<string, unknown> | null }>;
