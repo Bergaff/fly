@@ -6,6 +6,7 @@ import {
   type Paths, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo,
 } from "@/lib/bridge";
 import { parseReferencesFromText } from "@/lib/refparse";
+import { TASK_PRESETS, presetForIdea, presetForScript, type TaskPreset } from "@/lib/task-presets";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,8 @@ interface Props {
   ideas: Idea[];
   projects: { id: string; name: string }[];
   activeProject: string | "all";
+  focusIdeaId?: string | null;
+  onClearFocusIdea?: () => void;
   onSelectProject: (id: string | "all") => void;
   onAddJournalEntry: (ideaId: string, entry: { title: string; params: string; result: string; conclusion: string }) => void;
   onAddReferences: (items: Partial<Reference>[]) => void;
@@ -51,9 +54,22 @@ const PROVIDERS: { id: LlmProvider; label: string; hint: string; models: [string
 ];
 
 // ================================================================
-export function BrainView({ ideas, projects, activeProject, onSelectProject, onAddJournalEntry, onAddReferences }: Props) {
+export function BrainView({
+  ideas,
+  projects,
+  activeProject,
+  focusIdeaId,
+  onClearFocusIdea,
+  onSelectProject,
+  onAddJournalEntry,
+  onAddReferences,
+}: Props) {
   const [tab, setTab] = useState<"work" | "setup">("work");
   const [help, setHelp] = useState(false);
+
+  useEffect(() => {
+    if (focusIdeaId) setTab("work");
+  }, [focusIdeaId]);
 
   if (!isElectron) return <WebFallback />;
 
@@ -85,6 +101,8 @@ export function BrainView({ ideas, projects, activeProject, onSelectProject, onA
           ideas={ideas}
           projects={projects}
           activeProject={activeProject}
+          focusIdeaId={focusIdeaId}
+          onClearFocusIdea={onClearFocusIdea}
           onSelectProject={onSelectProject}
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
@@ -146,7 +164,16 @@ function PathStrip({ label, value, onChoose, onOpen, onReset, isDefault }: { lab
 }
 
 // ================================================================
-function Workspace({ ideas, projects, activeProject, onSelectProject, onAddJournalEntry, onAddReferences }: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
+function Workspace({
+  ideas,
+  projects,
+  activeProject,
+  focusIdeaId,
+  onClearFocusIdea,
+  onSelectProject,
+  onAddJournalEntry,
+  onAddReferences,
+}: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
   const pid = activeProject === "all" ? projects[0]?.id ?? "project" : activeProject;
   const [paths, setPaths] = useState<ProjectPaths | null>(null);
   const [perms, setPerms] = useState<Permissions | null>(null);
@@ -163,6 +190,8 @@ function Workspace({ ideas, projects, activeProject, onSelectProject, onAddJourn
   const [images, setImages] = useState<{ name: string; dataUrl: string }[]>([]);
   const [viewFile, setViewFile] = useState<{ name: string; text: string } | null>(null);
   const [ideaId, setIdeaId] = useState<string>(ideas[0]?.id ?? "");
+  const [rightTab, setRightTab] = useState<"presets" | "chat">("presets");
+  const [selectedPresetIdea, setSelectedPresetIdea] = useState<string>(focusIdeaId || ideas[0]?.id || TASK_PRESETS[0].ideaId);
   const [added, setAdded] = useState(false);
   const [saveNote, setSaveNote] = useState("");
   const pendingRun = useRef<string | null>(null);
@@ -230,12 +259,76 @@ function Workspace({ ideas, projects, activeProject, onSelectProject, onAddJourn
     ).then((x) => setImages(x.filter((v): v is { name: string; dataUrl: string } => !!v)));
   }
 
-  const openFile = async (name: string) => {
+  const openFile = useCallback(async (name: string) => {
+    const bridge = fly;
+    if (!bridge) return;
     setCurrent(name);
-    setCode(await fly!.readScript(pid, name));
+    setCode(await bridge.readScript(pid, name));
     setDirty(false);
     setSaveNote("");
-  };
+    const matched = presetForScript(name);
+    if (matched) {
+      setIdeaId(matched.ideaId);
+      setSelectedPresetIdea(matched.ideaId);
+    }
+  }, [pid]);
+
+  const syncBuiltInTemplates = useCallback(async () => {
+    const bridge = fly;
+    if (!bridge) return;
+    const res = await bridge.syncTemplates(pid);
+    const updated = await bridge.listScripts(pid);
+    setFiles(updated);
+    setSaveNote(res.added.length ? `добавлено шаблонов: ${res.added.length}` : "все шаблоны на месте");
+  }, [pid]);
+
+  const applyPreset = useCallback(
+    async (preset: TaskPreset, modeArgs: string, autoRun = false) => {
+      const bridge = fly;
+      if (!bridge) return;
+      await bridge.syncTemplates(pid);
+      const updated = await bridge.listScripts(pid);
+      setFiles(updated);
+      const txt = await bridge.readScript(pid, preset.script);
+      setCurrent(preset.script);
+      setCode(txt);
+      setDirty(false);
+      setArgs(modeArgs);
+      setIdeaId(preset.ideaId);
+      setSelectedPresetIdea(preset.ideaId);
+      setSaveNote(`готовый анализ: ${preset.script}`);
+      if (autoRun && !runId) {
+        const list = modeArgs.split(/\s+/).filter(Boolean);
+        setLiveLog("");
+        setDetail(null);
+        setImages([]);
+        setViewFile(null);
+        try {
+          const r = await bridge.runScript(pid, preset.script, list);
+          pendingRun.current = r.runDir;
+          setRunId(r.runId);
+          setAdded(false);
+          setLiveLog(`$ python ${preset.script} ${list.join(" ")}\n-> ${r.runDir}\n\n`);
+        } catch (e) {
+          setLiveLog(`не удалось запустить: ${(e as Error).message}\n`);
+        }
+      }
+    },
+    [pid, runId],
+  );
+
+  useEffect(() => {
+    if (!focusIdeaId) return;
+    setRightTab("presets");
+    setIdeaId(focusIdeaId);
+    setSelectedPresetIdea(focusIdeaId);
+    const preset = presetForIdea(focusIdeaId);
+    if (preset) {
+      void applyPreset(preset, preset.modes[0]?.args ?? "--synth", false);
+    }
+    onClearFocusIdea?.();
+  }, [focusIdeaId, applyPreset, onClearFocusIdea]);
+
   const save = async (opts?: { silent?: boolean }) => {
     if (!current) return null;
     const r = await fly!.writeScript(pid, current, code, { allowOverwrite: true });
@@ -395,16 +488,19 @@ function Workspace({ ideas, projects, activeProject, onSelectProject, onAddJourn
         </div>
       </div>
 
-      {/* три колонки: файлы, код и результаты, помощник */}
-      <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[235px_minmax(0,1fr)_340px] lg:divide-x">
+      {/* три колонки: файлы, код и результаты, готовые задачи / помощник */}
+      <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[245px_minmax(0,1fr)_360px] lg:divide-x">
         {/* --- слева: проводник --- */}
         <aside className="flex min-h-0 flex-col overflow-hidden border-b lg:border-b-0">
           <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
             <span className="label">файлы, .py</span>
-            <Button size="sm" variant="ghost" className="ml-auto" onClick={newFile}>
+            <Button size="sm" variant="ghost" className="ml-auto px-1.5" onClick={() => void syncBuiltInTemplates()} title="Докопировать встроенные скрипты анализа (00..19 и flylib.py)">
+              шаблоны
+            </Button>
+            <Button size="sm" variant="ghost" className="px-1.5" onClick={newFile}>
               новый
             </Button>
-            <Button size="sm" variant="ghost" onClick={importFile}>
+            <Button size="sm" variant="ghost" className="px-1.5" onClick={importFile}>
               импорт
             </Button>
           </div>
@@ -491,8 +587,8 @@ function Workspace({ ideas, projects, activeProject, onSelectProject, onAddJourn
               />
             ) : (
               <div className="flex h-full items-center justify-center border border-dashed">
-                <p className="max-w-[420px] px-4 text-center text-[12px] leading-relaxed text-muted-foreground">
-                  Здесь появится код. Слева шаблоны (00 проверка окружения, 02 игрушечная модель, 04 развёртка), справа помощник: он пишет файлы прямо в папку проекта.
+                <p className="max-w-[460px] px-4 text-center text-[12px] leading-relaxed text-muted-foreground">
+                  Выбери готовый анализ под задачу справа во вкладке «По задачам (без API)» или открой скрипт слева (00..19, flylib.py). Все основные эксперименты уже написаны и запускаются локально без генерации по API.
                 </p>
               </div>
             )}
@@ -574,8 +670,203 @@ function Workspace({ ideas, projects, activeProject, onSelectProject, onAddJourn
           </div>
         </section>
 
-        {/* --- справа: помощник --- */}
-        <ChatColumn pid={pid} ideas={ideas} perms={perms} onAddReferences={onAddReferences} />
+        {/* --- справа: готовый анализ по задачам (без API) или помощник --- */}
+        <aside className="flex min-h-0 flex-col overflow-hidden">
+          <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1">
+            {(
+              [
+                ["presets", "По задачам (без API)"],
+                ["chat", "Помощник API"],
+              ] as const
+            ).map(([k, lbl]) => (
+              <button
+                key={k}
+                onClick={() => setRightTab(k)}
+                className={cn(
+                  "cursor-pointer border-b px-2 py-1 text-[11.5px]",
+                  rightTab === k ? "border-foreground font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {lbl}
+              </button>
+            ))}
+          </div>
+          {rightTab === "presets" ? (
+            <PresetsColumn
+              ideas={ideas}
+              projectId={pid}
+              selectedIdeaId={selectedPresetIdea}
+              onSelectIdea={setSelectedPresetIdea}
+              currentScript={current}
+              running={!!runId}
+              onApplyPreset={(preset, modeArgs, autoRun) => void applyPreset(preset, modeArgs, autoRun)}
+              onOpenCompanion={(name) => void openFile(name)}
+            />
+          ) : (
+            <ChatColumn pid={pid} ideas={ideas} perms={perms} onAddReferences={onAddReferences} />
+          )}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+// ================================================================
+function PresetsColumn({
+  ideas,
+  projectId,
+  selectedIdeaId,
+  onSelectIdea,
+  currentScript,
+  running,
+  onApplyPreset,
+  onOpenCompanion,
+}: {
+  ideas: Idea[];
+  projectId: string;
+  selectedIdeaId: string;
+  onSelectIdea: (ideaId: string) => void;
+  currentScript: string | null;
+  running: boolean;
+  onApplyPreset: (preset: TaskPreset, modeArgs: string, autoRun: boolean) => void;
+  onOpenCompanion: (scriptName: string) => void;
+}) {
+  const [scope, setScope] = useState<"project" | "all">("all");
+  const ideaMap = useMemo(() => new Map(ideas.map((i) => [i.id, i])), [ideas]);
+
+  const visiblePresets = useMemo(() => {
+    if (scope === "all") return TASK_PRESETS;
+    const filtered = TASK_PRESETS.filter((p) => ideaMap.get(p.ideaId)?.projectId === projectId);
+    return filtered.length > 0 ? filtered : TASK_PRESETS;
+  }, [scope, ideaMap, projectId]);
+
+  const activePreset = useMemo(
+    () => visiblePresets.find((p) => p.ideaId === selectedIdeaId) ?? visiblePresets[0] ?? TASK_PRESETS[0],
+    [visiblePresets, selectedIdeaId],
+  );
+  const linkedIdea = ideaMap.get(activePreset.ideaId);
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="shrink-0 border-b px-2.5 py-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="label">готовые скрипты под задачи</span>
+          <div className="flex items-center gap-1">
+            {(
+              [
+                ["all", `все (${TASK_PRESETS.length})`],
+                ["project", "проект"],
+              ] as const
+            ).map(([k, l]) => (
+              <button
+                key={k}
+                onClick={() => setScope(k)}
+                className={cn(
+                  "border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer",
+                  scope === k ? "border-foreground bg-accent text-foreground" : "border-border text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+          Код анализа уже встроен в приложение (10..19 + общий модуль flylib.py): токены DeepSeek тратить не нужно.
+        </p>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {/* Список задач (компактный переключатель) */}
+        <div className="border-b">
+          {visiblePresets.map((p) => {
+            const idea = ideaMap.get(p.ideaId);
+            const isSelected = p.ideaId === activePreset.ideaId;
+            const isOpen = currentScript === p.script;
+            return (
+              <button
+                key={p.ideaId}
+                onClick={() => onSelectIdea(p.ideaId)}
+                className={cn(
+                  "flex w-full flex-col gap-0.5 border-b px-2.5 py-1.5 text-left last:border-b-0 cursor-pointer hover:bg-accent/60",
+                  isSelected && "bg-accent",
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate font-mono text-[10.5px] text-foreground">{p.script}</span>
+                  {isOpen && <span className="label shrink-0">открыт</span>}
+                </div>
+                <span className="line-clamp-1 text-[11.5px] text-muted-foreground">{idea?.title ?? p.shortTitle}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Подробная карточка выбранного готового анализа */}
+        <div className="flex flex-col gap-2.5 p-2.5 text-[12px]">
+          <div>
+            <div className="label">выбранная задача</div>
+            <div className="mt-0.5 font-medium leading-snug">{linkedIdea?.title ?? activePreset.shortTitle}</div>
+            <div className="mt-0.5 font-mono text-[11px] text-muted-foreground">скрипт: {activePreset.script}</div>
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted-foreground">{activePreset.summary}</p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <div className="label">режимы запуска (одной кнопкой)</div>
+            {activePreset.modes.map((m) => (
+              <div key={m.id} className="border p-2">
+                <div className="text-[11.5px] font-medium">{m.label}</div>
+                <div className="mt-0.5 break-all font-mono text-[10.5px] text-muted-foreground">
+                  python {activePreset.script} {m.args}
+                </div>
+                <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{m.hint}</p>
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <Button size="sm" variant="outline" onClick={() => onApplyPreset(activePreset, m.args, false)}>
+                    в редактор
+                  </Button>
+                  <Button size="sm" disabled={running} onClick={() => onApplyPreset(activePreset, m.args, true)}>
+                    {running ? "идёт расчёт..." : "запустить"}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="border p-2">
+            <div className="label">выходные файлы в папке прогона</div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {activePreset.outputs.map((out) => (
+                <span key={out} className="border bg-muted/40 px-1.5 py-0.5 font-mono text-[10px]">
+                  {out}
+                </span>
+              ))}
+            </div>
+            <div className="label mt-2">данные для полного режима (FLY_DATA)</div>
+            <div className="mt-1 flex flex-col gap-0.5">
+              {activePreset.requiredData.map((d) => (
+                <span key={d} className="truncate font-mono text-[10px] text-muted-foreground" title={d}>
+                  {d}
+                </span>
+              ))}
+            </div>
+            {activePreset.companionScripts && activePreset.companionScripts.length > 0 && (
+              <>
+                <div className="label mt-2">связанные базовые шаблоны</div>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {activePreset.companionScripts.map((cs) => (
+                    <button
+                      key={cs}
+                      onClick={() => onOpenCompanion(cs)}
+                      className="border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent"
+                    >
+                      {cs}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -682,7 +973,7 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
   const found = provider === "perplexity" && msgs.length ? parseReferencesFromText(msgs[msgs.length - 1].content) : [];
 
   return (
-    <aside className="flex min-h-0 flex-col overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="shrink-0 border-b px-2 py-1.5">
         <div className="flex items-center gap-1.5">
           <span className="label">помощник</span>
@@ -842,7 +1133,7 @@ function ChatColumn({ pid, ideas, perms, onAddReferences }: { pid: string; ideas
           {!keys[provider] && <span className="label ml-auto">сначала вставь ключ {provider}</span>}
         </div>
       </div>
-    </aside>
+    </div>
   );
 }
 
@@ -898,7 +1189,8 @@ function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const steps: [string, string][] = [
     ["Данные", "раздел «Данные и окружение»: выбери папку и нажми «Скачать мозг мухи», это около 100 МБ. Для первой пробы данные не нужны: шаблон 02 работает сам по себе."],
     ["Окружение", "там же видно Python и пакеты. Для прогонов модели надёжнее окружение conda: conda env create -f environment.yml в папке приложения, затем conda activate fly-brain. Внутри уже есть Brian2, NAVis и neuprint-python, а numpy держится ниже второй версии, иначе brian2 не импортируется."],
-    ["Первый прогон", "слева открой 00_check_env.py и запусти, затем 02_mb_toy_interference.py. Аргументы пишутся в поле над редактором: --relearn extinction --n-junk 25 --seed 1"],
+    ["Готовый анализ задач (без API)", "справа открыта вкладка «По задачам (без API)»: там лежат готовые проверенные скрипты 10..19 под все 10 текущих идей (лезии, интерференция, бенчмарк бэкендов, обучение в целом мозге, память ухаживания MaleCNS, тракт в VNC, социальное обучение, индивидуальность, брачная песня, PCI) и общий модуль flylib.py. В каждом есть быстрый режим --synth и полный режим на локальных файлах FLY_DATA."],
+    ["Первый прогон", "слева открой 00_check_env.py и запусти, либо выбери любую задачу справа и нажми «запустить» на режиме --synth. Аргументы видны и редактируются в строке над кодом."],
     ["Посмотреть нейроны", "шаблон 05_neuron_gallery.py рисует морфологию нейронов в трёх проекциях и накладывает активность из прогона: --ids 12781 556329 (скелеты скачаются сами) или --spikes путь_к_spikes.parquet, с флагом --animate получится gif с распространением сигнала."],
     ["Прогон модели", "шаблон 06_brian2_shiu.py считает LIF-сеть на Brian2: сам подбирает фоновый вес под целевую частоту, стимулирует и заглушает заданные нейроны, пишет spikes.parquet, rates_top.csv, raster.png. Проверка без данных: --synth --n 2000 --t 0.5."],
     ["Связка фигур", "шаблон 07_morph_activity_figure.py кладёт морфологию и активность в одну фигуру. Половины подписаны, потому что id MaleCNS и FlyWire v783 не совпадают; таблица соответствия передаётся флагом --map."],
@@ -1278,8 +1570,8 @@ function EnvPanel() {
             <p className="text-muted-foreground">
               Каждое окружение отдельно: <code className="bg-muted px-1">conda env create -f environment.yml</code> ставит
               fly-brain целиком (Brian2, NAVis, neuprint-python, cloud-volume). Быстрый путь без conda:{" "}
-              <code className="bg-muted px-1">pip install "numpy&lt;2" pandas pyarrow scipy matplotlib brian2</code>. Версия numpy важна:
-              в numpy 2 убрали ndarray.ptp, и brian2 падает при импорте.
+              <code className="bg-muted px-1">pip install "numpy&lt;2" "pyarrow&lt;19" pandas scipy matplotlib brian2</code>. Версии numpy и pyarrow важны:
+              в numpy 2 убрали ndarray.ptp (падает brian2), а pyarrow 20+ требует numpy 2.
             </p>
           </div>
           <div>

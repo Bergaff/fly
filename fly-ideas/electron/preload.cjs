@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld("fly", {
   },
   // --- скрипты проекта ---
   listScripts: (projectId) => ipcRenderer.invoke("fly:listScripts", projectId),
+  syncTemplates: (projectId, opts) => ipcRenderer.invoke("fly:syncTemplates", projectId, opts),
   readScript: (projectId, name) => ipcRenderer.invoke("fly:readScript", projectId, name),
   writeScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeScript", projectId, name, content, opts),
   deleteScript: (projectId, name) => ipcRenderer.invoke("fly:deleteScript", projectId, name),

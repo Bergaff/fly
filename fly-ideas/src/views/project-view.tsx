@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Idea, Project, Reference } from "@/data/types";
 import { OUTCOME_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
 import { priorityOf } from "@/lib/priority";
+import { presetForIdea } from "@/lib/task-presets";
 import { fly, type ProjectPaths, type RunInfo } from "@/lib/bridge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface Props {
   onUpdate: (patch: Partial<Project>) => void;
   onOpenWorkspace: () => void;
   onOpenIdea: (id: string) => void;
+  onOpenInBrain?: (idea: Idea) => void;
   onAddIdea: () => void;
   onShowIdeas: () => void;
   onShowDashboard: () => void;
@@ -38,6 +40,7 @@ export function ProjectView({
   onUpdate,
   onOpenWorkspace,
   onOpenIdea,
+  onOpenInBrain,
   onAddIdea,
   onShowIdeas,
   onShowDashboard,
@@ -253,10 +256,22 @@ export function ProjectView({
               <div className="divide-y">
                 {ranked.slice(0, 8).map((i) => {
                   const p = checklistProgress(i);
+                  const preset = presetForIdea(i.id);
                   return (
-                    <button key={i.id} onClick={() => onOpenIdea(i.id)} className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-accent cursor-pointer">
-                      <span className="size-2 shrink-0" style={{ background: STATUS_COLORS[i.status] }} />
-                      <span className="min-w-0 flex-1 truncate text-[12.5px]">{i.title}</span>
+                    <div key={i.id} className="flex w-full items-center gap-3 px-3 py-2 hover:bg-accent">
+                      <button onClick={() => onOpenIdea(i.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left cursor-pointer">
+                        <span className="size-2 shrink-0" style={{ background: STATUS_COLORS[i.status] }} />
+                        <span className="min-w-0 flex-1 truncate text-[12.5px]">{i.title}</span>
+                      </button>
+                      {preset && onOpenInBrain && (
+                        <button
+                          onClick={() => onOpenInBrain(i)}
+                          className="hidden shrink-0 border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground hover:text-foreground cursor-pointer md:inline-block"
+                          title={`Открыть готовый скрипт анализа ${preset.script} без API`}
+                        >
+                          {preset.script}
+                        </button>
+                      )}
                       <span className="label w-[86px] shrink-0">{STATUS_LABELS[i.status]}</span>
                       <span className="hidden w-[92px] shrink-0 items-center gap-1.5 sm:flex">
                         <span className="h-1 flex-1 bg-muted">
@@ -268,7 +283,7 @@ export function ProjectView({
                       </span>
                       <span className="w-[52px] shrink-0 text-right font-mono text-[11px] text-muted-foreground">{priorityOf(i)}</span>
                       <DeadlineBadge deadline={i.deadline} />
-                    </button>
+                    </div>
                   );
                 })}
               </div>

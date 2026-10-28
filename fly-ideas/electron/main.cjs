@@ -38,12 +38,50 @@ function getDirs() {
 }
 const DIRS = new Proxy({}, { get: (_t, k) => getDirs()[k] });
 
-function copyTemplates(scriptsDir) {
-  if (!fs.existsSync(TEMPLATES)) return;
+function copyTemplates(scriptsDir, opts) {
+  if (!fs.existsSync(TEMPLATES)) return [];
+  const overwrite = !!(opts && opts.overwrite);
+  const copied = [];
   for (const f of fs.readdirSync(TEMPLATES)) {
+    if (!/\.(py|md|json|yml)$/i.test(f)) continue;
+    const src = path.join(TEMPLATES, f);
+    if (!fs.statSync(src).isFile()) continue;
     const dst = path.join(scriptsDir, f);
-    if (!fs.existsSync(dst)) fs.copyFileSync(path.join(TEMPLATES, f), dst);
+    if (overwrite || !fs.existsSync(dst)) {
+      fs.copyFileSync(src, dst);
+      copied.push(f);
+    }
   }
+  return copied;
+}
+function syncProjectTemplates(projectId, codeDir, forceMissing = false) {
+  if (!fs.existsSync(TEMPLATES)) return [];
+  const id = slug(projectId);
+  const c = readConfig();
+  c.seededTemplates = c.seededTemplates || {};
+  const seeded = new Set(Array.isArray(c.seededTemplates[id]) ? c.seededTemplates[id] : []);
+  const isEmpty = fs.readdirSync(codeDir).length === 0;
+  const added = [];
+  let changed = false;
+  for (const f of fs.readdirSync(TEMPLATES)) {
+    if (!/\.(py|md|json|yml)$/i.test(f)) continue;
+    const src = path.join(TEMPLATES, f);
+    if (!fs.statSync(src).isFile()) continue;
+    const dst = path.join(codeDir, f);
+    if (!fs.existsSync(dst) && (isEmpty || forceMissing || !seeded.has(f))) {
+      fs.copyFileSync(src, dst);
+      added.push(f);
+    }
+    if (!seeded.has(f)) {
+      seeded.add(f);
+      changed = true;
+    }
+  }
+  if (changed || added.length > 0) {
+    c.seededTemplates[id] = Array.from(seeded);
+    writeConfig(c);
+  }
+  return added;
 }
 function ensureDirs() {
   const d = getDirs();
@@ -86,7 +124,7 @@ function projectPaths(projectId) {
   const runs = typeof over.runs === "string" ? over.runs : defaults.runs;
   fs.mkdirSync(code, { recursive: true });
   fs.mkdirSync(runs, { recursive: true });
-  if (fs.readdirSync(code).length === 0) copyTemplates(code);
+  syncProjectTemplates(id, code, false);
   return { projectId: id, code, runs, defaults };
 }
 function setProjectDir(projectId, kind, dir) {
@@ -111,8 +149,8 @@ const DATA_CATALOG = [
     title: "Список нейронов (Completeness v783)",
     file: "2025_Completeness_783.csv",
     url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/data/2025_Completeness_783.csv",
-    sizeMB: 3.2,
-    note: "ID нейронов и метаданные — нужен для любого запуска модели",
+    sizeMB: 3.1,
+    note: "ID нейронов FlyWire v783 (138 639 клеток), нужен для запуска целого мозга и сопоставления индексов",
   },
   {
     id: "connectivity-783",
@@ -120,8 +158,17 @@ const DATA_CATALOG = [
     title: "Связность (Connectivity v783, parquet)",
     file: "2025_Connectivity_783.parquet",
     url: "https://raw.githubusercontent.com/eonsystemspbc/fly-brain/main/data/2025_Connectivity_783.parquet",
-    sizeMB: 97,
-    note: "Пре/пост-синаптические индексы и веса — сам «мозг». Может лежать в Git LFS: если файл окажется ~130 байт, скачай вручную из репозитория",
+    sizeMB: 21.1,
+    note: "Пре- и постсинаптические индексы и знаковые веса (Excitatory x Connectivity), основная матрица связей",
+  },
+  {
+    id: "flywire-annotations-tsv",
+    group: "Eon fly-brain (FlyWire v783)",
+    title: "Аннотации типов клеток FlyWire (Schlegel et al. 2024, TSV)",
+    file: "Supplemental_file1_neuron_annotations.tsv",
+    url: "https://raw.githubusercontent.com/flyconnectome/flywire_annotations/main/supplemental_files/Supplemental_file1_neuron_annotations.tsv",
+    sizeMB: 31.7,
+    note: "Классы, типы клеток (KC, MBON, PAM, PPL1, APL, PN, DN), нейромедиатор и диморфизм для скриптов 01, 09 и 10..19",
   },
   {
     id: "sez-neurons",
@@ -187,32 +234,54 @@ const EXTERNAL_SOURCES = [
   { title: "eonsystemspbc/fly-brain — все бэкенды", url: "https://github.com/eonsystemspbc/fly-brain", note: "Brian2 / CUDA / PyTorch / NEST / GeNN, бенчмарки" },
 ];
 
-const MALE_CNS_BASE = "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/";
+const MALE_CNS_BASE = "https://storage.googleapis.com/flyem-male-cns/v0.9/connectome-data/flat-connectome/";
 
 // ------------------------------------------------------------
-// MaleCNS v1.0: полный коннектом ЦНС самца (Janelia), лицензия CC-BY 4.0
+// MaleCNS (полный коннектом ЦНС самца Janelia + таблицы сопоставления с FlyWire)
 // ------------------------------------------------------------
 DATA_CATALOG.push(
   {
     id: "malecns-annotations",
-    group: "MaleCNS v1.0, ЦНС самца (Janelia)",
-    title: "Аннотации нейронов: классы, типы, стороны",
-    file: "body-annotations-male-cns-v1.0-minconf-0.5.feather",
-    url: MALE_CNS_BASE + "body-annotations-male-cns-v1.0-minconf-0.5.feather",
+    group: "MaleCNS, ЦНС самца (Janelia)",
+    title: "Аннотации нейронов: классы, типы, области и VNC",
+    file: "body-annotations-male-cns-v0.9-minconf-0.5.feather",
+    url: MALE_CNS_BASE + "body-annotations-male-cns-v0.9-minconf-0.5.feather",
     page: "https://male-cns.janelia.org/download/",
     sizeMB: 13,
-    note: "Около 12 тыс. типов клеток, включая полоспецифичные и диморфные. Читается pyarrow или pandas.",
+    note: "Типы клеток мозга и брюшной нервной цепочки (включая pC1, P1, vPN1, aSP13, мотонейроны VNC). Читается pyarrow/pandas.",
     dest: "data",
   },
   {
     id: "malecns-neurotransmitters",
-    group: "MaleCNS v1.0, ЦНС самца (Janelia)",
+    group: "MaleCNS, ЦНС самца (Janelia)",
     title: "Предсказание нейромедиатора по нейрону",
-    file: "body-neurotransmitters-male-cns-v1.0.feather",
-    url: MALE_CNS_BASE + "body-neurotransmitters-male-cns-v1.0.feather",
+    file: "body-neurotransmitters-male-cns-v0.9.feather",
+    url: MALE_CNS_BASE + "body-neurotransmitters-male-cns-v0.9.feather",
     page: "https://male-cns.janelia.org/download/",
     sizeMB: 42,
     note: "Нужно для знаков синапсов при сборке LIF-модели на мужском коннектоме.",
+    dest: "data",
+  },
+  {
+    id: "malecns-fw-mapping",
+    group: "MaleCNS, ЦНС самца (Janelia)",
+    title: "Гомология клеток и связей MaleCNS <-> FlyWire v783",
+    file: "mcns_fw_edge_comp_mappings.json",
+    url: "https://raw.githubusercontent.com/flyconnectome/2025malecns/main/supplemental_data/mcns_fw_edge_comp_mappings.json",
+    page: "https://github.com/flyconnectome/2025malecns",
+    sizeMB: 6.7,
+    note: "Таблица соответствия типов самца и самки для скриптов 07 и 14 (память ухаживания и половой диморфизм).",
+    dest: "data",
+  },
+  {
+    id: "malecns-dn-clusters",
+    group: "MaleCNS, ЦНС самца (Janelia)",
+    title: "Функциональные кластеры нисходящих нейронов (DNa/DNp -> VNC)",
+    file: "dnan_cluster_function_20260509.csv",
+    url: "https://raw.githubusercontent.com/flyconnectome/2025malecns/main/supplemental_data/dnan_cluster_function_20260509.csv",
+    page: "https://github.com/flyconnectome/2025malecns",
+    sizeMB: 0.1,
+    note: "Разметка поведенческих пулов нисходящих нейронов шеи для скриптов 10 (лезии) и 15 (от памяти к мотонейронам VNC).",
     dest: "data",
   },
 );
@@ -807,14 +876,23 @@ function registerIpc(getWin) {
 
   ipcMain.handle("fly:listScripts", async (_e, projectId) => {
     const ws = projectPaths(projectId);
-    const files = (await fsp.readdir(ws.code)).filter((f) => f.endsWith(".py"));
+    const files = (await fsp.readdir(ws.code)).filter((f) => f.endsWith(".py")).sort();
     return Promise.all(files.map(async (f) => {
       const full = path.join(ws.code, f);
       const txt = await fsp.readFile(full, "utf8");
-      const m = txt.match(/^"""\s*\n?([\s\S]*?)"""/);
+      const m = txt.match(/^(?:#![^\n]*\n)?"""\s*\n?([\s\S]*?)"""/);
       const st = await fsp.stat(full);
       return { name: f, doc: m ? m[1].trim().split("\n")[0] : "", size: st.size, mtime: st.mtimeMs };
     }));
+  });
+  ipcMain.handle("fly:syncTemplates", (_e, projectId, opts) => {
+    const ws = projectPaths(projectId);
+    if (opts && opts.overwrite) {
+      const copied = copyTemplates(ws.code, { overwrite: true });
+      return { added: copied, code: ws.code };
+    }
+    const added = syncProjectTemplates(projectId, ws.code, true);
+    return { added, code: ws.code };
   });
   ipcMain.handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);

@@ -16,7 +16,7 @@ dependencies:
   - numpy=1.26.*
   - scipy
   - pandas
-  - pyarrow
+  - pyarrow<19
   - matplotlib
   - pillow
   - requests

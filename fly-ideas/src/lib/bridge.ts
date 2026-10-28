@@ -90,6 +90,7 @@ export interface FlyBridge {
   onDownloadProgress(cb: (p: { id: string; got: number; total: number }) => void): () => void;
 
   listScripts(projectId: string): Promise<ScriptInfo[]>;
+  syncTemplates(projectId: string, opts?: { overwrite?: boolean }): Promise<{ added: string[]; code: string }>;
   readScript(projectId: string, name: string): Promise<string>;
   writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
   deleteScript(projectId: string, name: string): Promise<boolean>;

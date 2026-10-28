@@ -19,16 +19,42 @@ except ImportError as e:
 
 comp_p = DATA / "2025_Completeness_783.csv"
 conn_p = DATA / "2025_Connectivity_783.parquet"
-for p in (comp_p, conn_p):
-    if not p.exists() or p.stat().st_size < 1000:
-        sys.exit(f"Файл не найден или это заглушка LFS: {p}\nСкачай во вкладке «Мозг».")
+use_synth = "--synth" in sys.argv
+if not use_synth:
+    for p in (comp_p, conn_p):
+        if not p.exists() or p.stat().st_size < 1000:
+            sys.exit(f"Файл не найден или это заглушка LFS: {p}\nСкачай во вкладке «Мозг» (или запусти с флагом --synth).")
 
-print("Читаю нейроны…")
-comp = pd.read_csv(comp_p)
-print(f"  {len(comp):,} нейронов, колонки: {list(comp.columns)[:12]}")
+if use_synth:
+    HERE = Path(__file__).resolve().parent
+    if str(HERE) not in sys.path:
+        sys.path.insert(0, str(HERE))
+    import flylib
+    comp, edges_s, _ = flylib.build_synthetic_connectome(seed=0)
+    conn = pd.DataFrame({
+        "Presynaptic_Index": edges_s["pre_idx"].to_numpy(),
+        "Postsynaptic_Index": edges_s["post_idx"].to_numpy(),
+        "Connectivity": edges_s["syn_count"].to_numpy(),
+        "Excitatory x Connectivity": edges_s["signed_weight"].to_numpy(),
+    })
+    print(f"Синтетический обзор коннектома: {len(comp):,} нейронов, {len(conn):,} рёбер")
+else:
+    print("Читаю нейроны...")
+    comp = pd.read_csv(comp_p, index_col=0).reset_index()
+    comp = comp.rename(columns={comp.columns[0]: "root_id"})
+    for ann_name in ("Supplemental_file1_neuron_annotations.tsv", "flywire_annotations.tsv"):
+        ann_p = DATA / ann_name
+        if ann_p.exists() and ann_p.stat().st_size > 1000:
+            print(f"Присоединяю аннотации типов клеток: {ann_name}")
+            ann = pd.read_csv(ann_p, sep="\t", low_memory=False)
+            if "root_id" in ann.columns:
+                keep_cols = [c for c in ("root_id", "cell_type", "cell_class", "super_class", "hemibrain_type", "top_nt", "side", "dimorphism") if c in ann.columns]
+                comp = comp.merge(ann[keep_cols].drop_duplicates("root_id"), on="root_id", how="left")
+            break
+    print(f"  {len(comp):,} нейронов, колонки: {list(comp.columns)[:12]}")
 
-print("Читаю связность…")
-conn = pd.read_parquet(conn_p)
+    print("Читаю связность...")
+    conn = pd.read_parquet(conn_p)
 print(f"  {len(conn):,} связей, колонки: {list(conn.columns)}")
 
 # Универсальный поиск колонок: в разных выгрузках они называются по-разному
@@ -43,17 +69,19 @@ def find(cols, *cands):
                 return col
     return None
 
-pre = find(conn.columns, "pre_root_id", "pre", "pre_pt_root_id", "source")
-post = find(conn.columns, "post_root_id", "post", "post_pt_root_id", "target")
-w = find(conn.columns, "syn_count", "weight", "count", "n_syn")
+pre = find(conn.columns, "presynaptic_index", "pre_root_id", "pre", "pre_pt_root_id", "source")
+post = find(conn.columns, "postsynaptic_index", "post_root_id", "post", "post_pt_root_id", "target")
+w = find(conn.columns, "connectivity", "syn_count", "weight", "count", "n_syn")
+signed_col = find(conn.columns, "excitatory x connectivity")
 nt = find(conn.columns, "nt_type", "neurotransmitter", "nt")
-print(f"  pre={pre} post={post} weight={w} nt={nt}")
+print(f"  pre={pre} post={post} weight={w} signed={signed_col}")
 
 stats = {
     "neurons": int(len(comp)),
     "edges": int(len(conn)),
-    "synapses_total": int(conn[w].sum()) if w else None,
+    "synapses_total": int(conn[w].abs().sum()) if w else None,
     "mean_out_degree": float(conn.groupby(pre).size().mean()) if pre else None,
+    "inhibitory_edges_pct": round(float((conn[signed_col] < 0).mean() * 100), 2) if signed_col else None,
 }
 if nt:
     stats["nt_distribution"] = {str(k): int(v) for k, v in conn[nt].value_counts().items()}

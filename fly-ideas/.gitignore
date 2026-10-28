@@ -6,3 +6,5 @@ release
 .DS_Store
 npm-debug.log*
 workspace/
+__pycache__/
+*.py[cod]

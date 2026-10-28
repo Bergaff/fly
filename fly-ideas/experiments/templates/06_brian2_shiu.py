@@ -91,7 +91,8 @@ for m in ("pandas", "brian2", "numpy"):
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from brian2 import (Hz, Network, NeuronGroup, PoissonGroup, SpikeMonitor, StateMonitor,  # noqa: E402
-                    Synapses, defaultclock, mV, ms, seed as b2seed)
+                    Synapses, defaultclock, mV, ms, prefs as b2prefs, seed as b2seed)
+b2prefs.codegen.target = "numpy"
 
 EXPS = [e.strip() for e in args.exp.split(",") if e.strip()] or ["stim"]
 
@@ -107,6 +108,16 @@ def load_edges():
     if path is not None and path.exists():
         df = pd.read_parquet(path) if path.suffix != ".csv" else pd.read_csv(path)
         cols = {c.lower(): c for c in df.columns}
+        if "presynaptic_index" in cols and "postsynaptic_index" in cols:
+            pi = df[cols["presynaptic_index"]].to_numpy(dtype=np.int64)
+            qi = df[cols["postsynaptic_index"]].to_numpy(dtype=np.int64)
+            comp_p = DATA / "2025_Completeness_783.csv"
+            if comp_p.exists() and comp_p.stat().st_size > 1000:
+                rids = pd.read_csv(comp_p, index_col=0).index.to_numpy(dtype=np.int64)
+                pi, qi = rids[pi], rids[qi]
+            wcol = cols.get("excitatory x connectivity") or cols.get("connectivity") or cols.get("weight")
+            w = df[wcol].astype(float).to_numpy() if wcol else np.ones(len(df))
+            return pi, qi, w, path.name
         pre = cols.get("pre") or cols.get("pre_root_id") or cols.get("pre_pt_root_id") or cols.get("bodyid_pre")
         post = cols.get("post") or cols.get("post_root_id") or cols.get("post_pt_root_id") or cols.get("bodyid_post")
         wcol = cols.get("weight") or cols.get("syn_count") or cols.get("count") or cols.get("n_synapses")
@@ -151,7 +162,7 @@ print(f"сеть: {N} нейронов, {pre.size} связей, источни�
 
 src = np.array([index[int(v)] for v in pre], dtype=np.int32)
 dst = np.array([index[int(v)] for v in post], dtype=np.int32)
-w_mv = np.clip(weight * params["w_syn"] * args.weight_scale, 0.0, args.max_weight)
+w_mv = np.clip(weight * params["w_syn"] * args.weight_scale, -args.max_weight, args.max_weight)
 
 
 def parse_ids(text):

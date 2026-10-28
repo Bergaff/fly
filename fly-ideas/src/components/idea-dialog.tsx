@@ -6,6 +6,7 @@ import { ExperimentLog } from "@/components/experiment-log";
 import { CitationsEditor } from "@/components/citations-editor";
 import { DeadlineBadge } from "@/components/deadline-badge";
 import { ArticleDraftButton } from "@/components/article-draft";
+import { presetForIdea } from "@/lib/task-presets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,19 @@ interface Props {
  onDelete: (id: string) => void;
 }
 
-export function IdeaDialog({ idea, allIdeas, references, projects, onCreateReference, onOpenReference, onClose, onSave, onDelete, onOpenOther }: Props & { onOpenOther?: (id: string) => void }) {
+export function IdeaDialog({
+ idea,
+ allIdeas,
+ references,
+ projects,
+ onCreateReference,
+ onOpenReference,
+ onClose,
+ onSave,
+ onDelete,
+ onOpenOther,
+ onOpenInBrain,
+}: Props & { onOpenOther?: (id: string) => void; onOpenInBrain?: (idea: Idea) => void }) {
  const [draft, setDraft] = useState<Idea | null>(idea);
  const [tagInput, setTagInput] = useState("");
  const [venueInput, setVenueInput] = useState("");
@@ -102,6 +115,16 @@ export function IdeaDialog({ idea, allIdeas, references, projects, onCreateRefer
  <DeadlineBadge deadline={draft.deadline} />
  </div>
  <ArticleDraftButton idea={draft} project={projects.find((p) => p.id === draft.projectId)} references={references} />
+ {presetForIdea(draft.id) && onOpenInBrain && (
+ <Button
+   size="sm"
+   variant="outline"
+   onClick={() => onOpenInBrain(draft)}
+   title={`Открыть готовый скрипт ${presetForIdea(draft.id)!.script} во вкладке Мозг без траты API`}
+ >
+   Готовый код ({presetForIdea(draft.id)!.script})
+ </Button>
+ )}
  </div>
  </DialogHeader>
 

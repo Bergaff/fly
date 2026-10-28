@@ -95,14 +95,29 @@ def load_real():
     edges_path = Path(args.edges) if args.edges else DATA / "2025_Connectivity_783.parquet"
     if not (cells_path.exists() and edges_path.exists()):
         return None
-    cells = pd.read_csv(cells_path, index_col=0).reset_index()
-    cells = cells.rename(columns={cells.columns[0]: "root_id"})
+    comp = pd.read_csv(cells_path, index_col=0).reset_index()
+    comp = comp.rename(columns={comp.columns[0]: "root_id"})
+    rids = comp["root_id"].to_numpy(dtype=np.int64)
+    cells = comp.copy()
+    for ann_name in ("Supplemental_file1_neuron_annotations.tsv", "flywire_annotations.tsv"):
+        ann_p = DATA / ann_name
+        if ann_p.exists() and ann_p.stat().st_size > 1000:
+            ann = pd.read_csv(ann_p, sep="\t", low_memory=False)
+            if "root_id" in ann.columns and "cell_type" in ann.columns:
+                cells = cells.merge(ann[["root_id", "cell_type"]].drop_duplicates("root_id"), on="root_id", how="left")
+            break
     type_col = next((c for c in cells.columns if c.lower() in ("type", "cell_type", "celltype", "class")), None)
     if type_col is None:
         return None
     cells = cells.rename(columns={type_col: "cell_type"})[["root_id", "cell_type"]].dropna()
     edges = pd.read_parquet(edges_path)
     low = {c.lower(): c for c in edges.columns}
+    if "presynaptic_index" in low and "postsynaptic_index" in low:
+        pi = edges[low["presynaptic_index"]].to_numpy(dtype=np.int64)
+        qi = edges[low["postsynaptic_index"]].to_numpy(dtype=np.int64)
+        wcol = low.get("connectivity") or low.get("excitatory x connectivity") or low.get("weight")
+        wv = np.abs(edges[wcol].to_numpy(dtype=float)) if wcol else np.ones(len(edges))
+        return cells, pd.DataFrame({"pre": rids[pi], "post": rids[qi], "weight": wv})
     pre = low.get("pre") or low.get("pre_root_id") or low.get("pre_pt_root_id")
     post = low.get("post") or low.get("post_root_id") or low.get("post_pt_root_id")
     w = low.get("weight") or low.get("syn_count") or low.get("count")

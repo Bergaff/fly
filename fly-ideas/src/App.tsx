@@ -26,6 +26,7 @@ export default function App() {
   const [openRefId, setOpenRefId] = useState<string | null>(null);
   const [compare, setCompare] = useState<string[]>([]);
   const [tab, setTab] = useState("ideas");
+  const [brainIdeaId, setBrainIdeaId] = useState<string | null>(null);
   const [legal, setLegal] = useState<LegalKind | null>(null);
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const [notes, setNotes] = useState<{ id: number; text: string }[]>([]);
@@ -116,6 +117,13 @@ export default function App() {
     const created = store.addIdea(pid);
     setOpenId(created.id);
   };
+
+  const openIdeaInBrain = useCallback((idea: { id: string; projectId: string }) => {
+    setActive(idea.projectId);
+    setBrainIdeaId(idea.id);
+    setOpenId(null);
+    setTab("brain");
+  }, []);
 
   const exportFile = async () => {
     const name = `fly-ideas-${new Date().toISOString().slice(0, 10)}.json`;
@@ -257,6 +265,7 @@ export default function App() {
                   onUpdate={(patch) => store.updateProject(activeProject.id, patch)}
                   onOpenWorkspace={() => setTab("brain")}
                   onOpenIdea={setOpenId}
+                  onOpenInBrain={openIdeaInBrain}
                   onAddIdea={addIdea}
                   onShowIdeas={() => setTab("ideas")}
                   onShowDashboard={() => setTab("dashboard")}
@@ -301,6 +310,8 @@ export default function App() {
                 ideas={state.ideas}
                 projects={state.projects.map((pr) => ({ id: pr.id, name: pr.name }))}
                 activeProject={active}
+                focusIdeaId={brainIdeaId}
+                onClearFocusIdea={() => setBrainIdeaId(null)}
                 onSelectProject={setActive}
                 onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
                 onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
@@ -323,6 +334,7 @@ export default function App() {
             setTimeout(() => setOpenRefId(id), 0);
           }}
           onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)}
+          onOpenInBrain={openIdeaInBrain}
           onClose={() => setOpenId(null)}
           onSave={store.updateIdea}
           onDelete={store.deleteIdea}
