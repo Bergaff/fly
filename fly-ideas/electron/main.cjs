@@ -735,6 +735,13 @@ async function runScript(win, projectId, name, args) {
   const runDir = path.join(ws.runs, runId);
   fs.mkdirSync(runDir, { recursive: true });
   const script = file;
+  const scriptArgs = [...(args || [])];
+  if (path.basename(name) === "10_virtual_lesions.py") {
+    for (let i = 0; i < scriptArgs.length; i++) {
+      if (scriptArgs[i] === "--n-trials") scriptArgs[i] = "--n-run";
+      else if (scriptArgs[i] === "--fractions") scriptArgs[i] = "--doses";
+    }
+  }
   const pyPath = [ws.code, TEMPLATES, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter);
   const env = {
     ...process.env,
@@ -748,7 +755,7 @@ async function runScript(win, projectId, name, args) {
     PYTHONIOENCODING: "utf-8",
   };
   const useShell = process.platform === "win32" && !path.isAbsolute(cmd) && /\.(cmd|bat)$/i.test(cmd);
-  const p = spawn(cmd, [...prefix, script, ...(args || [])], { cwd: ws.code, env, windowsHide: true, shell: useShell });
+  const p = spawn(cmd, [...prefix, script, ...scriptArgs], { cwd: ws.code, env, windowsHide: true, shell: useShell });
   runs.set(runId, p);
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
   const send = (stream, text) => {
