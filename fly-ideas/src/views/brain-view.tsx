@@ -1400,7 +1400,6 @@ function PresetsColumn({
   );
   const linkedIdea = ideaMap.get(activePreset.ideaId);
   const linkedIdeaProject = linkedIdea?.projectId ? projectMap.get(linkedIdea.projectId) : undefined;
-  const [showIdeaIndex, setShowIdeaIndex] = useState(false);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -1440,34 +1439,6 @@ function PresetsColumn({
         <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
           Код анализа встроен (10..19 и flylib.py): откроется и запустится в проекте «{activeProject?.name ?? projectId}».
         </p>
-      </div>
-
-      <div className="shrink-0 border-b">
-        <button className="flex w-full items-center justify-between px-2.5 py-1.5 text-left cursor-pointer hover:bg-accent/40" onClick={() => setShowIdeaIndex((v) => !v)}>
-          <span className="label">идеи в мозге · отдельные рабочие пространства ({ideas.length})</span>
-          <span className="font-mono text-[10px] text-muted-foreground">{showIdeaIndex ? "свернуть" : "показать"}</span>
-        </button>
-        {showIdeaIndex && (
-          <div className="max-h-[170px] overflow-y-auto border-t">
-            {ideas.map((idea) => {
-              const ideaProject = projectMap.get(idea.projectId);
-              const selected = idea.id === workspaceIdeaId;
-              return (
-                <div key={idea.id} className={cn("flex items-center gap-1 border-b px-2 py-1 last:border-b-0", selected && "bg-accent/60")}>
-                  <button className="min-w-0 flex-1 text-left cursor-pointer" onClick={() => onSelectIdea(idea.id)} title={`Открыть отдельные код, логи и прогоны для идеи «${idea.title}»`}>
-                    <span className="flex items-center gap-1 truncate text-[11px]">
-                      {ideaProject && <span className="size-1.5 shrink-0" style={{ background: ideaProject.color }} />}
-                      <span className="truncate">{idea.title}</span>
-                    </span>
-                    <span className="block truncate font-mono text-[9.5px] text-muted-foreground">{ideaProject?.name ?? idea.projectId} · {idea.status}</span>
-                  </button>
-                  {selected && <span className="label shrink-0">открыта</span>}
-                  <Button size="sm" variant="ghost" className="h-6 shrink-0 px-1.5 text-[10px]" onClick={() => onOpenIdeaCard(idea.id)}>карточка</Button>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -1666,7 +1637,8 @@ function ChatColumn({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [keyInput, setKeyInput] = useState("");
-  const [keys, setKeys] = useState<Record<string, boolean>>({});
+  const [keys, setKeys] = useState<Partial<Record<LlmProvider, boolean>>>({});
+  const keyRequest = useRef<Record<LlmProvider, number>>({ deepseek: 0, perplexity: 0, openai: 0 });
   const [ctxIdea, setCtxIdea] = useState("none");
   const [autoSave, setAutoSave] = useState(true);
   const [sendFile, setSendFile] = useState(false);
@@ -1680,6 +1652,20 @@ function ChatColumn({
     setCtxIdea(ideas.some((i) => i.id === nextIdea) ? nextIdea : "none");
   }, [workspaceId, ideas]);
 
+  const refreshKey = useCallback(async (keyProvider: LlmProvider) => {
+    const request = ++keyRequest.current[keyProvider];
+    setKeys((previous) => ({ ...previous, [keyProvider]: undefined }));
+    try {
+      const key = await fly!.getSecret(keyProvider);
+      if (keyRequest.current[keyProvider] === request) setKeys((previous) => ({ ...previous, [keyProvider]: !!key }));
+    } catch (e) {
+      if (keyRequest.current[keyProvider] === request) {
+        setKeys((previous) => ({ ...previous, [keyProvider]: false }));
+        setErr(`Не удалось проверить ключ ${keyProvider}: ${(e as Error).message}. Проверьте его повторно или сохраните ключ.`);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     setMsgs((() => {
       try {
@@ -1688,9 +1674,13 @@ function ChatColumn({
         return [];
       }
     })());
-    fly!.getSecret("deepseek").then((k) => setKeys((s) => ({ ...s, deepseek: !!k })));
-    fly!.getSecret("perplexity").then((k) => setKeys((s) => ({ ...s, perplexity: !!k })));
-  }, [workspaceId, pid]);
+    void refreshKey("deepseek");
+    void refreshKey("perplexity");
+    return () => {
+      keyRequest.current.deepseek += 1;
+      keyRequest.current.perplexity += 1;
+    };
+  }, [workspaceId, pid, refreshKey]);
 
   useEffect(() => {
     localStorage.setItem(`fly-ideas:chat:${workspaceId}`, JSON.stringify(msgs.slice(-60)));
@@ -1711,9 +1701,30 @@ function ChatColumn({
   }, [msgs, busy]);
 
   const saveKey = async () => {
-    await fly!.setSecret(provider, keyInput.trim() || null);
-    setKeys((s) => ({ ...s, [provider]: !!keyInput.trim() }));
-    setKeyInput("");
+    const key = keyInput.trim();
+    if (!key) return;
+    const keyProvider = provider;
+    const request = ++keyRequest.current[keyProvider];
+    try {
+      await fly!.setSecret(keyProvider, key);
+      if (keyRequest.current[keyProvider] === request) {
+        setKeys((s) => ({ ...s, [keyProvider]: true }));
+        setKeyInput("");
+        setErr("");
+      }
+    } catch (e) {
+      if (keyRequest.current[keyProvider] === request) setErr(`Не удалось сохранить ключ ${keyProvider}: ${(e as Error).message}`);
+    }
+  };
+
+  const removeKey = async (keyProvider: LlmProvider) => {
+    const request = ++keyRequest.current[keyProvider];
+    try {
+      await fly!.setSecret(keyProvider, null);
+      if (keyRequest.current[keyProvider] === request) setKeys((s) => ({ ...s, [keyProvider]: false }));
+    } catch (e) {
+      if (keyRequest.current[keyProvider] === request) setErr(`Не удалось удалить ключ ${keyProvider}: ${(e as Error).message}`);
+    }
   };
 
   const writeBlocks = async (
@@ -1765,6 +1776,10 @@ function ChatColumn({
   const send = async () => {
     const text = input.trim();
     if (!text || busy) return;
+    if (!keys[provider]) {
+      setErr(keys[provider] === undefined ? "Проверяем ключ API. Попробуйте отправить ещё раз через несколько секунд." : `Чтобы отправить сообщение, добавьте ключ ${provider} в панели помощника. Текст останется в поле ввода.`);
+      return;
+    }
     const targetWorkspace = workspaceId;
     const trackedIdea = activeIdea;
     const chosenFile = provider === "deepseek" && sendFile && editor.current ? { name: editor.current, content: editor.code, dirty: editor.dirty } : null;
@@ -1951,17 +1966,16 @@ function ChatColumn({
         </div>
 
         <div className="mt-1 flex items-center gap-1.5">
-          {keys[provider] ? (
+          {keys[provider] === undefined ? (
+            <span className="label">проверка ключа {provider}</span>
+          ) : keys[provider] ? (
             <>
               <span className="label">ключ {provider === "deepseek" ? "deepseek" : "perplexity"} задан</span>
               <Button
                 size="sm"
                 variant="ghost"
                 className="ml-auto"
-                onClick={async () => {
-                  await fly!.setSecret(provider, null);
-                  setKeys((s) => ({ ...s, [provider]: false }));
-                }}
+                onClick={() => void removeKey(provider)}
               >
                 удалить
               </Button>
@@ -1972,6 +1986,7 @@ function ChatColumn({
               <Button size="sm" onClick={saveKey} disabled={!keyInput.trim()}>
                 сохранить
               </Button>
+              <Button size="sm" variant="ghost" onClick={() => void refreshKey(provider)} title="Повторно проверить сохранённый ключ">проверить</Button>
             </>
           )}
         </div>
@@ -2116,24 +2131,24 @@ function ChatColumn({
 
         {busy && <div className="label py-1">запрос отправлен…</div>}
         {err && <div className="border border-destructive/40 p-1.5 text-[11px] text-destructive">{err}</div>}
+        {activeIdea && stageProgress && (
+          <details className="border-t">
+            <summary className="cursor-pointer list-none px-2 py-1.5 text-[10.5px]">
+              <span className="font-medium">Этапы идеи</span>
+              <span className="ml-2 font-mono text-muted-foreground">{stageProgress.done}/{stageProgress.total} · {stageProgress.pct}%</span>
+              <span className="ml-2 text-[9.5px] text-muted-foreground">учёт общий с Дашбордом</span>
+            </summary>
+            <div className="max-h-[220px] overflow-y-auto border-t p-2">
+              <p className="mb-1.5 text-[10px] text-muted-foreground">DeepSeek может отметить этап по вашему сообщению о завершении. Проверьте результат, статус можно изменить вручную.</p>
+              <BrainStages key={activeIdea.id} idea={activeIdea} onUpdateIdea={onUpdateIdea} />
+            </div>
+          </details>
+        )}
+
         <div ref={endRef} />
       </div>
 
-      {activeIdea && stageProgress && (
-        <details className="shrink-0 border-t">
-          <summary className="cursor-pointer list-none px-2 py-1.5 text-[10.5px]">
-            <span className="font-medium">Этапы идеи</span>
-            <span className="ml-2 font-mono text-muted-foreground">{stageProgress.done}/{stageProgress.total} · {stageProgress.pct}%</span>
-            <span className="ml-2 text-[9.5px] text-muted-foreground">учёт общий с Дашбордом</span>
-          </summary>
-          <div className="max-h-[220px] overflow-y-auto border-t p-2">
-            <p className="mb-1.5 text-[10px] text-muted-foreground">DeepSeek может отметить этап по вашему сообщению о завершении. Проверьте результат, статус можно изменить вручную.</p>
-            <BrainStages key={activeIdea.id} idea={activeIdea} onUpdateIdea={onUpdateIdea} />
-          </div>
-        </details>
-      )}
-
-      <div className="shrink-0 border-t p-2">
+      <div className="shrink-0 border-t bg-background p-2">
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -2145,7 +2160,7 @@ function ChatColumn({
           }}
           placeholder={provider === "deepseek" ? "что написать: Enter отправляет" : "что искать в литературе: Enter отправляет"}
           className="max-h-[140px] min-h-[52px] text-[12px]"
-          disabled={!keys[provider]}
+          aria-label="Сообщение помощнику"
         />
         <div className="mt-1 flex items-center gap-1.5">
           <Button size="sm" onClick={send} disabled={busy || !input.trim() || !keys[provider]}>
@@ -2154,7 +2169,11 @@ function ChatColumn({
           <Button size="sm" variant="ghost" onClick={() => setMsgs([])} disabled={!msgs.length}>
             очистить
           </Button>
-          {!keys[provider] && <span className="label ml-auto">сначала вставь ключ {provider}</span>}
+          {keys[provider] === undefined ? (
+            <span className="label ml-auto">проверка ключа {provider}</span>
+          ) : !keys[provider] ? (
+            <span className="label ml-auto">для отправки нужен ключ {provider}</span>
+          ) : null}
         </div>
       </div>
     </div>
@@ -2331,7 +2350,7 @@ function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     ["Данные", "раздел «Данные и окружение»: выбери папку и нажми «Скачать мозг мухи», это около 100 МБ. Для первой пробы данные не нужны: шаблон 02 работает сам по себе."],
     ["Окружение", "во вкладке «Данные и окружение» видны Python и пакеты. Если не хватает pandas или других основных библиотек, нажми «установить пакеты для анализов»: программа создаст workspace/.venv и настроит запуски на него. Brian2 можно установить отдельной кнопкой."],
     ["Готовый анализ задач (без API)", "справа открыта вкладка «По задачам (без API)»: там лежат готовые проверенные скрипты 10..19 под все 10 текущих идей (лезии, интерференция, бенчмарк бэкендов, обучение в целом мозге, память ухаживания MaleCNS, тракт в VNC, социальное обучение, индивидуальность, брачная песня, PCI) и общий модуль flylib.py. В каждом есть быстрый режим --synth и полный режим на локальных файлах FLY_DATA."],
-    ["Идеи и рабочие пространства", "В центре выбери проект и идею. У каждой идеи свои папки кода, логов и прогонов; список «идеи в мозге» справа позволяет быстро переключаться и открывать карточку идеи. При переходе несохранённый код можно сохранить. Проектное общее пространство доступно отдельным пунктом."],
+    ["Идеи и рабочие пространства", "В центре выбери проект и идею. У каждой идеи свои папки кода, логов и прогонов; переключатель идеи над редактором открывает её пространство и карточку. При переходе несохранённый код можно сохранить. Проектное общее пространство доступно отдельным пунктом."],
     ["Копирование логов", "Внизу панели результатов нажми «копировать лог», чтобы перенести вывод текущего запуска в буфер обмена."],
     ["Первый прогон", "слева открой 00_check_env.py и запусти, либо выбери любую задачу справа и нажми «запустить» на режиме --synth. Аргументы видны и редактируются в строке над кодом."],
     ["Посмотреть нейроны", "шаблон 05_neuron_gallery.py рисует морфологию нейронов в трёх проекциях и накладывает активность из прогона: --ids 12781 556329 (скелеты скачаются сами) или --spikes путь_к_spikes.parquet, с флагом --animate получится gif с распространением сигнала."],
