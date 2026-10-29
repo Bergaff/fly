@@ -33,6 +33,21 @@ function writeConfig(c) {
   fs.mkdirSync(path.dirname(CONFIG), { recursive: true });
   fs.writeFileSync(CONFIG, JSON.stringify(c, null, 2));
 }
+
+const DATA_FILE_ROLES = { connections: "FLY_CONNECTOME", annotations: "FLY_ANNOTATIONS", cell_types: "FLY_CELL_TYPES", neurotransmitters: "FLY_NEUROTRANSMITTERS" };
+function dataFileLinks() {
+  const saved = readConfig().dataFiles || {};
+  return Object.fromEntries(Object.keys(DATA_FILE_ROLES).map((role) => {
+    const file = typeof saved[role] === "string" ? saved[role] : "";
+    try {
+      const info = fs.statSync(file);
+      fs.accessSync(file, fs.constants.R_OK);
+      return [role, { path: file, available: info.isFile(), size: info.isFile() ? info.size : null }];
+    } catch {
+      return [role, { path: file, available: false, size: null }];
+    }
+  }));
+}
 /** Текущие папки: пользовательские из config.json поверх дефолтных */
 function getDirs() {
   const c = readConfig().dirs || {};
@@ -117,7 +132,7 @@ function parseScope(scopeOrProjectId) {
 function allowedTemplatesForScope(scope, includeAll = false) {
   if (includeAll || scope.kind !== "idea") return null;
   const specific = IDEA_TEMPLATE_MAP[scope.ideaId] || ["01_load_connectome.py"];
-  return new Set(["flylib.py", "00_check_env.py", ...specific]);
+  return new Set(["flylib.py", "00_check_env.py", "21_check_linked_data.py", ...specific]);
 }
 
 function migrateLegacyIdeaScripts(scope, codeDir) {
@@ -746,9 +761,14 @@ async function runScript(win, projectId, name, args) {
     }
   }
   const pyPath = [ws.code, TEMPLATES, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter);
+  const links = dataFileLinks();
   const env = {
     ...process.env,
     FLY_DATA: DIRS.data,
+    FLY_CONNECTOME: links.connections.path,
+    FLY_ANNOTATIONS: links.annotations.path,
+    FLY_CELL_TYPES: links.cell_types.path,
+    FLY_NEUROTRANSMITTERS: links.neurotransmitters.path,
     FLY_RUN_DIR: runDir,
     FLY_SCRIPTS: ws.code,
     FLY_PROJECT: ws.projectId,
@@ -1194,6 +1214,34 @@ function stopAgentServer() {
 // ------------------------------------------------------------
 function registerIpc(getWin) {
   ipcMain.handle("fly:getPaths", () => ({ workspace: WS, ...getDirs(), defaults: DEFAULT_DIRS, templates: TEMPLATES }));
+  ipcMain.handle("fly:getDataFileLinks", () => dataFileLinks());
+  ipcMain.handle("fly:chooseDataFile", async (_e, role) => {
+    if (!Object.hasOwn(DATA_FILE_ROLES, role)) throw new Error("Неизвестный тип файла данных.");
+    const titles = { connections: "Выберите таблицу связей", annotations: "Выберите классификацию нейронов", cell_types: "Выберите таблицу типов клеток", neurotransmitters: "Выберите таблицу нейромедиаторов" };
+    const r = await dialog.showOpenDialog(getWin(), {
+      title: titles[role],
+      defaultPath: getDirs().data,
+      properties: ["openFile"],
+      filters: [{ name: "Таблицы CSV, TSV, GZIP, Parquet", extensions: ["csv", "tsv", "gz", "parquet"] }],
+    });
+    if (r.canceled || !r.filePaths[0]) return dataFileLinks();
+    const file = r.filePaths[0];
+    if (!/\.(csv|tsv|csv\.gz|tsv\.gz|parquet)$/i.test(file)) throw new Error("Выберите таблицу CSV, TSV, CSV.GZ, TSV.GZ или Parquet.");
+    const info = await fsp.stat(file);
+    if (!info.isFile()) throw new Error("Выберите обычный файл таблицы.");
+    await fsp.access(file, fs.constants.R_OK);
+    const c = readConfig();
+    c.dataFiles = { ...(c.dataFiles || {}), [role]: file };
+    writeConfig(c);
+    return dataFileLinks();
+  });
+  ipcMain.handle("fly:clearDataFile", (_e, role) => {
+    if (!Object.hasOwn(DATA_FILE_ROLES, role)) throw new Error("Неизвестный тип файла данных.");
+    const c = readConfig();
+    if (c.dataFiles) delete c.dataFiles[role];
+    writeConfig(c);
+    return dataFileLinks();
+  });
 
   // --- выбор папок ---
   ipcMain.handle("fly:chooseFolder", async (_e, kind, title) => {

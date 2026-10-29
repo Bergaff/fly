@@ -4,7 +4,7 @@ import { checklistProgress } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
   type DataItem, type AgentInfo, type EnvInfo, type EnvSetupOutput, type PythonCandidate, type ExternalSource, type LlmMessage, type LlmProvider,
-  type Paths, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage,
+  type Paths, type DataFileLinks, type DataFileRole, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage,
 } from "@/lib/bridge";
 import { extractAssistantFiles, extractSelectedAssistantFile, formatAssistantResponse } from "@/lib/assistant-code";
 import { normalizeUsage } from "@/lib/api-usage";
@@ -52,7 +52,8 @@ const CODE_PROMPT = `Ты научный ассистент аспиранта, 
 - случайные примеры и синтетические сети явно помечай; не подменяй незаметно реальный коннектом synthetic-режимом;
 - если скрипт вычисляет научные показатели, определяй их корректно и не называй генетической наследуемостью простую воспроизводимость;
 - скрипт получает переменные окружения: FLY_DATA (папка данных коннектома), FLY_RUN_DIR (папка этого прогона,
-  туда писать summary.json и графики png), FLY_SCRIPTS (папка кода проекта), FLY_PROJECT (имя проекта);
+  туда писать summary.json и графики png), FLY_SCRIPTS (папка кода проекта), FLY_PROJECT (имя проекта).
+  FLY_CONNECTOME, FLY_ANNOTATIONS, FLY_CELL_TYPES и FLY_NEUROTRANSMITTERS содержат пути вручную подключённых таблиц, либо пустую строку. Если нужны данные, проверяй путь и колонки, указывай источник, не выдавай произвольную таблицу за исходную модель Shiu и не подменяй данные синтетикой без явного выбора;
 - добавь argparse с --seed и основными параметрами протокола, значения по умолчанию обязательны;
 - в summary.json положи args, метрики и имена созданных файлов;
 - не выдумывай API Brian2: если не уверен, скажи, что нужно проверить в документации;
@@ -2466,6 +2467,9 @@ function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 // ================================================================
 function DataPanel() {
+  const [links, setLinks] = useState<DataFileLinks | null>(null);
+  const [linkError, setLinkError] = useState("");
+  const [linkBusy, setLinkBusy] = useState(false);
   const [items, setItems] = useState<DataItem[]>([]);
   const [progress, setProgress] = useState<Record<string, { got: number; total: number }>>({});
   const [busy, setBusy] = useState<Record<string, boolean>>({});
@@ -2477,6 +2481,12 @@ function DataPanel() {
     setItems(await fly!.listData());
     setPaths(await fly!.getPaths());
     setExternal(await fly!.listExternal());
+    try {
+      setLinks(await fly!.getDataFileLinks());
+      setLinkError("");
+    } catch (error) {
+      setLinkError(`Не удалось проверить подключённые файлы: ${(error as Error).message}`);
+    }
   }, []);
   useEffect(() => {
     refresh();
@@ -2518,9 +2528,45 @@ function DataPanel() {
 
   const groups = useMemo(() => [...new Set(items.map((i) => i.group))], [items]);
   const missing = items.filter((i) => !i.present).length;
+  const changeLink = async (role: DataFileRole, clear = false) => {
+    setLinkBusy(true);
+    setLinkError("");
+    try {
+      setLinks(await (clear ? fly!.clearDataFile(role) : fly!.chooseDataFile(role)));
+    } catch (error) {
+      setLinkError(`Не удалось ${clear ? "отключить" : "подключить"} файл: ${(error as Error).message}`);
+    } finally {
+      setLinkBusy(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3">
+      <section className="border">
+        <div className="border-b px-2 py-1.5 text-[12px] font-medium">Файлы, скачанные вручную</div>
+        <div className="space-y-2 p-2">
+          {([['connections', 'Таблица связей', 'FLY_CONNECTOME'], ['annotations', 'Классификация нейронов', 'FLY_ANNOTATIONS'], ['cell_types', 'Типы клеток', 'FLY_CELL_TYPES'], ['neurotransmitters', 'Нейромедиаторы', 'FLY_NEUROTRANSMITTERS']] as const).map(([role, title, variable]) => {
+            const link = links?.[role];
+            return (
+              <div key={role} className="border-b pb-2 last:border-b-0 last:pb-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-medium">{title}</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">{variable}</span>
+                  <span className={cn('text-[10px]', link?.path && !link.available ? 'text-destructive' : 'text-muted-foreground')}>
+                    {!links ? 'проверка…' : !link?.path ? 'не выбран' : link.available ? `файл доступен · ${fmtBytes(link.size ?? 0)}` : 'файл недоступен'}
+                  </span>
+                  <Button size="sm" variant="outline" disabled={linkBusy} onClick={() => void changeLink(role)} aria-label={`Выбрать: ${title}`}>выбрать файл</Button>
+                  {link?.path && <Button size="sm" variant="ghost" disabled={linkBusy} onClick={() => void changeLink(role, true)} aria-label={`Отключить: ${title}`}>отключить</Button>}
+                </div>
+                {link?.path && <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground">{link.path}</p>}
+              </div>
+            );
+          })}
+          {linkError && <p role="alert" className="text-[11px] text-destructive">{linkError}</p>}
+          <p className="text-[11px] leading-relaxed text-muted-foreground">Выберите CSV, TSV, CSV.GZ, TSV.GZ или Parquet. Файлы остаются на месте. Пути доступны скриптам через переменные выше; только скрипты, поддерживающие эти переменные, используют их. Проверить таблицу можно в любой идее через 21_check_linked_data.py.</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">Готовые анализы 10..19 и старые скрипты пока не читают эти выбранные файлы автоматически. Им нужны их исходные форматы в папке данных. Доступность файла не подтверждает его состав, версию или пригодность для baseline Shiu.</p>
+        </div>
+      </section>
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={dlAll} disabled={!missing || Object.values(busy).some(Boolean)}>
           {missing ? `Скачать мозг мухи, файлов: ${missing}` : "Всё скачано"}

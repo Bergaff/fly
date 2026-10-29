@@ -4,6 +4,9 @@ contextBridge.exposeInMainWorld("fly", {
   isElectron: true,
   // --- пути / окружение ---
   getPaths: () => ipcRenderer.invoke("fly:getPaths"),
+  getDataFileLinks: () => ipcRenderer.invoke("fly:getDataFileLinks"),
+  chooseDataFile: (role) => ipcRenderer.invoke("fly:chooseDataFile", role),
+  clearDataFile: (role) => ipcRenderer.invoke("fly:clearDataFile", role),
   checkEnv: () => ipcRenderer.invoke("fly:checkEnv"),
   listPythons: () => ipcRenderer.invoke("fly:listPythons"),
   setPython: (pyCmd) => ipcRenderer.invoke("fly:setPython", pyCmd),

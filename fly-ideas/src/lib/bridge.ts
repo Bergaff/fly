@@ -91,12 +91,17 @@ export interface AgentNotice { text: string; at: number }
 
 export type DirKind = "data" | "scripts" | "runs" | "exports";
 export interface Paths { workspace: string; data: string; scripts: string; runs: string; exports: string; defaults: Record<DirKind, string>; templates: string }
+export type DataFileRole = "connections" | "annotations" | "cell_types" | "neurotransmitters";
+export type DataFileLinks = Record<DataFileRole, { path: string; available: boolean; size: number | null }>;
 export interface ExternalSource { title: string; url: string; note: string }
 export interface FileFilter { name: string; extensions: string[] }
 
 export interface FlyBridge {
   isElectron: true;
   getPaths(): Promise<Paths>;
+  getDataFileLinks(): Promise<DataFileLinks>;
+  chooseDataFile(role: DataFileRole): Promise<DataFileLinks>;
+  clearDataFile(role: DataFileRole): Promise<DataFileLinks>;
   chooseFolder(kind: DirKind, title?: string): Promise<string | null>;
   pickFolder(title?: string): Promise<string | null>;
   resetFolder(kind: DirKind): Promise<string>;
