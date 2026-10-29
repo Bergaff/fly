@@ -51,7 +51,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-courtship-memory": ["14_malecns_courtship_memory.py", "08_malecns_loader.py", "07_morph_activity_figure.py"],
   "i-memory-to-action": ["15_memory_to_motor_vnc.py", "08_malecns_loader.py", "05_neuron_gallery.py"],
   "i-observational": ["16_observational_learning.py", "09_mb_circuit_v783.py"],
-  "i-individuality": ["17_individuality_phenotypes.py", "06_brian2_shiu.py"],
+  "i-individuality": ["17_individuality_phenotypes.py", "06_brian2_shiu.py", "20_brian2_smoke_test.py"],
   "i-song": ["18_courtship_song_ipi.py", "08_malecns_loader.py"],
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };

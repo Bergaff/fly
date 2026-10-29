@@ -46,6 +46,37 @@ test('журнал API сохраняет одновременные вызов�
   }
 });
 
+test('новый тест Brian2 добавляется в идею и не заменяет пользовательские файлы', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fly-template-'));
+  let config = {};
+  try {
+    const start = main.indexOf('const IDEA_TEMPLATE_MAP =');
+    const end = main.indexOf('function ensureDirs()', start);
+    const code = main.slice(start, end);
+    const templates = vm.runInNewContext(`${code}\n({ syncProjectTemplates });`, {
+      fs, path, TEMPLATES: path.join(root, 'experiments', 'templates'),
+      DIRS: { scripts: path.join(dir, 'scripts'), runs: path.join(dir, 'runs') },
+      readConfig: () => config, writeConfig: (value) => { config = value; },
+    });
+    const ideaDir = path.join(dir, 'idea');
+    fs.mkdirSync(ideaDir);
+    fs.writeFileSync(path.join(ideaDir, 'env_smoke_test.py'), '# пользовательский файл\n');
+    templates.syncProjectTemplates('idea:i-individuality', ideaDir);
+    const smoke = path.join(ideaDir, '20_brian2_smoke_test.py');
+    assert.ok(fs.existsSync(smoke));
+    assert.equal(fs.readFileSync(path.join(ideaDir, 'env_smoke_test.py'), 'utf8'), '# пользовательский файл\n');
+    fs.writeFileSync(smoke, '# изменён пользователем\n');
+    templates.syncProjectTemplates('idea:i-individuality', ideaDir);
+    assert.equal(fs.readFileSync(smoke, 'utf8'), '# изменён пользователем\n');
+    const otherDir = path.join(dir, 'other');
+    fs.mkdirSync(otherDir);
+    templates.syncProjectTemplates('idea:i-lesions', otherDir);
+    assert.equal(fs.existsSync(path.join(otherDir, '20_brian2_smoke_test.py')), false);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('учёт токенов учитывает разные форматы и отсутствие данных', () => {
   const normalize = tsFunction(usage, 'normalizeUsage', '\n}\n');
   assert.deepEqual(JSON.parse(JSON.stringify(normalize({ prompt_tokens: 12, completion_tokens: 8 }))), { inputTokens: 12, outputTokens: 8, totalTokens: 20 });

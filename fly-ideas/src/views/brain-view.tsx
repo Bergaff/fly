@@ -118,7 +118,7 @@ export function BrainView({
         </Button>
       </div>
 
-      {tab === "work" ? (
+      <div className={cn("min-h-0 flex-1", tab !== "work" && "hidden")}>
         <Workspace
           ideas={ideas}
           projects={projects}
@@ -134,7 +134,8 @@ export function BrainView({
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
         />
-      ) : (
+      </div>
+      {tab === "setup" && (
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <div className="flex flex-col gap-4">
             <DataPanel />
