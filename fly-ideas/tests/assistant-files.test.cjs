@@ -58,6 +58,18 @@ test("сохранение принимает только завершённы�
   assert.equal(format("Объяснение\n```python\n# file: alpha.py\nprint(1)\n```\nДетали", "code"), "```python\n# file: alpha.py\nprint(1)\n```");
   assert.equal(format("Что именно нужно?", "code"), "Что именно нужно?");
   assert.equal(format(text, "explain"), text);
+
+  // Для ответа без Markdown приложение не угадывает границу кода и не сохраняет его автоматически.
+  const unfenced = "Введение\n\n# file: env_smoke_test.py\nprint('ok')\n\nЧто делать дальше:\n1. Запустить";
+  assert.equal(extract(unfenced).length, 0);
+  const selected = context.exports.extractSelectedAssistantFile;
+  assert.deepEqual(JSON.parse(JSON.stringify(selected("# file: env_smoke_test.py\r\nprint('ok')\r\n"))), {
+    name: "env_smoke_test.py", content: "# file: env_smoke_test.py\nprint('ok')\n",
+  });
+  assert.equal(selected(unfenced), null);
+  assert.equal(selected("# file: ../escape.py\nprint(1)"), null);
+  assert.equal(selected("# file: missing.py"), null);
+  assert.equal(selected("# file: missing.py\n  "), null);
 });
 
 test("Electron IPC сохраняет файлы раздельно по идеям и проверяет права", async () => {

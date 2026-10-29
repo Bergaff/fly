@@ -18,6 +18,16 @@ export function extractAssistantFiles(text: string): { name: string; content: st
   return files.filter((file) => !duplicates.has(file.name.toLowerCase()));
 }
 
+/** Ручное сохранение: пользователь сам выделяет код, начало должно содержать имя файла. */
+export function extractSelectedAssistantFile(text: string): { name: string; content: string } | null {
+  const content = text.replace(/\r\n/g, "\n").trim();
+  const firstLine = content.match(/^#\s*file:[ \t]*([^\s]+)[ \t]*\n/i);
+  const name = firstLine?.[1];
+  if (!firstLine || !name || !/^[A-Za-z0-9_][A-Za-z0-9_.-]*\.py$/.test(name) || name.includes("..")) return null;
+  if (!content.slice(firstLine[0].length).trim()) return null;
+  return { name, content: `${content}\n` };
+}
+
 /** В режиме кода убираем только пояснения рядом с распознанными файлами.
  * Если файлов нет, оставляем ответ, например уточняющий вопрос. */
 export function formatAssistantResponse(text: string, mode: "code" | "explain"): string {
