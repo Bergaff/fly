@@ -2101,7 +2101,10 @@ function ChatColumn({
 
         {msgs.map((m, i) => (
           <div key={i} className="border-b pb-2 mb-2 last:border-b-0">
-            <div className="label mb-1">{m.role === "user" ? "запрос" : "ответ"}</div>
+            <div className={cn("sticky top-0 z-10 mb-2 flex items-center justify-between gap-2 border-y px-2 py-1.5 font-mono text-[13px] font-semibold uppercase tracking-wide text-foreground", m.role === "user" ? "bg-secondary" : "bg-accent")}>
+              <span>{m.role === "user" ? "Запрос" : "Ответ"}</span>
+              <span className="text-[10px] tracking-normal">{m.role === "user" ? "Вы" : "Помощник"}</span>
+            </div>
             <MessageBody
               content={m.content}
               currentPid={pid}
