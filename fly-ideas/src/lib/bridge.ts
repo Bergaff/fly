@@ -1,3 +1,4 @@
+import type { AppState } from "@/data/types";
 /** Типизированный мост к Electron (preload.cjs). В браузере window.fly отсутствует. */
 
 export interface DataItem {
@@ -96,7 +97,17 @@ export type DataFileLinks = Record<DataFileRole, { path: string; available: bool
 export interface ExternalSource { title: string; url: string; note: string }
 export interface FileFilter { name: string; extensions: string[] }
 
+export interface SyncUi { state: AppState; chats: Record<string, string>; rates: string | null }
+export interface SyncSnapshot { id: string; createdAt: string; includeData: boolean; fileCount: number; kind: string }
+export interface SyncInfo { folder: string; shared: SyncSnapshot[]; backups: SyncSnapshot[]; backupRoot: string; error: string }
+export interface SyncProgress { phase: string; done: number; total: number; file: string }
 export interface FlyBridge {
+  syncInfo(): Promise<SyncInfo>;
+  chooseSyncFolder(): Promise<string | null>;
+  syncUpload(ui: SyncUi, includeData: boolean): Promise<{ id: string; path: string }>;
+  syncRestore(source: "shared" | "backup", id: string, ui: SyncUi): Promise<{ ui: SyncUi; backup: { id: string; path: string } }>;
+  syncFinish(reload: boolean): Promise<void>;
+  onSyncProgress(cb: (progress: SyncProgress) => void): () => void;
   isElectron: true;
   getPaths(): Promise<Paths>;
   getDataFileLinks(): Promise<DataFileLinks>;

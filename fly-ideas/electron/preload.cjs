@@ -2,6 +2,12 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("fly", {
   isElectron: true,
+  syncInfo: () => ipcRenderer.invoke("fly:syncInfo"),
+  chooseSyncFolder: () => ipcRenderer.invoke("fly:chooseSyncFolder"),
+  syncUpload: (ui, includeData) => ipcRenderer.invoke("fly:syncUpload", ui, includeData),
+  syncRestore: (source, id, ui) => ipcRenderer.invoke("fly:syncRestore", source, id, ui),
+  syncFinish: (reload) => ipcRenderer.invoke("fly:syncFinish", reload),
+  onSyncProgress: (cb) => { const h = (_e, p) => cb(p); ipcRenderer.on("fly:syncProgress", h); return () => ipcRenderer.removeListener("fly:syncProgress", h); },
   // --- пути / окружение ---
   getPaths: () => ipcRenderer.invoke("fly:getPaths"),
   getDataFileLinks: () => ipcRenderer.invoke("fly:getDataFileLinks"),

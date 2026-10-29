@@ -11,6 +11,7 @@ import { CompareView } from "@/views/compare-view";
 import { LibraryView } from "@/views/library-view";
 import { ReferenceDialog } from "@/components/reference-dialog";
 import { LegalDialog, type LegalKind } from "@/components/legal-dialog";
+import { SyncDialog } from "@/components/sync-dialog";
 import type { AgentInfo } from "@/lib/bridge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ export default function App() {
   const [compare, setCompare] = useState<string[]>([]);
   const [tab, setTab] = useState("ideas");
   const [brainIdeaId, setBrainIdeaId] = useState<string | null>(null);
+  const [syncOpen, setSyncOpen] = useState(false);
+  const [codeDirty, setCodeDirty] = useState(false);
   const [legal, setLegal] = useState<LegalKind | null>(null);
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const [notes, setNotes] = useState<{ id: number; text: string }[]>([]);
@@ -263,6 +266,7 @@ export default function App() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel>Данные</DropdownMenuLabel>
+                  {fly && <DropdownMenuItem onClick={() => setSyncOpen(true)}>Синхронизация через Google Диск…</DropdownMenuItem>}
                   <DropdownMenuItem onClick={exportFile}>Выгрузить JSON…</DropdownMenuItem>
                   <DropdownMenuItem onClick={importClick}>Загрузить JSON…</DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -353,6 +357,7 @@ export default function App() {
                 onCompleteStages={store.completeStages}
                 onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
                 onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
+                onDirtyChange={setCodeDirty}
               />
             </TabsContent>
             <TabsContent value="compare" className="min-h-0 overflow-hidden">
@@ -397,6 +402,7 @@ export default function App() {
           </div>
         )}
         <ReferenceDialog reference={openRef} usedBy={refUsedBy} onClose={() => setOpenRefId(null)} onSave={store.updateReference} onDelete={store.deleteReference} />
+        <SyncDialog open={syncOpen} onClose={() => setSyncOpen(false)} state={state} dirty={codeDirty} />
         <LegalDialog kind={legal} onClose={() => setLegal(null)} />
       </div>
     </TooltipProvider>

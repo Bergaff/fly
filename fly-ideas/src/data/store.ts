@@ -41,6 +41,7 @@ function withNewSeed(state: AppState): AppState {
 }
 
 function load(): AppState {
+ sessionStorage.removeItem("fly-ideas:sync-applying");
  try {
  const raw = localStorage.getItem(KEY);
  if (!raw) return structuredClone(SEED_STATE);
@@ -56,7 +57,7 @@ export function useStore() {
  const [state, setState] = useState<AppState>(load);
 
  useEffect(() => {
- localStorage.setItem(KEY, JSON.stringify(state));
+ if (!sessionStorage.getItem("fly-ideas:sync-applying")) localStorage.setItem(KEY, JSON.stringify(state));
  }, [state]);
 
  const stamp = () => new Date().toISOString();

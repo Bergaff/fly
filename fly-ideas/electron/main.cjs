@@ -8,6 +8,7 @@ const https = require("node:https");
 const http = require("node:http");
 const crypto = require("node:crypto");
 const { writeAssistantFile } = require("./assistant-files.cjs");
+const folderSync = require("./folder-sync.cjs");
 
 const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
@@ -216,6 +217,7 @@ function within(parent, target) {
 
 /** Рабочие папки идеи или проекта: код и прогоны. Можно переназначить через config.json. */
 function projectPaths(scopeOrProjectId) {
+  assertNotSyncing();
   const scope = parseScope(scopeOrProjectId);
   const cfg = readConfig().projectDirs || {};
   const over = cfg[scope.cfgKey] || {};
@@ -388,6 +390,25 @@ DATA_CATALOG.push(
 );
 
 const activeDownloads = new Map();
+let syncBusy = false;
+let syncAwaitingReload = false;
+let downloadsInFlight = 0;
+let llmInFlight = 0;
+let llmSettledAt = 0;
+let environmentInFlight = 0;
+let mutationsInFlight = 0;
+let agentRequestsInFlight = 0;
+function assertNotSyncing() {
+  if (syncBusy) throw new Error("Дождитесь окончания синхронизации.");
+}
+async function withSyncLock(operation) {
+  if (syncBusy || runs.size || downloadsInFlight || llmInFlight || environmentInFlight || mutationsInFlight || agentRequestsInFlight || agentWrites.size || Date.now() - llmSettledAt < 2000) {
+    throw new Error("Дождитесь завершения расчётов, загрузок, установки окружения и ответов помощника, затем повторите.");
+  }
+  syncBusy = true;
+  try { await apiCallWriteQueue; return await operation(); }
+  finally { if (!syncAwaitingReload) syncBusy = false; }
+}
 
 function fetchFollow(url, redirects = 0) {
   return new Promise((resolve, reject) => {
@@ -737,8 +758,10 @@ async function setupPythonEnv(win, mode = "core") {
 const runs = new Map();
 
 async function runScript(win, projectId, name, args) {
+  assertNotSyncing();
   const py = await pickPython();
   if (!py) throw new Error("Python 3 не найден. Установи Miniconda или Python 3.11/3.12 с python.org (галочка «Add to PATH»).");
+  assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
   const file = path.join(ws.code, path.basename(name));
@@ -963,6 +986,7 @@ const ideaBrief = (i) => ({
 });
 
 async function agentRoute(route, q, body, method) {
+  assertNotSyncing();
   switch (route) {
     case "/status": {
       const st = state();
@@ -1179,7 +1203,10 @@ function startAgentServer() {
     try {
       const q = Object.fromEntries(url.searchParams.entries());
       const body = req.method === "POST" ? await readBody(req) : {};
-      json(200, await agentRoute(url.pathname.replace(/^\/api/, ""), q, body, req.method));
+      assertNotSyncing();
+      agentRequestsInFlight++;
+      try { json(200, await agentRoute(url.pathname.replace(/^\/api/, ""), q, body, req.method)); }
+      finally { agentRequestsInFlight--; }
     } catch (e) {
       json(400, { error: String(e.message || e) });
     }
@@ -1213,9 +1240,75 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  ipcMain.handle("fly:getPaths", () => ({ workspace: WS, ...getDirs(), defaults: DEFAULT_DIRS, templates: TEMPLATES }));
-  ipcMain.handle("fly:getDataFileLinks", () => dataFileLinks());
-  ipcMain.handle("fly:chooseDataFile", async (_e, role) => {
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
+    assertNotSyncing(); mutationsInFlight++;
+    try { return await fn(...args); } finally { mutationsInFlight--; }
+  } : fn);
+
+  // Снимки находятся в локальной папке Google Drive for desktop, а не передаются через Google API.
+  const backupRoot = path.join(app.getPath("userData"), "sync-backups");
+  const runtime = () => ({
+    dataDir: DIRS.data,
+    getLinks: dataFileLinks,
+    projectPaths: (id) => {
+      const scope = parseScope(id), override = (readConfig().projectDirs || {})[scope.cfgKey] || {};
+      return { code: typeof override.code === "string" ? override.code : scope.defaults.code,
+        runs: typeof override.runs === "string" ? override.runs : scope.defaults.runs };
+    },
+  });
+  const sharedRoot = () => {
+    const selected = readConfig().syncFolder;
+    if (!selected || typeof selected !== "string") throw new Error("Сначала выберите папку Google Диска.");
+    const info = fs.lstatSync(selected);
+    if (!info.isDirectory() || info.isSymbolicLink()) throw new Error("Папка Google Диска недоступна или является ссылкой.");
+    return path.join(selected, "FlyIdeas-sync", "snapshots");
+  };
+  const progress = (data) => { const win = getWin(); if (win && !win.isDestroyed?.()) win.webContents.send("fly:syncProgress", data); };
+  handle("fly:syncInfo", async () => {
+    const folder = readConfig().syncFolder || "";
+    let shared = [], error = "";
+    if (folder) { try { shared = await folderSync.listSnapshots(sharedRoot()); } catch (e) { error = e.message; } }
+    const backups = await folderSync.listSnapshots(backupRoot);
+    return { folder, shared, backups, backupRoot, error };
+  });
+  handle("fly:chooseSyncFolder", async () => {
+    assertNotSyncing();
+    const r = await dialog.showOpenDialog(getWin(), { title: "Выберите синхронизируемую папку Google Диска", properties: ["openDirectory", "createDirectory"] });
+    if (r.canceled || !r.filePaths[0]) return null;
+    const c = readConfig(); c.syncFolder = r.filePaths[0]; writeConfig(c); return c.syncFolder;
+  });
+  handle("fly:syncUpload", (_e, ui, includeData) => withSyncLock(async () => {
+    return folderSync.createSnapshot(sharedRoot(), runtime(), ui, readApiCallStore(), !!includeData, { progress });
+  }));
+  handle("fly:syncRestore", (_e, source, id, ui) => withSyncLock(async () => {
+    if (source !== "shared" && source !== "backup") throw new Error("Неизвестный источник снимка.");
+    const result = await folderSync.restoreSnapshot(source === "shared" ? sharedRoot() : backupRoot, id, runtime(), ui, readApiCallStore(), backupRoot, progress, source === "backup");
+    try {
+      const temp = `${API_CALLS_FILE}.${process.pid}.sync.tmp`;
+      await fsp.mkdir(path.dirname(API_CALLS_FILE), { recursive: true });
+      try { await fsp.writeFile(temp, JSON.stringify(result.apiCalls, null, 2)); await fsp.rename(temp, API_CALLS_FILE); }
+      finally { await fsp.rm(temp, { force: true }).catch(() => {}); }
+      if (result.includeData) {
+        const c = readConfig(); c.dataFiles = result.linked;
+        const tempConfig = `${CONFIG}.${process.pid}.sync.tmp`;
+        try { await fsp.writeFile(tempConfig, JSON.stringify(c, null, 2)); await fsp.rename(tempConfig, CONFIG); }
+        finally { await fsp.rm(tempConfig, { force: true }).catch(() => {}); }
+      }
+    } catch (e) { throw new Error(`Не удалось применить журнал или пути данных. Локальная резервная копия: ${result.backup.path}. ${e.message}`); }
+    syncAwaitingReload = true;
+    return result;
+  }));
+  handle("fly:syncFinish", (_e, reload) => {
+    if (!syncAwaitingReload) throw new Error("Нет ожидающего восстановления.");
+    syncAwaitingReload = false; syncBusy = false;
+    if (reload) getWin().webContents.reload();
+  });
+
+  handle("fly:getPaths", () => ({ workspace: WS, ...getDirs(), defaults: DEFAULT_DIRS, templates: TEMPLATES }));
+  handle("fly:getDataFileLinks", () => dataFileLinks());
+  handle("fly:chooseDataFile", async (_e, role) => {
+    assertNotSyncing();
     if (!Object.hasOwn(DATA_FILE_ROLES, role)) throw new Error("Неизвестный тип файла данных.");
     const titles = { connections: "Выберите таблицу связей", annotations: "Выберите классификацию нейронов", cell_types: "Выберите таблицу типов клеток", neurotransmitters: "Выберите таблицу нейромедиаторов" };
     const r = await dialog.showOpenDialog(getWin(), {
@@ -1235,7 +1328,8 @@ function registerIpc(getWin) {
     writeConfig(c);
     return dataFileLinks();
   });
-  ipcMain.handle("fly:clearDataFile", (_e, role) => {
+  handle("fly:clearDataFile", (_e, role) => {
+    assertNotSyncing();
     if (!Object.hasOwn(DATA_FILE_ROLES, role)) throw new Error("Неизвестный тип файла данных.");
     const c = readConfig();
     if (c.dataFiles) delete c.dataFiles[role];
@@ -1244,7 +1338,7 @@ function registerIpc(getWin) {
   });
 
   // --- выбор папок ---
-  ipcMain.handle("fly:chooseFolder", async (_e, kind, title) => {
+  handle("fly:chooseFolder", async (_e, kind, title) => {
     const r = await dialog.showOpenDialog(getWin(), { title: title || "Выбери папку", defaultPath: getDirs()[kind] || app.getPath("documents"), properties: ["openDirectory", "createDirectory"] });
     if (r.canceled || !r.filePaths[0]) return null;
     const p = r.filePaths[0];
@@ -1257,11 +1351,11 @@ function registerIpc(getWin) {
     }
     return p;
   });
-  ipcMain.handle("fly:pickFolder", async (_e, title) => {
+  handle("fly:pickFolder", async (_e, title) => {
     const r = await dialog.showOpenDialog(getWin(), { title: title || "Выбери папку", properties: ["openDirectory", "createDirectory"] });
     return r.canceled ? null : r.filePaths[0];
   });
-  ipcMain.handle("fly:resetFolder", (_e, kind) => {
+  handle("fly:resetFolder", (_e, kind) => {
     const c = readConfig();
     if (c.dirs) delete c.dirs[kind];
     writeConfig(c);
@@ -1270,7 +1364,7 @@ function registerIpc(getWin) {
   });
 
   // --- сохранить / открыть файл через системный диалог ---
-  ipcMain.handle("fly:saveFile", async (_e, { defaultName, content, filters, kind }) => {
+  handle("fly:saveFile", async (_e, { defaultName, content, filters, kind }) => {
     const dir = getDirs()[kind || "exports"] || app.getPath("documents");
     const r = await dialog.showSaveDialog(getWin(), { defaultPath: path.join(dir, defaultName || "file.txt"), filters: filters || [{ name: "Все файлы", extensions: ["*"] }] });
     if (r.canceled || !r.filePath) return null;
@@ -1280,22 +1374,22 @@ function registerIpc(getWin) {
     writeConfig(c);
     return r.filePath;
   });
-  ipcMain.handle("fly:openFile", async (_e, { filters, kind }) => {
+  handle("fly:openFile", async (_e, { filters, kind }) => {
     const dir = getDirs()[kind || "exports"] || app.getPath("documents");
     const r = await dialog.showOpenDialog(getWin(), { defaultPath: dir, filters: filters || [{ name: "Все файлы", extensions: ["*"] }], properties: ["openFile"] });
     if (r.canceled || !r.filePaths[0]) return null;
     return { path: r.filePaths[0], content: await fsp.readFile(r.filePaths[0], "utf8") };
   });
-  ipcMain.handle("fly:checkEnv", () => checkEnv());
-  ipcMain.handle("fly:listPythons", () => listPythons());
-  ipcMain.handle("fly:setPython", async (_e, pyCmd) => {
+  handle("fly:checkEnv", () => checkEnv());
+  handle("fly:listPythons", () => listPythons());
+  handle("fly:setPython", async (_e, pyCmd) => {
     const c = readConfig();
     if (pyCmd && String(pyCmd).trim()) c.pythonPath = String(pyCmd).trim();
     else delete c.pythonPath;
     writeConfig(c);
     return checkEnv();
   });
-  ipcMain.handle("fly:pickPythonExe", async () => {
+  handle("fly:pickPythonExe", async () => {
     const r = await dialog.showOpenDialog(getWin(), {
       title: "Выбери интерпретатор Python (python.exe)",
       filters: process.platform === "win32" ? [{ name: "Python", extensions: ["exe"] }] : [{ name: "Все файлы", extensions: ["*"] }],
@@ -1310,11 +1404,11 @@ function registerIpc(getWin) {
     writeConfig(c);
     return checkEnv();
   });
-  ipcMain.handle("fly:setupPythonEnv", (_e, mode) => setupPythonEnv(getWin(), mode || "core"));
-  ipcMain.handle("fly:openPath", (_e, p) => shell.openPath(p));
-  ipcMain.handle("fly:openExternal", (_e, url) => shell.openExternal(url));
+  handle("fly:setupPythonEnv", async (_e, mode) => { assertNotSyncing(); environmentInFlight++; try { return await setupPythonEnv(getWin(), mode || "core"); } finally { environmentInFlight--; } });
+  handle("fly:openPath", (_e, p) => shell.openPath(p));
+  handle("fly:openExternal", (_e, url) => shell.openExternal(url));
 
-  ipcMain.handle("fly:listData", async () => {
+  handle("fly:listData", async () => {
     return Promise.all(
       DATA_CATALOG.map(async (item) => {
         const dir = item.dest === "scripts" ? DIRS.scripts : DIRS.data;
@@ -1325,13 +1419,14 @@ function registerIpc(getWin) {
       }),
     );
   });
-  ipcMain.handle("fly:download", async (_e, item, destDir) => download(getWin(), item, destDir));
-  ipcMain.handle("fly:listExternal", () => EXTERNAL_SOURCES);
-  ipcMain.handle("fly:cancelDownload", (_e, id) => { activeDownloads.get(id)?.destroy(); activeDownloads.delete(id); });
+  handle("fly:download", async (_e, item, destDir) => { assertNotSyncing(); downloadsInFlight++; try { return await download(getWin(), item, destDir); } finally { activeDownloads.delete(item.id); downloadsInFlight--; } });
+  handle("fly:listExternal", () => EXTERNAL_SOURCES);
+  handle("fly:cancelDownload", (_e, id) => { activeDownloads.get(id)?.destroy(); activeDownloads.delete(id); });
 
   // --- рабочее место проекта: папки кода и прогонов ---
-  ipcMain.handle("fly:projectPaths", (_e, projectId) => projectPaths(projectId));
-  ipcMain.handle("fly:chooseProjectFolder", async (_e, projectId, kind, title) => {
+  handle("fly:projectPaths", (_e, projectId) => projectPaths(projectId));
+  handle("fly:chooseProjectFolder", async (_e, projectId, kind, title) => {
+    assertNotSyncing();
     const r = await dialog.showOpenDialog(getWin(), {
       title: title || "Выбери папку проекта",
       defaultPath: projectPaths(projectId)[kind === "runs" ? "runs" : "code"],
@@ -1340,11 +1435,11 @@ function registerIpc(getWin) {
     if (r.canceled || !r.filePaths[0]) return null;
     return setProjectDir(projectId, kind === "runs" ? "runs" : "code", r.filePaths[0]);
   });
-  ipcMain.handle("fly:resetProjectFolder", (_e, projectId, kind) => setProjectDir(projectId, kind === "runs" ? "runs" : "code", null));
-  ipcMain.handle("fly:getPermissions", () => getPermissions());
-  ipcMain.handle("fly:setPermissions", (_e, patch) => setPermissions(patch || {}));
+  handle("fly:resetProjectFolder", (_e, projectId, kind) => { assertNotSyncing(); return setProjectDir(projectId, kind === "runs" ? "runs" : "code", null); });
+  handle("fly:getPermissions", () => getPermissions());
+  handle("fly:setPermissions", (_e, patch) => setPermissions(patch || {}));
 
-  ipcMain.handle("fly:listScripts", async (_e, projectId) => {
+  handle("fly:listScripts", async (_e, projectId) => {
     const ws = projectPaths(projectId);
     const files = (await fsp.readdir(ws.code)).filter((f) => f.endsWith(".py")).sort();
     return Promise.all(files.map(async (f) => {
@@ -1355,7 +1450,8 @@ function registerIpc(getWin) {
       return { name: f, doc: m ? m[1].trim().split("\n")[0] : "", size: st.size, mtime: st.mtimeMs };
     }));
   });
-  ipcMain.handle("fly:syncTemplates", (_e, projectId, opts) => {
+  handle("fly:syncTemplates", (_e, projectId, opts) => {
+    assertNotSyncing();
     const ws = projectPaths(projectId);
     const includeAll = !!(opts && opts.all);
     if (opts && opts.overwrite) {
@@ -1367,13 +1463,14 @@ function registerIpc(getWin) {
     const added = syncProjectTemplates(projectId, ws.code, true, includeAll);
     return { added, code: ws.code };
   });
-  ipcMain.handle("fly:readScript", (_e, projectId, name) => {
+  handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);
     const full = path.join(ws.code, path.basename(name));
     if (!within(ws.code, full)) throw new Error("Файл вне папки проекта.");
     return fsp.readFile(full, "utf8");
   });
-  ipcMain.handle("fly:writeScript", async (_e, projectId, name, content, opts) => {
+  handle("fly:writeScript", async (_e, projectId, name, content, opts) => {
+    assertNotSyncing();
     const ws = projectPaths(projectId);
     const perms = getPermissions();
     const base = path.basename(name).replace(/[^\w.-]+/g, "_");
@@ -1387,27 +1484,29 @@ function registerIpc(getWin) {
     await fsp.writeFile(file, content, "utf8");
     return { file: path.basename(file), path: file, created: !exists };
   });
-  ipcMain.handle("fly:writeAssistantScript", (_e, projectId, name, content, opts) => {
+  handle("fly:writeAssistantScript", (_e, projectId, name, content, opts) => {
+    assertNotSyncing();
     const ws = projectPaths(projectId);
     return writeAssistantFile({ codeDir: ws.code, expectedDir: opts?.expectedDir, name, content, permissions: getPermissions, expectedContent: opts?.expectedContent });
   });
-  ipcMain.handle("fly:deleteScript", async (_e, projectId, name) => {
+  handle("fly:deleteScript", async (_e, projectId, name) => {
+    assertNotSyncing();
     const ws = projectPaths(projectId);
     const full = path.join(ws.code, path.basename(name));
     if (!within(ws.code, full)) throw new Error("Файл вне папки проекта.");
     await fsp.rm(full, { force: true });
     return true;
   });
-  ipcMain.handle("fly:runScript", (_e, projectId, name, args) => runScript(getWin(), projectId, path.basename(name), args));
-  ipcMain.handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });
+  handle("fly:runScript", (_e, projectId, name, args) => runScript(getWin(), projectId, path.basename(name), args));
+  handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });
 
-  ipcMain.handle("fly:getSecret", (_e, k) => { const s = readSecrets(); return s[k] ? `${s[k].slice(0, 6)}…${s[k].slice(-4)}` : null; });
-  ipcMain.handle("fly:setSecret", (_e, k, v) => { const s = readSecrets(); if (v) s[k] = v; else delete s[k]; writeSecrets(s); return true; });
-  ipcMain.handle("fly:llmChat", (_e, req) => llmChat(req));
-  ipcMain.handle("fly:listApiCalls", (_e, workspaceId) => listApiCalls(workspaceId));
-  ipcMain.handle("fly:appendApiCall", (_e, workspaceId, record) => appendApiCall(workspaceId, record));
+  handle("fly:getSecret", (_e, k) => { const s = readSecrets(); return s[k] ? `${s[k].slice(0, 6)}…${s[k].slice(-4)}` : null; });
+  handle("fly:setSecret", (_e, k, v) => { const s = readSecrets(); if (v) s[k] = v; else delete s[k]; writeSecrets(s); return true; });
+  handle("fly:llmChat", async (_e, req) => { assertNotSyncing(); llmInFlight++; try { return await llmChat(req); } finally { llmInFlight--; llmSettledAt = Date.now(); } });
+  handle("fly:listApiCalls", (_e, workspaceId) => listApiCalls(workspaceId));
+  handle("fly:appendApiCall", (_e, workspaceId, record) => { assertNotSyncing(); return appendApiCall(workspaceId, record); });
 
-  ipcMain.handle("fly:listRuns", async (_e, projectId) => {
+  handle("fly:listRuns", async (_e, projectId) => {
     const ws = projectPaths(projectId);
     const entries = await fsp.readdir(ws.runs, { withFileTypes: true }).catch(() => []);
     const dirs = entries.filter((d) => d.isDirectory()).map((d) => d.name).sort().reverse();
@@ -1421,7 +1520,7 @@ function registerIpc(getWin) {
       return { dir: full, path: full, label: d, summary, files, mtime };
     }));
   });
-  ipcMain.handle("fly:readRunFile", async (_e, dir, name) => {
+  handle("fly:readRunFile", async (_e, dir, name) => {
     const p = path.join(dir, path.basename(name));
     if (!withinRuns(p)) throw new Error("Файл вне папки прогонов.");
     const ext = path.extname(name).toLowerCase();
@@ -1433,7 +1532,7 @@ function registerIpc(getWin) {
     if (st.size > 400_000) return { kind: "text", text: `(файл ${(st.size / 1e6).toFixed(1)} МБ — открой в папке)` };
     return { kind: "text", text: await fsp.readFile(p, "utf8") };
   });
-  ipcMain.handle("fly:exportRun", async (_e, dir) => {
+  handle("fly:exportRun", async (_e, dir) => {
     const src = dir;
     if (!withinRuns(src)) throw new Error("Папка вне каталога прогонов.");
     const dest = await dialog.showOpenDialog(getWin(), { title: "Куда скопировать прогон", properties: ["openDirectory", "createDirectory"] });
@@ -1442,7 +1541,8 @@ function registerIpc(getWin) {
     await fsp.cp(src, target, { recursive: true });
     return target;
   });
-  ipcMain.handle("fly:transferRun", async (_e, dir, targetProjectId, opts) => {
+  handle("fly:transferRun", async (_e, dir, targetProjectId, opts) => {
+    assertNotSyncing();
     const src = String(dir || "");
     if (!withinRuns(src)) throw new Error("Папка вне каталога прогонов.");
     const dstWs = projectPaths(targetProjectId);
@@ -1464,14 +1564,14 @@ function registerIpc(getWin) {
     }
     return { path: target, label: baseName, projectId: dstWs.projectId };
   });
-  ipcMain.handle("fly:syncState", (_e, st) => {
+  handle("fly:syncState", (_e, st) => {
     AGENT.state = st && typeof st === "object" ? st : null;
     AGENT.syncedAt = Date.now();
     writeSnapshot();
     return true;
   });
-  ipcMain.handle("fly:agentAck", (_e, reqId, result) => agentAck(reqId, result));
-  ipcMain.handle("fly:agentInfo", () => ({
+  handle("fly:agentAck", (_e, reqId, result) => agentAck(reqId, result));
+  handle("fly:agentInfo", () => ({
     enabled: agentEnabled(), running: !!AGENT.server, port: AGENT.port,
     url: AGENT.server ? `http://127.0.0.1:${AGENT.port}` : null,
     file: AGENT_FILE, token: AGENT.token,
@@ -1479,7 +1579,7 @@ function registerIpc(getWin) {
     syncedAt: AGENT.syncedAt || null,
     ideas: (state().ideas || []).length, projects: (state().projects || []).length,
   }));
-  ipcMain.handle("fly:setAgentEnabled", (_e, on) => {
+  handle("fly:setAgentEnabled", (_e, on) => {
     const c = readConfig();
     c.agentEnabled = !!on;
     writeConfig(c);
@@ -1487,7 +1587,7 @@ function registerIpc(getWin) {
     else stopAgentServer();
     return { enabled: agentEnabled(), running: !!AGENT.server, port: AGENT.port };
   });
-  ipcMain.handle("fly:readRun", async (_e, dir) => {
+  handle("fly:readRun", async (_e, dir) => {
     const p = dir;
     if (!withinRuns(p)) throw new Error("Папка вне каталога прогонов.");
     const out = { log: "", summary: null };

@@ -33,6 +33,7 @@ interface Props {
   onCompleteStages: (ideaId: string, stageIds: string[]) => void;
   onAddJournalEntry: (ideaId: string, entry: { title: string; params: string; result: string; conclusion: string }) => void;
   onAddReferences: (items: Partial<Reference>[]) => void;
+  onDirtyChange: (dirty: boolean) => void;
 }
 
 const CODE_PROMPT = `Ты научный ассистент аспиранта, который работает с вычислительной моделью мозга дрозофилы
@@ -86,6 +87,7 @@ export function BrainView({
   onCompleteStages,
   onAddJournalEntry,
   onAddReferences,
+  onDirtyChange,
 }: Props) {
   const [tab, setTab] = useState<"work" | "setup">("work");
   const [help, setHelp] = useState(false);
@@ -134,6 +136,7 @@ export function BrainView({
           onCompleteStages={onCompleteStages}
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
+          onDirtyChange={onDirtyChange}
         />
       </div>
       {tab === "setup" && (
@@ -247,6 +250,7 @@ function Workspace({
   onCompleteStages,
   onAddJournalEntry,
   onAddReferences,
+  onDirtyChange,
 }: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
   const pid = activeProject === "all" ? projects[0]?.id ?? "project" : activeProject;
   const [paths, setPaths] = useState<ProjectPaths | null>(null);
@@ -257,6 +261,9 @@ function Workspace({
   const [current, setCurrent] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [dirty, setDirty] = useState(false);
+  const [chatDraft, setChatDraft] = useState(false);
+  const [chatBusy, setChatBusy] = useState(false);
+  useEffect(() => { onDirtyChange(dirty || chatDraft || chatBusy); return () => onDirtyChange(false); }, [dirty, chatDraft, chatBusy, onDirtyChange]);
   const [args, setArgs] = useState("");
   const [activeRuns, setActiveRuns] = useState<Record<string, { runId: string; runDir: string } | undefined>>({});
   const [logsByProject, setLogsByProject] = useState<Record<string, string>>({});
@@ -1347,6 +1354,8 @@ function Workspace({
               editor={{ current, code, dirty }}
               getEditorState={() => editorRef.current}
               onSetPermissions={setPermission}
+              onDraftChange={setChatDraft}
+              onBusyChange={setChatBusy}
             />
           )}
         </aside>
@@ -1597,6 +1606,8 @@ function ChatColumn({
   editor,
   getEditorState,
   onSetPermissions,
+  onDraftChange,
+  onBusyChange,
 }: {
   pid: string;
   workspaceId: string;
@@ -1615,6 +1626,8 @@ function ChatColumn({
   editor: { current: string | null; code: string; dirty: boolean };
   getEditorState: () => { scopeId: string; current: string | null; code: string; dirty: boolean };
   onSetPermissions: (patch: Partial<Permissions>) => Promise<void>;
+  onDraftChange: (value: boolean) => void;
+  onBusyChange: (value: boolean) => void;
 }) {
   const [provider, setProvider] = useState<LlmProvider>("deepseek");
   const [model, setModel] = useState("deepseek-chat");
@@ -1626,6 +1639,7 @@ function ChatColumn({
     }
   });
   const [input, setInput] = useState("");
+  useEffect(() => { onDraftChange(!!input.trim()); return () => onDraftChange(false); }, [input, onDraftChange]);
   const [apiCalls, setApiCalls] = useState<ApiCallRecord[]>([]);
   const [apiScope, setApiScope] = useState<"workspace" | "all">("workspace");
   const [rates, setRates] = useState<Record<string, { input: string; output: string }>>(() => {
@@ -1685,7 +1699,7 @@ function ChatColumn({
   }, [workspaceId, pid, refreshKey]);
 
   useEffect(() => {
-    localStorage.setItem(`fly-ideas:chat:${workspaceId}`, JSON.stringify(msgs.slice(-60)));
+    if (!sessionStorage.getItem("fly-ideas:sync-applying")) localStorage.setItem(`fly-ideas:chat:${workspaceId}`, JSON.stringify(msgs.slice(-60)));
   }, [msgs, workspaceId]);
 
   useEffect(() => {
@@ -1829,6 +1843,7 @@ function ChatColumn({
     setMsgs(next);
     setInput("");
     setBusy(true);
+    onBusyChange(true);
     setErr("");
 
     let result: { content: string; usage?: unknown; finishReason?: string | null };
@@ -1858,6 +1873,7 @@ function ChatColumn({
         setMsgs((messages) => [...messages, { role: "assistant", content: `Ошибка API: ${errorText}` }]);
       }
       setBusy(false);
+      onBusyChange(false);
       return;
     }
 
@@ -1908,6 +1924,7 @@ function ChatColumn({
       setMsgs((messages) => [...messages, { role: "assistant", content: visibleContent, actions }]);
     }
     setBusy(false);
+    onBusyChange(false);
   };
 
   const found = provider === "perplexity" && msgs.length ? parseReferencesFromText(msgs[msgs.length - 1].content) : [];
