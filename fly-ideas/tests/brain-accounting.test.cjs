@@ -65,6 +65,7 @@ test('новый тест Brian2 добавляется в идею и не за
     const smoke = path.join(ideaDir, '20_brian2_smoke_test.py');
     assert.ok(fs.existsSync(smoke));
     assert.ok(fs.existsSync(path.join(ideaDir, '21_check_linked_data.py')));
+    assert.ok(fs.existsSync(path.join(ideaDir, '22_shiu_reference_check.py')));
     const sample = path.join(ideaDir, 'small_sample_lif_fixed.py');
     assert.ok(fs.existsSync(sample));
     fs.writeFileSync(sample, '# изменения пользователя\n');
@@ -79,6 +80,7 @@ test('новый тест Brian2 добавляется в идею и не за
     templates.syncProjectTemplates('idea:i-lesions', otherDir);
     assert.equal(fs.existsSync(path.join(otherDir, '20_brian2_smoke_test.py')), false);
     assert.ok(fs.existsSync(path.join(otherDir, '21_check_linked_data.py')));
+    assert.ok(fs.existsSync(path.join(otherDir, '22_shiu_reference_check.py')));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
