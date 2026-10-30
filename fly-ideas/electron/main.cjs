@@ -36,7 +36,7 @@ function writeConfig(c) {
   fs.writeFileSync(CONFIG, JSON.stringify(c, null, 2));
 }
 
-const DATA_FILE_ROLES = { connections: "FLY_CONNECTOME", annotations: "FLY_ANNOTATIONS", cell_types: "FLY_CELL_TYPES", neurotransmitters: "FLY_NEUROTRANSMITTERS" };
+const DATA_FILE_ROLES = { connections: "FLY_CONNECTOME", annotations: "FLY_ANNOTATIONS", cell_types: "FLY_CELL_TYPES", neurotransmitters: "FLY_NEUROTRANSMITTERS", shiu_connections: "FLY_SHIU_CONNECTIONS", shiu_neurons: "FLY_SHIU_NEURONS" };
 function dataFileLinks() {
   const saved = readConfig().dataFiles || {};
   return Object.fromEntries(Object.keys(DATA_FILE_ROLES).map((role) => {
@@ -134,7 +134,7 @@ function parseScope(scopeOrProjectId) {
 function allowedTemplatesForScope(scope, includeAll = false) {
   if (includeAll || scope.kind !== "idea") return null;
   const specific = IDEA_TEMPLATE_MAP[scope.ideaId] || ["01_load_connectome.py"];
-  return new Set(["flylib.py", "00_check_env.py", "21_check_linked_data.py", "22_shiu_reference_check.py", "23_shiu_mn9_adapted.py", "small_sample_lif_fixed.py", ...specific]);
+  return new Set(["flylib.py", "00_check_env.py", "21_check_linked_data.py", "22_shiu_reference_check.py", "23_shiu_mn9_adapted.py", "24_compare_shiu_connectivity.py", "small_sample_lif_fixed.py", ...specific]);
 }
 
 function migrateLegacyIdeaScripts(scope, codeDir) {
@@ -722,8 +722,8 @@ async function setupPythonEnv(win, mode = "core") {
     const isPy313Plus = mm[0] > 3 || (mm[0] === 3 && mm[1] >= 13);
 
     const corePkgs = isPy313Plus
-      ? ["numpy", "pyarrow", "pandas", "scipy", "matplotlib"]
-      : ["numpy<2", "pyarrow<19", "pandas", "scipy", "matplotlib"];
+      ? ["numpy", "pyarrow", "pandas", "scipy", "matplotlib", "duckdb>=1.2,<2"]
+      : ["numpy<2", "pyarrow<19", "pandas", "scipy", "matplotlib", "duckdb>=1.2,<2"];
     const extraPkgs = isPy313Plus
       ? ["brian2", "networkx", "joblib", "requests", "tqdm", "pillow"]
       : ["brian2==2.9.0", "networkx", "joblib", "requests", "tqdm", "pillow"];
@@ -793,6 +793,8 @@ async function runScript(win, projectId, name, args) {
     FLY_ANNOTATIONS: links.annotations.path,
     FLY_CELL_TYPES: links.cell_types.path,
     FLY_NEUROTRANSMITTERS: links.neurotransmitters.path,
+    FLY_SHIU_CONNECTIONS: links.shiu_connections.path,
+    FLY_SHIU_NEURONS: links.shiu_neurons.path,
     FLY_RUN_DIR: runDir,
     FLY_SCRIPTS: ws.code,
     FLY_PROJECT: ws.projectId,
@@ -1311,7 +1313,7 @@ function registerIpc(getWin) {
   handle("fly:chooseDataFile", async (_e, role) => {
     assertNotSyncing();
     if (!Object.hasOwn(DATA_FILE_ROLES, role)) throw new Error("Неизвестный тип файла данных.");
-    const titles = { connections: "Выберите таблицу связей", annotations: "Выберите классификацию нейронов", cell_types: "Выберите таблицу типов клеток", neurotransmitters: "Выберите таблицу нейромедиаторов" };
+    const titles = { connections: "Выберите таблицу связей", annotations: "Выберите классификацию нейронов", cell_types: "Выберите таблицу типов клеток", neurotransmitters: "Выберите таблицу нейромедиаторов", shiu_connections: "Выберите авторскую связность Shiu v630 (Parquet)", shiu_neurons: "Выберите авторский список нейронов Shiu v630 (CSV)" };
     const r = await dialog.showOpenDialog(getWin(), {
       title: titles[role],
       defaultPath: getDirs().data,

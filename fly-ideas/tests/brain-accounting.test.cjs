@@ -70,6 +70,11 @@ test('новый тест Brian2 добавляется в идею и не за
     assert.ok(fs.existsSync(sample));
     fs.writeFileSync(sample, '# изменения пользователя\n');
     templates.syncProjectTemplates('idea:i-individuality', ideaDir);
+    const compare = path.join(ideaDir, '24_compare_shiu_connectivity.py');
+    assert.ok(fs.existsSync(compare));
+    fs.writeFileSync(compare, '# пользовательская версия сравнения\n');
+    templates.syncProjectTemplates('idea:i-individuality', ideaDir);
+    assert.equal(fs.readFileSync(compare, 'utf8'), '# пользовательская версия сравнения\n');
     assert.equal(fs.readFileSync(sample, 'utf8'), '# изменения пользователя\n');
     assert.equal(fs.readFileSync(path.join(ideaDir, 'env_smoke_test.py'), 'utf8'), '# пользовательский файл\n');
     fs.writeFileSync(smoke, '# изменён пользователем\n');
@@ -82,6 +87,7 @@ test('новый тест Brian2 добавляется в идею и не за
     assert.ok(fs.existsSync(path.join(otherDir, '21_check_linked_data.py')));
     assert.ok(fs.existsSync(path.join(otherDir, '22_shiu_reference_check.py')));
     assert.ok(fs.existsSync(path.join(otherDir, '23_shiu_mn9_adapted.py')));
+    assert.ok(fs.existsSync(path.join(otherDir, '24_compare_shiu_connectivity.py')));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

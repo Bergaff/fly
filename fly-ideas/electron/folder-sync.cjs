@@ -3,7 +3,7 @@ const fsp = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const ROLES = ['connections', 'annotations', 'cell_types', 'neurotransmitters'];
+const ROLES = ['connections', 'annotations', 'cell_types', 'neurotransmitters', 'shiu_connections', 'shiu_neurons'];
 const SKIP_DIRS = new Set(['.git', '.venv', 'node_modules', '__pycache__']);
 const SKIP_FILES = new Set(['secrets.json', '.env']);
 const ID_RE = /^[a-zA-Z0-9_-][a-zA-Z0-9_.-]{0,119}$/;
@@ -73,7 +73,7 @@ async function walk(root, output, kind, scope) {
       if (entry.isSymbolicLink()) throw new Error(`Ссылки внутри синхронизируемых папок не поддерживаются: ${path.join(dir, entry.name)}`);
       const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
       if (!safeRel(rel)) throw new Error(`Имя файла несовместимо с Windows: ${rel}`);
-      if (entry.isDirectory()) { if (!SKIP_DIRS.has(entry.name.toLowerCase())) await visit(path.join(dir, entry.name), rel); }
+      if (entry.isDirectory()) { if (!SKIP_DIRS.has(entry.name.toLowerCase()) && !entry.name.toLowerCase().startsWith('.compare_tmp-')) await visit(path.join(dir, entry.name), rel); }
       else if (entry.isFile() && !SKIP_FILES.has(entry.name.toLowerCase())) output.push({ kind, scope, rel, source: path.join(dir, entry.name) });
     }
   }

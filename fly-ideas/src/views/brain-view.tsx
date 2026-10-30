@@ -38,7 +38,7 @@ interface Props {
 }
 
 const CODE_PROMPT = `Ты научный ассистент аспиранта, который работает с вычислительной моделью мозга дрозофилы
-(LIF-модель Shiu et al. 2024 на коннектоме FlyWire v783, репозиторий eonsystemspbc/fly-brain; numpy, Brian2, pandas).
+(модель Shiu et al. 2024 и её возможные адаптации; авторский ноутбук использует FlyWire v630; numpy, Brian2, pandas).
 Пользователь пишет код с помощью ИИ и интересуется когнитивистикой: память, обучение в грибовидных телах,
 интерференция, социальное обучение.
 
@@ -55,7 +55,7 @@ const CODE_PROMPT = `Ты научный ассистент аспиранта, 
 - если скрипт вычисляет научные показатели, определяй их корректно и не называй генетической наследуемостью простую воспроизводимость;
 - скрипт получает переменные окружения: FLY_DATA (папка данных коннектома), FLY_RUN_DIR (папка этого прогона,
   туда писать summary.json и графики png), FLY_SCRIPTS (папка кода проекта), FLY_PROJECT (имя проекта).
-  FLY_CONNECTOME, FLY_ANNOTATIONS, FLY_CELL_TYPES и FLY_NEUROTRANSMITTERS содержат пути вручную подключённых таблиц, либо пустую строку. Если нужны данные, проверяй путь и колонки, указывай источник, не выдавай произвольную таблицу за исходную модель Shiu и не подменяй данные синтетикой без явного выбора;
+  FLY_CONNECTOME, FLY_ANNOTATIONS, FLY_CELL_TYPES, FLY_NEUROTRANSMITTERS, FLY_SHIU_CONNECTIONS и FLY_SHIU_NEURONS содержат пути вручную подключённых таблиц, либо пустую строку. Если нужны данные, проверяй путь и колонки, указывай источник, не выдавай произвольную таблицу за исходную модель Shiu и не подменяй данные синтетикой без явного выбора;
 - добавь argparse с --seed и основными параметрами протокола, значения по умолчанию обязательны;
 - в summary.json положи args, метрики и имена созданных файлов;
 - не выдумывай API Brian2: если не уверен, скажи, что нужно проверить в документации;
@@ -1211,6 +1211,7 @@ function Workspace({
 
           <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-2 py-1.5">
             <span className="label">результат · {scopeLabel}</span>
+            <Button size="sm" variant="outline" disabled={!!runId} onClick={() => void startScriptInProject(scopeId, "24_compare_shiu_connectivity.py", [])} title="Сравнить подключённые связи Princeton и авторские файлы Shiu v630">сравнить связность</Button>
             {selRun ? (
               <>
                 <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
@@ -2629,7 +2630,7 @@ function DataPanel() {
       <section className="border">
         <div className="border-b px-2 py-1.5 text-[12px] font-medium">Файлы, скачанные вручную</div>
         <div className="space-y-2 p-2">
-          {([['connections', 'Таблица связей', 'FLY_CONNECTOME'], ['annotations', 'Классификация нейронов', 'FLY_ANNOTATIONS'], ['cell_types', 'Типы клеток', 'FLY_CELL_TYPES'], ['neurotransmitters', 'Нейромедиаторы', 'FLY_NEUROTRANSMITTERS']] as const).map(([role, title, variable]) => {
+          {([['connections', 'Таблица связей', 'FLY_CONNECTOME'], ['annotations', 'Классификация нейронов', 'FLY_ANNOTATIONS'], ['cell_types', 'Типы клеток', 'FLY_CELL_TYPES'], ['neurotransmitters', 'Нейромедиаторы', 'FLY_NEUROTRANSMITTERS'], ['shiu_connections', 'Авторские связи Shiu v630 (Parquet)', 'FLY_SHIU_CONNECTIONS'], ['shiu_neurons', 'Авторский список нейронов Shiu v630 (CSV)', 'FLY_SHIU_NEURONS']] as const).map(([role, title, variable]) => {
             const link = links?.[role];
             return (
               <div key={role} className="border-b pb-2 last:border-b-0 last:pb-0">
@@ -2646,6 +2647,8 @@ function DataPanel() {
               </div>
             );
           })}
+          <p className="text-[11px] leading-relaxed text-muted-foreground">Авторские файлы можно скачать на GitHub: <button type="button" className="cursor-pointer underline" onClick={() => void fly!.openExternal("https://github.com/philshiu/Drosophila_brain_model/blob/91bdd1e7dcf193f3e7ca5a8933497fcef63b7960/2023_03_23_connectivity_630_final.parquet")}>2023_03_23_connectivity_630_final.parquet</button> и <button type="button" className="cursor-pointer underline" onClick={() => void fly!.openExternal("https://github.com/philshiu/Drosophila_brain_model/blob/91bdd1e7dcf193f3e7ca5a8933497fcef63b7960/2023_03_23_completeness_630_final.csv")}>2023_03_23_completeness_630_final.csv</button>. На GitHub нажмите Download raw file, затем выберите скачанные файлы выше. Ваши файлы Princeton остаются подключёнными отдельно.</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">Для сравнения откройте выбранную идею в «Код и результаты» и нажмите «сравнить связность». Нужны все три таблицы: ваши связи и два авторских файла. Нейромедиаторы нужны только для сравнения знаков.</p>
           {linkError && <p role="alert" className="text-[11px] text-destructive">{linkError}</p>}
           <p className="text-[11px] leading-relaxed text-muted-foreground">Выберите CSV, TSV, CSV.GZ, TSV.GZ или Parquet. Файлы остаются на месте. Пути доступны скриптам через переменные выше; только скрипты, поддерживающие эти переменные, используют их. Проверить таблицу можно в любой идее через 21_check_linked_data.py.</p>
           <p className="text-[11px] leading-relaxed text-muted-foreground">Готовые анализы 10..19 и старые скрипты пока не читают эти выбранные файлы автоматически. Им нужны их исходные форматы в папке данных. Доступность файла не подтверждает его состав, версию или пригодность для baseline Shiu.</p>
@@ -2685,7 +2688,7 @@ function DataPanel() {
         <a className="underline" href="https://github.com/eonsystemspbc/fly-brain" target="_blank" rel="noreferrer">
           eonsystemspbc/fly-brain
         </a>
-        : FlyWire v783 (последний публичный релиз коннектома, тот же, что в Nature 2024) и код модели Shiu et al. Полный мозг занимает около 100 МБ таблиц, не терабайты.
+        : FlyWire v783 (публичный релиз коннектома) и код модели Shiu et al. В опубликованной работе авторский ноутбук использует v630. Полный мозг занимает около 100 МБ таблиц, не терабайты.
       </p>
 
       {groups.map((g) => (

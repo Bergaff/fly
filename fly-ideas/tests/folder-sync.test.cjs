@@ -17,6 +17,7 @@ test('два компьютера: снимки независимы, локал
   await put(path.join(a.projectPaths('idea:a').runs, 'run', 'summary.json'), '{"result":1}');
   await put(path.join(aPath, 'secrets.json'), 'secret');
   await put(path.join(aPath, '.venv', 'lib.py'), 'venv');
+  await put(path.join(a.projectPaths('idea:a').runs, 'run', '.compare_tmp-old', 'scratch'), 'temporary');
   await put(path.join(bPath, 'work.py'), 'computer B');
   await put(path.join(bPath, 'keep.py'), 'not deleted');
   const apiA = { a: [{ question: 'question A' }] }, apiB = { b: [{ question: 'question B' }] };
@@ -31,6 +32,7 @@ test('два компьютера: снимки независимы, локал
   assert.equal(await fs.readFile(path.join(bPath, 'keep.py'), 'utf8'), 'not deleted');
   await assert.rejects(fs.stat(path.join(bPath, 'secrets.json')), { code: 'ENOENT' });
   await assert.rejects(fs.stat(path.join(bPath, '.venv')), { code: 'ENOENT' });
+  await assert.rejects(fs.stat(path.join(b.projectPaths('idea:a').runs, 'run', '.compare_tmp-old')), { code: 'ENOENT' });
   const back = await restoreSnapshot(path.join(dir, 'backups'), result.backup.id, b, ui('A'), apiA, path.join(dir, 'backups'), () => {}, true);
   assert.deepEqual(back.ui, ui('B', []));
   assert.deepEqual(back.apiCalls, apiB);
@@ -40,7 +42,9 @@ test('два компьютера: снимки независимы, локал
 test('данные и внешние таблицы включаются только по выбору и получают новые пути', async () => fixture(async dir => {
   const shared = path.join(dir, 'drive'), table = path.join(dir, 'outside', 'connections.csv');
   await put(table, 'edge data');
-  const a = runtime(path.join(dir, 'a'), { connections: { path: table } }), b = runtime(path.join(dir, 'b'));
+  const author = path.join(dir, 'outside', 'author.parquet'), authorIds = path.join(dir, 'outside', 'author.csv');
+  await put(author, 'author edges'); await put(authorIds, 'author IDs');
+  const a = runtime(path.join(dir, 'a'), { connections: { path: table }, shiu_connections: {path: author}, shiu_neurons: {path: authorIds} }), b = runtime(path.join(dir, 'b'));
   await put(path.join(a.dataDir, 'data.csv'), 'data');
   const noData = await createSnapshot(shared, a, ui('A'), {}, false);
   const plain = await restoreSnapshot(shared, noData.id, b, ui('B'), {}, path.join(dir, 'backup'));
@@ -50,6 +54,8 @@ test('данные и внешние таблицы включаются тол�
   const result = await restoreSnapshot(shared, data.id, b, ui('B'), {}, path.join(dir, 'backup'));
   assert.equal(await fs.readFile(path.join(b.dataDir, 'data.csv'), 'utf8'), 'data');
   assert.equal(await fs.readFile(result.linked.connections, 'utf8'), 'edge data');
+  assert.equal(await fs.readFile(result.linked.shiu_connections, 'utf8'), 'author edges');
+  assert.equal(await fs.readFile(result.linked.shiu_neurons, 'utf8'), 'author IDs');
   assert.notEqual(result.linked.connections, table);
 }));
 

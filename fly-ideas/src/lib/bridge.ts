@@ -92,7 +92,7 @@ export interface AgentNotice { text: string; at: number }
 
 export type DirKind = "data" | "scripts" | "runs" | "exports";
 export interface Paths { workspace: string; data: string; scripts: string; runs: string; exports: string; defaults: Record<DirKind, string>; templates: string }
-export type DataFileRole = "connections" | "annotations" | "cell_types" | "neurotransmitters";
+export type DataFileRole = "connections" | "annotations" | "cell_types" | "neurotransmitters" | "shiu_connections" | "shiu_neurons";
 export type DataFileLinks = Record<DataFileRole, { path: string; available: boolean; size: number | null }>;
 export interface ExternalSource { title: string; url: string; note: string }
 export interface FileFilter { name: string; extensions: string[] }

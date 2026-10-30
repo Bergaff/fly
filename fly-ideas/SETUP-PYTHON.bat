@@ -38,12 +38,12 @@ if not exist "workspace\.venv\Scripts\python.exe" (
 set "VENV_PY=workspace\.venv\Scripts\python.exe"
 
 echo.
-echo  [2/3] Устанавливаю научные пакеты (numpy, pandas, scipy, matplotlib, pyarrow, brian2)...
+echo  [2/3] Устанавливаю научные пакеты (numpy, pandas, scipy, matplotlib, pyarrow, brian2, duckdb)...
 "%VENV_PY%" -c "import sys; raise SystemExit(0 if sys.version_info[:2] <= (3, 12) else 1)" >nul 2>nul
 if not errorlevel 1 (
-  "%VENV_PY%" -m pip install --prefer-binary "numpy<2" "pyarrow<19" pandas scipy matplotlib brian2==2.9.0 networkx joblib requests tqdm pillow
+  "%VENV_PY%" -m pip install --prefer-binary "numpy<2" "pyarrow<19" pandas scipy matplotlib brian2==2.9.0 networkx joblib requests tqdm pillow "duckdb>=1.2,<2"
 ) else (
-  "%VENV_PY%" -m pip install --prefer-binary numpy pyarrow pandas scipy matplotlib brian2 networkx joblib requests tqdm pillow
+  "%VENV_PY%" -m pip install --prefer-binary numpy pyarrow pandas scipy matplotlib brian2 networkx joblib requests tqdm pillow "duckdb>=1.2,<2"
 )
 
 if errorlevel 1 (
