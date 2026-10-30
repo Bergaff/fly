@@ -120,6 +120,7 @@ export interface FlyBridge {
   openFile(opts: { filters?: FileFilter[]; kind?: DirKind }): Promise<{ path: string; content: string } | null>;
   listExternal(): Promise<ExternalSource[]>;
   readRunFile(dir: string, name: string): Promise<{ kind: "image"; dataUrl: string } | { kind: "text"; text: string }>;
+  copyRunFile(dir: string, name: string): Promise<{ kind: "text" | "image"; bytes: number }>;
   exportRun(dir: string): Promise<string | null>;
   transferRun(dir: string, targetProjectId: string, opts?: { move?: boolean }): Promise<{ path: string; label: string; projectId: string }>;
 

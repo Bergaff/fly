@@ -273,6 +273,12 @@ function Workspace({
   const [detail, setDetail] = useState<{ log: string; summary: Record<string, unknown> | null } | null>(null);
   const [images, setImages] = useState<{ name: string; dataUrl: string }[]>([]);
   const [viewFile, setViewFile] = useState<{ name: string; text: string } | null>(null);
+  // null означает лог выбранного прогона или текущий живой лог.
+  const [selectedArtifact, setSelectedArtifact] = useState<string | null>(null);
+  const [artifactLoading, setArtifactLoading] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
+  const [copyBusy, setCopyBusy] = useState(false);
+  const copyRequest = useRef(0);
   const [ideaId, setIdeaId] = useState<string>(() => ideas.find((i) => i.projectId === pid)?.id ?? ideas[0]?.id ?? "");
   const [workspaceIdeaId, setWorkspaceIdeaId] = useState<string>(() => focusIdeaId || ideas.find((i) => i.projectId === pid)?.id || "");
   const [rightTab, setRightTab] = useState<"presets" | "chat">("presets");
@@ -282,7 +288,6 @@ function Workspace({
   const [added, setAdded] = useState(false);
   const [collapsedTree, setCollapsedTree] = useState<Set<string>>(() => new Set());
   const [saveNote, setSaveNote] = useState("");
-  const [logCopied, setLogCopied] = useState(false);
   const [missingPackage, setMissingPackage] = useState<string | null>(null);
   const [installingPackages, setInstallingPackages] = useState(false);
   const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
@@ -304,7 +309,7 @@ function Workspace({
 
   const runId = activeRuns[scopeId]?.runId ?? null;
   const liveLog = logsByProject[scopeId] ?? "";
-  const displayLog = runId ? liveLog : selRun ? detail?.log ?? liveLog : liveLog;
+  const displayLog = selRun ? detail?.log ?? "" : liveLog;
   const otherProjects = useMemo(() => projects.filter((p) => p.id !== pid), [projects, pid]);
 
   const orderedIdeasForJournal = useMemo(() => {
@@ -341,6 +346,10 @@ function Workspace({
     const targetScope = pidRef.current;
     const isCurrent = () => runRequest.current === request && pidRef.current === targetScope;
     setSelRun(r);
+    copyRequest.current += 1;
+    setCopyStatus("");
+    setSelectedArtifact(null);
+    setArtifactLoading(false);
     setViewFile(null);
     setImages([]);
     setDetail(null);
@@ -358,7 +367,10 @@ function Workspace({
   async function openRunArtifact(r: RunInfo, name: string) {
     const targetScope = pidRef.current;
     const request = openRun(r);
+    if (name === "log.txt") return;
+    setSelectedArtifact(name);
     if (/\.(png|jpe?g|svg|gif)$/i.test(name)) return;
+    setArtifactLoading(true);
     try {
       if (/\.(parquet|xlsx)$/i.test(name)) {
         const separator = r.path.includes("\\") ? "\\" : "/";
@@ -369,7 +381,9 @@ function Workspace({
       const res = await fly!.readRunFile(r.path, name);
       if (res.kind === "text" && runRequest.current === request && pidRef.current === targetScope) setViewFile({ name, text: res.text });
     } catch (e) {
-      if (runRequest.current === request && pidRef.current === targetScope) setSaveNote(`Не удалось открыть файл: ${(e as Error).message}`);
+      if (runRequest.current === request && pidRef.current === targetScope) setCopyStatus(`Не удалось открыть файл: ${(e as Error).message}`);
+    } finally {
+      if (runRequest.current === request && pidRef.current === targetScope) setArtifactLoading(false);
     }
   }
 
@@ -378,6 +392,12 @@ function Workspace({
     if (!bridge) return;
       setLogsByProject((prev) => ({ ...prev, [targetPid]: "" }));
       if (pidRef.current === targetPid) {
+      runRequest.current += 1;
+      copyRequest.current += 1;
+      setSelRun(null);
+      setSelectedArtifact(null);
+      setArtifactLoading(false);
+      setCopyStatus("");
       setDetail(null);
       setImages([]);
       setViewFile(null);
@@ -423,6 +443,10 @@ function Workspace({
     let cancelled = false;
     runRequest.current += 1;
     fileRequest.current += 1;
+    copyRequest.current += 1;
+    setSelectedArtifact(null);
+    setArtifactLoading(false);
+    setCopyStatus("");
     setFiles([]);
     setRuns([]);
     setPaths(null);
@@ -509,8 +533,8 @@ function Workspace({
   }, [refreshRuns, projects, ideas]);
 
   useEffect(() => {
-    logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
-  }, [liveLog]);
+    if (!selRun && !selectedArtifact) logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
+  }, [liveLog, selRun, selectedArtifact]);
 
   const saveBeforeWorkspaceChange = useCallback(async () => {
     if (!dirty || !current || !fly) return true;
@@ -805,25 +829,33 @@ function Workspace({
     setAdded(true);
   };
 
-  const otherFiles = selRun ? selRun.files.filter((f) => !/\.(png|jpe?g|svg|gif)$/i.test(f) && f !== "summary.json") : [];
-  const copyLogs = async () => {
-    const text = displayLog || "";
-    if (!text) return;
+  const resultFiles = selRun ? selRun.files.filter((f) => f !== "log.txt") : [];
+  const copyCurrentResult = async () => {
+    const request = ++copyRequest.current;
+    const name = selectedArtifact || "log.txt";
+    setCopyStatus("");
+    setCopyBusy(true);
     try {
-      await navigator.clipboard.writeText(text);
-      setLogCopied(true);
-      window.setTimeout(() => setLogCopied(false), 1500);
-    } catch {
-      const area = document.createElement("textarea");
-      area.value = text;
-      area.style.position = "fixed";
-      area.style.opacity = "0";
-      document.body.appendChild(area);
-      area.select();
-      document.execCommand("copy");
-      area.remove();
-      setLogCopied(true);
-      window.setTimeout(() => setLogCopied(false), 1500);
+      if (selRun && (selectedArtifact || selRun.files.includes("log.txt"))) {
+        const result = await fly!.copyRunFile(selRun.path, name);
+        if (copyRequest.current === request) setCopyStatus(`Скопировано: ${name}${result.kind === "image" ? " (изображение)" : " (текст)"}`);
+      } else if (!selectedArtifact && displayLog) {
+        try { await navigator.clipboard.writeText(displayLog); }
+        catch {
+          const area = document.createElement("textarea");
+          area.value = displayLog;
+          area.style.position = "fixed";
+          area.style.opacity = "0";
+          document.body.appendChild(area);
+          try { area.select(); if (!document.execCommand("copy")) throw new Error("Буфер обмена недоступен."); }
+          finally { area.remove(); }
+        }
+        if (copyRequest.current === request) setCopyStatus("Скопирована видимая часть текущего лога.");
+      }
+    } catch (e) {
+      if (copyRequest.current === request) setCopyStatus(`Не удалось скопировать ${name}: ${(e as Error).message}`);
+    } finally {
+      setCopyBusy(false);
     }
   };
 
@@ -1249,53 +1281,40 @@ function Workspace({
 
           <div ref={logRef} className="max-h-[40%] min-h-[130px] shrink-0 overflow-y-auto p-2">
             <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
-              <span className="label">лог выполнения · {scopeLabel}</span>
+              <span className="min-w-0 break-all font-mono text-[10px] text-muted-foreground">{selectedArtifact ? `выбран файл: ${selectedArtifact}` : `лог выполнения · ${scopeLabel}`}</span>
               <div className="flex items-center gap-1">
                 {missingPackage && (
                   <Button size="sm" variant="outline" className="h-6 px-2 text-[10.5px]" onClick={() => void installPackageAndRetry()} disabled={installingPackages}>
                     {installingPackages ? "устанавливаю…" : `установить ${missingPackage} и повторить`}
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" className="h-6 px-2 text-[10.5px]" onClick={() => void copyLogs()} disabled={!displayLog}>
-                  {logCopied ? "скопировано" : "копировать лог"}
+                <Button size="sm" variant="ghost" className="h-6 max-w-[230px] truncate px-2 text-[10.5px]" title={selectedArtifact ? `Копировать содержимое ${selectedArtifact}` : "Копировать лог"} onClick={() => void copyCurrentResult()} disabled={copyBusy || artifactLoading || (!selectedArtifact && !displayLog && !(selRun?.files.includes("log.txt")))}>
+                  {selectedArtifact ? `копировать ${selectedArtifact}` : "копировать лог"}
                 </Button>
               </div>
             </div>
-            {images.length > 0 && (
-              <div className="mb-2 grid gap-2 md:grid-cols-2">
-                {images.map((im) => (
-                  <figure key={im.name} className="border bg-card">
-                    <img src={im.dataUrl} alt={im.name} className="w-full" />
-                    <figcaption className="border-t px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{im.name}</figcaption>
-                  </figure>
+            {copyStatus && <p role="status" className="mb-1 break-words text-[10px] text-muted-foreground">{copyStatus}</p>}
+            {selRun && <p className="mb-1 text-[10px] text-muted-foreground">Предпросмотр может быть неполным; копируется содержимое файла до 8 МиБ. CSV и TSV копируются как текст.</p>}
+            {selRun && <div className="mb-2 flex flex-wrap gap-1">
+              <button type="button" onClick={() => openRun(selRun)} className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", !selectedArtifact && "bg-accent")}>лог</button>
+              {resultFiles.map((f) => <button type="button" key={f} onClick={() => void openRunArtifact(selRun, f)} className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", selectedArtifact === f && "bg-accent")}>{f}</button>)}
+            </div>}
+            {selectedArtifact ? (
+              <>
+                {artifactLoading && <p className="text-[11px] text-muted-foreground">Открываем файл…</p>}
+                {images.filter((im) => im.name === selectedArtifact).map((im) => <figure key={im.name} className="mb-2 border bg-card"><img src={im.dataUrl} alt={im.name} className="w-full" /><figcaption className="border-t px-2 py-1 font-mono text-[10px] text-muted-foreground">{im.name}</figcaption></figure>)}
+                {/\.svg$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">SVG копируется как текст.</p>}
+                {/\.gif$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">Для копирования GIF откройте папку прогона.</p>}
+                {/\.(parquet|xlsx)$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">Этот формат открывается во внешней программе. Для копирования файла откройте папку прогона.</p>}
+                {viewFile?.name === selectedArtifact && ((!viewFile.text.startsWith("(файл ") && (/\.csv$/i.test(viewFile.name) || /\.tsv$/i.test(viewFile.name))) ? (
+                  <DelimitedTable name={viewFile.name} text={viewFile.text} delimiter={/\.tsv$/i.test(viewFile.name) ? "\t" : ","} />
+                ) : (
+                  <div className="mb-2 border"><div className="border-b px-2 py-1 font-mono text-[10px] text-muted-foreground">{viewFile.name}</div><pre className="max-h-[240px] overflow-auto bg-muted/40 p-2 font-mono text-[11px] whitespace-pre-wrap">{viewFile.text}</pre></div>
                 ))}
-              </div>
-            )}
-            {otherFiles.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-1">
-                {otherFiles.map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => void openRunArtifact(selRun!, f)}
-                    className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", viewFile?.name === f && "bg-accent")}
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
-            )}
-            {viewFile && ((!viewFile.text.startsWith("(файл ") && (/\.csv$/i.test(viewFile.name) || /\.tsv$/i.test(viewFile.name))) ? (
-              <DelimitedTable name={viewFile.name} text={viewFile.text} delimiter={/\.tsv$/i.test(viewFile.name) ? "\t" : ","} />
+              </>
             ) : (
-              <div className="mb-2 border">
-                <div className="border-b px-2 py-1 font-mono text-[10px] text-muted-foreground">{viewFile.name}</div>
-                <pre className="max-h-[240px] overflow-auto bg-muted/40 p-2 font-mono text-[11px] whitespace-pre-wrap">{viewFile.text}</pre>
-              </div>
-            ))}
-            {detail?.summary && <pre className="mb-2 max-h-[240px] overflow-auto border bg-muted/40 p-2 font-mono text-[11px]">{JSON.stringify(detail.summary, null, 2)}</pre>}
-            <pre className="overflow-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-muted-foreground">
-              {displayLog || "лог появится здесь после запуска"}
-            </pre>
+              <pre className="overflow-auto font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-muted-foreground">{displayLog || "лог появится здесь после запуска"}</pre>
+            )}
           </div>
         </section>
 
@@ -2487,7 +2506,7 @@ function HelpDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     ["Окружение", "во вкладке «Данные и окружение» видны Python и пакеты. Если не хватает pandas или других основных библиотек, нажми «установить пакеты для анализов»: программа создаст workspace/.venv и настроит запуски на него. Brian2 можно установить отдельной кнопкой."],
     ["Готовый анализ задач (без API)", "справа открыта вкладка «По задачам (без API)»: там лежат готовые проверенные скрипты 10..19 под все 10 текущих идей (лезии, интерференция, бенчмарк бэкендов, обучение в целом мозге, память ухаживания MaleCNS, тракт в VNC, социальное обучение, индивидуальность, брачная песня, PCI) и общий модуль flylib.py. В каждом есть быстрый режим --synth и полный режим на локальных файлах FLY_DATA."],
     ["Идеи и рабочие пространства", "В центре выбери проект и идею. У каждой идеи свои папки кода, логов и прогонов; переключатель идеи над редактором открывает её пространство и карточку. При переходе несохранённый код можно сохранить. Проектное общее пространство доступно отдельным пунктом."],
-    ["Копирование логов", "Внизу панели результатов нажми «копировать лог», чтобы перенести вывод текущего запуска в буфер обмена."],
+    ["Копирование результатов", "Внизу панели результатов выбери лог или конкретный файл, затем нажми кнопку копирования с его именем. Текстовые файлы до 8 МиБ копируются целиком, PNG/JPEG как изображение. Крупные и неподдерживаемые файлы открой через папку прогона."],
     ["Первый прогон", "слева открой 00_check_env.py и запусти, либо выбери любую задачу справа и нажми «запустить» на режиме --synth. Аргументы видны и редактируются в строке над кодом."],
     ["Посмотреть нейроны", "шаблон 05_neuron_gallery.py рисует морфологию нейронов в трёх проекциях и накладывает активность из прогона: --ids 12781 556329 (скелеты скачаются сами) или --spikes путь_к_spikes.parquet, с флагом --animate получится gif с распространением сигнала."],
     ["Прогон модели", "шаблон 06_brian2_shiu.py считает LIF-сеть на Brian2: сам подбирает фоновый вес под целевую частоту, стимулирует и заглушает заданные нейроны, пишет spikes.parquet, rates_top.csv, raster.png. Проверка без данных: --synth --n 2000 --t 0.5."],

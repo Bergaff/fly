@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, shell, ipcMain, dialog, clipboard, nativeImage } = require("electron");
 const os = require("node:os");
 const path = require("node:path");
 const fs = require("node:fs");
@@ -9,6 +9,7 @@ const http = require("node:http");
 const crypto = require("node:crypto");
 const { writeAssistantFile } = require("./assistant-files.cjs");
 const folderSync = require("./folder-sync.cjs");
+const { copyRunFile } = require("./result-copy.cjs");
 
 const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
@@ -1532,6 +1533,13 @@ function registerIpc(getWin) {
     if (st.size > 400_000) return { kind: "text", text: `(файл ${(st.size / 1e6).toFixed(1)} МБ — открой в папке)` };
     return { kind: "text", text: await fsp.readFile(p, "utf8") };
   });
+  handle("fly:copyRunFile", (_e, dir, name) => copyRunFile({
+    dir, name, withinRuns, clipboard, nativeImage,
+    withinRealRuns: (full) => {
+      const dirs = [DIRS.runs, ...Object.values(readConfig().projectDirs || {}).map((v) => v?.runs).filter((v) => typeof v === "string")];
+      return dirs.some((root) => { try { return within(fs.realpathSync(root), full); } catch { return false; } });
+    },
+  }));
   handle("fly:exportRun", async (_e, dir) => {
     const src = dir;
     if (!withinRuns(src)) throw new Error("Папка вне каталога прогонов.");

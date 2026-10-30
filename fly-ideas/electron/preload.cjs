@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld("fly", {
   openFile: (opts) => ipcRenderer.invoke("fly:openFile", opts),
   listExternal: () => ipcRenderer.invoke("fly:listExternal"),
   readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),
+  copyRunFile: (dir, name) => ipcRenderer.invoke("fly:copyRunFile", dir, name),
   exportRun: (dir) => ipcRenderer.invoke("fly:exportRun", dir),
   transferRun: (dir, targetProjectId, opts) => ipcRenderer.invoke("fly:transferRun", dir, targetProjectId, opts),
   // --- рабочее место проекта ---
