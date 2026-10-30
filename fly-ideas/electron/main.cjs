@@ -629,7 +629,7 @@ async function checkEnv() {
   if (py) {
     const probe = `
 import json, importlib
-mods = ["numpy","pandas","pyarrow","brian2","torch","matplotlib","scipy"]
+mods = ["numpy","pandas","pyarrow","brian2","torch","matplotlib","scipy","duckdb"]
 out = {}
 for m in mods:
     try:

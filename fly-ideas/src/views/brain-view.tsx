@@ -2893,7 +2893,7 @@ function EnvPanel() {
     });
   }, []);
 
-  const need = ["numpy", "pandas", "scipy", "matplotlib", "pyarrow"];
+  const need = ["numpy", "pandas", "scipy", "matplotlib", "pyarrow", "duckdb"];
   const missing = env ? need.filter((m) => !env.packages[m]) : need;
   const setup = async (mode: "core" | "full" = "core") => {
     setSettingUp(true);
@@ -2978,7 +2978,7 @@ function EnvPanel() {
               </Button>
             )}
             <span className="label">
-              {env ? (missing.length ? `не хватает: ${missing.join(", ")}` : "numpy, pandas, scipy, matplotlib и pyarrow доступны") : "проверка Python…"}
+              {env ? (missing.length ? `не хватает: ${missing.join(", ")}` : "numpy, pandas, scipy, matplotlib, pyarrow и duckdb доступны") : "проверка Python…"}
             </span>
           </div>
           <p className="text-[11px] leading-relaxed text-muted-foreground">

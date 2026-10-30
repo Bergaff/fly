@@ -27,12 +27,14 @@ test('IPC связывает файлы, передаёт пути запуще�
     };
     const fakeProcess = { ...process, env: { ...process.env, VITE_DEV_SERVER_URL: 'http://localhost:5173', FLY_CONNECTOME: 'not-inherited' }, platform: process.platform };
     const source = await fsp.readFile(mainPath, 'utf8');
-    vm.runInNewContext(`${source}\npickPython = async () => ({exe: ${JSON.stringify(python)}, version: 'test'});\nregisterIpc(() => ({webContents:{send:(_channel, event) => { if(event.stream === 'exit') onExit(event); }}}));`, {
+    vm.runInNewContext(`${source}\npickPython = async () => ({exe: ${JSON.stringify(python)}, cmd: ${JSON.stringify(python)}, version: 'test'});\nregisterIpc(() => ({webContents:{send:(_channel, event) => { if(event.stream === 'exit') onExit(event); }}}));`, {
       require: (name) => name === 'electron' ? electron : realRequire(name),
       __dirname: path.join(dir, 'app', 'electron'), process: fakeProcess, console, setTimeout, clearTimeout, Buffer, URL,
       onExit: (ev) => onExit(ev), module: { exports: {} },
     });
     const call = (name, ...args) => handlers.get(`fly:${name}`)(null, ...args);
+    const env = await call('checkEnv');
+    assert.ok(Object.hasOwn(env.packages, 'duckdb'), 'duckdb must be included in environment diagnostics');
     const file = path.join(dir, 'ручные связи.csv.gz');
     const contents = zlib.gzipSync('pre_root_id,post_root_id,syn_count\n720575940000000001,720575940000000002,7\n');
     await fsp.writeFile(file, contents);
