@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Idea, IdeaScores, IdeaStatus, Project, Reference } from "@/data/types";
 import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
+import { ResearchProgress } from "@/components/research-progress";
 import { Checklist } from "@/components/checklist";
 import { ExperimentLog } from "@/components/experiment-log";
 import { CitationsEditor } from "@/components/citations-editor";
@@ -163,6 +164,8 @@ export function IdeaDialog({
  </TabsContent>
 
  <TabsContent value="checklist" className="pt-2">
+ <ResearchProgress idea={draft} onUpdateIdea={(_id, patch) => setDraft((current) => current ? { ...current, ...patch } : current)} />
+ <p className="mt-3 text-[10px] text-muted-foreground">Изменения сохраняются кнопкой «Сохранить» внизу окна.</p>
  <p className="mb-3 text-xs text-muted-foreground">Этапы «от идеи до статьи». Галочки сохраняются с датой; порядок можно менять перетаскиванием.</p>
  <Checklist items={draft.checklist} onChange={(items) => set("checklist", items)} />
  </TabsContent>

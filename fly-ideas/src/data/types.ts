@@ -46,6 +46,19 @@ export interface ChecklistItem {
  doneAt?: string | null;
 }
 
+export type ResearchStageId = "observation" | "reproduction" | "interpretation" | "verification";
+export interface ResearchStageState { done: boolean; evidence: string; doneAt?: string | null }
+export const RESEARCH_STAGES: { id: ResearchStageId; label: string; description: string }[] = [
+ { id: "observation", label: "Наблюдение", description: "Что замечено, в каких данных и условиях?" },
+ { id: "reproduction", label: "Воспроизведение", description: "Получен ли результат повторно при описанных условиях?" },
+ { id: "interpretation", label: "Интерпретация", description: "Какое объяснение предложено и каковы его ограничения?" },
+ { id: "verification", label: "Верификация", description: "Какие независимые проверки или контроли выполнены?" },
+];
+export function researchProgress(idea: Pick<Idea, "researchProgress">) {
+ const done = RESEARCH_STAGES.filter((stage) => idea.researchProgress?.[stage.id]?.done === true).length;
+ return { done, total: RESEARCH_STAGES.length, pct: Math.round(done / RESEARCH_STAGES.length * 100) };
+}
+
 /** Стандартный конвейер «от идеи до статьи» */
 export const DEFAULT_CHECKLIST: string[] = [
  "Прочитать ключевые статьи по теме",
@@ -122,6 +135,7 @@ export interface Idea {
  notes: string;
  links: { label: string; url: string }[];
  checklist: ChecklistItem[];
+ researchProgress?: Partial<Record<ResearchStageId, ResearchStageState>>;
  deadline: string | null; // YYYY-MM-DD
  dependsOn: string[]; // id идей, из которых «растёт» эта
  experiments: ExperimentEntry[];

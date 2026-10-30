@@ -1,5 +1,5 @@
 import type { Idea } from "@/data/types";
-import { OUTCOME_COLORS, OUTCOME_LABELS, checklistProgress, deadlineInfo } from "@/data/types";
+import { OUTCOME_COLORS, OUTCOME_LABELS, checklistProgress, researchProgress, deadlineInfo } from "@/data/types";
 import { EffortImpactChart } from "@/components/charts/effort-impact-chart";
 import { StatusFunnel } from "@/components/charts/status-funnel";
 import { DependencyGraph } from "@/components/charts/dependency-graph";
@@ -77,6 +77,19 @@ export function DashboardView({ ideas, onOpen }: { ideas: Idea[]; onOpen: (id: s
           )}
         </Panel>
       </div>
+
+      <Panel title="научный прогресс по идеям" note="Наблюдение, воспроизведение, интерпретация, верификация. Это отметки пользователя, а не автоматическая проверка результатов. Нажатие открывает идею; редактирование находится на вкладке «Чеклист».">
+        <div className="max-h-[300px] overflow-y-auto">
+          {ideas.map((idea) => {
+            const progress = researchProgress(idea);
+            return <button key={idea.id} onClick={() => onOpen(idea.id)} className="flex w-full items-center gap-2 border-b py-1.5 text-left last:border-b-0 hover:bg-accent cursor-pointer">
+              <span className="min-w-0 flex-1 truncate text-[11px]">{idea.title}</span>
+              <span className="font-mono text-[10px]">{progress.done}/{progress.total} · {progress.pct}%</span>
+            </button>;
+          })}
+          {!ideas.length && <p className="py-2 text-[11px] text-muted-foreground">Идей пока нет.</p>}
+        </div>
+      </Panel>
 
       <Panel
         title="последние записи журнала"
