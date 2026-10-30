@@ -134,7 +134,7 @@ function parseScope(scopeOrProjectId) {
 function allowedTemplatesForScope(scope, includeAll = false) {
   if (includeAll || scope.kind !== "idea") return null;
   const specific = IDEA_TEMPLATE_MAP[scope.ideaId] || ["01_load_connectome.py"];
-  return new Set(["flylib.py", "00_check_env.py", "21_check_linked_data.py", "22_shiu_reference_check.py", "small_sample_lif_fixed.py", ...specific]);
+  return new Set(["flylib.py", "00_check_env.py", "21_check_linked_data.py", "22_shiu_reference_check.py", "23_shiu_mn9_adapted.py", "small_sample_lif_fixed.py", ...specific]);
 }
 
 function migrateLegacyIdeaScripts(scope, codeDir) {

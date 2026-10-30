@@ -81,6 +81,7 @@ test('новый тест Brian2 добавляется в идею и не за
     assert.equal(fs.existsSync(path.join(otherDir, '20_brian2_smoke_test.py')), false);
     assert.ok(fs.existsSync(path.join(otherDir, '21_check_linked_data.py')));
     assert.ok(fs.existsSync(path.join(otherDir, '22_shiu_reference_check.py')));
+    assert.ok(fs.existsSync(path.join(otherDir, '23_shiu_mn9_adapted.py')));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
