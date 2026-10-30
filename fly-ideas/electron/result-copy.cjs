@@ -36,8 +36,16 @@ async function copyRunFile({ dir, name, withinRuns, withinRealRuns = withinRuns,
   } finally { await handle.close(); }
   if (TEXT_EXTENSIONS.has(ext)) {
     if (!isUtf8(buffer)) throw new Error('Файл не является текстом UTF-8. Откройте его через папку прогона.');
-    clipboard.writeText(buffer.toString('utf8'));
-    return { kind: 'text', bytes: buffer.length };
+    const text = buffer.toString('utf8');
+    // На Windows буфер может быть занят другой программой: запись иногда не
+    // сообщает об этом ошибкой. Не подтверждаем копирование старого содержимого.
+    const normaliseLines = value => value.replace(/\r\n/g, '\n');
+    for (let attempt = 0; attempt < 3; attempt++) {
+      clipboard.writeText(text);
+      if (normaliseLines(clipboard.readText()) === normaliseLines(text)) return { kind: 'text', bytes: buffer.length };
+      if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw new Error('Не удалось подтвердить содержимое буфера обмена. Попробуйте снова или откройте файл в папке прогона.');
   }
   const image = nativeImage.createFromBuffer(buffer);
   if (image.isEmpty()) throw new Error('Не удалось прочитать изображение. Откройте файл через папку прогона.');

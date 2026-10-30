@@ -833,7 +833,7 @@ function Workspace({
   const copyCurrentResult = async () => {
     const request = ++copyRequest.current;
     const name = selectedArtifact || "log.txt";
-    setCopyStatus("");
+    setCopyStatus(`Копируем: ${name}…`);
     setCopyBusy(true);
     try {
       if (selRun && (selectedArtifact || selRun.files.includes("log.txt"))) {
@@ -1288,16 +1288,16 @@ function Workspace({
                     {installingPackages ? "устанавливаю…" : `установить ${missingPackage} и повторить`}
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" className="h-6 max-w-[230px] truncate px-2 text-[10.5px]" title={selectedArtifact ? `Копировать содержимое ${selectedArtifact}` : "Копировать лог"} onClick={() => void copyCurrentResult()} disabled={copyBusy || artifactLoading || (!selectedArtifact && !displayLog && !(selRun?.files.includes("log.txt")))}>
+                <Button size="sm" variant="ghost" className="h-6 max-w-[230px] truncate px-2 text-[10.5px]" title={selectedArtifact ? `Копировать содержимое ${selectedArtifact}` : "Копировать лог"} onClick={() => void copyCurrentResult()} disabled={copyBusy || (!selectedArtifact && !displayLog && !(selRun?.files.includes("log.txt")))}>
                   {selectedArtifact ? `копировать ${selectedArtifact}` : "копировать лог"}
                 </Button>
               </div>
             </div>
-            {copyStatus && <p role="status" className="mb-1 break-words text-[10px] text-muted-foreground">{copyStatus}</p>}
-            {selRun && <p className="mb-1 text-[10px] text-muted-foreground">Предпросмотр может быть неполным; копируется содержимое файла до 8 МиБ. CSV и TSV копируются как текст.</p>}
+            {copyStatus && <p role="status" className="mb-1 break-words border px-1.5 py-1 font-mono text-[10px] text-foreground">{copyStatus}</p>}
+            {selRun && <p className="mb-1 text-[10px] text-muted-foreground">Сначала выберите файл для просмотра, затем нажмите «копировать». Предпросмотр может быть неполным; содержимое файла копируется до 8 МиБ.</p>}
             {selRun && <div className="mb-2 flex flex-wrap gap-1">
-              <button type="button" onClick={() => openRun(selRun)} className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", !selectedArtifact && "bg-accent")}>лог</button>
-              {resultFiles.map((f) => <button type="button" key={f} onClick={() => void openRunArtifact(selRun, f)} className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", selectedArtifact === f && "bg-accent")}>{f}</button>)}
+              <button type="button" aria-pressed={!selectedArtifact} onClick={() => openRun(selRun)} className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", !selectedArtifact && "bg-accent")}>показать лог</button>
+              {resultFiles.map((f) => <button type="button" key={f} aria-pressed={selectedArtifact === f} onClick={() => void openRunArtifact(selRun, f)} className={cn("border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent", selectedArtifact === f && "bg-accent")}>показать {f}</button>)}
             </div>}
             {selectedArtifact ? (
               <>

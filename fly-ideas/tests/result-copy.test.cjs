@@ -24,7 +24,7 @@ test('копирование выбранного результата сохр�
   await fs.writeFile(path.join(dir, 'rates.csv'), csv);
   await fs.writeFile(path.join(dir, 'log.txt'), 'это лог');
   let clipboardText = '';
-  const options = { dir, withinRuns: p => isInside(root, p), clipboard: { writeText: value => { clipboardText = value; } } };
+  const options = { dir, withinRuns: p => isInside(root, p), clipboard: { writeText: value => { clipboardText = value; }, readText: () => clipboardText } };
   assert.equal((await copyRunFile({ ...options, name: 'summary.json' })).kind, 'text'); assert.equal(clipboardText, json);
   await copyRunFile({ ...options, name: 'rates.csv' }); assert.equal(clipboardText, csv); assert.ok(csv.length > 400000);
   await copyRunFile({ ...options, name: 'log.txt' }); assert.equal(clipboardText, 'это лог');
@@ -48,6 +48,24 @@ test('поддерживает PNG и корректно отказывает в
   await assert.rejects(copyRunFile({ ...opts, dir: path.dirname(root), name: 'secret.txt' }), /вне папки/);
 }));
 
+test('не подтверждает копирование, если буфер остался со старым кодом', async () => fixture(async root => {
+  const dir = path.join(root, 'run'); await fs.mkdir(dir);
+  await fs.writeFile(path.join(dir, 'summary.json'), '{"status":"ok"}');
+  let attempts = 0;
+  const clipboard = { writeText: () => { attempts++; }, readText: () => 'import pandas as pd' };
+  await assert.rejects(copyRunFile({ dir, name: 'summary.json', withinRuns: p => isInside(root, p), clipboard }), /Не удалось подтвердить/);
+  assert.equal(attempts, 3);
+}));
+
+test('проверка буфера учитывает замену переносов строк в Windows и повторяет запись', async () => fixture(async root => {
+  const dir = path.join(root, 'run'); await fs.mkdir(dir);
+  await fs.writeFile(path.join(dir, 'summary.json'), '{\n"status": "ok"\n}\n');
+  let value = 'old', attempts = 0;
+  const clipboard = { writeText: v => { if (++attempts > 1) value = v.replace(/\n/g, '\r\n'); }, readText: () => value };
+  await copyRunFile({ dir, name: 'summary.json', withinRuns: p => isInside(root, p), clipboard });
+  assert.equal(attempts, 2); assert.equal(value, '{\r\n"status": "ok"\r\n}\r\n');
+}));
+
 test('не копирует файл или родительскую папку, ведущие по ссылке за пределы прогонов', { skip: process.platform === 'win32' && 'создание ссылок на Windows может требовать разрешения' }, async () => fixture(async root => {
   const run = path.join(root, 'runs', 'run'), outside = path.join(root, 'outside');
   await fs.mkdir(run, { recursive: true }); await fs.mkdir(outside);
@@ -67,7 +85,7 @@ test('IPC копирует конкретный выбранный файл и �
   const electron = {
     app: { getPath: name => path.join(root, name), whenReady: () => new Promise(() => {}), on: () => {} },
     ipcMain: { handle: (name, fn) => handlers.set(name, fn) }, BrowserWindow: {}, shell: {}, dialog: {},
-    clipboard: { writeText: value => { clipboardText = value; } }, nativeImage: {},
+    clipboard: { writeText: value => { clipboardText = value; }, readText: () => clipboardText }, nativeImage: {},
   };
   const source = await fs.readFile(mainPath, 'utf8');
   vm.runInNewContext(`${source}\nregisterIpc(() => null);`, { require: name => name === 'electron' ? electron : realRequire(name), __dirname: path.join(root, 'app', 'electron'), process: { ...process, env: { ...process.env, VITE_DEV_SERVER_URL: 'http://localhost:5173' } }, console, setTimeout, clearTimeout, Buffer, URL, module: { exports: {} } });
@@ -84,6 +102,8 @@ test('IPC копирует конкретный выбранный файл и �
 test('переключение выбирает отдельный результат, лог не подставляется при ошибке', async () => {
   const source = await fs.readFile(path.join(__dirname, '../src/views/brain-view.tsx'), 'utf8');
   assert.match(source, /setSelectedArtifact\(name\)/);
+  assert.match(source, /disabled=\{copyBusy \|\| \(!selectedArtifact/);
+  assert.match(source, /показать \{f\}/);
   assert.match(source, /resultFiles = selRun \? selRun\.files\.filter\(\(f\) => f !== "log\.txt"\)/);
   const start = source.indexOf('  const copyCurrentResult = async () => {');
   const end = source.indexOf('  const installPackageAndRetry', start);
