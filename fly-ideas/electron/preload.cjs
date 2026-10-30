@@ -1,0 +1,92 @@
+const { contextBridge, ipcRenderer } = require("electron");
+
+contextBridge.exposeInMainWorld("fly", {
+  isElectron: true,
+  syncInfo: () => ipcRenderer.invoke("fly:syncInfo"),
+  chooseSyncFolder: () => ipcRenderer.invoke("fly:chooseSyncFolder"),
+  syncUpload: (ui, includeData) => ipcRenderer.invoke("fly:syncUpload", ui, includeData),
+  syncRestore: (source, id, ui) => ipcRenderer.invoke("fly:syncRestore", source, id, ui),
+  syncFinish: (reload) => ipcRenderer.invoke("fly:syncFinish", reload),
+  onSyncProgress: (cb) => { const h = (_e, p) => cb(p); ipcRenderer.on("fly:syncProgress", h); return () => ipcRenderer.removeListener("fly:syncProgress", h); },
+  // --- пути / окружение ---
+  getPaths: () => ipcRenderer.invoke("fly:getPaths"),
+  getDataFileLinks: () => ipcRenderer.invoke("fly:getDataFileLinks"),
+  chooseDataFile: (role) => ipcRenderer.invoke("fly:chooseDataFile", role),
+  clearDataFile: (role) => ipcRenderer.invoke("fly:clearDataFile", role),
+  checkEnv: () => ipcRenderer.invoke("fly:checkEnv"),
+  listPythons: () => ipcRenderer.invoke("fly:listPythons"),
+  setPython: (pyCmd) => ipcRenderer.invoke("fly:setPython", pyCmd),
+  pickPythonExe: () => ipcRenderer.invoke("fly:pickPythonExe"),
+  setupPythonEnv: (mode) => ipcRenderer.invoke("fly:setupPythonEnv", mode),
+  onEnvSetupOutput: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:envSetupOutput", h);
+    return () => ipcRenderer.removeListener("fly:envSetupOutput", h);
+  },
+  openPath: (p) => ipcRenderer.invoke("fly:openPath", p),
+  openExternal: (url) => ipcRenderer.invoke("fly:openExternal", url),
+  chooseFolder: (kind, title) => ipcRenderer.invoke("fly:chooseFolder", kind, title),
+  pickFolder: (title) => ipcRenderer.invoke("fly:pickFolder", title),
+  resetFolder: (kind) => ipcRenderer.invoke("fly:resetFolder", kind),
+  saveFile: (opts) => ipcRenderer.invoke("fly:saveFile", opts),
+  openFile: (opts) => ipcRenderer.invoke("fly:openFile", opts),
+  listExternal: () => ipcRenderer.invoke("fly:listExternal"),
+  readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),
+  copyRunFile: (dir, name) => ipcRenderer.invoke("fly:copyRunFile", dir, name),
+  exportRun: (dir) => ipcRenderer.invoke("fly:exportRun", dir),
+  transferRun: (dir, targetProjectId, opts) => ipcRenderer.invoke("fly:transferRun", dir, targetProjectId, opts),
+  // --- рабочее место проекта ---
+  projectPaths: (projectId) => ipcRenderer.invoke("fly:projectPaths", projectId),
+  chooseProjectFolder: (projectId, kind, title) => ipcRenderer.invoke("fly:chooseProjectFolder", projectId, kind, title),
+  resetProjectFolder: (projectId, kind) => ipcRenderer.invoke("fly:resetProjectFolder", projectId, kind),
+  getPermissions: () => ipcRenderer.invoke("fly:getPermissions"),
+  setPermissions: (patch) => ipcRenderer.invoke("fly:setPermissions", patch),
+  // --- данные мозга ---
+  listData: () => ipcRenderer.invoke("fly:listData"),
+  download: (item, destDir) => ipcRenderer.invoke("fly:download", item, destDir),
+  cancelDownload: (id) => ipcRenderer.invoke("fly:cancelDownload", id),
+  onDownloadProgress: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:downloadProgress", h);
+    return () => ipcRenderer.removeListener("fly:downloadProgress", h);
+  },
+  // --- скрипты проекта ---
+  listScripts: (projectId) => ipcRenderer.invoke("fly:listScripts", projectId),
+  syncTemplates: (projectId, opts) => ipcRenderer.invoke("fly:syncTemplates", projectId, opts),
+  readScript: (projectId, name) => ipcRenderer.invoke("fly:readScript", projectId, name),
+  writeScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeScript", projectId, name, content, opts),
+  writeAssistantScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeAssistantScript", projectId, name, content, opts),
+  deleteScript: (projectId, name) => ipcRenderer.invoke("fly:deleteScript", projectId, name),
+  runScript: (projectId, name, args) => ipcRenderer.invoke("fly:runScript", projectId, name, args),
+  killRun: (runId) => ipcRenderer.invoke("fly:killRun", runId),
+  onRunOutput: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:runOutput", h);
+    return () => ipcRenderer.removeListener("fly:runOutput", h);
+  },
+  // --- секреты (ключи API хранятся в userData, не в localStorage) ---
+  getSecret: (k) => ipcRenderer.invoke("fly:getSecret", k),
+  setSecret: (k, v) => ipcRenderer.invoke("fly:setSecret", k, v),
+  // --- LLM-прокси: ключ не покидает main-процесс ---
+  llmChat: (req) => ipcRenderer.invoke("fly:llmChat", req),
+  listApiCalls: (workspaceId) => ipcRenderer.invoke("fly:listApiCalls", workspaceId),
+  appendApiCall: (workspaceId, record) => ipcRenderer.invoke("fly:appendApiCall", workspaceId, record),
+  // --- мост для внешнего агента (MCP): локальный HTTP, приложение источник правды ---
+  agentInfo: () => ipcRenderer.invoke("fly:agentInfo"),
+  setAgentEnabled: (on) => ipcRenderer.invoke("fly:setAgentEnabled", on),
+  syncState: (st) => ipcRenderer.invoke("fly:syncState", st),
+  agentAck: (reqId, result) => ipcRenderer.invoke("fly:agentAck", reqId, result),
+  onAgentWrite: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:agentWrite", h);
+    return () => ipcRenderer.removeListener("fly:agentWrite", h);
+  },
+  onAgentNotice: (cb) => {
+    const h = (_e, p) => cb(p);
+    ipcRenderer.on("fly:agentNotice", h);
+    return () => ipcRenderer.removeListener("fly:agentNotice", h);
+  },
+  // --- результаты прогонов ---
+  listRuns: (projectId) => ipcRenderer.invoke("fly:listRuns", projectId),
+  readRun: (dir) => ipcRenderer.invoke("fly:readRun", dir),
+});

@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Оформление: наборный лист.
+  Приглушённая шкала (серо-коричневый, сталь, олива, охра, кирпич),
+  квадратные углы, волосяные линии, табличные цифры, без теней и анимаций.
+*/
+
+:root {
+  --radius: 2px;
+
+  --background: oklch(0.958 0.004 84);
+  --foreground: oklch(0.235 0.01 62);
+  --card: oklch(0.982 0.003 84);
+  --card-foreground: oklch(0.235 0.01 62);
+  --popover: oklch(0.978 0.003 84);
+  --popover-foreground: oklch(0.235 0.01 62);
+  --primary: oklch(0.3 0.014 58);
+  --primary-foreground: oklch(0.972 0.004 84);
+  --secondary: oklch(0.918 0.006 82);
+  --secondary-foreground: oklch(0.28 0.012 60);
+  --muted: oklch(0.918 0.006 82);
+  --muted-foreground: oklch(0.475 0.012 68);
+  --accent: oklch(0.9 0.008 80);
+  --accent-foreground: oklch(0.25 0.012 60);
+  --destructive: oklch(0.455 0.125 33);
+  --border: oklch(0.85 0.008 78);
+  --input: oklch(0.845 0.009 78);
+  --ring: oklch(0.42 0.016 62);
+
+  /* статусы и графики: только приглушённые тона, без спектра */
+  --chart-1: oklch(0.45 0.07 247);
+  --chart-2: oklch(0.44 0.075 148);
+  --chart-3: oklch(0.52 0.095 78);
+  --chart-4: oklch(0.455 0.105 34);
+  --chart-5: oklch(0.36 0.022 250);
+
+  --sidebar: oklch(0.938 0.005 82);
+  --sidebar-foreground: oklch(0.235 0.01 62);
+  --sidebar-border: oklch(0.85 0.008 78);
+
+  --grid-line: oklch(0.235 0.01 62 / 8%);
+}
+
+.dark {
+  --background: oklch(0.196 0.008 66);
+  --foreground: oklch(0.918 0.006 84);
+  --card: oklch(0.228 0.009 66);
+  --card-foreground: oklch(0.918 0.006 84);
+  --popover: oklch(0.238 0.009 66);
+  --popover-foreground: oklch(0.918 0.006 84);
+  --primary: oklch(0.885 0.008 84);
+  --primary-foreground: oklch(0.205 0.008 66);
+  --secondary: oklch(0.272 0.009 66);
+  --secondary-foreground: oklch(0.9 0.006 84);
+  --muted: oklch(0.268 0.009 66);
+  --muted-foreground: oklch(0.685 0.011 80);
+  --accent: oklch(0.292 0.01 68);
+  --accent-foreground: oklch(0.918 0.006 84);
+  --destructive: oklch(0.62 0.125 33);
+  --border: oklch(0.335 0.01 70);
+  --input: oklch(0.375 0.011 70);
+  --ring: oklch(0.72 0.012 82);
+
+  --chart-1: oklch(0.635 0.075 247);
+  --chart-2: oklch(0.625 0.08 148);
+  --chart-3: oklch(0.705 0.095 78);
+  --chart-4: oklch(0.625 0.105 34);
+  --chart-5: oklch(0.74 0.02 250);
+
+  --sidebar: oklch(0.178 0.008 66);
+  --sidebar-foreground: oklch(0.918 0.006 84);
+  --sidebar-border: oklch(0.322 0.01 70);
+
+  --grid-line: oklch(0.918 0.006 84 / 8%);
+}
+
+@theme inline {
+  --font-sans: system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "Consolas", "Droid Sans Mono", monospace;
+
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  html {
+    font-family: var(--font-sans);
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "tnum" 1, "kern" 1;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+  /* фокус: рамка, без свечения */
+  :focus-visible {
+    outline: 1px solid var(--ring);
+    outline-offset: 1px;
+  }
+  ::selection {
+    background: var(--foreground);
+    color: var(--background);
+  }
+  /* полосы прокрутки видны всегда, не наезжают на содержимое */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted-foreground) var(--secondary);
+  }
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--secondary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border: 3px solid var(--secondary);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--foreground);
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--secondary);
+  }
+  .scroll-pane {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+  input[type="checkbox"] {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--input);
+    background: transparent;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  input[type="checkbox"]:checked {
+    background: var(--foreground);
+    border-color: var(--foreground);
+  }
+  input[type="range"] {
+    appearance: none;
+    height: 1px;
+    background: var(--input);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 9px;
+    height: 15px;
+    background: var(--foreground);
+    border: 0;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.5;
+    cursor: pointer;
+  }
+  pre,
+  code,
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Служебная подпись: разделы, шапки таблиц, поля */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.4;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  /* Разделительная линия набора */
+  .rule {
+    border-top: 1px solid var(--border);
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Поле ввода в стиле учётной карточки */
+  .field {
+    background: transparent;
+    border-bottom: 1px solid var(--input);
+  }
+}

@@ -1,0 +1,410 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BrainView } from "@/views/brain-view";
+import { useTheme } from "@/lib/theme";
+import { fly, isElectron } from "@/lib/bridge";
+import { useStore } from "@/data/store";
+import { IdeaDialog } from "@/components/idea-dialog";
+import { IdeasView } from "@/views/ideas-view";
+import { ProjectView } from "@/views/project-view";
+import { DashboardView } from "@/views/dashboard-view";
+import { CompareView } from "@/views/compare-view";
+import { LibraryView } from "@/views/library-view";
+import { ReferenceDialog } from "@/components/reference-dialog";
+import { LegalDialog, type LegalKind } from "@/components/legal-dialog";
+import { SyncDialog } from "@/components/sync-dialog";
+import type { AgentInfo } from "@/lib/bridge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+export default function App() {
+  const store = useStore();
+  const { state } = store;
+  const [active, setActive] = useState<string | "all">("all");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [openRefId, setOpenRefId] = useState<string | null>(null);
+  const [compare, setCompare] = useState<string[]>([]);
+  const [tab, setTab] = useState("ideas");
+  const [brainIdeaId, setBrainIdeaId] = useState<string | null>(null);
+  const [syncOpen, setSyncOpen] = useState(false);
+  const [codeDirty, setCodeDirty] = useState(false);
+  const [legal, setLegal] = useState<LegalKind | null>(null);
+  const [agent, setAgent] = useState<AgentInfo | null>(null);
+  const [notes, setNotes] = useState<{ id: number; text: string }[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { theme, toggle: toggleTheme } = useTheme();
+
+  const visible = useMemo(() => (active === "all" ? state.ideas : state.ideas.filter((i) => i.projectId === active)), [state.ideas, active]);
+  const openIdea = state.ideas.find((i) => i.id === openId) ?? null;
+  const compareIdeas = compare.map((id) => state.ideas.find((i) => i.id === id)).filter((i): i is NonNullable<typeof i> => !!i);
+  const activeProject = state.projects.find((p) => p.id === active);
+  const openRef = state.references.find((r) => r.id === openRefId) ?? null;
+  const refUsedBy = openRef ? state.ideas.filter((i) => i.citations.some((c) => c.refId === openRef.id)).map((i) => ({ id: i.id, title: i.title })) : [];
+
+  const toggleCompare = (id: string) =>
+    setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? [...c.slice(1), id] : [...c, id]));
+
+  const pushNote = useCallback((text: string) => {
+    const id = Date.now() + Math.random();
+    setNotes((n) => [...n.slice(-3), { id, text }]);
+    setTimeout(() => setNotes((n) => n.filter((x) => x.id !== id)), 12000);
+  }, []);
+
+  // Снимок состояния для внешнего агента: он читает его через локальный мост
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    const t = setTimeout(() => void bridge.syncState(state), 350);
+    return () => clearTimeout(t);
+  }, [state]);
+
+  useEffect(() => {
+    if (!fly) return;
+    void fly.agentInfo().then(setAgent);
+  }, []);
+
+  // Записи агента применяем к store через те же функции, что и обычные действия
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    return bridge.onAgentWrite(({ reqId, kind, payload }) => {
+      try {
+        if (kind === "journal") {
+          const w = payload as { ideaId: string; title: string; params: string; result: string; conclusion: string; outcome?: string };
+          const entry = store.addExperiment(w.ideaId, {
+            title: w.title,
+            params: w.params,
+            result: w.result,
+            conclusion: w.conclusion,
+            outcome: (w.outcome as never) ?? "inconclusive",
+          });
+          void bridge.agentAck(reqId, { ok: true, entryId: entry.id });
+        } else if (kind === "idea") {
+          const w = payload as { projectId: string; title: string; question: string; method: string; validation: string };
+          const created = store.addIdea(w.projectId, {
+            title: w.title,
+            question: w.question,
+            method: w.method,
+            validation: w.validation,
+          });
+          void bridge.agentAck(reqId, { ok: true, ideaId: created.id });
+        } else if (kind === "reference") {
+          const created = store.addReference(payload as never);
+          void bridge.agentAck(reqId, { ok: true, refId: created.id });
+        } else if (kind === "ideaPatch") {
+          const w = payload as { id: string; patch: Record<string, unknown> };
+          store.updateIdea(w.id, w.patch as never);
+          void bridge.agentAck(reqId, { ok: true });
+        } else {
+          void bridge.agentAck(reqId, { ok: false, error: `Неизвестный тип записи: ${kind}` });
+        }
+      } catch (e) {
+        void bridge.agentAck(reqId, { ok: false, error: String((e as Error).message || e) });
+      }
+    });
+  }, [store]);
+
+  useEffect(() => {
+    const bridge = fly;
+    if (!bridge) return;
+    return bridge.onAgentNotice((n) => {
+      pushNote(n.text);
+      void bridge.agentInfo().then(setAgent);
+    });
+  }, [pushNote]);
+
+  const addIdea = () => {
+    const pid = active === "all" ? state.projects[0].id : active;
+    const created = store.addIdea(pid);
+    setOpenId(created.id);
+  };
+
+  const openIdeaInBrain = useCallback((idea: { id: string; projectId: string }) => {
+    setActive(idea.projectId);
+    setBrainIdeaId(idea.id);
+    setOpenId(null);
+    setTab("brain");
+  }, []);
+
+  const exportFile = async () => {
+    const name = `fly-ideas-${new Date().toISOString().slice(0, 10)}.json`;
+    if (fly) {
+      const p = await fly.saveFile({ defaultName: name, content: store.exportJson(), filters: [{ name: "JSON", extensions: ["json"] }], kind: "exports" });
+      if (p) alert(`Сохранено: ${p}`);
+      return;
+    }
+    const blob = new Blob([store.exportJson()], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const importFile = async (f: File) => {
+    try {
+      store.importJson(await f.text());
+    } catch (e) {
+      alert(`Не удалось импортировать: ${(e as Error).message}`);
+    }
+  };
+  const importClick = async () => {
+    if (!fly) return fileRef.current?.click();
+    const r = await fly.openFile({ filters: [{ name: "JSON", extensions: ["json"] }], kind: "exports" });
+    if (!r) return;
+    try {
+      store.importJson(r.content);
+    } catch (e) {
+      alert(`Не удалось импортировать: ${(e as Error).message}`);
+    }
+  };
+
+  const counters: Record<string, string> = {
+    project: "",
+    ideas: String(visible.length),
+    dashboard: `${state.ideas.filter((i) => ["exploring", "active", "drafting"].includes(i.status)).length} в работе`,
+    compare: compare.length ? `${compare.length} из 3` : "",
+    library: String(state.references.length),
+    brain: "",
+  };
+
+  return (
+    <TooltipProvider>
+      <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b px-4 py-2">
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-8 shrink-0 items-center justify-center border font-mono text-[12px] tracking-[0.1em]">FI</span>
+              <div className="leading-tight">
+                <div className="text-[13px] font-semibold tracking-[-0.01em]">Fly Ideas</div>
+                <div className="label">{activeProject ? activeProject.name : `все проекты, идей: ${state.ideas.length}`}</div>
+              </div>
+            </div>
+
+            {tab !== "brain" && <div className="flex items-center gap-1.5">
+              <label htmlFor="active-project" className="label">проект</label>
+              <select
+                id="active-project"
+                value={active}
+                onChange={(event) => {
+                  const id = event.target.value;
+                  setActive(id);
+                  setTab((cur) => (cur === "brain" && id !== "all" ? "brain" : id === "all" ? "ideas" : "project"));
+                }}
+                className="h-7 max-w-[200px] border bg-background px-1.5 text-[11px]"
+              >
+                <option value="all">Все идеи</option>
+                {state.projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+              </select>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" title="Управление проектами">···</Button></DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => {
+                    const name = prompt("Название проекта:");
+                    if (name?.trim()) setActive(store.addProject(name.trim()).id);
+                  }}>Новый проект</DropdownMenuItem>
+                  {activeProject && <DropdownMenuItem onClick={() => {
+                    const name = prompt("Название проекта:", activeProject.name);
+                    if (name?.trim()) store.updateProject(activeProject.id, { name: name.trim() });
+                  }}>Переименовать проект</DropdownMenuItem>}
+                  {activeProject && <DropdownMenuItem variant="destructive" disabled={state.projects.length <= 1} onClick={() => {
+                    if (confirm(`Удалить проект «${activeProject.name}»? Идеи переедут в другой проект.`)) {
+                      store.deleteProject(activeProject.id);
+                      setActive("all");
+                      setTab("ideas");
+                    }
+                  }}>Удалить проект</DropdownMenuItem>}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>}
+
+            <Tabs
+              value={tab}
+              onValueChange={(nextTab) => {
+                setTab(nextTab);
+                if (nextTab === "brain" && active === "all" && state.projects[0]) {
+                  setActive(state.projects[0].id);
+                }
+              }}
+            >
+              <TabsList>
+                {(
+                  [
+                    ...(activeProject ? ([["project", "Проект"]] as const) : []),
+                    ["ideas", "Идеи"],
+                    ["dashboard", "Дашборд"],
+                    ["compare", "Сравнение"],
+                    ["library", "Библиотека"],
+                    ["brain", "Мозг"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <TabsTrigger key={key} value={key}>
+                    {label}
+                    {counters[key] && <span className="font-mono text-[10px] text-muted-foreground">{counters[key]}</span>}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+
+            <div className="ml-auto flex items-center gap-1.5">
+              {agent?.running && (
+                <span
+                  className="label hidden border px-1.5 py-0.5 xl:inline"
+                  title={`Внешний агент читает идеи и запускает прогоны через ${agent.file}`}
+                >
+                  агент: порт {agent.port}
+                </span>
+              )}
+              <span className="label hidden xl:inline">источник: {isElectron ? "локальное окно" : "браузер, часть функций недоступна"}</span>
+              <Button variant="ghost" size="sm" onClick={toggleTheme} title="Переключить светлую и тёмную тему">
+                {theme === "dark" ? "светлая" : "тёмная"}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">Меню</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel>Данные</DropdownMenuLabel>
+                  {fly && <DropdownMenuItem onClick={() => setSyncOpen(true)}>Синхронизация через Google Диск…</DropdownMenuItem>}
+                  <DropdownMenuItem onClick={exportFile}>Выгрузить JSON…</DropdownMenuItem>
+                  <DropdownMenuItem onClick={importClick}>Загрузить JSON…</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Документы</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => setLegal("terms")}>Условия использования</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLegal("privacy")}>Политика конфиденциальности</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onClick={() => confirm("Сбросить всё к стартовому набору идей?") && store.reset()}>
+                    Сброс к стартовым идеям
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={(e) => e.target.files?.[0] && importFile(e.target.files[0])} />
+            </div>
+          </header>
+
+          <Tabs
+            value={tab}
+            onValueChange={(nextTab) => {
+              setTab(nextTab);
+              if (nextTab === "brain" && active === "all" && state.projects[0]) {
+                setActive(state.projects[0].id);
+              }
+            }}
+            className="min-h-0 flex-1 gap-0 overflow-hidden"
+          >
+            {activeProject && (
+              <TabsContent value="project" className="min-h-0 overflow-hidden">
+                <ProjectView
+                  project={activeProject}
+                  ideas={visible}
+                  references={state.references}
+                  onUpdate={(patch) => store.updateProject(activeProject.id, patch)}
+                  onOpenWorkspace={() => setTab("brain")}
+                  onOpenIdea={setOpenId}
+                  onOpenInBrain={openIdeaInBrain}
+                  onAddIdea={addIdea}
+                  onShowIdeas={() => setTab("ideas")}
+                  onShowDashboard={() => setTab("dashboard")}
+                />
+              </TabsContent>
+            )}
+            <TabsContent value="ideas" className="min-h-0 overflow-hidden">
+              <IdeasView
+                ideas={visible}
+                projects={state.projects}
+                activeProject={active}
+                onOpen={setOpenId}
+                onAdd={addIdea}
+                onMove={store.moveIdea}
+                onCopyTo={(id, pid) => store.duplicateIdea(id, pid)}
+                onDelete={(id) => confirm("Удалить идею?") && store.deleteIdea(id)}
+                onStatus={store.setStatus}
+                compare={compare}
+                onToggleCompare={toggleCompare}
+              />
+            </TabsContent>
+            <TabsContent value="dashboard" className="min-h-0 overflow-hidden">
+              <DashboardView ideas={visible} onOpen={setOpenId} />
+            </TabsContent>
+            <TabsContent value="library" className="min-h-0 overflow-hidden">
+              <LibraryView
+                references={state.references}
+                ideas={visible}
+                allIdeas={state.ideas}
+                scopeLabel={activeProject ? `«${activeProject.name}»` : "видимые идеи"}
+                onOpen={setOpenRefId}
+                onAdd={() => setOpenRefId(store.addReference().id)}
+                onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
+                onOpenIdea={(id) => {
+                  setTab("ideas");
+                  setOpenId(id);
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="brain" className="min-h-0 overflow-hidden">
+              <BrainView
+                ideas={state.ideas}
+                projects={state.projects}
+                activeProject={active}
+                focusIdeaId={brainIdeaId}
+                onClearFocusIdea={() => setBrainIdeaId(null)}
+                onSelectProject={setActive}
+                onAddProject={(name) => store.addProject(name)}
+                onAddIdea={(projectId, title) => store.addIdea(projectId, { title })}
+                onOpenIdeaCard={(id) => setOpenId(id)}
+                onUpdateIdea={store.updateIdea}
+                onCompleteStages={store.completeStages}
+                onAddJournalEntry={(ideaId, e) => store.addExperiment(ideaId, { ...e, outcome: "inconclusive" })}
+                onAddReferences={(items) => items.forEach((it) => store.addReference(it))}
+                onDirtyChange={setCodeDirty}
+              />
+            </TabsContent>
+            <TabsContent value="compare" className="min-h-0 overflow-hidden">
+              <CompareView ideas={compareIdeas} all={state.ideas} onRemove={(id) => setCompare((c) => c.filter((x) => x !== id))} onOpen={setOpenId} />
+            </TabsContent>
+          </Tabs>
+        </main>
+
+        <IdeaDialog
+          idea={openIdea}
+          allIdeas={state.ideas}
+          references={state.references}
+          projects={state.projects}
+          onCreateReference={(title) => store.addReference({ title })}
+          onOpenReference={(id) => {
+            setOpenId(null);
+            setTimeout(() => setOpenRefId(id), 0);
+          }}
+          onOpenOther={(id) => setTimeout(() => setOpenId(id), 0)}
+          onOpenInBrain={openIdeaInBrain}
+          onClose={() => setOpenId(null)}
+          onSave={store.updateIdea}
+          onDelete={store.deleteIdea}
+        />
+        {notes.length > 0 && (
+          <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[320px] flex-col gap-2">
+            {notes.map((n) => (
+              <div key={n.id} className="pointer-events-auto border bg-card p-2 text-[12px]">
+                <div className="flex items-start gap-2">
+                  <span className="label shrink-0">агент</span>
+                  <span className="min-w-0 flex-1">{n.text}</span>
+                  <button
+                    className="shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
+                    onClick={() => setNotes((list) => list.filter((x) => x.id !== n.id))}
+                    title="Скрыть"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <ReferenceDialog reference={openRef} usedBy={refUsedBy} onClose={() => setOpenRefId(null)} onSave={store.updateReference} onDelete={store.deleteReference} />
+        <SyncDialog open={syncOpen} onClose={() => setSyncOpen(false)} state={state} dirty={codeDirty} />
+        <LegalDialog kind={legal} onClose={() => setLegal(null)} />
+      </div>
+    </TooltipProvider>
+  );
+}

@@ -1,0 +1,187 @@
+import type { AppState } from "@/data/types";
+/** Типизированный мост к Electron (preload.cjs). В браузере window.fly отсутствует. */
+
+export interface DataItem {
+  id: string;
+  group: string;
+  title: string;
+  file: string;
+  url: string;
+  sizeMB: number;
+  note: string;
+  dest?: "data" | "scripts";
+  /** ссылка для кнопки «источник», если файл лежит не на GitHub */
+  page?: string;
+  path: string;
+  size: number | null;
+  present: boolean;
+}
+
+export interface PythonCandidate {
+  cmd: string;
+  exe: string;
+  version: string;
+  majorMinor: [number, number];
+  hasCore: boolean;
+  okMap: Record<string, boolean>;
+  source: string;
+  note: string;
+}
+
+export interface EnvInfo {
+  python: PythonCandidate | null;
+  configuredPython?: string | null;
+  venvPath?: string;
+  conda: string | null;
+  packages: Record<string, string | null>;
+  gpu: string | null;
+}
+
+export interface EnvSetupOutput {
+  text: string;
+  done: boolean;
+  ok?: boolean;
+}
+
+export interface ScriptInfo { name: string; doc: string; size: number; mtime: number }
+export interface RunInfo { dir: string; path: string; label: string; summary: Record<string, unknown> | null; files: string[]; mtime: number }
+export interface RunOutput { runId: string; projectId?: string; runDir?: string; stream: "stdout" | "stderr" | "exit"; text: string; code?: number }
+export interface LlmMessage { role: "system" | "user" | "assistant"; content: string }
+export interface LlmUsage { inputTokens: number | null; outputTokens: number | null; totalTokens: number | null }
+export interface ApiCallRecord {
+  id: string;
+  at: string;
+  workspaceId: string;
+  provider: LlmProvider;
+  model: string;
+  question: string;
+  answer: string;
+  usage: LlmUsage | null;
+  status: "ok" | "error";
+}
+
+export type LlmProvider = "deepseek" | "perplexity" | "openai";
+
+/** Рабочее место идеи или проекта: где лежит код и куда падают прогоны */
+export interface ProjectPaths { projectId: string; ideaId?: string | null; code: string; runs: string; defaults: { code: string; runs: string } }
+
+/** Права помощника на файлы и запуск */
+export interface Permissions { createFiles: boolean; overwriteFiles: boolean; runScripts: boolean }
+
+/** Мост для внешнего агента (MCP): что доступно и куда пишутся его действия */
+export interface AgentInfo {
+  enabled: boolean;
+  running: boolean;
+  port: number;
+  url: string | null;
+  file: string;
+  token: string;
+  mcp: string;
+  syncedAt: number | null;
+  ideas: number;
+  projects: number;
+}
+
+export interface AgentWrite {
+  reqId: string;
+  kind: "journal" | "idea" | "reference" | "ideaPatch";
+  payload: Record<string, unknown>;
+}
+
+export interface AgentNotice { text: string; at: number }
+
+export type DirKind = "data" | "scripts" | "runs" | "exports";
+export interface Paths { workspace: string; data: string; scripts: string; runs: string; exports: string; defaults: Record<DirKind, string>; templates: string }
+export type DataFileRole = "connections" | "annotations" | "cell_types" | "neurotransmitters";
+export type DataFileLinks = Record<DataFileRole, { path: string; available: boolean; size: number | null }>;
+export interface ExternalSource { title: string; url: string; note: string }
+export interface FileFilter { name: string; extensions: string[] }
+
+export interface SyncUi { state: AppState; chats: Record<string, string>; rates: string | null }
+export interface SyncSnapshot { id: string; createdAt: string; includeData: boolean; fileCount: number; kind: string }
+export interface SyncInfo { folder: string; shared: SyncSnapshot[]; backups: SyncSnapshot[]; backupRoot: string; error: string }
+export interface SyncProgress { phase: string; done: number; total: number; file: string }
+export interface FlyBridge {
+  syncInfo(): Promise<SyncInfo>;
+  chooseSyncFolder(): Promise<string | null>;
+  syncUpload(ui: SyncUi, includeData: boolean): Promise<{ id: string; path: string }>;
+  syncRestore(source: "shared" | "backup", id: string, ui: SyncUi): Promise<{ ui: SyncUi; backup: { id: string; path: string } }>;
+  syncFinish(reload: boolean): Promise<void>;
+  onSyncProgress(cb: (progress: SyncProgress) => void): () => void;
+  isElectron: true;
+  getPaths(): Promise<Paths>;
+  getDataFileLinks(): Promise<DataFileLinks>;
+  chooseDataFile(role: DataFileRole): Promise<DataFileLinks>;
+  clearDataFile(role: DataFileRole): Promise<DataFileLinks>;
+  chooseFolder(kind: DirKind, title?: string): Promise<string | null>;
+  pickFolder(title?: string): Promise<string | null>;
+  resetFolder(kind: DirKind): Promise<string>;
+  saveFile(opts: { defaultName: string; content: string; filters?: FileFilter[]; kind?: DirKind }): Promise<string | null>;
+  openFile(opts: { filters?: FileFilter[]; kind?: DirKind }): Promise<{ path: string; content: string } | null>;
+  listExternal(): Promise<ExternalSource[]>;
+  readRunFile(dir: string, name: string): Promise<{ kind: "image"; dataUrl: string } | { kind: "text"; text: string }>;
+  copyRunFile(dir: string, name: string): Promise<{ kind: "text" | "image"; bytes: number }>;
+  exportRun(dir: string): Promise<string | null>;
+  transferRun(dir: string, targetProjectId: string, opts?: { move?: boolean }): Promise<{ path: string; label: string; projectId: string }>;
+
+  projectPaths(projectId: string): Promise<ProjectPaths>;
+  chooseProjectFolder(projectId: string, kind: "code" | "runs", title?: string): Promise<ProjectPaths | null>;
+  resetProjectFolder(projectId: string, kind: "code" | "runs"): Promise<ProjectPaths>;
+  getPermissions(): Promise<Permissions>;
+  setPermissions(patch: Partial<Permissions>): Promise<Permissions>;
+
+  checkEnv(): Promise<EnvInfo>;
+  listPythons(): Promise<PythonCandidate[]>;
+  setPython(pyCmd: string | null): Promise<EnvInfo>;
+  pickPythonExe(): Promise<EnvInfo | null>;
+  setupPythonEnv(mode?: "core" | "full"): Promise<EnvInfo>;
+  onEnvSetupOutput(cb: (p: EnvSetupOutput) => void): () => void;
+  openPath(p: string): Promise<string>;
+  openExternal(url: string): Promise<void>;
+  listData(): Promise<DataItem[]>;
+  download(item: DataItem, destDir?: string): Promise<{ path: string; size: number }>;
+  cancelDownload(id: string): Promise<void>;
+  onDownloadProgress(cb: (p: { id: string; got: number; total: number }) => void): () => void;
+
+  listScripts(projectId: string): Promise<ScriptInfo[]>;
+  syncTemplates(projectId: string, opts?: { overwrite?: boolean; all?: boolean }): Promise<{ added: string[]; code: string }>;
+  readScript(projectId: string, name: string): Promise<string>;
+  writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
+  writeAssistantScript(projectId: string, name: string, content: string, opts: { expectedDir: string; expectedContent?: string }): Promise<{ file: string; path: string; created: boolean; backup?: string }>;
+  deleteScript(projectId: string, name: string): Promise<boolean>;
+  runScript(projectId: string, name: string, args: string[]): Promise<{ runId: string; runDir: string }>;
+  killRun(runId: string): Promise<void>;
+  onRunOutput(cb: (p: RunOutput) => void): () => void;
+
+  getSecret(k: string): Promise<string | null>;
+  setSecret(k: string, v: string | null): Promise<boolean>;
+  llmChat(req: { provider: LlmProvider; model?: string; messages: LlmMessage[]; temperature?: number }): Promise<{ content: string; usage?: unknown; finishReason?: string | null }>;
+  listApiCalls(workspaceId: string): Promise<ApiCallRecord[]>;
+  appendApiCall(workspaceId: string, record: ApiCallRecord): Promise<void>;
+
+  listRuns(projectId: string): Promise<RunInfo[]>;
+  readRun(dir: string): Promise<{ log: string; summary: Record<string, unknown> | null }>;
+
+  // --- мост для внешнего агента (MCP) ---
+  agentInfo(): Promise<AgentInfo>;
+  setAgentEnabled(on: boolean): Promise<{ enabled: boolean; running: boolean; port: number }>;
+  syncState(state: unknown): Promise<boolean>;
+  agentAck(reqId: string, result: unknown): Promise<boolean>;
+  onAgentWrite(cb: (w: AgentWrite) => void): () => void;
+  onAgentNotice(cb: (n: AgentNotice) => void): () => void;
+}
+
+declare global {
+  interface Window { fly?: FlyBridge }
+}
+
+export const fly: FlyBridge | null = typeof window !== "undefined" && window.fly ? window.fly : null;
+export const isElectron = !!fly;
+
+export const fmtBytes = (n: number | null | undefined) => {
+  if (n == null) return "нет данных";
+  if (n < 1024) return `${n} Б`;
+  if (n < 1024 ** 2) return `${(n / 1024).toFixed(0)} КБ`;
+  if (n < 1024 ** 3) return `${(n / 1024 ** 2).toFixed(1)} МБ`;
+  return `${(n / 1024 ** 3).toFixed(2)} ГБ`;
+};
