@@ -8,10 +8,10 @@ export function ResearchProgress({ idea, onUpdateIdea }: { idea: Idea; onUpdateI
     const previous = stages[id] ?? { done: false, evidence: "" };
     onUpdateIdea(idea.id, { researchProgress: { ...stages, [id]: { ...previous, ...patch } } });
   };
-  return <details className="border-t" open>
-    <summary className="cursor-pointer px-2 py-1.5 text-[10.5px]">
+  return <section className="border-t">
+    <div className="px-2 py-1.5 text-[10.5px]">
       <span className="font-medium">Научный прогресс</span><span className="ml-2 font-mono text-muted-foreground">{progress.done}/{progress.total} · {progress.pct}%</span>
-    </summary>
+    </div>
     <div className="border-t px-2 py-1.5">
       <p className="mb-1.5 text-[10px] text-muted-foreground">Самооценка по этой идее, не доказательство результата. Отмечайте этапы вручную и указывайте основание. Прежние этапы статьи сохранены отдельно.</p>
       {RESEARCH_STAGES.map((stage, index) => {
@@ -28,5 +28,5 @@ export function ResearchProgress({ idea, onUpdateIdea }: { idea: Idea; onUpdateI
         </div>;
       })}
     </div>
-  </details>;
+  </section>;
 }

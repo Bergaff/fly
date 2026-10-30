@@ -11,7 +11,6 @@ import { normalizeUsage } from "@/lib/api-usage";
 import { canRequestSuggestions, parseSuggestions, suggestionContext } from "@/lib/idea-suggestions";
 import { parseReferencesFromText } from "@/lib/refparse";
 import { TASK_PRESETS, presetForIdea, presetForScript, type TaskPreset } from "@/lib/task-presets";
-import { ResearchProgress } from "@/components/research-progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -2223,7 +2222,6 @@ function ChatColumn({
 
         {busy && <div className="label py-1">запрос отправлен…</div>}
         {err && <div className="border border-destructive/40 p-1.5 text-[11px] text-destructive">{err}</div>}
-        {activeIdea && <ResearchProgress key={activeIdea.id} idea={activeIdea} onUpdateIdea={onUpdateIdea} />}
         {activeIdea && stageProgress && (
           <details className="border-t">
             <summary className="cursor-pointer list-none px-2 py-1.5 text-[10.5px]">

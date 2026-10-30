@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Idea, IdeaScores, IdeaStatus, Project, Reference } from "@/data/types";
-import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
+import { SCORE_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress, researchProgress } from "@/data/types";
 import { ResearchProgress } from "@/components/research-progress";
 import { Checklist } from "@/components/checklist";
 import { ExperimentLog } from "@/components/experiment-log";
@@ -132,6 +132,7 @@ export function IdeaDialog({
  <Tabs value={tab} onValueChange={setTab}>
  <TabsList>
  <TabsTrigger value="overview"> Разбор</TabsTrigger>
+ <TabsTrigger value="research"> Прогресс <span className="font-mono text-[10px] text-muted-foreground">{researchProgress(draft).done}/4</span></TabsTrigger>
  <TabsTrigger value="checklist"> Чеклист <span className="font-mono text-[10px] text-muted-foreground">{checklistProgress(draft).done}/{checklistProgress(draft).total}</span></TabsTrigger>
  <TabsTrigger value="log"> Журнал {draft.experiments.length > 0 && <span className="font-mono text-[10px] text-muted-foreground">{draft.experiments.length}</span>}</TabsTrigger>
  <TabsTrigger value="refs"> Источники {draft.citations.length > 0 && <span className="font-mono text-[10px] text-muted-foreground">{draft.citations.length}</span>}</TabsTrigger>
@@ -163,9 +164,12 @@ export function IdeaDialog({
  />
  </TabsContent>
 
- <TabsContent value="checklist" className="pt-2">
+ <TabsContent value="research" className="pt-2">
  <ResearchProgress idea={draft} onUpdateIdea={(_id, patch) => setDraft((current) => current ? { ...current, ...patch } : current)} />
  <p className="mt-3 text-[10px] text-muted-foreground">Изменения сохраняются кнопкой «Сохранить» внизу окна.</p>
+ </TabsContent>
+
+ <TabsContent value="checklist" className="pt-2">
  <p className="mb-3 text-xs text-muted-foreground">Этапы «от идеи до статьи». Галочки сохраняются с датой; порядок можно менять перетаскиванием.</p>
  <Checklist items={draft.checklist} onChange={(items) => set("checklist", items)} />
  </TabsContent>

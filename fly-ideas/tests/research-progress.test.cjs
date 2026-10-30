@@ -73,3 +73,12 @@ test('выключенные предложения не разрешают за
   assert.equal(suggestions.canRequestSuggestions(true, false, true, false), false);
   assert.equal(suggestions.canRequestSuggestions(true, false, true, true), true);
 });
+
+test('научный прогресс расположен на отдельной вкладке карточки, а не в чате', () => {
+  const brain = fs.readFileSync(path.join(root, 'src/views/brain-view.tsx'), 'utf8');
+  const dialog = fs.readFileSync(path.join(root, 'src/components/idea-dialog.tsx'), 'utf8');
+  assert.doesNotMatch(brain, /<ResearchProgress\b/);
+  assert.match(dialog, /<TabsTrigger value="research">\s*Прогресс/);
+  assert.match(dialog, /<TabsContent value="research"[\s\S]*?<ResearchProgress[\s\S]*?<\/TabsContent>/);
+  assert.match(dialog, /onSave\(id, rest\)/);
+});
