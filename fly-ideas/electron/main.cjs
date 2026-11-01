@@ -73,12 +73,15 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py"]);
+
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
   const overwrite = !!(opts && opts.overwrite);
   const filterSet = opts && opts.only ? new Set(opts.only) : null;
   const copied = [];
   for (const f of fs.readdirSync(TEMPLATES)) {
+    if (ON_DEMAND_TEMPLATES.has(f)) continue;
     if (!/\.(py|md|json|yml)$/i.test(f)) continue;
     if (filterSet && !filterSet.has(f)) continue;
     const src = path.join(TEMPLATES, f);
@@ -170,6 +173,7 @@ function syncProjectTemplates(scopeOrProjectId, codeDir, forceMissing = false, i
   const added = [];
   let changed = false;
   for (const f of fs.readdirSync(TEMPLATES)) {
+    if (ON_DEMAND_TEMPLATES.has(f)) continue;
     if (!/\.(py|md|json|yml)$/i.test(f)) continue;
     if (allowed && !allowed.has(f)) continue;
     const src = path.join(TEMPLATES, f);
@@ -1243,7 +1247,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1465,6 +1469,20 @@ function registerIpc(getWin) {
     }
     const added = syncProjectTemplates(projectId, ws.code, true, includeAll);
     return { added, code: ws.code };
+  });
+  // По явному выбору пользователя: только в текущую идею и без перезаписи.
+  handle("fly:prepareV630Template", async (_e, projectId) => {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    const ws = projectPaths(projectId);
+    const name = "25_shiu_v630_control.py";
+    const source = path.join(TEMPLATES, name);
+    const dest = path.join(ws.code, name);
+    const template = await fsp.readFile(source);
+    let added = false;
+    try { await fsp.copyFile(source, dest, fs.constants.COPYFILE_EXCL); added = true; }
+    catch (error) { if (error.code !== "EEXIST") throw error; }
+    const existing = await fsp.readFile(dest);
+    return { name, added, matches: template.equals(existing), code: ws.code };
   });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);

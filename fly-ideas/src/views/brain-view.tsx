@@ -294,6 +294,7 @@ function Workspace({
   const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
   const pendingPresetIdea = useRef<string | null>(null);
   const explicitProjectWorkspace = useRef<string | null>(null);
+  const preparingV630 = useRef(false);
   const lastRunByScope = useRef<Record<string, { scriptName: string; args: string[] } | undefined>>({});
   const project = projects.find((p) => p.id === pid);
   const scopeId = workspaceIdeaId ? `idea:${workspaceIdeaId}` : pid;
@@ -419,6 +420,34 @@ function Workspace({
       }));
     }
   }, []);
+
+  const runV630 = async (simulate: boolean) => {
+    const bridge = fly;
+    const target = scopeId;
+    if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
+    if (simulate && !confirm("Пробный контроль v630: один повтор, 100 Гц, левая сторона. Полный граф может занять несколько гигабайт RAM и долго выполняться. Запустить?")) return;
+    if (editorRef.current.current === "25_shiu_v630_control.py" && editorRef.current.dirty) {
+      setSaveNote("В контрольном файле есть несохранённые изменения. Сохраните их или отмените перед запуском.");
+      return;
+    }
+    preparingV630.current = true;
+    try {
+      const template = await bridge.prepareV630Template(target);
+      const updated = await bridge.listScripts(target);
+      if (pidRef.current !== target) return;
+      setFiles(updated);
+      if (!template.matches) {
+        setSaveNote("Файл 25_shiu_v630_control.py уже изменён. Он не перезаписан и не запущен; откройте его и проверьте.");
+        return;
+      }
+      setSaveNote(template.added ? "Контрольный файл добавлен только в выбранную идею." : "Запускаю контроль в выбранной идее.");
+      await startScriptInProject(target, template.name, simulate ? ["--simulate"] : []);
+    } catch (e) {
+      if (pidRef.current === target) setSaveNote(`Не удалось подготовить контроль v630: ${(e as Error).message}`);
+    } finally {
+      preparingV630.current = false;
+    }
+  };
 
   useEffect(() => {
     const keepProjectScope =
@@ -1212,6 +1241,8 @@ function Workspace({
           <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-2 py-1.5">
             <span className="label">результат · {scopeLabel}</span>
             <Button size="sm" variant="outline" disabled={!!runId} onClick={() => void startScriptInProject(scopeId, "24_compare_shiu_connectivity.py", [])} title="Сравнить подключённые связи Princeton и авторские файлы Shiu v630">сравнить связность</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(false)} title="Без симуляции: проверить подключённые авторские файлы в выбранной идее">проверить v630</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(true)} title="Один пробный контроль на авторской v630 без лезий">пробный контроль v630</Button>
             {selRun ? (
               <>
                 <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
@@ -2648,7 +2679,7 @@ function DataPanel() {
             );
           })}
           <p className="text-[11px] leading-relaxed text-muted-foreground">Авторские файлы можно скачать на GitHub: <button type="button" className="cursor-pointer underline" onClick={() => void fly!.openExternal("https://github.com/philshiu/Drosophila_brain_model/blob/91bdd1e7dcf193f3e7ca5a8933497fcef63b7960/2023_03_23_connectivity_630_final.parquet")}>2023_03_23_connectivity_630_final.parquet</button> и <button type="button" className="cursor-pointer underline" onClick={() => void fly!.openExternal("https://github.com/philshiu/Drosophila_brain_model/blob/91bdd1e7dcf193f3e7ca5a8933497fcef63b7960/2023_03_23_completeness_630_final.csv")}>2023_03_23_completeness_630_final.csv</button>. На GitHub нажмите Download raw file, затем выберите скачанные файлы выше. Ваши файлы Princeton остаются подключёнными отдельно.</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">Для сравнения откройте выбранную идею в «Код и результаты» и нажмите «сравнить связность». Нужны все три таблицы: ваши связи и два авторских файла. Нейромедиаторы нужны только для сравнения знаков.</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">Для сравнения откройте выбранную идею в «Код и результаты» и нажмите «сравнить связность». Нужны все три таблицы: ваши связи и два авторских файла. Нейромедиаторы нужны только для сравнения знаков. Для отдельного контроля на v630 выберите идею и нажмите «проверить v630», затем «пробный контроль v630».</p>
           {linkError && <p role="alert" className="text-[11px] text-destructive">{linkError}</p>}
           <p className="text-[11px] leading-relaxed text-muted-foreground">Выберите CSV, TSV, CSV.GZ, TSV.GZ или Parquet. Файлы остаются на месте. Пути доступны скриптам через переменные выше; только скрипты, поддерживающие эти переменные, используют их. Проверить таблицу можно в любой идее через 21_check_linked_data.py.</p>
           <p className="text-[11px] leading-relaxed text-muted-foreground">Готовые анализы 10..19 и старые скрипты пока не читают эти выбранные файлы автоматически. Им нужны их исходные форматы в папке данных. Доступность файла не подтверждает его состав, версию или пригодность для baseline Shiu.</p>

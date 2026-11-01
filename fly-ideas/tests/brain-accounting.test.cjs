@@ -88,6 +88,9 @@ test('новый тест Brian2 добавляется в идею и не за
     assert.ok(fs.existsSync(path.join(otherDir, '22_shiu_reference_check.py')));
     assert.ok(fs.existsSync(path.join(otherDir, '23_shiu_mn9_adapted.py')));
     assert.ok(fs.existsSync(path.join(otherDir, '24_compare_shiu_connectivity.py')));
+    assert.equal(fs.existsSync(path.join(otherDir, '25_shiu_v630_control.py')), false);
+    templates.syncProjectTemplates('idea:i-lesions', otherDir, true, true);
+    assert.equal(fs.existsSync(path.join(otherDir, '25_shiu_v630_control.py')), false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
