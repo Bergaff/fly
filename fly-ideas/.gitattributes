@@ -1,1 +1,2 @@
 *.bat text eol=crlf
+experiments/templates/26_shiu_author_model.py text eol=lf

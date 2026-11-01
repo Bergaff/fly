@@ -73,7 +73,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
-const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py"]);
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py"]);
 
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
@@ -1247,7 +1247,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1483,6 +1483,27 @@ function registerIpc(getWin) {
     catch (error) { if (error.code !== "EEXIST") throw error; }
     const existing = await fsp.readFile(dest);
     return { name, added, matches: template.equals(existing), code: ws.code };
+  });
+  handle("fly:prepareShiuOriginal", async (_e, projectId) => {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    const ws = projectPaths(projectId);
+    const files = ["26_shiu_original_check.py", "26_shiu_author_model.py", "26_shiu_author_LICENSE.txt"];
+    const contents = await Promise.all(files.map((name) => fsp.readFile(path.join(TEMPLATES, name))));
+    // Сначала проверяем все существующие файлы, без замены пользовательских изменений.
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const existing = await fsp.readFile(path.join(ws.code, files[i]));
+        if (!contents[i].equals(existing)) return { name: files[0], matches: false, conflict: files[i], added: [] };
+      } catch (err) { if (err.code !== "ENOENT") throw err; }
+    }
+    const added = [];
+    for (let i = 0; i < files.length; i++) {
+      const target = path.join(ws.code, files[i]);
+      try { await fsp.copyFile(path.join(TEMPLATES, files[i]), target, fs.constants.COPYFILE_EXCL); added.push(files[i]); }
+      catch (err) { if (err.code !== "EEXIST") throw err; }
+      if (!contents[i].equals(await fsp.readFile(target))) return { name: files[0], matches: false, conflict: files[i], added };
+    }
+    return { name: files[0], matches: true, conflict: null, added };
   });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);

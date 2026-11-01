@@ -146,6 +146,7 @@ export interface FlyBridge {
   listScripts(projectId: string): Promise<ScriptInfo[]>;
   syncTemplates(projectId: string, opts?: { overwrite?: boolean; all?: boolean }): Promise<{ added: string[]; code: string }>;
   prepareV630Template(projectId: string): Promise<{ name: string; added: boolean; matches: boolean; code: string }>;
+  prepareShiuOriginal(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[] }>;
   readScript(projectId: string, name: string): Promise<string>;
   writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
   writeAssistantScript(projectId: string, name: string, content: string, opts: { expectedDir: string; expectedContent?: string }): Promise<{ file: string; path: string; created: boolean; backup?: string }>;

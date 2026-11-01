@@ -449,6 +449,34 @@ function Workspace({
     }
   };
 
+  const runShiuOriginal = async () => {
+    const bridge = fly;
+    const target = scopeId;
+    if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
+    if (!confirm("Сверка с оригинальным model.py авторов: один повтор v630, 100 Гц, seed 0. Монитор записывает все спайки и может потребовать несколько гигабайт памяти. Запустить?")) return;
+    if (["26_shiu_original_check.py", "26_shiu_author_model.py"].includes(editorRef.current.current ?? "") && editorRef.current.dirty) {
+      setSaveNote("В файле сверки есть несохранённые изменения. Сохраните их или отмените перед запуском.");
+      return;
+    }
+    preparingV630.current = true;
+    try {
+      const template = await bridge.prepareShiuOriginal(target);
+      const updated = await bridge.listScripts(target);
+      if (pidRef.current !== target) return;
+      setFiles(updated);
+      if (!template.matches) {
+        setSaveNote(`Файл ${template.conflict} изменён. Он не перезаписан; автоматический запуск остановлен.`);
+        return;
+      }
+      setSaveNote("Сверяю функции авторского model.py в выбранной идее.");
+      await startScriptInProject(target, template.name, ["--simulate"]);
+    } catch (e) {
+      if (pidRef.current === target) setSaveNote(`Не удалось подготовить сверку с авторским кодом: ${(e as Error).message}`);
+    } finally {
+      preparingV630.current = false;
+    }
+  };
+
   useEffect(() => {
     const keepProjectScope =
       (pendingOpenScript.current?.pid === pid && !pendingOpenScript.current.pid.startsWith("idea:")) ||
@@ -901,7 +929,7 @@ function Workspace({
       }));
     });
     try {
-      await bridge.setupPythonEnv(missingPackage === "brian2" ? "full" : "core");
+      await bridge.setupPythonEnv(["brian2", "joblib"].includes(missingPackage) ? "full" : "core");
       setMissingPackage(null);
       setSaveNote(`пакеты установлены, повторяю ${failedRun?.scriptName ?? "скрипт"}`);
       if (failedRun) await startScriptInProject(scopeId, failedRun.scriptName, failedRun.args);
@@ -1243,6 +1271,7 @@ function Workspace({
             <Button size="sm" variant="outline" disabled={!!runId} onClick={() => void startScriptInProject(scopeId, "24_compare_shiu_connectivity.py", [])} title="Сравнить подключённые связи Princeton и авторские файлы Shiu v630">сравнить связность</Button>
             <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(false)} title="Без симуляции: проверить подключённые авторские файлы в выбранной идее">проверить v630</Button>
             <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(true)} title="Один пробный контроль на авторской v630 без лезий">пробный контроль v630</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runShiuOriginal()} title="Сравнить предыдущий контроль с неизменёнными функциями model.py авторов">сверка с model.py</Button>
             {selRun ? (
               <>
                 <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>

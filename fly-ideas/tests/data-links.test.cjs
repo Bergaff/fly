@@ -74,6 +74,17 @@ test('IPC связывает файлы, передаёт пути запуще�
     await fsp.writeFile(path.join(ws.code, newName), '# user edit\n');
     assert.equal((await call('prepareV630Template', 'idea:example')).matches, false);
     assert.equal(await fsp.readFile(path.join(ws.code, newName), 'utf8'), '# user edit\n');
+    const originalFiles = ['26_shiu_original_check.py', '26_shiu_author_model.py', '26_shiu_author_LICENSE.txt'];
+    for (const name of originalFiles) await fsp.copyFile(path.join(root, 'experiments/templates', name), path.join(templateDir, name));
+    await assert.rejects(call('prepareShiuOriginal', 'project'), /идею/);
+    const original = await call('prepareShiuOriginal', 'idea:example');
+    assert.equal(original.matches, true); assert.equal(original.added.length, 3);
+    for (const name of originalFiles) await assert.rejects(fsp.stat(path.join(otherWs.code, name)), {code: 'ENOENT'});
+    assert.equal((await call('prepareShiuOriginal', 'idea:example')).added.length, 0);
+    await fsp.writeFile(path.join(ws.code, originalFiles[1]), '# edited author file\n');
+    const conflict = await call('prepareShiuOriginal', 'idea:example');
+    assert.equal(conflict.matches, false); assert.equal(conflict.conflict, originalFiles[1]);
+    assert.equal(await fsp.readFile(path.join(ws.code, originalFiles[1]), 'utf8'), '# edited author file\n');
     await fsp.copyFile(script, path.join(ws.code, '21_check_linked_data.py'));
     const completed = new Promise((resolve) => { onExit = resolve; });
     const run = await call('runScript', 'idea:example', '21_check_linked_data.py', []);
