@@ -20,6 +20,10 @@ test('GPU-пилот CUDA 13: C++17 без изменения кода CPU и о
   const r=spawnSync(p,[path.join(__dirname,'colab-gpu-wrapper-check.py')],{encoding:'utf8'});
   assert.equal(r.status,0,r.stdout+'\n'+r.stderr);
 });
+test('Повторное использование сборки: малая сеть C++ standalone, не CUDA', {skip:(!python || spawnSync('g++',['--version']).status!==0) && 'нужны Brian2 и g++',timeout:60000},()=>{
+  const r=spawnSync(python,[path.join(__dirname,'colab-gpu-reuse-check.py')],{encoding:'utf8',timeout:55000,env:{...process.env,PYTHONIOENCODING:'utf-8'}});
+  assert.equal(r.status,0,r.stdout+'\n'+r.stderr);
+});
 test('Colab CPU: проверка топа, настоящая малая сеть Brian2, снимки, продолжение и ветви', {skip:!python && 'нужны numpy, pandas, pyarrow, brian2, psutil',timeout:180000},()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'fly-colab-'));
   try {
