@@ -55,6 +55,7 @@ contextBridge.exposeInMainWorld("fly", {
   syncTemplates: (projectId, opts) => ipcRenderer.invoke("fly:syncTemplates", projectId, opts),
   prepareV630Template: (projectId) => ipcRenderer.invoke("fly:prepareV630Template", projectId),
   prepareShiuOriginal: (projectId) => ipcRenderer.invoke("fly:prepareShiuOriginal", projectId),
+  prepareTop200: (projectId) => ipcRenderer.invoke("fly:prepareTop200", projectId),
   readScript: (projectId, name) => ipcRenderer.invoke("fly:readScript", projectId, name),
   writeScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeScript", projectId, name, content, opts),
   writeAssistantScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeAssistantScript", projectId, name, content, opts),

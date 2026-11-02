@@ -85,6 +85,15 @@ test('IPC связывает файлы, передаёт пути запуще�
     const conflict = await call('prepareShiuOriginal', 'idea:example');
     assert.equal(conflict.matches, false); assert.equal(conflict.conflict, originalFiles[1]);
     assert.equal(await fsp.readFile(path.join(ws.code, originalFiles[1]), 'utf8'), '# edited author file\n');
+    const topName = '27_shiu_top200_v630.py';
+    await fsp.copyFile(path.join(root, 'experiments/templates', topName), path.join(templateDir, topName));
+    await assert.rejects(call('prepareTop200', 'project'), /идею/);
+    const topConflict = await call('prepareTop200', 'idea:example');
+    assert.equal(topConflict.matches, false); assert.equal(topConflict.conflict, newName);
+    await assert.rejects(fsp.stat(path.join(ws.code, topName)), {code: 'ENOENT'});
+    const topReady = await call('prepareTop200', 'idea:other');
+    assert.equal(topReady.matches, true); assert.equal(topReady.added.length, 2);
+    assert.equal((await call('prepareTop200', 'idea:other')).added.length, 0);
     await fsp.copyFile(script, path.join(ws.code, '21_check_linked_data.py'));
     const completed = new Promise((resolve) => { onExit = resolve; });
     const run = await call('runScript', 'idea:example', '21_check_linked_data.py', []);

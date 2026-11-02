@@ -477,6 +477,30 @@ function Workspace({
     }
   };
 
+  const runTop200 = async (resume: boolean, pilot = false) => {
+    const bridge = fly;
+    const target = scopeId;
+    if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
+    if (!confirm(pilot ? "Пилот топ-200: один повтор на v630 при 200 Гц, полная сеть. Расчёт может потребовать несколько гигабайтов памяти. Запустить?" : "Топ-200: до 30 повторов на v630 при 200 Гц, полная сеть. Расчёт может занять много времени и несколько гигабайтов памяти. Продолжить?")) return;
+    if (["25_shiu_v630_control.py", "27_shiu_top200_v630.py"].includes(editorRef.current.current ?? "") && editorRef.current.dirty) {
+      setSaveNote("В файле расчёта есть несохранённые изменения. Сохраните их или отмените перед запуском."); return;
+    }
+    preparingV630.current = true;
+    try {
+      const previous = resume ? await bridge.pickFolder("Выберите папку ранее прерванного прогона топ-200") : null;
+      if (resume && !previous) return;
+      const prepared = await bridge.prepareTop200(target);
+      const updated = await bridge.listScripts(target);
+      if (pidRef.current !== target) return;
+      setFiles(updated);
+      if (!prepared.matches) { setSaveNote(`Файл ${prepared.conflict} изменён. Он не перезаписан; запуск остановлен.`); return; }
+      setSaveNote("Топ-200 сохраняет результаты после каждого повтора.");
+      await startScriptInProject(target, prepared.name, previous ? ["--simulate", "--resume-from", previous] : pilot ? ["--simulate", "--pilot"] : ["--simulate"]);
+    } catch (e) {
+      if (pidRef.current === target) setSaveNote(`Не удалось подготовить топ-200: ${(e as Error).message}`);
+    } finally { preparingV630.current = false; }
+  };
+
   useEffect(() => {
     const keepProjectScope =
       (pendingOpenScript.current?.pid === pid && !pendingOpenScript.current.pid.startsWith("idea:")) ||
@@ -1272,6 +1296,9 @@ function Workspace({
             <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(false)} title="Без симуляции: проверить подключённые авторские файлы в выбранной идее">проверить v630</Button>
             <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(true)} title="Один пробный контроль на авторской v630 без лезий">пробный контроль v630</Button>
             <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runShiuOriginal()} title="Сравнить предыдущий контроль с неизменёнными функциями model.py авторов">сверка с model.py</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runTop200(false, true)} title="Один повтор, без построения рейтинга топ-200">пилот топ-200</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runTop200(false)} title="30 повторов при 200 Гц, для отбора топ-200">топ-200 v630</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runTop200(true)} title="Продолжить прерванный расчёт из папки с контрольной точкой">продолжить топ-200</Button>
             {selRun ? (
               <>
                 <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
