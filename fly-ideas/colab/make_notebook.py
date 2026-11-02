@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 files={name:(ROOT/'experiments/templates'/name).read_bytes() for name in ['25_shiu_v630_control.py','27_shiu_top200_v630.py','28_shiu_lesions_v630.py','30_shiu_lesion_overview.py']}
 files['fly_colab.py']=(ROOT/'colab/fly_colab.py').read_bytes()
+files['gpu_cuda13_pilot.py']=(ROOT/'colab/gpu_cuda13_pilot.py').read_bytes()
 bundle={k:{'sha256':hashlib.sha256(v).hexdigest(),'gzip_base64':base64.b64encode(gzip.compress(v,mtime=0)).decode('ascii')} for k,v in files.items()}
 
 def md(text):return {'cell_type':'markdown','metadata':{},'source':text.strip().splitlines(keepends=True)}
@@ -99,7 +100,7 @@ md('''## 6. Отдельный экспериментальный GPU-пилот
 
 Будут выполнены контроль и одна лезия при 100 Гц, seed 0, сначала на CPU, затем на GPU. CPU-пилот не добавляется в полную серию, GPU не добавляется в CPU-базу. Brian2CUDA использует другую версию Brian2 и другой генератор случайных чисел, поэтому одинаковые seed не гарантируют одинаковые спайки. Времена CPU и GPU также не являются корректным сравнением скорости: компиляция GPU включена, а время CPU из кода 28 не включает построение сети. Для выводов понадобится расширенная проверка и измерение. Проба может не запуститься или не поместиться в память бесплатной видеокарты. В этом случае CPU-серия остаётся независимой.
 
-GPU-путь не проверен нами на настоящем Colab/GPU. Если будет ошибка, сохраните текст ячейки и пришлите его; не запускайте полный план на неподтверждённом GPU-коде.'''),
+Для CUDA 13 экспериментальная обёртка включает C++17 и сохраняет параметры компиляции рядом с результатом, не меняя код CPU. Исправленный путь не проверен нами на настоящем Colab/GPU. Если будет ошибка, сохраните текст ячейки и пришлите его; не запускайте полный план на неподтверждённом GPU-коде.'''),
 code('''#@title 6. Попробовать CPU и GPU отдельно
 RUN_GPU_PILOT = False #@param {type:"boolean"}
 if RUN_GPU_PILOT:
@@ -110,7 +111,7 @@ if RUN_GPU_PILOT:
     GPU_PY = ensure_venv(PY312, '/content/fly-shiu-gpu-31216',
         ['numpy==2.2.6', 'pandas==2.2.3', 'pyarrow==18.1.0', 'brian2cuda==1.0b1', 'psutil==6.1.1'], FLY_ENV)
     run_with_output([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu-pilot'], FLY_ENV)
-    run_with_output([str(GPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'gpu-pilot'], FLY_ENV)
+    run_with_output([str(GPU_PY), str(CODE / 'gpu_cuda13_pilot.py'), '--script', str(CODE / 'fly_colab.py'), '--root', str(ROOT)], FLY_ENV)
     print('Пилоты сохранены отдельно в 04_Отдельные_GPU_пробы. Они не входят в полный план.')
 else:
     print('GPU-пилот не запущен.')'''),

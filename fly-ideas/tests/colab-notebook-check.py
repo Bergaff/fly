@@ -23,10 +23,10 @@ bundle=ast.literal_eval(entry.value)
 for name,item in bundle.items():
     raw=gzip.decompress(base64.b64decode(item['gzip_base64']))
     assert hashlib.sha256(raw).hexdigest()==item['sha256']
-    ref=(root/'colab/fly_colab.py') if name=='fly_colab.py' else (root/'experiments/templates'/name)
+    ref=(root/'colab'/name) if name in ('fly_colab.py','gpu_cuda13_pilot.py') else (root/'experiments/templates'/name)
     assert raw==ref.read_bytes(),name
 for var in ('START_CPU','RUN_GPU_PILOT','EXPORT_CPU'):
     source=next(s for s in programs if var+' = False' in s)
     assert var+' = False' in source
-assert len(bundle)==5
+assert len(bundle)==6
 print('Notebook JSON, cells, safe defaults and bundled code: ok')
