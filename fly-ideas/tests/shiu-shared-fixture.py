@@ -106,6 +106,54 @@ def main():
     try: pilot.open_db(pilot_db.parent,altered,False);raise AssertionError('mismatched protocol accepted')
     except ValueError as e: assert 'Протокол' in str(e)
     assert (view.digest(control_path),view.digest(selected_path))==protected
+    # Следующие семь seed используют те же веса и 30 старых результатов без изменения исходной базы.
+    extension=load('individuality_extension',templates/'34_shiu_individuality_extension.py')
+    assert extension.load_pilot().sha(templates/'33_shiu_individuality_pilot.py')==extension.PILOT_SHA
+    original_pilot_hash=view.digest(pilot_db)
+    def ext_run(name,stage):
+        output=tmp/name;output.mkdir();extension.execute(pilot,shared,view,module,study,manifest,output,stage);return output
+    calls.clear();out_plan=ext_run('ext-plan','extend-plan');assert not calls
+    planned=json.loads((out_plan/'summary.json').read_text(encoding='utf8'))
+    assert planned['previous_trials']==30 and planned['new_completed']==0 and planned['new_planned']==70
+    assert not (pilot_db.parent/'extension_10seeds_v1').exists()
+    bad_data=dict(data);bad_data['weights']=data['weights'].copy();bad_data['weights'][0]+=1
+    module.validate_simulation=lambda *_:(lesion,base,bad_data)
+    calls.clear();module.run_trial=fake
+    try: ext_run('ext-bad-weights','extend-run');raise AssertionError('changed weights accepted')
+    except ValueError as e: assert 'Веса варианта' in str(e)
+    assert not calls
+    module.validate_simulation=lambda *_:(lesion,base,data)
+    ext_attempted=[]
+    def interrupt_extension(l,b,d,targets,seed):
+        ext_attempted.append((d['weights'].copy(),seed))
+        if len(ext_attempted)>1: raise RuntimeError('extension interrupted')
+        return actual_trial(l,b,d,targets,seed)
+    module.run_trial=interrupt_extension
+    try: ext_run('ext-interrupt','extend-run');raise AssertionError('interruption not raised')
+    except RuntimeError as e: assert str(e)=='extension interrupted'
+    ext_db=pilot_db.parent/'extension_10seeds_v1'/'extension.sqlite3'
+    with sqlite3.connect(ext_db) as db: assert db.execute('SELECT count(*) FROM trials').fetchone()[0]==1
+    assert ext_attempted[0][1]==3 and np.array_equal(ext_attempted[0][0],attempted[0][0])
+    stopped=tmp/'ext-stop';stopped.mkdir();(stopped/'stop.request').write_text('stop',encoding='utf8')
+    calls.clear();module.run_trial=fake;extension.execute(pilot,shared,view,module,study,manifest,stopped,'extend-run')
+    assert not calls and json.loads((stopped/'summary.json').read_text(encoding='utf8'))['status']=='stopped'
+    calls.clear();out_ext=ext_run('ext-resume','extend-run')
+    ext_info=json.loads((out_ext/'summary.json').read_text(encoding='utf8'))
+    assert ext_info['status']=='complete' and ext_info['new_completed']==70 and ext_info['total_trials']==100 and len(calls)==69
+    with sqlite3.connect(out_ext/'extension_snapshot.sqlite3') as db: assert db.execute('SELECT count(*) FROM trials').fetchone()[0]==70
+    import csv
+    with (out_ext/'variants_10seed.csv').open(encoding='utf-8-sig',newline='') as f: variants=list(csv.DictReader(f))
+    assert len(variants)==10 and all(v['trials']=='10' and v['complete']=='True' for v in variants)
+    with (out_ext/'trials_10seed.csv').open(encoding='utf-8-sig',newline='') as f: trials=list(csv.DictReader(f))
+    assert len(trials)==100 and sum(t['origin']=='pilot' for t in trials)==30
+    assert view.digest(pilot_db)==original_pilot_hash and (view.digest(control_path),view.digest(selected_path))==protected
+    calls.clear();ext_run('ext-repeat','extend-run');assert not calls
+    calls.clear();ext_run('ext-review','extend-review');assert not calls
+    # Повреждение строки запрещает обзор; исходный пилот не меняется.
+    with sqlite3.connect(ext_db) as db: db.execute('UPDATE trials SET left_count=left_count+1 WHERE variant=0 AND seed=3');db.commit()
+    try: ext_run('ext-corrupt','extend-review');raise AssertionError('corrupted row accepted')
+    except ValueError as e: assert 'повреждённый' in str(e)
+    assert view.digest(pilot_db)==original_pilot_hash and (view.digest(control_path),view.digest(selected_path))==protected
     calls.clear();module.run_trial=fake;code,complete,report=run('all','all',['--study',study_id]);assert code==0 and report['result']['completed']==510 and len(calls)==180
     assert (complete/'selected_conditions.csv').is_file() and (complete/'pair_interactions.csv').is_file()
     assert (Path(report['shared_report'])/'selected_conditions.csv').is_file() and (Path(report['shared_report'])/'summary.json').is_file()

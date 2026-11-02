@@ -576,7 +576,7 @@ function Workspace({
     } catch (e) { setRunNote(`Не удалось прочитать общую папку: ${(e as Error).message}`); }
   };
 
-  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review") => {
+  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review") => {
     const bridge=fly; const target=scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
     preparingV630.current=true;setPreparing(true);
@@ -592,9 +592,9 @@ function Workspace({
         if (!sharedStudy) { setRunNote("Сначала выберите общий набор."); return; }
         args=["--stage",stage,"--study",sharedStudy];
       }
-      if (stage.startsWith("pilot-")) {
+      if (stage.startsWith("pilot-") || stage.startsWith("extend-")) {
         // The main process creates a separate protected copy and checks it before launch.
-        await startScriptInProject(target,"33_shiu_individuality_pilot.py",args,"shared");
+        await startScriptInProject(target,stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
       } else {
         const prepared=await bridge.prepareSharedStudy(target);
         if (pidRef.current!==target) return;
@@ -1530,7 +1530,11 @@ function Workspace({
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("pilot-plan"); }}>план пилота без симуляций</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("pilot-run"); }}>рассчитать или продолжить пилот</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("pilot-review"); }}>обзор сохранённого пилота</Button>
-                <p className="text-[11px] text-muted-foreground">Пилот: 10 фиксированных вариантов весов ±5%, 3 seed, 50 Гц. До 30 новых повторов последовательно. Выбор плана и обзор ничего не рассчитывают; кнопка расчёта запускает или продолжает пилот. 5% не подтверждены биологически; это не животные.</p>
+                <p className="text-[11px] text-muted-foreground">Пилот: 10 фиксированных вариантов весов ±5%, 3 seed, 50 Гц. До 30 новых повторов последовательно. 5% не подтверждены биологически; это не животные.</p>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("extend-plan"); }}>план продолжения до 10 seed</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("extend-run"); }}>рассчитать или продолжить 70 повторов</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("extend-review"); }}>обзор продолжения на 10 seed</Button>
+                <p className="text-[11px] text-muted-foreground">Продолжение: 7 дополнительных seed для 10 прежних вариантов, до 70 новых повторов. Нужен завершённый исходный пилот. План и обзор не запускают симуляции; база прежнего пилота не изменяется.</p>
               </div> : <div className="flex flex-col items-start gap-2">
                 <Button onClick={() => { setSharedDialog(null); void runShared("init"); }}>создать набор из топ-200</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("plan"); }}>план без симуляций</Button>
