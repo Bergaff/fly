@@ -298,6 +298,7 @@ function Workspace({
   const [saveNote, setSaveNote] = useState("");
   const [runNote, setRunNote] = useState("");
   const [topDialog, setTopDialog] = useState(false);
+  const [lesionDialog, setLesionDialog] = useState(false);
   const [checkDialog, setCheckDialog] = useState<"control" | "original" | null>(null);
   const [preparing, setPreparing] = useState(false);
   const [startingRuns, setStartingRuns] = useState<Record<string, boolean>>({});
@@ -385,7 +386,7 @@ function Workspace({
     if (/\.(png|jpe?g|svg|gif)$/i.test(name)) return;
     setArtifactLoading(true);
     try {
-      if (/\.(parquet|xlsx)$/i.test(name)) {
+      if (/\.(parquet|xlsx|sqlite3|npy)$/i.test(name)) {
         const separator = r.path.includes("\\") ? "\\" : "/";
         const error = await fly!.openPath(`${r.path}${separator}${name}`);
         if (error && runRequest.current === request && pidRef.current === targetScope) setSaveNote(`Не удалось открыть файл: ${error}`);
@@ -400,7 +401,7 @@ function Workspace({
     }
   }
 
-  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], useTop200Copies = false) => {
+  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | null = null) => {
     const bridge = fly;
     if (!bridge) return;
     if (!launchTracker.current.begin(targetPid)) {
@@ -417,7 +418,7 @@ function Workspace({
       onMissingPackage(null);
     }
     try {
-      const r = useTop200Copies ? await bridge.runTop200(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
+      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
       if (launchTracker.current.resolved(targetPid, r.runId)) {
         setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
         if (pidRef.current === targetPid) setRunNote(`Расчёт выполняется. Папка: ${r.runDir}`);
@@ -510,9 +511,30 @@ function Workspace({
       setFiles(updated);
       if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
       setRunNote("Топ-200 сохраняет результаты после каждого повтора.");
-      await startScriptInProject(target, prepared.name, previous ? ["--simulate", "--resume-from", previous] : pilot ? ["--simulate", "--pilot"] : ["--simulate"], true);
+      await startScriptInProject(target, prepared.name, previous ? ["--simulate", "--resume-from", previous] : pilot ? ["--simulate", "--pilot"] : ["--simulate"], "top200");
     } catch (e) {
       if (pidRef.current === target) setRunNote(`Не удалось подготовить топ-200: ${(e as Error).message}`);
+    } finally { preparingV630.current = false; setPreparing(false); }
+  };
+
+  const runLesions = async (mode: "pilot" | "full" | "resume") => {
+    const bridge = fly; const target = scopeId;
+    if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
+    preparingV630.current = true; setPreparing(true);
+    setRunNote("Выберите папку завершённого отбора топ-200.");
+    try {
+      const top = await bridge.pickFolder("Выберите папку полного прогона топ-200 с summary.json и checkpoint.json");
+      if (!top) { setRunNote("Запуск отменён: папка отбора не выбрана."); return; }
+      const previous = mode === "resume" ? await bridge.pickFolder("Выберите папку прерванного или пилотного прогона лезий с lesions.sqlite3") : null;
+      if (mode === "resume" && !previous) { setRunNote("Продолжение отменено: папка лезий не выбрана."); return; }
+      setRunNote("Подготовка проверенных копий лезий…");
+      const prepared = await bridge.prepareLesions(target);
+      if (pidRef.current !== target) return;
+      if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
+      const args = ["--simulate", "--top-run", top, ...(mode === "pilot" ? ["--pilot"] : previous ? ["--resume-from", previous] : [])];
+      await startScriptInProject(target, prepared.name, args, "lesions");
+    } catch (e) {
+      if (pidRef.current === target) setRunNote(`Не удалось подготовить лезии: ${(e as Error).message}`);
     } finally { preparingV630.current = false; setPreparing(false); }
   };
 
@@ -1294,6 +1316,7 @@ function Workspace({
           <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-2 py-1.5">
             <span className="label">результат · {scopeLabel}</span>
             <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setTopDialog(true)}>топ-200</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setLesionDialog(true)}>лезии v630</Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild><Button size="sm" variant="ghost" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId}>проверки Shiu</Button></DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -1393,6 +1416,19 @@ function Workspace({
               <p className="text-[11px] text-muted-foreground">Пилот не создаёт список топ-200. Для продолжения выберите папку с checkpoint.json и файлами повторов.</p>
             </DialogContent>
           </Dialog>
+          <Dialog open={lesionDialog} onOpenChange={setLesionDialog}>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Исходящие лезии на v630</DialogTitle>
+                <DialogDescription>Сначала выберите папку завершённого топ-200 с 30 повторами. Пилот выполняет контроль и одну лезию при 100 Гц. Полный план: 48 240 односекундных симуляций, потенциально недели работы и несколько гигабайтов памяти. Повторы сохраняются в базе после каждого запуска.</DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-start gap-2">
+                <Button onClick={() => { setLesionDialog(false); void runLesions("pilot"); }}>пилот: контроль и одна лезия</Button>
+                <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("full"); }}>начать полный расчёт</Button>
+                <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("resume"); }}>продолжить из папки лезий</Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground">Это лезии исходящих связей в модели, а не доказательство необходимости нейрона у животного.</p>
+            </DialogContent>
+          </Dialog>
           <Dialog open={checkDialog !== null} onOpenChange={(open) => { if (!open) setCheckDialog(null); }}>
             <DialogContent>
               <DialogHeader><DialogTitle>{checkDialog === "control" ? "Пробный контроль v630" : "Сверка с model.py"}</DialogTitle>
@@ -1424,7 +1460,7 @@ function Workspace({
                 {images.filter((im) => im.name === selectedArtifact).map((im) => <figure key={im.name} className="mb-2 border bg-card"><img src={im.dataUrl} alt={im.name} className="w-full" /><figcaption className="border-t px-2 py-1 font-mono text-[10px] text-muted-foreground">{im.name}</figcaption></figure>)}
                 {/\.svg$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">SVG копируется как текст.</p>}
                 {/\.gif$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">Для копирования GIF откройте папку прогона.</p>}
-                {/\.(parquet|xlsx)$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">Этот формат открывается во внешней программе. Для копирования файла откройте папку прогона.</p>}
+                {/\.(parquet|xlsx|sqlite3|npy)$/i.test(selectedArtifact) && <p className="mb-1 text-[10px] text-muted-foreground">Этот формат открывается во внешней программе. Для копирования файла откройте папку прогона.</p>}
                 {viewFile?.name === selectedArtifact && ((!viewFile.text.startsWith("(файл ") && (/\.csv$/i.test(viewFile.name) || /\.tsv$/i.test(viewFile.name))) ? (
                   <DelimitedTable name={viewFile.name} text={viewFile.text} delimiter={/\.tsv$/i.test(viewFile.name) ? "\t" : ","} />
                 ) : (

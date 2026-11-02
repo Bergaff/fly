@@ -73,7 +73,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
-const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py"]);
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py"]);
 
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
@@ -760,31 +760,33 @@ async function setupPythonEnv(win, mode = "core") {
 // Изолированные проверенные копии для топ-200 не затрагивают файлы пользователя.
 const TOP200_DIR = ".shiu-top200-v630";
 const TOP200_FILES = ["25_shiu_v630_control.py", "27_shiu_top200_v630.py"];
-async function prepareTop200Files(ws) {
-  const dir = path.join(ws.code, TOP200_DIR);
+const LESIONS_DIR = ".shiu-lesions-v630";
+const LESIONS_FILES = [...TOP200_FILES, "28_shiu_lesions_v630.py"];
+async function prepareProtectedFiles(ws, dirName, files) {
+  const dir = path.join(ws.code, dirName);
   try { await fsp.mkdir(dir); } catch (e) { if (e.code !== "EEXIST") throw e; }
   const dirInfo = await fsp.lstat(dir);
-  if (!dirInfo.isDirectory() || dirInfo.isSymbolicLink()) throw new Error("Папка копий топ-200 должна быть обычной папкой, не ссылкой.");
+  if (!dirInfo.isDirectory() || dirInfo.isSymbolicLink()) throw new Error("Папка проверенных копий должна быть обычной папкой, не ссылкой.");
   const norm = (b) => b.toString("utf8").replace(/\r\n/g, "\n");
-  const contents = await Promise.all(TOP200_FILES.map((name) => fsp.readFile(path.join(TEMPLATES, name))));
-  for (let i = 0; i < TOP200_FILES.length; i++) {
-    const target = path.join(dir, TOP200_FILES[i]);
+  const contents = await Promise.all(files.map((name) => fsp.readFile(path.join(TEMPLATES, name))));
+  for (let i = 0; i < files.length; i++) {
+    const target = path.join(dir, files[i]);
     try {
       const st = await fsp.lstat(target);
       if (!st.isFile() || st.isSymbolicLink() || norm(await fsp.readFile(target)) !== norm(contents[i]))
-        return { name: TOP200_FILES[1], matches: false, conflict: TOP200_FILES[i], added: [], code: dir };
+        return { name: files[files.length-1], matches: false, conflict: files[i], added: [], code: dir };
     } catch (e) { if (e.code !== "ENOENT") throw e; }
   }
   const added = [];
-  for (let i = 0; i < TOP200_FILES.length; i++) {
-    const target = path.join(dir, TOP200_FILES[i]);
-    try { await fsp.copyFile(path.join(TEMPLATES, TOP200_FILES[i]), target, fs.constants.COPYFILE_EXCL); added.push(TOP200_FILES[i]); }
+  for (let i = 0; i < files.length; i++) {
+    const target = path.join(dir, files[i]);
+    try { await fsp.copyFile(path.join(TEMPLATES, files[i]), target, fs.constants.COPYFILE_EXCL); added.push(files[i]); }
     catch (e) { if (e.code !== "EEXIST") throw e; }
     const st = await fsp.lstat(target);
     if (!st.isFile() || st.isSymbolicLink() || norm(await fsp.readFile(target)) !== norm(contents[i]))
-      return { name: TOP200_FILES[1], matches: false, conflict: TOP200_FILES[i], added, code: dir };
+      return { name: files[files.length-1], matches: false, conflict: files[i], added, code: dir };
   }
-  return { name: TOP200_FILES[1], matches: true, conflict: null, added, code: dir };
+  return { name: files[files.length-1], matches: true, conflict: null, added, code: dir };
 }
 
 // ------------------------------------------------------------
@@ -793,21 +795,23 @@ async function prepareTop200Files(ws) {
 const runs = new Map();
 const runningScopes = new Map();
 
-async function runScript(win, projectId, name, args, { top200 = false } = {}) {
+async function runScript(win, projectId, name, args, { protectedMode = null } = {}) {
   assertNotSyncing();
   const py = await pickPython();
   if (!py) throw new Error("Python 3 не найден. Установи Miniconda или Python 3.11/3.12 с python.org (галочка «Add to PATH»).");
   assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
-  if (top200) {
+  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : null;
+  const protectedDir = protectedMode === "top200" ? TOP200_DIR : LESIONS_DIR;
+  if (protectedFiles) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
-    const prepared = await prepareTop200Files(ws);
-    if (!prepared.matches) throw new Error(`Копия ${prepared.conflict} в папке топ-200 изменена. Она не перезаписана, запуск остановлен.`);
+    const prepared = await prepareProtectedFiles(ws, protectedDir, protectedFiles);
+    if (!prepared.matches) throw new Error(`Проверенная копия ${prepared.conflict} изменена. Она не перезаписана, запуск остановлен.`);
     assertNotSyncing();
   }
   if (runningScopes.has(ws.projectId)) throw new Error("В этом пространстве уже выполняется расчёт. Дождитесь его завершения.");
-  const file = top200 ? path.join(ws.code, TOP200_DIR, TOP200_FILES[1]) : path.join(ws.code, path.basename(name));
+  const file = protectedFiles ? path.join(ws.code, protectedDir, protectedFiles[protectedFiles.length-1]) : path.join(ws.code, path.basename(name));
   if (!within(ws.code, file)) throw new Error("Скрипт вне папки рабочего пространства.");
   if (!fs.existsSync(file)) throw new Error(`Скрипт ${path.basename(name)} не найден в выбранной идее.`);
   const { cmd, prefix } = parsePySpec(py.exe || py.cmd);
@@ -1288,7 +1292,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1548,7 +1552,11 @@ function registerIpc(getWin) {
   });
   handle("fly:prepareTop200", async (_e, projectId) => {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
-    return prepareTop200Files(projectPaths(projectId));
+    return prepareProtectedFiles(projectPaths(projectId), TOP200_DIR, TOP200_FILES);
+  });
+  handle("fly:prepareLesions", async (_e, projectId) => {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    return prepareProtectedFiles(projectPaths(projectId), LESIONS_DIR, LESIONS_FILES);
   });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);
@@ -1590,7 +1598,14 @@ function registerIpc(getWin) {
       args.length === 1 || (args.length === 2 && args[1] === "--pilot") ||
       (args.length === 3 && args[1] === "--resume-from" && typeof args[2] === "string" && args[2].length > 0));
     if (!ok) throw new Error("Недопустимые параметры топ-200.");
-    return runScript(getWin(), projectId, TOP200_FILES[1], args, { top200: true });
+    return runScript(getWin(), projectId, TOP200_FILES[1], args, { protectedMode: "top200" });
+  });
+  handle("fly:runLesions", (_e, projectId, args) => {
+    const valid = Array.isArray(args) && args[0] === "--simulate" && args[1] === "--top-run" && typeof args[2] === "string" && args[2].length > 0 && (
+      args.length === 3 || (args.length === 4 && args[3] === "--pilot") ||
+      (args.length === 5 && args[3] === "--resume-from" && typeof args[4] === "string" && args[4].length > 0));
+    if (!valid) throw new Error("Недопустимые параметры лезий.");
+    return runScript(getWin(), projectId, LESIONS_FILES[2], args, { protectedMode: "lesions" });
   });
   handle("fly:getActiveRun", (_e, projectId) => runningScopes.get(parseScope(projectId).scopeId) || null);
   handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });

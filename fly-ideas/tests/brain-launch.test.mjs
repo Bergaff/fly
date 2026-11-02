@@ -91,6 +91,24 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     await screen.findByText(/Последний прогон сообщил/);
     assert.ok(await screen.findByRole('button',{name:'установить Brian2 и joblib'}));
     assert.equal(calls.length,5);
+    // Запуск лезий требует выбор проверенного источника и явный выбор режима.
+    failStart=false;quick=true;resumePath='C:\\top run';
+    dom.window.fly.prepareLesions=async()=>({name:'28_shiu_lesions_v630.py',matches:true,conflict:null,added:[],code:'C:\\lesions'});
+    dom.window.fly.runLesions=(scope,args)=>dom.window.fly.runScript(scope,'28_shiu_lesions_v630.py',args);
+    fireEvent.click(screen.getByRole('button',{name:'Код и результаты'}));
+    fireEvent.click(screen.getByRole('button',{name:'лезии v630'}));
+    assert.match(screen.getByRole('dialog').textContent,/48 240/);
+    assert.equal(calls.length,5);
+    fireEvent.click(screen.getByRole('button',{name:'пилот: контроль и одна лезия'}));
+    await waitFor(()=>assert.equal(calls.length,6));
+    assert.deepEqual(calls[5].args,['--simulate','--top-run',resumePath,'--pilot']);
+    await waitFor(()=>assert.equal(screen.getByRole('button',{name:'лезии v630'}).disabled,false));
+    let selectedFolders=['C:\\top folder','C:\\lesion folder'];
+    dom.window.fly.pickFolder=async()=>selectedFolders.shift() ?? null;
+    fireEvent.click(screen.getByRole('button',{name:'лезии v630'}));
+    fireEvent.click(screen.getByRole('button',{name:'продолжить из папки лезий'}));
+    await waitFor(()=>assert.equal(calls.length,7));
+    assert.deepEqual(calls[6].args,['--simulate','--top-run','C:\\top folder','--resume-from','C:\\lesion folder']);
     // При возвращении на вкладку уже идущий процесс снова доступен для остановки.
     cleanup();
     dom.window.fly.getActiveRun=async()=>({runId:'old-run',runDir:'C:\\old'});
