@@ -151,6 +151,8 @@ export interface FlyBridge {
   prepareLesions(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
   prepareParallelLesions(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
   prepareFocusedLesions(projectId: string, mode: "overview" | "selected"): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
+  prepareSharedStudy(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
+  listSharedStudies(): Promise<{ root: string; studies: { id: string; label: string; path: string; created: number; progress: { stage: string; completed: number; total: number } | null }[] }>;
   readScript(projectId: string, name: string): Promise<string>;
   writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
   writeAssistantScript(projectId: string, name: string, content: string, opts: { expectedDir: string; expectedContent?: string }): Promise<{ file: string; path: string; created: boolean; backup?: string }>;
@@ -160,6 +162,7 @@ export interface FlyBridge {
   runLesions(projectId: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   runParallelLesions(projectId: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   runFocusedLesions(projectId: string, mode: "overview" | "selected", args: string[]): Promise<{ runId: string; runDir: string }>;
+  runSharedStudy(projectId: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   getActiveRun(projectId: string): Promise<{ runId: string; runDir: string } | null>;
   killRun(runId: string): Promise<void>;
   onRunOutput(cb: (p: RunOutput) => void): () => void;

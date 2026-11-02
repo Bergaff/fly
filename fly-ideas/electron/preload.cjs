@@ -59,6 +59,8 @@ contextBridge.exposeInMainWorld("fly", {
   prepareLesions: (projectId) => ipcRenderer.invoke("fly:prepareLesions", projectId),
   prepareParallelLesions: (projectId) => ipcRenderer.invoke("fly:prepareParallelLesions", projectId),
   prepareFocusedLesions: (projectId, mode) => ipcRenderer.invoke("fly:prepareFocusedLesions", projectId, mode),
+  prepareSharedStudy: (projectId) => ipcRenderer.invoke("fly:prepareSharedStudy", projectId),
+  listSharedStudies: () => ipcRenderer.invoke("fly:listSharedStudies"),
   readScript: (projectId, name) => ipcRenderer.invoke("fly:readScript", projectId, name),
   writeScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeScript", projectId, name, content, opts),
   writeAssistantScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeAssistantScript", projectId, name, content, opts),
@@ -68,6 +70,7 @@ contextBridge.exposeInMainWorld("fly", {
   runLesions: (projectId, args) => ipcRenderer.invoke("fly:runLesions", projectId, args),
   runParallelLesions: (projectId, args) => ipcRenderer.invoke("fly:runParallelLesions", projectId, args),
   runFocusedLesions: (projectId, mode, args) => ipcRenderer.invoke("fly:runFocusedLesions", projectId, mode, args),
+  runSharedStudy: (projectId, args) => ipcRenderer.invoke("fly:runSharedStudy", projectId, args),
   getActiveRun: (projectId) => ipcRenderer.invoke("fly:getActiveRun", projectId),
   killRun: (runId) => ipcRenderer.invoke("fly:killRun", runId),
   onRunOutput: (cb) => {

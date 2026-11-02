@@ -73,7 +73,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
-const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py", "30_shiu_lesion_overview.py", "31_shiu_selected_lesions.py"]);
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py", "30_shiu_lesion_overview.py", "31_shiu_selected_lesions.py", "32_shiu_shared_study.py"]);
 
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
@@ -766,6 +766,7 @@ const PARALLEL_FILES = [...LESIONS_FILES, "29_shiu_lesions_parallel.py"];
 const FOCUSED_DIR = ".shiu-focused-v630";
 const OVERVIEW_FILES = [...LESIONS_FILES, "30_shiu_lesion_overview.py"];
 const SELECTED_FILES = [...OVERVIEW_FILES, "31_shiu_selected_lesions.py"];
+const SHARED_FILES = [...SELECTED_FILES, "32_shiu_shared_study.py"];
 async function prepareProtectedFiles(ws, dirName, files) {
   const dir = path.join(ws.code, dirName);
   try { await fsp.mkdir(dir); } catch (e) { if (e.code !== "EEXIST") throw e; }
@@ -806,15 +807,15 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
-  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : protectedMode === "overview" ? OVERVIEW_FILES : protectedMode === "selected" ? SELECTED_FILES : null;
-  const protectedDir = protectedMode === "top200" ? TOP200_DIR : protectedMode === "overview" || protectedMode === "selected" ? FOCUSED_DIR : LESIONS_DIR;
+  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : protectedMode === "overview" ? OVERVIEW_FILES : protectedMode === "selected" ? SELECTED_FILES : protectedMode === "shared" ? SHARED_FILES : null;
+  const protectedDir = protectedMode === "top200" ? TOP200_DIR : ["overview", "selected", "shared"].includes(protectedMode) ? FOCUSED_DIR : LESIONS_DIR;
   if (protectedFiles) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
     const prepared = await prepareProtectedFiles(ws, protectedDir, protectedFiles);
     if (!prepared.matches) throw new Error(`Проверенная копия ${prepared.conflict} изменена. Она не перезаписана, запуск остановлен.`);
     assertNotSyncing();
   }
-  const focusedSimulation = protectedMode === "selected" && ["singles", "all"].includes(args?.[5]);
+  const focusedSimulation = (protectedMode === "selected" && ["singles", "all"].includes(args?.[5])) || (protectedMode === "shared" && ["singles", "all"].includes(args?.[1]));
   if ((focusedSimulation && runs.size > 0) || [...runs.values()].some((active) => active.flyFocusedSimulation))
     throw new Error("Перед новой симуляцией остановите другие расчёты в приложении и дождитесь завершения.");
   if (runningScopes.has(ws.projectId)) throw new Error("В этом пространстве уже выполняется расчёт. Дождитесь его завершения.");
@@ -822,7 +823,9 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   if (!within(ws.code, file)) throw new Error("Скрипт вне папки рабочего пространства.");
   if (!fs.existsSync(file)) throw new Error(`Скрипт ${path.basename(name)} не найден в выбранной идее.`);
   const { cmd, prefix } = parsePySpec(py.exe || py.cmd);
-  const baseId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + path.basename(name).replace(/\.py$/, "");
+  const sharedLabel = { init: "01_общий_топ200", plan: "02_план_лезий", singles: "03_одиночные_лезии", all: "04_пары_и_группа", review: "05_обзор_лезий", individuality: "06_индивидуальность" };
+  const label = protectedMode === "shared" ? sharedLabel[args?.[1]] : path.basename(name).replace(/\.py$/, "");
+  const baseId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + label;
   let runId = baseId;
   let seq = 2;
   while (runs.has(runId) || runStatus.has(runId) || fs.existsSync(path.join(ws.runs, runId))) {
@@ -850,6 +853,7 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
     FLY_SHIU_CONNECTIONS: links.shiu_connections.path,
     FLY_SHIU_NEURONS: links.shiu_neurons.path,
     FLY_RUN_DIR: runDir,
+    ...(protectedMode === "shared" ? { FLY_SHIU_SHARED_ROOT: path.join(DIRS.data, "shiu-v630-shared") } : {}),
     ...(protectedMode === "parallel" ? { FLY_PARENT_PID: String(process.pid) } : {}),
     FLY_SCRIPTS: ws.code,
     FLY_PROJECT: ws.projectId,
@@ -1302,7 +1306,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:prepareParallelLesions", "fly:runParallelLesions", "fly:prepareFocusedLesions", "fly:runFocusedLesions", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:prepareParallelLesions", "fly:runParallelLesions", "fly:prepareFocusedLesions", "fly:runFocusedLesions", "fly:prepareSharedStudy", "fly:runSharedStudy", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1577,6 +1581,33 @@ function registerIpc(getWin) {
     if (mode !== "overview" && mode !== "selected") throw new Error("Неизвестный режим анализа.");
     return prepareProtectedFiles(projectPaths(projectId), FOCUSED_DIR, mode === "overview" ? OVERVIEW_FILES : SELECTED_FILES);
   });
+  handle("fly:prepareSharedStudy", async (_e, projectId) => {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    return prepareProtectedFiles(projectPaths(projectId), FOCUSED_DIR, SHARED_FILES);
+  });
+  handle("fly:listSharedStudies", async () => {
+    const root = path.join(DIRS.data, "shiu-v630-shared");
+    let entries;
+    try {
+      const st=await fsp.lstat(root); if (!st.isDirectory() || st.isSymbolicLink()) throw new Error("Общее хранилище должно быть обычной папкой.");
+      entries=await fsp.readdir(root,{withFileTypes:true});
+    } catch (e) { if (e.code === "ENOENT") return { root, studies: [] }; throw e; }
+    const studies=[];
+    for (const entry of entries) {
+      if (!entry.isDirectory() || entry.isSymbolicLink() || !/^Study_[A-Za-z0-9_-]+$/.test(entry.name)) continue;
+      const dir=path.join(root,entry.name); const manifestPath=path.join(dir,"manifest.json");
+      try {
+        const st=await fsp.lstat(manifestPath); if (!st.isFile() || st.isSymbolicLink() || st.size > 200000) continue;
+        const manifest=JSON.parse(await fsp.readFile(manifestPath,"utf8"));
+        if (manifest.kind !== "fly-shiu-v630-shared-1" || manifest.id !== entry.name || typeof manifest.label !== "string") continue;
+        let progress=null;
+        try { progress=JSON.parse(await fsp.readFile(path.join(dir,"progress.json"),"utf8")); } catch {}
+        studies.push({ id:entry.name, label:manifest.label, path:dir, created: Number(manifest.created_unix)||0, progress });
+      } catch {}
+    }
+    studies.sort((a,b)=>b.created-a.created || a.id.localeCompare(b.id));
+    return { root, studies };
+  });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);
     const full = path.join(ws.code, path.basename(name));
@@ -1647,6 +1678,18 @@ function registerIpc(getWin) {
       return runScript(getWin(), projectId, SELECTED_FILES[4], args, { protectedMode: "selected" });
     }
     throw new Error("Неизвестный режим анализа.");
+  });
+  handle("fly:runSharedStudy", (_e, projectId, args) => {
+    const scope=parseScope(projectId);
+    if (scope.kind !== "idea" || !Array.isArray(args) || args.length!==4 || args[0]!=="--stage" || typeof args[3]!=="string" || !args[3]) throw new Error("Некорректные параметры общего набора.");
+    const stage=args[1];
+    if (stage === "init") {
+      if (scope.ideaId!=="i-lesions" || args[2]!=="--top-run") throw new Error("Новый набор создаётся в идее лезий из папки топ-200.");
+    } else {
+      if (!["plan","singles","all","review","individuality"].includes(stage) || args[2]!=="--study" || !/^Study_[A-Za-z0-9_-]+$/.test(args[3])) throw new Error("Неизвестный общий набор или режим.");
+      if (stage === "individuality" ? scope.ideaId!=="i-individuality" : scope.ideaId!=="i-lesions") throw new Error("Выберите соответствующую идею.");
+    }
+    return runScript(getWin(),projectId,SHARED_FILES[SHARED_FILES.length-1],args,{protectedMode:"shared"});
   });
   handle("fly:getActiveRun", (_e, projectId) => runningScopes.get(parseScope(projectId).scopeId) || null);
   handle("fly:killRun", async (_e, runId) => {

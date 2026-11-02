@@ -300,6 +300,9 @@ function Workspace({
   const [topDialog, setTopDialog] = useState(false);
   const [lesionDialog, setLesionDialog] = useState(false);
   const [focusedDialog, setFocusedDialog] = useState<"lesions" | "individuality" | null>(null);
+  const [sharedDialog, setSharedDialog] = useState<"lesions" | "individuality" | null>(null);
+  const [sharedInfo, setSharedInfo] = useState<Awaited<ReturnType<NonNullable<typeof fly>["listSharedStudies"]>> | null>(null);
+  const [sharedStudy, setSharedStudy] = useState("");
   const [checkDialog, setCheckDialog] = useState<"control" | "original" | null>(null);
   const [preparing, setPreparing] = useState(false);
   const [startingRuns, setStartingRuns] = useState<Record<string, boolean>>({});
@@ -403,7 +406,7 @@ function Workspace({
     }
   }
 
-  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | "parallel" | "overview" | "selected" | null = null) => {
+  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | "parallel" | "overview" | "selected" | "shared" | null = null) => {
     const bridge = fly;
     if (!bridge) return;
     if (!launchTracker.current.begin(targetPid)) {
@@ -420,7 +423,7 @@ function Workspace({
       onMissingPackage(null);
     }
     try {
-      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : protectedMode === "parallel" ? await bridge.runParallelLesions(targetPid, argList) : protectedMode === "overview" || protectedMode === "selected" ? await bridge.runFocusedLesions(targetPid, protectedMode, argList) : await bridge.runScript(targetPid, scriptName, argList);
+      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : protectedMode === "parallel" ? await bridge.runParallelLesions(targetPid, argList) : protectedMode === "overview" || protectedMode === "selected" ? await bridge.runFocusedLesions(targetPid, protectedMode, argList) : protectedMode === "shared" ? await bridge.runSharedStudy(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
       if (launchTracker.current.resolved(targetPid, r.runId)) {
         setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
         if (pidRef.current === targetPid) setRunNote(`Расчёт выполняется. Папка: ${r.runDir}`);
@@ -562,6 +565,40 @@ function Workspace({
     } catch (e) {
       if (pidRef.current === target) setRunNote(`Не удалось подготовить анализ: ${(e as Error).message}`);
     } finally { preparingV630.current = false; setPreparing(false); }
+  };
+
+  const openShared = async (kind: "lesions" | "individuality") => {
+    setSharedDialog(kind); setSharedInfo(null);
+    try {
+      const info = await fly!.listSharedStudies();
+      setSharedInfo(info);
+      setSharedStudy((previous) => info.studies.some((item) => item.id === previous) ? previous : info.studies.length === 1 ? info.studies[0].id : "");
+    } catch (e) { setRunNote(`Не удалось прочитать общую папку: ${(e as Error).message}`); }
+  };
+
+  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality") => {
+    const bridge=fly; const target=scopeId;
+    if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
+    preparingV630.current=true;setPreparing(true);
+    try {
+      let args: string[];
+      if (stage === "init") {
+        setRunNote("Выберите папку полного топ-200. Копия будет сохранена в общей папке.");
+        const top=await bridge.pickFolder("Выберите папку полного топ-200: summary.json, checkpoint.json и 30 файлов повторов");
+        if (!top) { setRunNote("Создание набора отменено."); return; }
+        setSharedStudy("");
+        args=["--stage",stage,"--top-run",top];
+      } else {
+        if (!sharedStudy) { setRunNote("Сначала выберите общий набор."); return; }
+        args=["--stage",stage,"--study",sharedStudy];
+      }
+      const prepared=await bridge.prepareSharedStudy(target);
+      if (pidRef.current!==target) return;
+      if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
+      await startScriptInProject(target,prepared.name,args,"shared");
+    } catch (e) {
+      if (pidRef.current===target) setRunNote(`Не удалось подготовить общий набор: ${(e as Error).message}`);
+    } finally { preparingV630.current=false;setPreparing(false); }
   };
 
   const stopCurrentRun = async () => {
@@ -1356,8 +1393,8 @@ function Workspace({
             <span className="label">результат · {scopeLabel}</span>
             <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setTopDialog(true)}>топ-200</Button>
             <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setLesionDialog(true)}>лезии v630</Button>
-            {workspaceIdeaId === "i-lesions" && <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing} onClick={() => setFocusedDialog("lesions")}>выборочные лезии</Button>}
-            {workspaceIdeaId === "i-individuality" && <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing} onClick={() => setFocusedDialog("individuality")}>контроли v630</Button>}
+            {workspaceIdeaId === "i-lesions" && <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing} onClick={() => void openShared("lesions")}>выборочные лезии</Button>}
+            {workspaceIdeaId === "i-individuality" && <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing} onClick={() => void openShared("individuality")}>контроли v630</Button>}
             <DropdownMenu>
               <DropdownMenuTrigger asChild><Button size="sm" variant="ghost" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId}>проверки Shiu</Button></DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -1469,6 +1506,31 @@ function Workspace({
                 <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("parallel"); }}>продолжить: 2 процесса</Button>
               </div>
               <p className="text-[11px] text-muted-foreground">Перед продолжением остановите прежний расчёт и дождитесь его завершения. Выберите папку самого последнего прогона лезий. Два процесса работают с пониженным приоритетом, но создают две большие сети. На Windows перед стартом требуется не менее 8 ГиБ свободной RAM; при падении ниже 2 ГиБ новые повторы прекращаются. Это не гарантия отзывчивости или достаточной памяти: сохраните работу в Word и следите за RAM. При замедлении используйте один процесс. Модельная лезия не доказывает необходимость нейрона у животного.</p>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={sharedDialog !== null} onOpenChange={(open) => { if (!open) setSharedDialog(null); }}>
+            <DialogContent>
+              <DialogHeader><DialogTitle>{sharedDialog === "individuality" ? "Индивидуальность: общие контроли" : "Выборочные лезии: общий набор"}</DialogTitle>
+                <DialogDescription>{sharedDialog === "individuality" ? "Обзор сохраняется в пространстве этой идеи. Контрольные повторы являются симуляциями одной модели, а не устойчивыми индивидуальными фенотипами." : "Новый набор начинает лезии с нуля и не ищет старые SQLite. Топ-200 выбирается один раз и копируется в общую папку. План и обзор не запускают симуляций."}</DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-wrap items-center gap-2"><p className="break-all font-mono text-[10px] text-muted-foreground">общая папка: {sharedInfo?.root ?? "загрузка…"}</p>{sharedInfo && sharedInfo.studies.length > 0 && <Button size="sm" variant="outline" onClick={() => void fly!.openPath(sharedInfo.root)}>открыть общую папку</Button>}</div>
+              {!sharedInfo ? <p className="text-[11px] text-muted-foreground">Проверяем общую папку…</p> : sharedInfo.studies.length > 0 ? <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px]">набор</span>
+                <Select value={sharedStudy} onValueChange={setSharedStudy}><SelectTrigger className="min-w-[220px] max-w-full"><SelectValue placeholder="выберите набор" /></SelectTrigger><SelectContent>{sharedInfo.studies.map((item) => <SelectItem key={item.id} value={item.id}>{item.label}</SelectItem>)}</SelectContent></Select>
+                {sharedStudy && <Button size="sm" variant="outline" onClick={() => void fly!.openPath(sharedInfo.studies.find((item) => item.id === sharedStudy)!.path)}>открыть папку набора</Button>}
+                {sharedInfo.studies.find((item) => item.id === sharedStudy)?.progress && <span className="font-mono text-[10px] text-muted-foreground">последний прогресс: {sharedInfo.studies.find((item) => item.id === sharedStudy)!.progress!.completed}/{sharedInfo.studies.find((item) => item.id === sharedStudy)!.progress!.total}</span>}
+              </div> : <p className="text-[11px] text-muted-foreground">Общих наборов пока нет. Создайте набор в идее лезий.</p>}
+              {sharedDialog === "individuality" ? <div className="flex flex-col items-start gap-2">
+                <Button disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("individuality"); }}>построить обзор общих контролей</Button>
+              </div> : <div className="flex flex-col items-start gap-2">
+                <Button onClick={() => { setSharedDialog(null); void runShared("init"); }}>создать набор из топ-200</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("plan"); }}>план без симуляций</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("singles"); }}>рассчитать или продолжить 10 клеток</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("all"); }}>рассчитать или продолжить пары и группу</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("review"); }}>обзор сохранённых лезий</Button>
+              </div>}
+              <p className="text-[11px] text-muted-foreground">Сначала рассчитываются 30 новых контролей и до 300 одиночных лезий. Пять пар и группа добавляют 180 повторов; если одиночный этап не завершён, он будет продолжен. Расчёт занимает несколько часов и несколько гигабайтов RAM. Остановите другие тяжёлые расчёты перед симуляцией. В общей папке остаются данные и периодические резервные снимки; это не копия на другом устройстве.</p>
+              <Button size="sm" variant="ghost" onClick={() => { const kind=sharedDialog; setSharedDialog(null);setFocusedDialog(kind); }}>ручной режим для прежних баз</Button>
             </DialogContent>
           </Dialog>
           <Dialog open={focusedDialog !== null} onOpenChange={(open) => { if (!open) setFocusedDialog(null); }}>
