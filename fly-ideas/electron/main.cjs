@@ -757,21 +757,57 @@ async function setupPythonEnv(win, mode = "core") {
   }
 }
 
+// Изолированные проверенные копии для топ-200 не затрагивают файлы пользователя.
+const TOP200_DIR = ".shiu-top200-v630";
+const TOP200_FILES = ["25_shiu_v630_control.py", "27_shiu_top200_v630.py"];
+async function prepareTop200Files(ws) {
+  const dir = path.join(ws.code, TOP200_DIR);
+  try { await fsp.mkdir(dir); } catch (e) { if (e.code !== "EEXIST") throw e; }
+  const dirInfo = await fsp.lstat(dir);
+  if (!dirInfo.isDirectory() || dirInfo.isSymbolicLink()) throw new Error("Папка копий топ-200 должна быть обычной папкой, не ссылкой.");
+  const norm = (b) => b.toString("utf8").replace(/\r\n/g, "\n");
+  const contents = await Promise.all(TOP200_FILES.map((name) => fsp.readFile(path.join(TEMPLATES, name))));
+  for (let i = 0; i < TOP200_FILES.length; i++) {
+    const target = path.join(dir, TOP200_FILES[i]);
+    try {
+      const st = await fsp.lstat(target);
+      if (!st.isFile() || st.isSymbolicLink() || norm(await fsp.readFile(target)) !== norm(contents[i]))
+        return { name: TOP200_FILES[1], matches: false, conflict: TOP200_FILES[i], added: [], code: dir };
+    } catch (e) { if (e.code !== "ENOENT") throw e; }
+  }
+  const added = [];
+  for (let i = 0; i < TOP200_FILES.length; i++) {
+    const target = path.join(dir, TOP200_FILES[i]);
+    try { await fsp.copyFile(path.join(TEMPLATES, TOP200_FILES[i]), target, fs.constants.COPYFILE_EXCL); added.push(TOP200_FILES[i]); }
+    catch (e) { if (e.code !== "EEXIST") throw e; }
+    const st = await fsp.lstat(target);
+    if (!st.isFile() || st.isSymbolicLink() || norm(await fsp.readFile(target)) !== norm(contents[i]))
+      return { name: TOP200_FILES[1], matches: false, conflict: TOP200_FILES[i], added, code: dir };
+  }
+  return { name: TOP200_FILES[1], matches: true, conflict: null, added, code: dir };
+}
+
 // ------------------------------------------------------------
 // Запуск скриптов
 // ------------------------------------------------------------
 const runs = new Map();
 const runningScopes = new Map();
 
-async function runScript(win, projectId, name, args) {
+async function runScript(win, projectId, name, args, { top200 = false } = {}) {
   assertNotSyncing();
   const py = await pickPython();
   if (!py) throw new Error("Python 3 не найден. Установи Miniconda или Python 3.11/3.12 с python.org (галочка «Add to PATH»).");
   assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
+  if (top200) {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    const prepared = await prepareTop200Files(ws);
+    if (!prepared.matches) throw new Error(`Копия ${prepared.conflict} в папке топ-200 изменена. Она не перезаписана, запуск остановлен.`);
+    assertNotSyncing();
+  }
   if (runningScopes.has(ws.projectId)) throw new Error("В этом пространстве уже выполняется расчёт. Дождитесь его завершения.");
-  const file = path.join(ws.code, path.basename(name));
+  const file = top200 ? path.join(ws.code, TOP200_DIR, TOP200_FILES[1]) : path.join(ws.code, path.basename(name));
   if (!within(ws.code, file)) throw new Error("Скрипт вне папки рабочего пространства.");
   if (!fs.existsSync(file)) throw new Error(`Скрипт ${path.basename(name)} не найден в выбранной идее.`);
   const { cmd, prefix } = parsePySpec(py.exe || py.cmd);
@@ -1252,7 +1288,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1512,24 +1548,7 @@ function registerIpc(getWin) {
   });
   handle("fly:prepareTop200", async (_e, projectId) => {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
-    const ws = projectPaths(projectId);
-    const files = ["25_shiu_v630_control.py", "27_shiu_top200_v630.py"];
-    const norm = (b) => b.toString("utf8").replace(/\r\n/g, "\n");
-    const contents = await Promise.all(files.map((name) => fsp.readFile(path.join(TEMPLATES, name))));
-    for (let i = 0; i < files.length; i++) {
-      try {
-        const existing = await fsp.readFile(path.join(ws.code, files[i]));
-        if (norm(contents[i]) !== norm(existing)) return { name: files[1], matches: false, conflict: files[i], added: [] };
-      } catch (err) { if (err.code !== "ENOENT") throw err; }
-    }
-    const added = [];
-    for (let i = 0; i < files.length; i++) {
-      const target = path.join(ws.code, files[i]);
-      try { await fsp.copyFile(path.join(TEMPLATES, files[i]), target, fs.constants.COPYFILE_EXCL); added.push(files[i]); }
-      catch (err) { if (err.code !== "EEXIST") throw err; }
-      if (norm(contents[i]) !== norm(await fsp.readFile(target))) return { name: files[1], matches: false, conflict: files[i], added };
-    }
-    return { name: files[1], matches: true, conflict: null, added };
+    return prepareTop200Files(projectPaths(projectId));
   });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);
@@ -1566,6 +1585,13 @@ function registerIpc(getWin) {
     return true;
   });
   handle("fly:runScript", (_e, projectId, name, args) => runScript(getWin(), projectId, path.basename(name), args));
+  handle("fly:runTop200", (_e, projectId, args) => {
+    const ok = Array.isArray(args) && args[0] === "--simulate" && (
+      args.length === 1 || (args.length === 2 && args[1] === "--pilot") ||
+      (args.length === 3 && args[1] === "--resume-from" && typeof args[2] === "string" && args[2].length > 0));
+    if (!ok) throw new Error("Недопустимые параметры топ-200.");
+    return runScript(getWin(), projectId, TOP200_FILES[1], args, { top200: true });
+  });
   handle("fly:getActiveRun", (_e, projectId) => runningScopes.get(parseScope(projectId).scopeId) || null);
   handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });
 

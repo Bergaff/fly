@@ -87,14 +87,37 @@ test('IPC связывает файлы, передаёт пути запуще�
     assert.equal(conflict.matches, false); assert.equal(conflict.conflict, originalFiles[1]);
     assert.equal(await fsp.readFile(path.join(ws.code, originalFiles[1]), 'utf8'), '# edited author file\n');
     const topName = '27_shiu_top200_v630.py';
-    await fsp.copyFile(path.join(root, 'experiments/templates', topName), path.join(templateDir, topName));
+    // Маленькая заглушка проверяет IPC и папку запуска, модель не запускается.
+    const stub = `import os,json,sys,hashlib
+from pathlib import Path
+base=Path(__file__).parent/'25_shiu_v630_control.py'
+raw=base.read_bytes().replace(b'\\r\\n',b'\\n')
+open(os.path.join(os.environ['FLY_RUN_DIR'],'summary.json'),'w').write(json.dumps({'base':hashlib.sha256(raw).hexdigest(),'script':__file__,'args':sys.argv[1:]}))
+`;
+    await fsp.writeFile(path.join(templateDir, topName), stub);
+    await fsp.writeFile(path.join(ws.code, topName), '# user version, do not run\n');
     await assert.rejects(call('prepareTop200', 'project'), /идею/);
+    const topReady = await call('prepareTop200', 'idea:example');
+    assert.equal(topReady.matches, true); assert.equal(topReady.added.length, 2);
+    assert.equal(topReady.code, path.join(ws.code, '.shiu-top200-v630'));
+    assert.equal(await fsp.readFile(path.join(ws.code, newName), 'utf8'), '# user edit\n');
+    assert.equal(await fsp.readFile(path.join(ws.code, topName), 'utf8'), '# user version, do not run\n');
+    assert.equal((await call('prepareTop200', 'idea:example')).added.length, 0);
+    await assert.rejects(fsp.stat(path.join(otherWs.code, '.shiu-top200-v630')), {code: 'ENOENT'});
+    await assert.rejects(call('runTop200', 'idea:example', ['--anything']), /параметры/);
+    const topCompleted = new Promise((resolve) => { onExit = resolve; });
+    const topRun = await call('runTop200', 'idea:example', ['--simulate', '--pilot']);
+    assert.equal((await topCompleted).code, 0);
+    const topReport = JSON.parse(await fsp.readFile(path.join(topRun.runDir, 'summary.json'), 'utf8'));
+    assert.equal(topReport.base, 'b5f200a3e9472c9aa6318acab8b5fb928d23af3b458c2d43fc29909241e95711');
+    assert.equal(topReport.script, path.join(topReady.code, topName));
+    assert.deepEqual(topReport.args, ['--simulate', '--pilot']);
+    await fsp.writeFile(path.join(topReady.code, newName), '# do not overwrite\n');
     const topConflict = await call('prepareTop200', 'idea:example');
     assert.equal(topConflict.matches, false); assert.equal(topConflict.conflict, newName);
-    await assert.rejects(fsp.stat(path.join(ws.code, topName)), {code: 'ENOENT'});
-    const topReady = await call('prepareTop200', 'idea:other');
-    assert.equal(topReady.matches, true); assert.equal(topReady.added.length, 2);
-    assert.equal((await call('prepareTop200', 'idea:other')).added.length, 0);
+    await assert.rejects(call('runTop200', 'idea:example', ['--simulate']), /не перезаписана/);
+    assert.equal(await fsp.readFile(path.join(topReady.code, newName), 'utf8'), '# do not overwrite\n');
+    assert.equal(await fsp.readFile(path.join(ws.code, newName), 'utf8'), '# user edit\n');
     await fsp.writeFile(path.join(ws.code, 'wait_test.py'), 'import time\ntime.sleep(0.5)\n');
     const waitCompleted = new Promise((resolve) => { onExit = resolve; });
     const waiting = await call('runScript', 'idea:example', 'wait_test.py', []);

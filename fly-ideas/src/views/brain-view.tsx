@@ -400,7 +400,7 @@ function Workspace({
     }
   }
 
-  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[]) => {
+  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], useTop200Copies = false) => {
     const bridge = fly;
     if (!bridge) return;
     if (!launchTracker.current.begin(targetPid)) {
@@ -417,7 +417,7 @@ function Workspace({
       onMissingPackage(null);
     }
     try {
-      const r = await bridge.runScript(targetPid, scriptName, argList);
+      const r = useTop200Copies ? await bridge.runTop200(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
       if (launchTracker.current.resolved(targetPid, r.runId)) {
         setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
         if (pidRef.current === targetPid) setRunNote(`Расчёт выполняется. Папка: ${r.runDir}`);
@@ -498,9 +498,6 @@ function Workspace({
     const bridge = fly;
     const target = scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
-    if (["25_shiu_v630_control.py", "27_shiu_top200_v630.py"].includes(editorRef.current.current ?? "") && editorRef.current.dirty) {
-      setRunNote("В файле расчёта есть несохранённые изменения. Сохраните их или отмените перед запуском."); return;
-    }
     preparingV630.current = true;
     setPreparing(true);
     setRunNote("Подготовка файлов расчёта в выбранной идее…");
@@ -511,9 +508,9 @@ function Workspace({
       const updated = await bridge.listScripts(target);
       if (pidRef.current !== target) return;
       setFiles(updated);
-      if (!prepared.matches) { setRunNote(`Файл ${prepared.conflict} изменён. Он не перезаписан; запуск остановлен.`); return; }
+      if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
       setRunNote("Топ-200 сохраняет результаты после каждого повтора.");
-      await startScriptInProject(target, prepared.name, previous ? ["--simulate", "--resume-from", previous] : pilot ? ["--simulate", "--pilot"] : ["--simulate"]);
+      await startScriptInProject(target, prepared.name, previous ? ["--simulate", "--resume-from", previous] : pilot ? ["--simulate", "--pilot"] : ["--simulate"], true);
     } catch (e) {
       if (pidRef.current === target) setRunNote(`Не удалось подготовить топ-200: ${(e as Error).message}`);
     } finally { preparingV630.current = false; setPreparing(false); }
@@ -1386,7 +1383,7 @@ function Workspace({
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Отбор топ-200 на v630</DialogTitle>
-                <DialogDescription>21 правый sugar GRN, 200 Гц. Это не лезии. Полная сеть может потребовать несколько гигабайтов памяти. 30 повторов могут выполняться долго. Каждый завершённый повтор сохраняется.</DialogDescription>
+                <DialogDescription>21 правый sugar GRN, 200 Гц. Используются отдельные проверенные копии, ваши файлы не изменяются. Это не лезии. Полная сеть может потребовать несколько гигабайтов памяти. 30 повторов могут выполняться долго. Каждый завершённый повтор сохраняется.</DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-start gap-2">
                 <Button onClick={() => { setTopDialog(false); void runTop200(false, true); }}>пилот: 1 повтор</Button>

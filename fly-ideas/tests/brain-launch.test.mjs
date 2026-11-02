@@ -14,7 +14,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
   dom.window.HTMLElement.prototype.scrollTo = function() {};
   dom.window.HTMLElement.prototype.scrollIntoView = function() {};
   globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
-  let output = () => {}, calls = [], quick = true, failStart = false, delayStart = false, releaseStart, prepare = {name:'27_shiu_top200_v630.py',matches:true,conflict:null,added:[]}, resumePath='C:\\run with space';
+  let output = () => {}, calls = [], quick = true, failStart = false, delayStart = false, releaseStart, prepare = {name:'27_shiu_top200_v630.py',matches:true,conflict:null,added:[],code:'C:\\idea\\code\\.shiu-top200-v630'}, resumePath='C:\\run with space';
   const py={exe:'python',cmd:'python',version:'3.11',source:'test',majorMinor:[3,11],hasCore:true,okMap:{},note:''};
   const env={python:py,packages:{numpy:'1',pandas:'1',scipy:'1',matplotlib:'1',pyarrow:'1',duckdb:'1',brian2:'1',joblib:'1'},conda:null,gpu:null};
   const paths={projectId:'idea:i',code:'C:\\idea\\code',runs:'C:\\idea\\runs',defaults:{code:'C:\\idea\\code',runs:'C:\\idea\\runs'}};
@@ -34,6 +34,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     checkEnv:async()=>env,listPythons:async()=>[py],onEnvSetupOutput:()=>()=>{},
     agentInfo:async()=>null,listData:async()=>[],getPaths:async()=>null,listExternal:async()=>[],getDataFileLinks:async()=>({}),onDownloadProgress:()=>()=>{},
   };
+  dom.window.fly.runTop200=(scope,args)=>dom.window.fly.runScript(scope,'27_shiu_top200_v630.py',args);
   const vite=await createServer({configFile: new URL('../vite.config.ts', import.meta.url).pathname,server:{middlewareMode:true},appType:'custom'});
   const {render,fireEvent,screen,waitFor,cleanup,act}=await import('@testing-library/react');
   try {
@@ -61,7 +62,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     await waitFor(()=>assert.equal(top.disabled,false));
     prepare={...prepare,matches:false,conflict:'25_shiu_v630_control.py'};
     fireEvent.click(top);fireEvent.click(screen.getByRole('button',{name:'пилот: 1 повтор'}));
-    await waitFor(()=>assert.match(document.body.textContent,/Файл 25_shiu_v630_control.py изменён/));
+    await waitFor(()=>assert.match(document.body.textContent,/Проверочная копия 25_shiu_v630_control.py изменена/));
     assert.equal(calls.length,3);
     prepare={...prepare,matches:true,conflict:null};
     resumePath=null;
