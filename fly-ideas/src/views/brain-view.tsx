@@ -576,7 +576,7 @@ function Workspace({
     } catch (e) { setRunNote(`Не удалось прочитать общую папку: ${(e as Error).message}`); }
   };
 
-  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review") => {
+  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review" | "holdout-plan" | "holdout-run" | "holdout-review") => {
     const bridge=fly; const target=scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
     preparingV630.current=true;setPreparing(true);
@@ -592,9 +592,9 @@ function Workspace({
         if (!sharedStudy) { setRunNote("Сначала выберите общий набор."); return; }
         args=["--stage",stage,"--study",sharedStudy];
       }
-      if (stage.startsWith("pilot-") || stage.startsWith("extend-")) {
+      if (stage.startsWith("pilot-") || stage.startsWith("extend-") || stage.startsWith("holdout-")) {
         // The main process creates a separate protected copy and checks it before launch.
-        await startScriptInProject(target,stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
+        await startScriptInProject(target,stage.startsWith("holdout-") ? "35_shiu_individuality_holdout.py" : stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
       } else {
         const prepared=await bridge.prepareSharedStudy(target);
         if (pidRef.current!==target) return;
@@ -1535,6 +1535,10 @@ function Workspace({
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("extend-run"); }}>рассчитать или продолжить 70 повторов</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("extend-review"); }}>обзор продолжения на 10 seed</Button>
                 <p className="text-[11px] text-muted-foreground">Продолжение: 7 дополнительных seed для 10 прежних вариантов, до 70 новых повторов. Нужен завершённый исходный пилот. План и обзор не запускают симуляции; база прежнего пилота не изменяется.</p>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("holdout-plan"); }}>план проверки на новых seed</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("holdout-run"); }}>рассчитать или продолжить проверку: 100 повторов</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("holdout-review"); }}>обзор проверки на новых seed</Button>
+                <p className="text-[11px] text-muted-foreground">Проверка: прежние 10 вариантов, новые seed 10–19. Нужны все 100 прежних повторов. План и обзор не запускают симуляции. План сравнения фиксируется до новых повторов, итог только после 100/100. Один процесс; перед запуском сохраните работу и проверьте свободную RAM.</p>
               </div> : <div className="flex flex-col items-start gap-2">
                 <Button onClick={() => { setSharedDialog(null); void runShared("init"); }}>создать набор из топ-200</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("plan"); }}>план без симуляций</Button>

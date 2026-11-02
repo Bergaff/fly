@@ -140,7 +140,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     const studyId='Study_20261102_123456_abcdef12';
     dom.window.fly.listSharedStudies=async()=>({root:'C:\\data\\shiu-v630-shared',studies:[{id:studyId,label:'Новый набор',path:'C:\\data\\study',created:1,progress:null}]});
     dom.window.fly.prepareSharedStudy=async()=>({name:'32_shiu_shared_study.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
-    dom.window.fly.runSharedStudy=(scope,args)=>dom.window.fly.runScript(scope,args[1].startsWith('extend-')?'34_shiu_individuality_extension.py':args[1].startsWith('pilot-')?'33_shiu_individuality_pilot.py':'32_shiu_shared_study.py',args);
+    dom.window.fly.runSharedStudy=(scope,args)=>dom.window.fly.runScript(scope,args[1].startsWith('holdout-')?'35_shiu_individuality_holdout.py':args[1].startsWith('extend-')?'34_shiu_individuality_extension.py':args[1].startsWith('pilot-')?'33_shiu_individuality_pilot.py':'32_shiu_shared_study.py',args);
     dom.window.fly.prepareFocusedLesions=async(_scope,mode)=>({name:mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
     dom.window.fly.runFocusedLesions=(scope,mode,args)=>dom.window.fly.runScript(scope,mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',args);
     const commonProps={projects:[{id:'p',name:'Проект',color:'#777'}],activeProject:'p',onSelectProject:noop,onAddProject:noop,onAddIdea:noop,onOpenIdeaCard:noop,onUpdateIdea:noop,onCompleteStages:noop,onAddJournalEntry:noop,onAddReferences:noop,onDirtyChange:noop};
@@ -192,6 +192,14 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
       await waitFor(()=>assert.equal(calls.length,index+1));
       assert.deepEqual(calls[index],{scope:'idea:i-individuality',name:'34_shiu_individuality_extension.py',args:['--stage',stage,'--study',studyId]});
     }
+    for (const [name,stage,index] of [['план проверки на новых seed','holdout-plan',18],['рассчитать или продолжить проверку: 100 повторов','holdout-run',19],['обзор проверки на новых seed','holdout-review',20]]) {
+      await waitFor(()=>assert.equal(screen.getByRole('button',{name:'контроли v630'}).disabled,false));
+      fireEvent.click(screen.getByRole('button',{name:'контроли v630'}));
+      const button=await screen.findByRole('button',{name});await waitFor(()=>assert.equal(button.disabled,false));fireEvent.click(button);
+      await waitFor(()=>assert.equal(calls.length,index+1));
+      assert.deepEqual(calls[index],{scope:'idea:i-individuality',name:'35_shiu_individuality_holdout.py',args:['--stage',stage,'--study',studyId]});
+    }
+
 
   } catch (e) { if (e.errors) console.error(e.errors); throw e; } finally {cleanup();await vite.close();dom.window.close();}
 });

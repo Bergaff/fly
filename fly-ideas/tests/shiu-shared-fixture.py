@@ -149,9 +149,75 @@ def main():
     assert view.digest(pilot_db)==original_pilot_hash and (view.digest(control_path),view.digest(selected_path))==protected
     calls.clear();ext_run('ext-repeat','extend-run');assert not calls
     calls.clear();ext_run('ext-review','extend-review');assert not calls
+    # Новая серия фиксирует план на основе прежних 100 до запуска, без записи в старые базы.
+    holdout=load('individuality_holdout',templates/'35_shiu_individuality_holdout.py')
+    assert holdout.load_extension().PILOT_SHA==extension.PILOT_SHA
+    assert holdout.average_ranks([3,1,1,4])==[3,1.5,1.5,4]
+    assert abs(holdout.correlation([1,2,3],[3,2,1])+1)<1e-12
+    assert holdout.correlation([1,1,1],[1,2,3]) is None
+    def hold_run(name,stage):
+        output=tmp/name;output.mkdir();holdout.execute(pilot,extension,shared,view,module,study,manifest,output,stage);return output
+    with sqlite3.connect(ext_db) as db:
+        missing=db.execute('SELECT * FROM trials WHERE variant=9 AND seed=9').fetchone()
+        db.execute('DELETE FROM trials WHERE variant=9 AND seed=9');db.commit()
+    try: hold_run('holdout-incomplete-prior','holdout-plan');raise AssertionError('incomplete previous extension accepted')
+    except ValueError as e: assert '70' in str(e)
+    with sqlite3.connect(ext_db) as db: db.execute('INSERT INTO trials VALUES(?,?,?,?,?,?,?,?)',missing);db.commit()
+    ext_before=view.digest(ext_db)
+    calls.clear();out_hplan=hold_run('holdout-plan','holdout-plan');assert not calls
+    hp=json.loads((out_hplan/'summary.json').read_text(encoding='utf8'))
+    frozen=json.loads((out_hplan/'frozen_plan.json').read_text(encoding='utf8'))
+    assert hp['previous_trials']==100 and hp['new_planned']==100 and hp['new_completed']==0 and hp['status']=='plan_ready'
+    assert frozen['holdout_seeds']==list(range(10,20)) and not (pilot_db.parent/'holdout_10seeds_v1').exists()
+    bad_data=dict(data);bad_data['weights']=data['weights'].copy();bad_data['weights'][0]+=1
+    module.validate_simulation=lambda *_:(lesion,base,bad_data);calls.clear();module.run_trial=fake
+    try: hold_run('holdout-bad-weights','holdout-run');raise AssertionError('changed weights accepted')
+    except ValueError as e: assert 'Веса варианта' in str(e)
+    assert not calls
+    module.validate_simulation=lambda *_:(lesion,base,data)
+    h_attempt=[]
+    def interrupt_holdout(l,b,d,targets,seed):
+        h_attempt.append(seed)
+        if len(h_attempt)>1: raise RuntimeError('holdout interrupted')
+        return actual_trial(l,b,d,targets,seed)
+    module.run_trial=interrupt_holdout
+    try: hold_run('holdout-interrupt','holdout-run');raise AssertionError('interruption not raised')
+    except RuntimeError as e: assert str(e)=='holdout interrupted'
+    hold_db=pilot_db.parent/'holdout_10seeds_v1'/'holdout.sqlite3'
+    with sqlite3.connect(hold_db) as db:
+        assert db.execute('SELECT count(*) FROM trials').fetchone()[0]==1
+        assert json.loads(db.execute('SELECT value FROM metadata WHERE key="protocol"').fetchone()[0])==frozen
+    stopped=tmp/'holdout-stop';stopped.mkdir();(stopped/'stop.request').write_text('stop',encoding='utf8')
+    calls.clear();module.run_trial=fake;holdout.execute(pilot,extension,shared,view,module,study,manifest,stopped,'holdout-run')
+    stopped_info=json.loads((stopped/'summary.json').read_text(encoding='utf8'))
+    assert not calls and stopped_info['status']=='stopped' and stopped_info['new_completed']==1 and stopped_info['metrics']=={}
+    calls.clear();out_h=hold_run('holdout-resume','holdout-run')
+    hi=json.loads((out_h/'summary.json').read_text(encoding='utf8'))
+    assert hi['status']=='complete' and hi['new_completed']==100 and len(calls)==99 and 'left_spearman' in hi['metrics']
+    with sqlite3.connect(hold_db) as db:
+        combinations=db.execute('SELECT variant,seed FROM trials').fetchall()
+        assert set(combinations)=={(v,s) for v in range(10) for s in range(10,20)}
+    with (out_h/'trials_holdout.csv').open(encoding='utf-8-sig',newline='') as f: assert len(list(csv.DictReader(f)))==100
+    assert json.loads((out_h/'frozen_plan.json').read_text(encoding='utf8'))==frozen
+    # Известный обратный порядок и нулевой разброс: точные метрики и обработка неопределённой корреляции.
+    synthetic=tmp/'holdout-metrics';synthetic.mkdir()
+    test_protocol=dict(frozen,discovery_left_means_hz=list(range(1,11)),discovery_left_average_ranks_low_first=list(range(1,11)),discovery_right_means_hz=[1]*10)
+    synthetic_rows=[(v,seed,10-v,1,1.,1.,'hash','digest') for v in range(10) for seed in range(10,20)]
+    holdout.report(pilot,view,synthetic,[],[None]*100,synthetic_rows,'complete',test_protocol)
+    metrics=json.loads((synthetic/'summary.json').read_text(encoding='utf8'))['metrics']
+    assert abs(metrics['left_spearman']+1)<1e-12 and abs(metrics['left_pearson']+1)<1e-12
+    assert metrics['right_spearman'] is None and metrics['left_mean_difference_variant_10_minus_9']==-1
+    assert view.digest(ext_db)==ext_before and view.digest(pilot_db)==original_pilot_hash and (view.digest(control_path),view.digest(selected_path))==protected
+    calls.clear();hold_run('holdout-repeat','holdout-run');hold_run('holdout-review','holdout-review');assert not calls
+    with sqlite3.connect(hold_db) as db: db.execute('UPDATE trials SET left_count=left_count+1 WHERE variant=0 AND seed=10');db.commit()
+    try: hold_run('holdout-corrupt','holdout-review');raise AssertionError('corrupted holdout accepted')
+    except ValueError as e: assert 'повреждённый' in str(e)
+    assert view.digest(ext_db)==ext_before and view.digest(pilot_db)==original_pilot_hash
     # Повреждение строки запрещает обзор; исходный пилот не меняется.
     with sqlite3.connect(ext_db) as db: db.execute('UPDATE trials SET left_count=left_count+1 WHERE variant=0 AND seed=3');db.commit()
     try: ext_run('ext-corrupt','extend-review');raise AssertionError('corrupted row accepted')
+    except ValueError as e: assert 'повреждённый' in str(e)
+    try: hold_run('holdout-bad-prior','holdout-plan');raise AssertionError('corrupted previous extension accepted')
     except ValueError as e: assert 'повреждённый' in str(e)
     assert view.digest(pilot_db)==original_pilot_hash and (view.digest(control_path),view.digest(selected_path))==protected
     calls.clear();module.run_trial=fake;code,complete,report=run('all','all',['--study',study_id]);assert code==0 and report['result']['completed']==510 and len(calls)==180
