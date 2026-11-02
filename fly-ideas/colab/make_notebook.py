@@ -73,10 +73,11 @@ for name, item in BUNDLE.items():
         target.write_bytes(contents)
 print('Встроенный код проверен.')""".replace('__BUNDLE__',repr(bundle))),
 code('''#@title 4. Проверить входные файлы и топ-200 без симуляций
-subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'check'], check=True, env=FLY_ENV)'''),
+print('Проверка запущена: копирование и проверка больших файлов может занять несколько минут.', flush=True)
+run_with_output([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'check'], FLY_ENV)'''),
 md('''## 5. Основная серия CPU
 
-Включите флажок **START_CPU**, только когда готовы к расчёту, и запустите следующую ячейку. До двух процессов используются, только если хватает свободной памяти; иначе один. Скорость зависит от выданной Colab машины, сеть строится заново для каждого повтора, ускорение относительно вашего компьютера не гарантируется. Для ориентира: прежний локальный замер около 28 секунд на повтор даёт примерно 380 часов последовательной симуляции для 48 240 повторов, без построения сети; Colab может быть быстрее или медленнее.
+Включите флажок **START_CPU**, только когда готовы к расчёту, и запустите следующую ячейку. До двух процессов используются, только если хватает свободной памяти; иначе один. Журнал выводит каждый сохранённый повтор; если процесс долго молчит, появится сообщение об ожидании, но оно не доказывает прогресс. Скорость зависит от выданной Colab машины, сеть строится заново для каждого повтора, ускорение относительно вашего компьютера не гарантируется. Для ориентира: прежний локальный замер около 28 секунд на повтор даёт примерно 380 часов последовательной симуляции для 48 240 повторов, без построения сети; Colab может быть быстрее или медленнее.
 
 База работает на временном диске Colab. Каждые 25 завершённых повторов создаётся новый сжатый согласованный снимок на Google Диске и проверяется его чтение. При внезапном отключении последние повторы после снимка могут потеряться. Для продолжения подключитесь заново и выполните ячейки 1, 3, 3б, 4 и 5; в 5 снова включите флажок. Уже сохранённые повторы пропускаются. Снимки не удаляются автоматически, следите за свободным местом на Диске. При ошибке записи процесс прекращает работу. Сеть/Google Drive могут задерживать синхронизацию: после остановки убедитесь, что снимки действительно видны в Google Диске.
 
@@ -88,7 +89,8 @@ CHECKPOINT_EVERY = 25 #@param {type:"integer"}
 MAX_TRIALS_THIS_SESSION = 0 #@param {type:"integer"}
 # MAX_TRIALS_THIS_SESSION = 0 означает без ограничения на число повторов в этом сеансе.
 if START_CPU:
-    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu', '--workers', str(CPU_WORKERS), '--checkpoint-every', str(CHECKPOINT_EVERY), '--max-trials', str(MAX_TRIALS_THIS_SESSION)], check=True, env=FLY_ENV)
+    print('Запуск CPU: сначала копирование и проверка входных файлов. Пожалуйста, подождите.', flush=True)
+    run_with_output([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu', '--workers', str(CPU_WORKERS), '--checkpoint-every', str(CHECKPOINT_EVERY), '--max-trials', str(MAX_TRIALS_THIS_SESSION)], FLY_ENV)
 else:
     print('Расчёт не запущен. Для старта включите START_CPU и выполните ячейку.')'''),
 md('''## 6. Отдельный экспериментальный GPU-пилот
@@ -107,8 +109,8 @@ if RUN_GPU_PILOT:
     subprocess.run(['nvidia-smi'], check=True)
     GPU_PY = ensure_venv(PY312, '/content/fly-shiu-gpu-31216',
         ['numpy==2.2.6', 'pandas==2.2.3', 'pyarrow==18.1.0', 'brian2cuda==1.0b1', 'psutil==6.1.1'], FLY_ENV)
-    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu-pilot'], check=True, env=FLY_ENV)
-    subprocess.run([str(GPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'gpu-pilot'], check=True, env=FLY_ENV)
+    run_with_output([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu-pilot'], FLY_ENV)
+    run_with_output([str(GPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'gpu-pilot'], FLY_ENV)
     print('Пилоты сохранены отдельно в 04_Отдельные_GPU_пробы. Они не входят в полный план.')
 else:
     print('GPU-пилот не запущен.')'''),
@@ -118,7 +120,7 @@ md('''## 7. Экспорт для приложения
 code('''#@title 7. Создать проверенную копию SQLite для приложения
 EXPORT_CPU = False #@param {type:"boolean"}
 if EXPORT_CPU:
-    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'export'], check=True, env=FLY_ENV)
+    run_with_output([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'export'], FLY_ENV)
 else:
     print('Экспорт не запущен.')''')]
 for i,cell in enumerate(cells): cell['id']=f'fly-shiu-{i:02d}'

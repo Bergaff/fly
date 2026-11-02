@@ -4,8 +4,11 @@ import json
 import os
 from pathlib import Path
 import platform
+import queue
+import signal
 import shutil
 import subprocess
+import threading
 import tarfile
 import tempfile
 import urllib.request
@@ -21,6 +24,62 @@ def clean_python_env():
         env.pop(name, None)
     env['PYTHONNOUSERSITE'] = '1'
     return env
+
+
+def run_with_output(command, env, heartbeat=20):
+    """Stream child stdout/stderr into the notebook rather than the kernel's OS fd."""
+    process_env = dict(env, PYTHONUNBUFFERED='1', PYTHONIOENCODING='utf-8')
+    process = subprocess.Popen(command, env=process_env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               text=True, encoding='utf8', errors='replace', bufsize=1, start_new_session=True)
+    messages = queue.Queue()
+    end = object()
+    def reader():
+        try:
+            for line in process.stdout:
+                messages.put(line)
+        finally:
+            messages.put(end)
+    threading.Thread(target=reader, name='fly-colab-output', daemon=True).start()
+
+    def drain():
+        while True:
+            try:
+                message = messages.get(timeout=heartbeat)
+            except queue.Empty:
+                if process.poll() is None:
+                    print('Нет новых строк; процесс ещё работает. Это не подтверждает прогресс.', flush=True)
+                else:
+                    # A crashed parent must not leave worker processes running unseen.
+                    try:
+                        os.killpg(process.pid, signal.SIGTERM)
+                    except ProcessLookupError:
+                        pass
+                continue
+            if message is end:
+                break
+            print(message, end='', flush=True)
+        return process.wait()
+
+    try:
+        code = drain()
+    except KeyboardInterrupt:
+        print('Запрошена остановка. Ждём сохранения доступного прогресса; не запускайте вторую копию.', flush=True)
+        try:
+            process.send_signal(signal.SIGINT)
+        except ProcessLookupError:
+            pass
+        try:
+            drain()
+        except KeyboardInterrupt:
+            print('Повторное прерывание: принудительная остановка. Несохранённые повторы могут потеряться.', flush=True)
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+        raise
+    if code:
+        raise subprocess.CalledProcessError(code, command)
+    return code
 
 
 def hash_file(path):

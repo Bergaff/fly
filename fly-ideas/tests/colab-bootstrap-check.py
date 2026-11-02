@@ -65,4 +65,15 @@ with tempfile.TemporaryDirectory() as d:
     try:b.ensure_venv(python,venv,[],b.clean_python_env());raise AssertionError('другая версия среды принята')
     except RuntimeError as e:assert 'Версия' in str(e)
     assert exe.exists()
-print('Bootstrap: проверка скачивания, версии, целостности и безопасного извлечения: ok')
+# Вывод и heartbeat должны попадать в поток самого блокнота, включая stderr.
+import contextlib, subprocess, sys
+captured=io.StringIO()
+with contextlib.redirect_stdout(captured):
+    b.run_with_output([sys.executable,'-c',"import time,sys;print('первая строка',flush=True);time.sleep(.25);print('сообщение ошибки',file=sys.stderr,flush=True)"], b.clean_python_env(), heartbeat=0.05)
+text=captured.getvalue()
+assert 'первая строка' in text and 'сообщение ошибки' in text and 'процесс ещё работает' in text
+captured=io.StringIO()
+with contextlib.redirect_stdout(captured):
+    try: b.run_with_output([sys.executable,'-c','raise SystemExit(7)'],b.clean_python_env(),heartbeat=.1);raise AssertionError('ошибка скрыта')
+    except subprocess.CalledProcessError as e:assert e.returncode==7
+print('Bootstrap и потоковый журнал: проверено')
