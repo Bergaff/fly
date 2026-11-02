@@ -19,11 +19,12 @@ test('IPC связывает файлы, передаёт пути запуще�
     const realRequire = require('node:module').createRequire(mainPath);
     const handlers = new Map();
     let selected = '';
+    let updateConfirm = 0;
     let onExit;
     const electron = {
       app: { getPath: (name) => path.join(dir, name), whenReady: () => new Promise(() => {}), on: () => {} },
       ipcMain: { handle: (name, fn) => handlers.set(name, fn) }, BrowserWindow: {}, shell: {},
-      dialog: { showOpenDialog: async () => selected ? { canceled: false, filePaths: [selected] } : { canceled: true, filePaths: [] } },
+      dialog: { showMessageBox: async () => ({response: updateConfirm}), showOpenDialog: async () => selected ? { canceled: false, filePaths: [selected] } : { canceled: true, filePaths: [] } },
     };
     const fakeProcess = { ...process, env: { ...process.env, VITE_DEV_SERVER_URL: 'http://localhost:5173', FLY_CONNECTOME: 'not-inherited' }, platform: process.platform };
     const source = await fsp.readFile(mainPath, 'utf8');
@@ -33,6 +34,7 @@ test('IPC связывает файлы, передаёт пути запуще�
       onExit: (ev) => onExit(ev), module: { exports: {} },
     });
     const call = (name, ...args) => handlers.get(`fly:${name}`)(null, ...args);
+    assert.deepEqual(JSON.parse(JSON.stringify(await call('prepareAppUpdate'))),{canceled:true});
     const env = await call('checkEnv');
     assert.ok(Object.hasOwn(env.packages, 'duckdb'), 'duckdb must be included in environment diagnostics');
     assert.ok(Object.hasOwn(env.packages, 'joblib'), 'joblib must be included in environment diagnostics');
@@ -60,6 +62,10 @@ test('IPC связывает файлы, передаёт пути запуще�
     selected = '';
     await call('chooseDataFile', 'connections');
     assert.equal((await call('getDataFileLinks')).connections.path, file);
+    const marker=path.join(dir,'app','workspace','.app-updates','pending.json');
+    await fsp.mkdir(path.dirname(marker),{recursive:true});await fsp.writeFile(marker,'{}');
+    await assert.rejects(call('runScript','idea:example','not_present.py',[]),/Обновление готово/);
+    await fsp.unlink(marker);
     const ws = await call('projectPaths', 'idea:example');
     const otherWs = await call('projectPaths', 'idea:other');
     const newName = '25_shiu_v630_control.py';
@@ -248,9 +254,18 @@ with open(os.path.join(out,'summary.json'),'w') as f: json.dump({'status':'stopp
     assert.equal(holdReport.root,sharedRoot);assert.equal(holdReport.threads,'1');
     const holdDone=new Promise((resolve)=>{onExit=resolve;});
     const holdRun=await call('runSharedStudy','idea:i-individuality',['--stage','holdout-run','--study',sharedId]);
+    updateConfirm=1;await assert.rejects(call('prepareAppUpdate'),/Дождитесь завершения расчётов/);updateConfirm=0;
     await assert.rejects(call('runScript','idea:other',longName,[]),/остановите другие/);
     await call('killRun',holdRun.runId);assert.equal((await holdDone).code,0);
     assert.equal(await fsp.readFile(path.join(holdRun.runDir,'stop.request'),'utf8'),'stop');
+    const analysisName='36_shiu_individuality_analysis.py';
+    await fsp.writeFile(path.join(templateDir,analysisName),`import os,sys,json\nout=os.environ['FLY_RUN_DIR']\nwith open(os.path.join(out,'summary.json'),'w') as f: json.dump({'args':sys.argv[1:],'script':__file__,'root':os.environ['FLY_SHIU_SHARED_ROOT']},f)\n`);
+    await assert.rejects(call('runSharedStudy','idea:i-lesions',['--stage','analyze-20','--study',sharedId]),/идею/);
+    const analysisDone=new Promise((resolve)=>{onExit=resolve;});
+    const analysisArgs=['--stage','analyze-20','--study',sharedId];
+    const analysisRun=await call('runSharedStudy','idea:i-individuality',analysisArgs);assert.equal((await analysisDone).code,0);
+    const analysisReport=JSON.parse(await fsp.readFile(path.join(analysisRun.runDir,'summary.json'),'utf8'));
+    assert.deepEqual(analysisReport.args,analysisArgs);assert.match(analysisReport.script,/\.shiu-individuality-analysis-v630/);assert.equal(analysisReport.root,sharedRoot);
     await fsp.writeFile(path.join(ws.code, 'wait_test.py'), 'import time\ntime.sleep(0.5)\n');
     const waitCompleted = new Promise((resolve) => { onExit = resolve; });
     const waiting = await call('runScript', 'idea:example', 'wait_test.py', []);

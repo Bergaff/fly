@@ -110,6 +110,7 @@ export interface FlyBridge {
   onSyncProgress(cb: (progress: SyncProgress) => void): () => void;
   isElectron: true;
   getPaths(): Promise<Paths>;
+  prepareAppUpdate(): Promise<{ canceled: boolean; commit?: string; files?: number; skippedLauncher?: string }>;
   getDataFileLinks(): Promise<DataFileLinks>;
   chooseDataFile(role: DataFileRole): Promise<DataFileLinks>;
   clearDataFile(role: DataFileRole): Promise<DataFileLinks>;

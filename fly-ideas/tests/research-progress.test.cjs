@@ -14,7 +14,8 @@ function load(file, aliases = {}) {
 }
 const types = load('src/data/types.ts');
 const suggestions = load('src/lib/idea-suggestions.ts', { '@/data/types': types });
-const component = load('src/components/research-progress.tsx', { '@/data/types': types });
+const v630 = load('src/lib/v630-progress.ts');
+const component = load('src/components/research-progress.tsx', { '@/data/types': types, '@/lib/v630-progress': v630 });
 const plain = (x) => JSON.parse(JSON.stringify(x));
 const idea = (name) => ({ id: name, title: name, question: `${name} question`, method: `${name} method`, validation: `${name} validation`, checklist: [{ id: 'old', done: true, text: 'старый этап' }], experiments: [] });
 
@@ -81,4 +82,17 @@ test('научный прогресс расположен на отдельно
   assert.match(dialog, /<TabsTrigger value="research">\s*Прогресс/);
   assert.match(dialog, /<TabsContent value="research"[\s\S]*?<ResearchProgress[\s\S]*?<\/TabsContent>/);
   assert.match(dialog, /onSave\(id, rest\)/);
+});
+
+test('результаты v630 добавляются явно, сохраняют записи и не дублируются', () => {
+  const a=idea('i-individuality');a.researchProgress={observation:{done:false,evidence:'мой собственный текст'},verification:{done:false,evidence:'ожидаю независимой проверки'}};
+  const next=v630.addV630Evidence(a);
+  assert.match(next.observation.evidence,/мой собственный текст/);
+  assert.match(next.observation.evidence,/Study_20261102_135659_26e34eaf/);
+  assert.equal(next.observation.done,true);assert.equal(next.reproduction.done,true);assert.equal(next.interpretation.done,true);
+  assert.equal(next.verification.done,false);assert.match(next.verification.evidence,/биологическая реалистичность/);
+  assert.equal(a.researchProgress.observation.done,false);
+  assert.deepEqual(plain(v630.addV630Evidence({...a,researchProgress:next})),plain(next));
+  const lesions=v630.addV630Evidence(idea('i-lesions'));assert.match(lesions.reproduction.evidence,/330\/510/);assert.equal(lesions.reproduction.done,false);
+  assert.equal(v630.v630EvidenceAvailable('другая идея'),false);
 });

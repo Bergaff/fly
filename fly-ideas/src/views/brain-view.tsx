@@ -576,7 +576,7 @@ function Workspace({
     } catch (e) { setRunNote(`Не удалось прочитать общую папку: ${(e as Error).message}`); }
   };
 
-  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review" | "holdout-plan" | "holdout-run" | "holdout-review") => {
+  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review" | "holdout-plan" | "holdout-run" | "holdout-review" | "analyze-20") => {
     const bridge=fly; const target=scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
     preparingV630.current=true;setPreparing(true);
@@ -592,9 +592,9 @@ function Workspace({
         if (!sharedStudy) { setRunNote("Сначала выберите общий набор."); return; }
         args=["--stage",stage,"--study",sharedStudy];
       }
-      if (stage.startsWith("pilot-") || stage.startsWith("extend-") || stage.startsWith("holdout-")) {
+      if (stage.startsWith("pilot-") || stage.startsWith("extend-") || stage.startsWith("holdout-") || stage === "analyze-20") {
         // The main process creates a separate protected copy and checks it before launch.
-        await startScriptInProject(target,stage.startsWith("holdout-") ? "35_shiu_individuality_holdout.py" : stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
+        await startScriptInProject(target,stage === "analyze-20" ? "36_shiu_individuality_analysis.py" : stage.startsWith("holdout-") ? "35_shiu_individuality_holdout.py" : stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
       } else {
         const prepared=await bridge.prepareSharedStudy(target);
         if (pidRef.current!==target) return;
@@ -1539,6 +1539,8 @@ function Workspace({
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("holdout-run"); }}>рассчитать или продолжить проверку: 100 повторов</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("holdout-review"); }}>обзор проверки на новых seed</Button>
                 <p className="text-[11px] text-muted-foreground">Проверка: прежние 10 вариантов, новые seed 10–19. Нужны все 100 прежних повторов. План и обзор не запускают симуляции. План сравнения фиксируется до новых повторов, итог только после 100/100. Один процесс; перед запуском сохраните работу и проверьте свободную RAM.</p>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("analyze-20"); }}>анализ всех 20 seed без симуляций</Button>
+                <p className="text-[11px] text-muted-foreground">Объединяет проверенные 200 повторов и контроли, показывает сравнения по seed и вариантам. Описательное разложение не измеряет долю индивидуальности.</p>
               </div> : <div className="flex flex-col items-start gap-2">
                 <Button onClick={() => { setSharedDialog(null); void runShared("init"); }}>создать набор из топ-200</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("plan"); }}>план без симуляций</Button>
@@ -2847,6 +2849,8 @@ function DataPanel() {
   const [linkError, setLinkError] = useState("");
   const [linkBusy, setLinkBusy] = useState(false);
   const [items, setItems] = useState<DataItem[]>([]);
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState("");
   const [progress, setProgress] = useState<Record<string, { got: number; total: number }>>({});
   const [busy, setBusy] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -2918,6 +2922,21 @@ function DataPanel() {
 
   return (
     <div className="flex flex-col gap-3">
+      <section className="border">
+        <div className="border-b px-2 py-1.5 text-[12px] font-medium">Обновление приложения</div>
+        <div className="space-y-2 p-2">
+          <Button size="sm" variant="outline" disabled={updateBusy} onClick={async () => {
+            setUpdateBusy(true); setUpdateMessage("");
+            try {
+              const result=await fly!.prepareAppUpdate();
+              if (!result.canceled) setUpdateMessage(`Скачан коммит ${result.commit?.slice(0,12)}, файлов: ${result.files}. Закройте все окна Fly Ideas и снова откройте START.bat. Данные не заменяются.`);
+            } catch (error) { setUpdateMessage(`Не удалось подготовить обновление: ${(error as Error).message}`); }
+            finally { setUpdateBusy(false); }
+          }}>{updateBusy ? "скачиваю обновление…" : "скачать обновление ветки"}</Button>
+          <p className="text-[11px] text-muted-foreground">Ветка arena/01a0b34a-fly. Перед загрузкой завершите расчёты; при следующем запуске будут созданы резервные копии изменяемых файлов приложения. START.bat автоматически не заменяется. Только версия через START.bat.</p>
+          {updateMessage && <p role="status" className="break-all text-[11px]">{updateMessage}</p>}
+        </div>
+      </section>
       <section className="border">
         <div className="border-b px-2 py-1.5 text-[12px] font-medium">Файлы, скачанные вручную</div>
         <div className="space-y-2 p-2">

@@ -209,8 +209,35 @@ def main():
     assert metrics['right_spearman'] is None and metrics['left_mean_difference_variant_10_minus_9']==-1
     assert view.digest(ext_db)==ext_before and view.digest(pilot_db)==original_pilot_hash and (view.digest(control_path),view.digest(selected_path))==protected
     calls.clear();hold_run('holdout-repeat','holdout-run');hold_run('holdout-review','holdout-review');assert not calls
+    # Отдельный обзор объединяет ровно 200 проверенных повторов, не запускает симуляции.
+    analysis=load('individuality_analysis',templates/'36_shiu_individuality_analysis.py')
+    assert analysis.load_holdout().EXTENSION_SHA==holdout.EXTENSION_SHA
+    analysis_out=tmp/'analysis-20';analysis_out.mkdir();hold_hash=view.digest(hold_db);calls.clear()
+    analysis.execute(pilot,extension,holdout,shared,view,study,manifest,analysis_out)
+    assert not calls and view.digest(hold_db)==hold_hash and view.digest(ext_db)==ext_before and view.digest(pilot_db)==original_pilot_hash
+    analysis_info=json.loads((analysis_out/'summary.json').read_text(encoding='utf8'))
+    assert analysis_info['trials']==200 and analysis_info['seeds']==20 and analysis_info['status']=='complete'
+    with (analysis_out/'variants_20seed.csv').open(encoding='utf-8-sig',newline='') as f:
+        variants20=list(csv.DictReader(f));assert len(variants20)==10 and all(r['trials']=='20' for r in variants20)
+    with (analysis_out/'trials_20seed.csv').open(encoding='utf-8-sig',newline='') as f: assert len(list(csv.DictReader(f)))==200
+    with (analysis_out/'seeds_20seed.csv').open(encoding='utf-8-sig',newline='') as f: assert len(list(csv.DictReader(f)))==20
+    for side in ('left','right'):
+        ss=analysis_info['metrics']['sums_of_squares'][side]
+        assert abs(ss['total_ss']-ss['variant_mean_ss']-ss['seed_mean_ss']-ss['residual_ss'])<1e-8
+    # Независимая синтетическая матрица: аддитивные эффекты, остаток равен нулю.
+    matrix_out=tmp/'analysis-matrix';matrix_out.mkdir()
+    matrix=[(v,s,2*v+3*s,2,1.,1.,'hash','digest') for v in range(10) for s in range(20)]
+    control_matrix=[(50,'',s,0,0,1.,'') for s in range(30)]
+    analysis.analyze(pilot,holdout,view,matrix_out,control_matrix,matrix,{'study_id':study_id,'previous_rows_sha256':'dummy'})
+    mm=json.loads((matrix_out/'summary.json').read_text(encoding='utf8'))['metrics']
+    assert abs(mm['sums_of_squares']['left']['residual_ss'])<1e-8
+    assert mm['variant_10_minus_9_left_mean_hz']==2 and mm['variant_10_above_9_seed_count']==20
+    assert mm['right_spearman_0_9_vs_10_19'] is None
     with sqlite3.connect(hold_db) as db: db.execute('UPDATE trials SET left_count=left_count+1 WHERE variant=0 AND seed=10');db.commit()
     try: hold_run('holdout-corrupt','holdout-review');raise AssertionError('corrupted holdout accepted')
+    except ValueError as e: assert 'повреждённый' in str(e)
+    broken_out=tmp/'analysis-broken';broken_out.mkdir()
+    try: analysis.execute(pilot,extension,holdout,shared,view,study,manifest,broken_out);raise AssertionError('corrupted holdout accepted')
     except ValueError as e: assert 'повреждённый' in str(e)
     assert view.digest(ext_db)==ext_before and view.digest(pilot_db)==original_pilot_hash
     # Повреждение строки запрещает обзор; исходный пилот не меняется.

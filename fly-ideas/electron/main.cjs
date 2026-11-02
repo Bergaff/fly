@@ -73,7 +73,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
-const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py", "30_shiu_lesion_overview.py", "31_shiu_selected_lesions.py", "32_shiu_shared_study.py", "33_shiu_individuality_pilot.py", "34_shiu_individuality_extension.py", "35_shiu_individuality_holdout.py"]);
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py", "30_shiu_lesion_overview.py", "31_shiu_selected_lesions.py", "32_shiu_shared_study.py", "33_shiu_individuality_pilot.py", "34_shiu_individuality_extension.py", "35_shiu_individuality_holdout.py", "36_shiu_individuality_analysis.py"]);
 
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
@@ -773,6 +773,8 @@ const EXTENSION_DIR = ".shiu-individuality-extension-v630";
 const EXTENSION_FILES = [...INDIVIDUAL_FILES, "34_shiu_individuality_extension.py"];
 const HOLDOUT_DIR = ".shiu-individuality-holdout-v630";
 const HOLDOUT_FILES = [...EXTENSION_FILES, "35_shiu_individuality_holdout.py"];
+const ANALYSIS_DIR = ".shiu-individuality-analysis-v630";
+const ANALYSIS_FILES = [...HOLDOUT_FILES, "36_shiu_individuality_analysis.py"];
 async function prepareProtectedFiles(ws, dirName, files) {
   const dir = path.join(ws.code, dirName);
   try { await fsp.mkdir(dir); } catch (e) { if (e.code !== "EEXIST") throw e; }
@@ -806,20 +808,27 @@ async function prepareProtectedFiles(ws, dirName, files) {
 const runs = new Map();
 const runningScopes = new Map();
 
+function assertNoPendingUpdate() {
+  if (fs.existsSync(path.join(WS, ".app-updates", "pending.json"))) throw new Error("Обновление готово. Сохраните работу, закройте приложение и запустите START.bat до нового расчёта.");
+}
+
 async function runScript(win, projectId, name, args, { protectedMode = null } = {}) {
   assertNotSyncing();
+  assertNoPendingUpdate();
   const py = await pickPython();
   if (!py) throw new Error("Python 3 не найден. Установи Miniconda или Python 3.11/3.12 с python.org (галочка «Add to PATH»).");
   assertNotSyncing();
+  assertNoPendingUpdate();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
-  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : protectedMode === "overview" ? OVERVIEW_FILES : protectedMode === "selected" ? SELECTED_FILES : protectedMode === "shared" ? SHARED_FILES : protectedMode === "individual" ? INDIVIDUAL_FILES : protectedMode === "extension" ? EXTENSION_FILES : protectedMode === "holdout" ? HOLDOUT_FILES : null;
-  const protectedDir = protectedMode === "top200" ? TOP200_DIR : protectedMode === "individual" ? INDIVIDUAL_DIR : protectedMode === "extension" ? EXTENSION_DIR : protectedMode === "holdout" ? HOLDOUT_DIR : ["overview", "selected", "shared"].includes(protectedMode) ? FOCUSED_DIR : LESIONS_DIR;
+  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : protectedMode === "overview" ? OVERVIEW_FILES : protectedMode === "selected" ? SELECTED_FILES : protectedMode === "shared" ? SHARED_FILES : protectedMode === "individual" ? INDIVIDUAL_FILES : protectedMode === "extension" ? EXTENSION_FILES : protectedMode === "holdout" ? HOLDOUT_FILES : protectedMode === "analysis" ? ANALYSIS_FILES : null;
+  const protectedDir = protectedMode === "top200" ? TOP200_DIR : protectedMode === "individual" ? INDIVIDUAL_DIR : protectedMode === "extension" ? EXTENSION_DIR : protectedMode === "holdout" ? HOLDOUT_DIR : protectedMode === "analysis" ? ANALYSIS_DIR : ["overview", "selected", "shared"].includes(protectedMode) ? FOCUSED_DIR : LESIONS_DIR;
   if (protectedFiles) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
     const prepared = await prepareProtectedFiles(ws, protectedDir, protectedFiles);
     if (!prepared.matches) throw new Error(`Проверенная копия ${prepared.conflict} изменена. Она не перезаписана, запуск остановлен.`);
     assertNotSyncing();
+    assertNoPendingUpdate();
   }
   const focusedSimulation = (protectedMode === "selected" && ["singles", "all"].includes(args?.[5])) || (protectedMode === "shared" && ["singles", "all"].includes(args?.[1])) || (protectedMode === "individual" && args?.[1] === "pilot-run") || (protectedMode === "extension" && args?.[1] === "extend-run") || (protectedMode === "holdout" && args?.[1] === "holdout-run");
   if ((focusedSimulation && runs.size > 0) || [...runs.values()].some((active) => active.flyFocusedSimulation))
@@ -830,8 +839,8 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   if (!fs.existsSync(file)) throw new Error(`Скрипт ${path.basename(name)} не найден в выбранной идее.`);
   const { cmd, prefix } = parsePySpec(py.exe || py.cmd);
   const sharedLabel = { init: "01_общий_топ200", plan: "02_план_лезий", singles: "03_одиночные_лезии", all: "04_пары_и_группа", review: "05_обзор_лезий", individuality: "06_индивидуальность" };
-  const individualLabel = {"pilot-plan":"07_план_индивидуальности", "pilot-run":"08_пилот_индивидуальности", "pilot-review":"09_обзор_пилота", "extend-plan":"10_план_10_seed", "extend-run":"11_продолжение_10_seed", "extend-review":"12_обзор_10_seed", "holdout-plan":"13_план_проверки", "holdout-run":"14_проверка_новые_seed", "holdout-review":"15_обзор_проверки"};
-  const label = protectedMode === "shared" ? sharedLabel[args?.[1]] : ["individual", "extension", "holdout"].includes(protectedMode) ? individualLabel[args?.[1]] : path.basename(name).replace(/\.py$/, "");
+  const individualLabel = {"pilot-plan":"07_план_индивидуальности", "pilot-run":"08_пилот_индивидуальности", "pilot-review":"09_обзор_пилота", "extend-plan":"10_план_10_seed", "extend-run":"11_продолжение_10_seed", "extend-review":"12_обзор_10_seed", "holdout-plan":"13_план_проверки", "holdout-run":"14_проверка_новые_seed", "holdout-review":"15_обзор_проверки", "analyze-20":"16_анализ_20_seed"};
+  const label = protectedMode === "shared" ? sharedLabel[args?.[1]] : ["individual", "extension", "holdout", "analysis"].includes(protectedMode) ? individualLabel[args?.[1]] : path.basename(name).replace(/\.py$/, "");
   const baseId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + label;
   let runId = baseId;
   let seq = 2;
@@ -860,9 +869,9 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
     FLY_SHIU_CONNECTIONS: links.shiu_connections.path,
     FLY_SHIU_NEURONS: links.shiu_neurons.path,
     FLY_RUN_DIR: runDir,
-    ...(["shared", "individual", "extension", "holdout"].includes(protectedMode) ? { FLY_SHIU_SHARED_ROOT: path.join(DIRS.data, "shiu-v630-shared") } : {}),
+    ...(["shared", "individual", "extension", "holdout", "analysis"].includes(protectedMode) ? { FLY_SHIU_SHARED_ROOT: path.join(DIRS.data, "shiu-v630-shared") } : {}),
     ...(protectedMode === "parallel" ? { FLY_PARENT_PID: String(process.pid) } : {}),
-    ...(["individual", "extension", "holdout"].includes(protectedMode) ? { OMP_NUM_THREADS: "1", OPENBLAS_NUM_THREADS: "1", MKL_NUM_THREADS: "1", NUMEXPR_NUM_THREADS: "1" } : {}),
+    ...(["individual", "extension", "holdout", "analysis"].includes(protectedMode) ? { OMP_NUM_THREADS: "1", OPENBLAS_NUM_THREADS: "1", MKL_NUM_THREADS: "1", NUMEXPR_NUM_THREADS: "1" } : {}),
     FLY_SCRIPTS: ws.code,
     FLY_PROJECT: ws.projectId,
     ...(ws.ideaId ? { FLY_IDEA: ws.ideaId } : {}),
@@ -1379,6 +1388,29 @@ function registerIpc(getWin) {
     if (reload) getWin().webContents.reload();
   });
 
+  handle("fly:prepareAppUpdate", async () => {
+    if (!isDev) throw new Error("Обновление доступно только в версии, запускаемой через START.bat, не в portable exe.");
+    const choice = await dialog.showMessageBox(getWin(), { type: "question", title: "Обновление приложения", buttons: ["Отмена", "Скачать"], defaultId: 0, cancelId: 0,
+      message: "Скачать снимок ветки arena/01a0b34a-fly?", detail: "При следующем запуске START.bat файлы приложения будут заменены, а предыдущие версии сохранены в workspace/.app-updates. Данные и рабочие проекты не заменяются. START.bat автоматически не обновляется. Сохраните работу, завершите расчёты и закройте все окна Fly Ideas перед перезапуском. Код из этой ветки будет выполняться на компьютере." });
+    if (choice.response !== 1) return { canceled: true };
+    return withSyncLock(async () => {
+      const py = await pickPython();
+      if (!py) throw new Error("Для скачивания нужен доступный Python 3.");
+      const {cmd,prefix}=parsePySpec(py.exe || py.cmd);
+      const script=path.join(appRoot,"electron","app-update.py");
+      const output=await new Promise((resolve,reject) => {
+        const child=spawn(cmd,[...prefix,script,"--prepare","--app",appRoot,"--config",CONFIG,"--owner-pid",String(process.pid)],{windowsHide:true,env:{...process.env,PYTHONIOENCODING:"utf-8"}});
+        let out="",err=""; const timer=setTimeout(()=>child.kill(),180000);
+        child.stdout.on("data", b => { out=(out+b.toString()).slice(-100000); });
+        child.stderr.on("data", b => { err=(err+b.toString()).slice(-100000); });
+        child.on("error", e => { clearTimeout(timer);reject(e); });
+        child.on("close", code => { clearTimeout(timer); if (code!==0) reject(new Error(err.trim() || `Загрузка остановлена (код ${code}).`)); else resolve(out); });
+      });
+      const result=JSON.parse(output.trim());
+      return { canceled: false, commit: result.commit, files: result.files, skippedLauncher: result.skipped_launcher };
+    });
+  });
+
   handle("fly:getPaths", () => ({ workspace: WS, ...getDirs(), defaults: DEFAULT_DIRS, templates: TEMPLATES }));
   handle("fly:getDataFileLinks", () => dataFileLinks());
   handle("fly:chooseDataFile", async (_e, role) => {
@@ -1694,10 +1726,11 @@ function registerIpc(getWin) {
     if (stage === "init") {
       if (scope.ideaId!=="i-lesions" || args[2]!=="--top-run") throw new Error("Новый набор создаётся в идее лезий из папки топ-200.");
     } else {
-      const individual = ["individuality","pilot-plan","pilot-run","pilot-review","extend-plan","extend-run","extend-review","holdout-plan","holdout-run","holdout-review"].includes(stage);
-      if (!["plan","singles","all","review","individuality","pilot-plan","pilot-run","pilot-review","extend-plan","extend-run","extend-review","holdout-plan","holdout-run","holdout-review"].includes(stage) || args[2]!=="--study" || !/^Study_[A-Za-z0-9_-]+$/.test(args[3])) throw new Error("Неизвестный общий набор или режим.");
+      const individual = ["individuality","pilot-plan","pilot-run","pilot-review","extend-plan","extend-run","extend-review","holdout-plan","holdout-run","holdout-review","analyze-20"].includes(stage);
+      if (!["plan","singles","all","review","individuality","pilot-plan","pilot-run","pilot-review","extend-plan","extend-run","extend-review","holdout-plan","holdout-run","holdout-review","analyze-20"].includes(stage) || args[2]!=="--study" || !/^Study_[A-Za-z0-9_-]+$/.test(args[3])) throw new Error("Неизвестный общий набор или режим.");
       if (individual ? scope.ideaId!=="i-individuality" : scope.ideaId!=="i-lesions") throw new Error("Выберите соответствующую идею.");
     }
+    if (stage === "analyze-20") return runScript(getWin(),projectId,ANALYSIS_FILES[ANALYSIS_FILES.length-1],args,{protectedMode:"analysis"});
     if (["holdout-plan","holdout-run","holdout-review"].includes(stage)) return runScript(getWin(),projectId,HOLDOUT_FILES[HOLDOUT_FILES.length-1],args,{protectedMode:"holdout"});
     if (["extend-plan","extend-run","extend-review"].includes(stage)) return runScript(getWin(),projectId,EXTENSION_FILES[EXTENSION_FILES.length-1],args,{protectedMode:"extension"});
     if (["pilot-plan","pilot-run","pilot-review"].includes(stage)) return runScript(getWin(),projectId,INDIVIDUAL_FILES[INDIVIDUAL_FILES.length-1],args,{protectedMode:"individual"});
@@ -1836,12 +1869,18 @@ function createWindow() {
   else mainWin.loadFile(path.join(__dirname, "..", "dist", "index.html"));
 }
 
-app.whenReady().then(() => {
-  ensureDirs();
-  registerIpc(() => mainWin);
-  createWindow();
-  startAgentServer();
-  app.on("activate", () => BrowserWindow.getAllWindows().length === 0 && createWindow());
-});
+// One instance per user data directory prevents two windows using the same workspace.
+const haveInstanceLock = app.requestSingleInstanceLock?.() ?? true;
+if (!haveInstanceLock) app.quit();
+else {
+  app.on("second-instance", () => { if (mainWin) { if (mainWin.isMinimized()) mainWin.restore(); mainWin.show(); mainWin.focus(); } });
+  app.whenReady().then(() => {
+    ensureDirs();
+    registerIpc(() => mainWin);
+    createWindow();
+    startAgentServer();
+    app.on("activate", () => BrowserWindow.getAllWindows().length === 0 && createWindow());
+  });
+}
 app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
 app.on("before-quit", () => stopAgentServer());

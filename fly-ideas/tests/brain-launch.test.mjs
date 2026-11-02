@@ -90,6 +90,10 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     fireEvent.click(goto);
     await screen.findByText(/Последний прогон сообщил/);
     assert.ok(await screen.findByRole('button',{name:'установить Brian2 и joblib'}));
+    let updateCalls=0;dom.window.fly.prepareAppUpdate=async()=>{updateCalls++;return {canceled:false,commit:'a'.repeat(40),files:123}};
+    fireEvent.click(screen.getByRole('button',{name:'скачать обновление ветки'}));
+    await waitFor(()=>assert.equal(updateCalls,1));
+    await screen.findByText(/Скачан коммит aaaaaaaaaaaa/);
     assert.equal(calls.length,5);
     // Запуск лезий требует выбор проверенного источника и явный выбор режима.
     failStart=false;quick=true;resumePath='C:\\top run';
@@ -140,7 +144,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     const studyId='Study_20261102_123456_abcdef12';
     dom.window.fly.listSharedStudies=async()=>({root:'C:\\data\\shiu-v630-shared',studies:[{id:studyId,label:'Новый набор',path:'C:\\data\\study',created:1,progress:null}]});
     dom.window.fly.prepareSharedStudy=async()=>({name:'32_shiu_shared_study.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
-    dom.window.fly.runSharedStudy=(scope,args)=>dom.window.fly.runScript(scope,args[1].startsWith('holdout-')?'35_shiu_individuality_holdout.py':args[1].startsWith('extend-')?'34_shiu_individuality_extension.py':args[1].startsWith('pilot-')?'33_shiu_individuality_pilot.py':'32_shiu_shared_study.py',args);
+    dom.window.fly.runSharedStudy=(scope,args)=>dom.window.fly.runScript(scope,args[1]==='analyze-20'?'36_shiu_individuality_analysis.py':args[1].startsWith('holdout-')?'35_shiu_individuality_holdout.py':args[1].startsWith('extend-')?'34_shiu_individuality_extension.py':args[1].startsWith('pilot-')?'33_shiu_individuality_pilot.py':'32_shiu_shared_study.py',args);
     dom.window.fly.prepareFocusedLesions=async(_scope,mode)=>({name:mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
     dom.window.fly.runFocusedLesions=(scope,mode,args)=>dom.window.fly.runScript(scope,mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',args);
     const commonProps={projects:[{id:'p',name:'Проект',color:'#777'}],activeProject:'p',onSelectProject:noop,onAddProject:noop,onAddIdea:noop,onOpenIdeaCard:noop,onUpdateIdea:noop,onCompleteStages:noop,onAddJournalEntry:noop,onAddReferences:noop,onDirtyChange:noop};
@@ -199,6 +203,13 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
       await waitFor(()=>assert.equal(calls.length,index+1));
       assert.deepEqual(calls[index],{scope:'idea:i-individuality',name:'35_shiu_individuality_holdout.py',args:['--stage',stage,'--study',studyId]});
     }
+
+    await waitFor(()=>assert.equal(screen.getByRole('button',{name:'контроли v630'}).disabled,false));
+    fireEvent.click(screen.getByRole('button',{name:'контроли v630'}));
+    const analysis=await screen.findByRole('button',{name:'анализ всех 20 seed без симуляций'});
+    await waitFor(()=>assert.equal(analysis.disabled,false));fireEvent.click(analysis);
+    await waitFor(()=>assert.equal(calls.length,22));
+    assert.deepEqual(calls[21],{scope:'idea:i-individuality',name:'36_shiu_individuality_analysis.py',args:['--stage','analyze-20','--study',studyId]});
 
 
   } catch (e) { if (e.errors) console.error(e.errors); throw e; } finally {cleanup();await vite.close();dom.window.close();}

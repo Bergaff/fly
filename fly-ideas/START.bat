@@ -12,6 +12,28 @@ if errorlevel 1 (
   exit /b 1
 )
 
+if exist "electron\app-update-start.cjs" (
+  node "electron\app-update-start.cjs"
+  if errorlevel 1 (
+    echo.
+    echo  [!] Обновление не применено. Закрой все окна Fly Ideas и проверь сообщение выше.
+    pause
+    exit /b 1
+  )
+)
+
+if exist "workspace\.app-updates\npm-pending" (
+  echo.
+  echo  Обновляю зависимости приложения...
+  call npm ci
+  if errorlevel 1 (
+    echo  [!] Не удалось обновить зависимости. Проверь интернет и запусти снова.
+    pause
+    exit /b 1
+  )
+  del "workspace\.app-updates\npm-pending"
+)
+
 if not exist node_modules (
   echo.
   echo  Первый запуск: устанавливаю зависимости, это займёт пару минут...
