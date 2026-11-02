@@ -48,16 +48,16 @@ md('''## 2. Скопируйте исходные файлы на Диск
 ```
 
 Внутрь `top200` положите именно содержимое полной папки топа, не ещё одну вложенную папку. Можно скопировать её из общего набора приложения (`01_top200`) или исходного завершённого прогона. Старые SQLite не нужны. Дождитесь полной загрузки файлов на Google Диск.'''),
-code('''#@title 3. Подготовить изолированное CPU-окружение
-import sys, subprocess, os, base64, gzip, hashlib
-from pathlib import Path
-if sys.version_info[:2] != (3, 12):
-    raise RuntimeError('Этот блокнот подготовлен для Python 3.12 в Colab. Версия изменилась; не смешивайте результаты, нужна проверка окружения.')
-CPU_PY = Path('/content/fly-shiu-cpu/bin/python')
-if not CPU_PY.exists():
-    subprocess.run([sys.executable, '-m', 'venv', str(CPU_PY.parents[1])], check=True)
-subprocess.run([str(CPU_PY), '-m', 'pip', 'install', '-q', 'numpy==1.26.4', 'pandas==2.2.3', 'pyarrow==18.1.0', 'brian2==2.9.0', 'psutil==6.1.1'], check=True)
-print('CPU-окружение готово.')'''),
+code('#@title 3. Подготовить изолированное CPU-окружение\n' + (ROOT/'colab/bootstrap.py').read_text(encoding='utf8') + """
+
+# Ядро Colab может использовать другую версию Python; оно не меняется.
+FLY_ENV = clean_python_env()
+PY312 = ensure_python_312('/content')
+CPU_PY = ensure_venv(PY312, '/content/fly-shiu-cpu-31216',
+    ['numpy==1.26.4', 'pandas==2.2.3', 'pyarrow==18.1.0', 'brian2==2.9.0', 'psutil==6.1.1'], FLY_ENV)
+import base64, gzip
+print('CPU-окружение готово:', executable_version(CPU_PY, FLY_ENV))
+"""),
 code("""#@title 3б. Развернуть проверенный код из самого блокнота
 BUNDLE = __BUNDLE__
 CODE = Path('/content/fly-shiu-code')
@@ -73,7 +73,7 @@ for name, item in BUNDLE.items():
         target.write_bytes(contents)
 print('Встроенный код проверен.')""".replace('__BUNDLE__',repr(bundle))),
 code('''#@title 4. Проверить входные файлы и топ-200 без симуляций
-subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'check'], check=True)'''),
+subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'check'], check=True, env=FLY_ENV)'''),
 md('''## 5. Основная серия CPU
 
 Включите флажок **START_CPU**, только когда готовы к расчёту, и запустите следующую ячейку. До двух процессов используются, только если хватает свободной памяти; иначе один. Скорость зависит от выданной Colab машины, сеть строится заново для каждого повтора, ускорение относительно вашего компьютера не гарантируется. Для ориентира: прежний локальный замер около 28 секунд на повтор даёт примерно 380 часов последовательной симуляции для 48 240 повторов, без построения сети; Colab может быть быстрее или медленнее.
@@ -88,7 +88,7 @@ CHECKPOINT_EVERY = 25 #@param {type:"integer"}
 MAX_TRIALS_THIS_SESSION = 0 #@param {type:"integer"}
 # MAX_TRIALS_THIS_SESSION = 0 означает без ограничения на число повторов в этом сеансе.
 if START_CPU:
-    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu', '--workers', str(CPU_WORKERS), '--checkpoint-every', str(CHECKPOINT_EVERY), '--max-trials', str(MAX_TRIALS_THIS_SESSION)], check=True)
+    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu', '--workers', str(CPU_WORKERS), '--checkpoint-every', str(CHECKPOINT_EVERY), '--max-trials', str(MAX_TRIALS_THIS_SESSION)], check=True, env=FLY_ENV)
 else:
     print('Расчёт не запущен. Для старта включите START_CPU и выполните ячейку.')'''),
 md('''## 6. Отдельный экспериментальный GPU-пилот
@@ -105,12 +105,10 @@ if RUN_GPU_PILOT:
     if not shutil.which('nvidia-smi') or not shutil.which('nvcc'):
         raise RuntimeError('Нужен GPU runtime Colab с NVIDIA GPU и nvcc. GPU-пилот не запущен.')
     subprocess.run(['nvidia-smi'], check=True)
-    GPU_PY = Path('/content/fly-shiu-gpu/bin/python')
-    if not GPU_PY.exists():
-        subprocess.run([sys.executable, '-m', 'venv', str(GPU_PY.parents[1])], check=True)
-    subprocess.run([str(GPU_PY), '-m', 'pip', 'install', '-q', 'numpy==2.2.6', 'pandas==2.2.3', 'pyarrow==18.1.0', 'brian2cuda==1.0b1', 'psutil==6.1.1'], check=True)
-    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu-pilot'], check=True)
-    subprocess.run([str(GPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'gpu-pilot'], check=True)
+    GPU_PY = ensure_venv(PY312, '/content/fly-shiu-gpu-31216',
+        ['numpy==2.2.6', 'pandas==2.2.3', 'pyarrow==18.1.0', 'brian2cuda==1.0b1', 'psutil==6.1.1'], FLY_ENV)
+    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'cpu-pilot'], check=True, env=FLY_ENV)
+    subprocess.run([str(GPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'gpu-pilot'], check=True, env=FLY_ENV)
     print('Пилоты сохранены отдельно в 04_Отдельные_GPU_пробы. Они не входят в полный план.')
 else:
     print('GPU-пилот не запущен.')'''),
@@ -120,7 +118,7 @@ md('''## 7. Экспорт для приложения
 code('''#@title 7. Создать проверенную копию SQLite для приложения
 EXPORT_CPU = False #@param {type:"boolean"}
 if EXPORT_CPU:
-    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'export'], check=True)
+    subprocess.run([str(CPU_PY), str(CODE / 'fly_colab.py'), '--root', str(ROOT), '--mode', 'export'], check=True, env=FLY_ENV)
 else:
     print('Экспорт не запущен.')''')]
 for i,cell in enumerate(cells): cell['id']=f'fly-shiu-{i:02d}'

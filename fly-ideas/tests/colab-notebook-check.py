@@ -11,6 +11,11 @@ assert notebook['nbformat']==4 and notebook['nbformat_minor']==5
 cells=notebook['cells'];ids=[c['id'] for c in cells];assert len(ids)==len(set(ids))
 programs=[''.join(c['source']) for c in cells if c['cell_type']=='code']
 for source in programs: compile(source,'notebook-cell','exec')
+setup=next(s for s in programs if s.startswith('#@title 3.'))
+assert (root/'colab/bootstrap.py').read_text(encoding='utf8').strip() in setup
+assert "ensure_python_312('/content')" in setup and 'sys.version_info[:2] != (3, 12)' not in setup
+assert "env=FLY_ENV" in next(s for s in programs if s.startswith('#@title 4.'))
+assert "ensure_venv(PY312" in next(s for s in programs if s.startswith('#@title 6.'))
 source=next(s for s in programs if s.startswith('#@title 3б.'))
 tree=ast.parse(source);entry=next(x for x in tree.body if isinstance(x,ast.Assign) and isinstance(x.targets[0],ast.Name) and x.targets[0].id=='BUNDLE')
 bundle=ast.literal_eval(entry.value)

@@ -10,3 +10,4 @@ experiments/templates/25_shiu_v630_control.py text eol=lf
 colab/fly_colab.py text eol=lf
 colab/make_notebook.py text eol=lf
 colab/Shiu_v630_Colab.ipynb text eol=lf
+colab/bootstrap.py text eol=lf

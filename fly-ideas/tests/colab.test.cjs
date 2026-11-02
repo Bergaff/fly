@@ -10,6 +10,11 @@ test('самостоятельный Colab notebook: структура, вст�
   const r=spawnSync(p,[path.join(__dirname,'colab-notebook-check.py')],{encoding:'utf8'});
   assert.equal(r.status,0,r.stdout+'\n'+r.stderr);
 });
+test('Colab bootstrap: независимый Python, проверка целостности и безопасное извлечение',()=>{
+  const p=process.env.FLY_TEST_PYTHON||'python3';
+  const r=spawnSync(p,[path.join(__dirname,'colab-bootstrap-check.py')],{encoding:'utf8'});
+  assert.equal(r.status,0,r.stdout+'\n'+r.stderr);
+});
 test('Colab CPU: проверка топа, настоящая малая сеть Brian2, снимки, продолжение и ветви', {skip:!python && 'нужны numpy, pandas, pyarrow, brian2, psutil',timeout:180000},()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'fly-colab-'));
   try {
