@@ -7,6 +7,7 @@ import {
   type Paths, type DataFileLinks, type DataFileRole, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage,
 } from "@/lib/bridge";
 import { extractAssistantFiles, extractSelectedAssistantFile, formatAssistantResponse } from "@/lib/assistant-code";
+import { RunLaunchTracker } from "@/lib/run-launch";
 import { normalizeUsage } from "@/lib/api-usage";
 import { canRequestSuggestions, parseSuggestions, suggestionContext } from "@/lib/idea-suggestions";
 import { parseReferencesFromText } from "@/lib/refparse";
@@ -92,6 +93,7 @@ export function BrainView({
 }: Props) {
   const [tab, setTab] = useState<"work" | "setup">("work");
   const [help, setHelp] = useState(false);
+  const [missingPackage, setMissingPackage] = useState<string | null>(null);
 
   useEffect(() => {
     if (focusIdeaId) setTab("work");
@@ -138,13 +140,16 @@ export function BrainView({
           onAddJournalEntry={onAddJournalEntry}
           onAddReferences={onAddReferences}
           onDirtyChange={onDirtyChange}
+          missingPackage={missingPackage}
+          onMissingPackage={setMissingPackage}
+          onOpenSetup={() => setTab("setup")}
         />
       </div>
       {tab === "setup" && (
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <div className="flex flex-col gap-4">
+            <EnvPanel missingPackage={missingPackage} onResolved={() => setMissingPackage(null)} />
             <DataPanel />
-            <EnvPanel />
           </div>
         </div>
       )}
@@ -252,7 +257,10 @@ function Workspace({
   onAddJournalEntry,
   onAddReferences,
   onDirtyChange,
-}: Omit<Props, "activeProject"> & { activeProject: string | "all" }) {
+  missingPackage,
+  onMissingPackage,
+  onOpenSetup,
+}: Omit<Props, "activeProject"> & { activeProject: string | "all"; missingPackage: string | null; onMissingPackage: (name: string | null) => void; onOpenSetup: () => void }) {
   const pid = activeProject === "all" ? projects[0]?.id ?? "project" : activeProject;
   const [paths, setPaths] = useState<ProjectPaths | null>(null);
   const [perms, setPerms] = useState<Permissions | null>(null);
@@ -288,14 +296,18 @@ function Workspace({
   const [added, setAdded] = useState(false);
   const [collapsedTree, setCollapsedTree] = useState<Set<string>>(() => new Set());
   const [saveNote, setSaveNote] = useState("");
-  const [missingPackage, setMissingPackage] = useState<string | null>(null);
-  const [installingPackages, setInstallingPackages] = useState(false);
+  const [runNote, setRunNote] = useState("");
+  const [topDialog, setTopDialog] = useState(false);
+  const [checkDialog, setCheckDialog] = useState<"control" | "original" | null>(null);
+  const [preparing, setPreparing] = useState(false);
+  const [startingRuns, setStartingRuns] = useState<Record<string, boolean>>({});
   const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
   const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
   const pendingPresetIdea = useRef<string | null>(null);
   const explicitProjectWorkspace = useRef<string | null>(null);
   const preparingV630 = useRef(false);
-  const lastRunByScope = useRef<Record<string, { scriptName: string; args: string[] } | undefined>>({});
+  const launchTracker = useRef(new RunLaunchTracker());
+  const exitVersions = useRef<Record<string, number>>({});
   const project = projects.find((p) => p.id === pid);
   const scopeId = workspaceIdeaId ? `idea:${workspaceIdeaId}` : pid;
   const selectedWorkspaceIdea = ideas.find((i) => i.id === workspaceIdeaId);
@@ -391,61 +403,64 @@ function Workspace({
   const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[]) => {
     const bridge = fly;
     if (!bridge) return;
-      setLogsByProject((prev) => ({ ...prev, [targetPid]: "" }));
-      if (pidRef.current === targetPid) {
-      runRequest.current += 1;
-      copyRequest.current += 1;
-      setSelRun(null);
-      setSelectedArtifact(null);
-      setArtifactLoading(false);
-      setCopyStatus("");
-      setDetail(null);
-      setImages([]);
-      setViewFile(null);
+    if (!launchTracker.current.begin(targetPid)) {
+      if (pidRef.current === targetPid) setRunNote("В этом пространстве уже запускается или выполняется расчёт.");
+      return;
     }
-    lastRunByScope.current[targetPid] = { scriptName, args: argList };
-    if (pidRef.current === targetPid) setMissingPackage(null);
+    setStartingRuns((prev) => ({ ...prev, [targetPid]: true }));
+    setLogsByProject((prev) => ({ ...prev, [targetPid]: "" }));
+    if (pidRef.current === targetPid) {
+      setRunNote(`Подготовка запуска ${scriptName}. Проверяется Python и создаётся папка прогона.`);
+      runRequest.current += 1; copyRequest.current += 1;
+      setSelRun(null); setSelectedArtifact(null); setArtifactLoading(false); setCopyStatus("");
+      setDetail(null); setImages([]); setViewFile(null);
+      onMissingPackage(null);
+    }
     try {
       const r = await bridge.runScript(targetPid, scriptName, argList);
-      setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
+      if (launchTracker.current.resolved(targetPid, r.runId)) {
+        setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
+        if (pidRef.current === targetPid) setRunNote(`Расчёт выполняется. Папка: ${r.runDir}`);
+      }
       if (pidRef.current === targetPid) setAdded(false);
-      setLogsByProject((prev) => ({
-        ...prev,
-        [targetPid]: `$ python ${scriptName} ${argList.join(" ")}\n-> ${r.runDir}\n\n`,
-      }));
+      setLogsByProject((prev) => ({ ...prev, [targetPid]: `$ python ${scriptName} ${argList.join(" ")}\n-> ${r.runDir}\n\n${prev[targetPid] ?? ""}` }));
     } catch (e) {
-      setLogsByProject((prev) => ({
-        ...prev,
-        [targetPid]: `не удалось запустить: ${(e as Error).message}\n`,
-      }));
+      launchTracker.current.failed(targetPid);
+      const message = `Не удалось запустить: ${(e as Error).message}`;
+      setLogsByProject((prev) => ({ ...prev, [targetPid]: `${message}\n` }));
+      if (pidRef.current === targetPid) setRunNote(message);
+    } finally {
+      setStartingRuns((prev) => ({ ...prev, [targetPid]: false }));
     }
-  }, []);
+  }, [onMissingPackage]);
 
   const runV630 = async (simulate: boolean) => {
     const bridge = fly;
     const target = scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
-    if (simulate && !confirm("Пробный контроль v630: один повтор, 100 Гц, левая сторона. Полный граф может занять несколько гигабайт RAM и долго выполняться. Запустить?")) return;
     if (editorRef.current.current === "25_shiu_v630_control.py" && editorRef.current.dirty) {
-      setSaveNote("В контрольном файле есть несохранённые изменения. Сохраните их или отмените перед запуском.");
+      setRunNote("В контрольном файле есть несохранённые изменения. Сохраните их или отмените перед запуском.");
       return;
     }
     preparingV630.current = true;
+    setPreparing(true);
+    setRunNote("Подготовка файлов расчёта в выбранной идее…");
     try {
       const template = await bridge.prepareV630Template(target);
       const updated = await bridge.listScripts(target);
       if (pidRef.current !== target) return;
       setFiles(updated);
       if (!template.matches) {
-        setSaveNote("Файл 25_shiu_v630_control.py уже изменён. Он не перезаписан и не запущен; откройте его и проверьте.");
+        setRunNote("Файл 25_shiu_v630_control.py уже изменён. Он не перезаписан и не запущен; откройте его и проверьте.");
         return;
       }
-      setSaveNote(template.added ? "Контрольный файл добавлен только в выбранную идею." : "Запускаю контроль в выбранной идее.");
+      setRunNote(template.added ? "Контрольный файл добавлен только в выбранную идею." : "Запускаю контроль в выбранной идее.");
       await startScriptInProject(target, template.name, simulate ? ["--simulate"] : []);
     } catch (e) {
-      if (pidRef.current === target) setSaveNote(`Не удалось подготовить контроль v630: ${(e as Error).message}`);
+      if (pidRef.current === target) setRunNote(`Не удалось подготовить контроль v630: ${(e as Error).message}`);
     } finally {
       preparingV630.current = false;
+      setPreparing(false);
     }
   };
 
@@ -453,27 +468,29 @@ function Workspace({
     const bridge = fly;
     const target = scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
-    if (!confirm("Сверка с оригинальным model.py авторов: один повтор v630, 100 Гц, seed 0. Монитор записывает все спайки и может потребовать несколько гигабайт памяти. Запустить?")) return;
     if (["26_shiu_original_check.py", "26_shiu_author_model.py"].includes(editorRef.current.current ?? "") && editorRef.current.dirty) {
-      setSaveNote("В файле сверки есть несохранённые изменения. Сохраните их или отмените перед запуском.");
+      setRunNote("В файле сверки есть несохранённые изменения. Сохраните их или отмените перед запуском.");
       return;
     }
     preparingV630.current = true;
+    setPreparing(true);
+    setRunNote("Подготовка файлов расчёта в выбранной идее…");
     try {
       const template = await bridge.prepareShiuOriginal(target);
       const updated = await bridge.listScripts(target);
       if (pidRef.current !== target) return;
       setFiles(updated);
       if (!template.matches) {
-        setSaveNote(`Файл ${template.conflict} изменён. Он не перезаписан; автоматический запуск остановлен.`);
+        setRunNote(`Файл ${template.conflict} изменён. Он не перезаписан; автоматический запуск остановлен.`);
         return;
       }
-      setSaveNote("Сверяю функции авторского model.py в выбранной идее.");
+      setRunNote("Сверяю функции авторского model.py в выбранной идее.");
       await startScriptInProject(target, template.name, ["--simulate"]);
     } catch (e) {
-      if (pidRef.current === target) setSaveNote(`Не удалось подготовить сверку с авторским кодом: ${(e as Error).message}`);
+      if (pidRef.current === target) setRunNote(`Не удалось подготовить сверку с авторским кодом: ${(e as Error).message}`);
     } finally {
       preparingV630.current = false;
+      setPreparing(false);
     }
   };
 
@@ -481,24 +498,25 @@ function Workspace({
     const bridge = fly;
     const target = scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
-    if (!confirm(pilot ? "Пилот топ-200: один повтор на v630 при 200 Гц, полная сеть. Расчёт может потребовать несколько гигабайтов памяти. Запустить?" : "Топ-200: до 30 повторов на v630 при 200 Гц, полная сеть. Расчёт может занять много времени и несколько гигабайтов памяти. Продолжить?")) return;
     if (["25_shiu_v630_control.py", "27_shiu_top200_v630.py"].includes(editorRef.current.current ?? "") && editorRef.current.dirty) {
-      setSaveNote("В файле расчёта есть несохранённые изменения. Сохраните их или отмените перед запуском."); return;
+      setRunNote("В файле расчёта есть несохранённые изменения. Сохраните их или отмените перед запуском."); return;
     }
     preparingV630.current = true;
+    setPreparing(true);
+    setRunNote("Подготовка файлов расчёта в выбранной идее…");
     try {
       const previous = resume ? await bridge.pickFolder("Выберите папку ранее прерванного прогона топ-200") : null;
-      if (resume && !previous) return;
+      if (resume && !previous) { setRunNote("Продолжение отменено: папка не выбрана."); return; }
       const prepared = await bridge.prepareTop200(target);
       const updated = await bridge.listScripts(target);
       if (pidRef.current !== target) return;
       setFiles(updated);
-      if (!prepared.matches) { setSaveNote(`Файл ${prepared.conflict} изменён. Он не перезаписан; запуск остановлен.`); return; }
-      setSaveNote("Топ-200 сохраняет результаты после каждого повтора.");
+      if (!prepared.matches) { setRunNote(`Файл ${prepared.conflict} изменён. Он не перезаписан; запуск остановлен.`); return; }
+      setRunNote("Топ-200 сохраняет результаты после каждого повтора.");
       await startScriptInProject(target, prepared.name, previous ? ["--simulate", "--resume-from", previous] : pilot ? ["--simulate", "--pilot"] : ["--simulate"]);
     } catch (e) {
-      if (pidRef.current === target) setSaveNote(`Не удалось подготовить топ-200: ${(e as Error).message}`);
-    } finally { preparingV630.current = false; }
+      if (pidRef.current === target) setRunNote(`Не удалось подготовить топ-200: ${(e as Error).message}`);
+    } finally { preparingV630.current = false; setPreparing(false); }
   };
 
   useEffect(() => {
@@ -539,7 +557,7 @@ function Workspace({
     setImages([]);
     setViewFile(null);
     setSaveNote("");
-    setMissingPackage(null);
+    setRunNote("");
     void loadFiles(scopeId).then(async (rn) => {
       if (cancelled) return;
       setRuns(rn);
@@ -574,6 +592,18 @@ function Workspace({
   }, [scopeId, loadFiles, workspaceIdeaId, startScriptInProject]);
 
   useEffect(() => {
+    let cancelled = false;
+    const version = exitVersions.current[scopeId] ?? 0;
+    void fly!.getActiveRun(scopeId).then((active) => {
+      if (!cancelled && active && (exitVersions.current[scopeId] ?? 0) === version && launchTracker.current.adopt(scopeId, active.runId)) {
+        setActiveRuns((prev) => ({ ...prev, [scopeId]: active }));
+        setRunNote(`Расчёт выполняется. Папка: ${active.runDir}`);
+      }
+    }).catch((e) => { if (!cancelled) setRunNote(`Не удалось проверить состояние расчётов: ${(e as Error).message}`); });
+    return () => { cancelled = true; };
+  }, [scopeId]);
+
+  useEffect(() => {
     void fly!.getPermissions().then(setPerms);
   }, []);
 
@@ -584,19 +614,22 @@ function Workspace({
       const evPid = p.projectId || pidRef.current;
       const missingModule = p.stream === "stderr" ? p.text.match(/No module named ["']([^"']+)["']/)?.[1] : null;
       if (missingModule && evPid === pidRef.current) {
-        setMissingPackage(missingModule);
-        setSaveNote(`Python-пакет ${missingModule} не установлен. Его можно установить и повторить запуск кнопкой рядом с логом.`);
+        onMissingPackage(missingModule);
+        setRunNote(`Python-пакет ${missingModule} не установлен. Перейдите в «Данные и окружение», затем повторите запуск вручную.`);
       }
       setLogsByProject((prev) => ({
         ...prev,
         [evPid]: ((prev[evPid] ?? "") + p.text).slice(-60000),
       }));
       if (p.stream === "exit") {
+        exitVersions.current[evPid] = (exitVersions.current[evPid] ?? 0) + 1;
+        launchTracker.current.exit(evPid, p.runId);
+        if (evPid === pidRef.current) setRunNote(`Прогон завершён, код ${p.code ?? "неизвестен"}. Проверьте лог и summary.json.`);
         let finishedDir: string | undefined = p.runDir;
         setActiveRuns((prev) => {
           finishedDir = finishedDir || prev[evPid]?.runDir;
           const next = { ...prev };
-          delete next[evPid];
+          if (next[evPid]?.runId === p.runId) delete next[evPid];
           return next;
         });
         if (evPid === pidRef.current) {
@@ -611,7 +644,7 @@ function Workspace({
         }
       }
     });
-  }, [refreshRuns, projects, ideas]);
+  }, [refreshRuns, projects, ideas, onMissingPackage]);
 
   useEffect(() => {
     if (!selRun && !selectedArtifact) logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
@@ -940,35 +973,6 @@ function Workspace({
     }
   };
 
-  const installPackageAndRetry = async () => {
-    const bridge = fly;
-    const failedRun = lastRunByScope.current[scopeId];
-    if (!bridge || !missingPackage || installingPackages) return;
-    setInstallingPackages(true);
-    setSaveNote(`устанавливаю ${missingPackage} в локальное окружение Python...`);
-    const off = bridge.onEnvSetupOutput((p) => {
-      setLogsByProject((prev) => ({
-        ...prev,
-        [scopeId]: ((prev[scopeId] ?? "") + p.text).slice(-60000),
-      }));
-    });
-    try {
-      await bridge.setupPythonEnv(["brian2", "joblib"].includes(missingPackage) ? "full" : "core");
-      setMissingPackage(null);
-      setSaveNote(`пакеты установлены, повторяю ${failedRun?.scriptName ?? "скрипт"}`);
-      if (failedRun) await startScriptInProject(scopeId, failedRun.scriptName, failedRun.args);
-    } catch (e) {
-      const message = (e as Error).message;
-      setSaveNote(`не удалось установить пакеты: ${message}`);
-      setLogsByProject((prev) => ({
-        ...prev,
-        [scopeId]: `${prev[scopeId] ?? ""}\n\n[ошибка установки] ${message}\n`,
-      }));
-    } finally {
-      off();
-      setInstallingPackages(false);
-    }
-  };
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -1292,13 +1296,20 @@ function Workspace({
 
           <div className="flex shrink-0 flex-wrap items-center gap-2 border-y px-2 py-1.5">
             <span className="label">результат · {scopeLabel}</span>
-            <Button size="sm" variant="outline" disabled={!!runId} onClick={() => void startScriptInProject(scopeId, "24_compare_shiu_connectivity.py", [])} title="Сравнить подключённые связи Princeton и авторские файлы Shiu v630">сравнить связность</Button>
-            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(false)} title="Без симуляции: проверить подключённые авторские файлы в выбранной идее">проверить v630</Button>
-            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runV630(true)} title="Один пробный контроль на авторской v630 без лезий">пробный контроль v630</Button>
-            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runShiuOriginal()} title="Сравнить предыдущий контроль с неизменёнными функциями model.py авторов">сверка с model.py</Button>
-            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runTop200(false, true)} title="Один повтор, без построения рейтинга топ-200">пилот топ-200</Button>
-            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runTop200(false)} title="30 повторов при 200 Гц, для отбора топ-200">топ-200 v630</Button>
-            <Button size="sm" variant="outline" disabled={!!runId || !workspaceIdeaId} onClick={() => void runTop200(true)} title="Продолжить прерванный расчёт из папки с контрольной точкой">продолжить топ-200</Button>
+            <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setTopDialog(true)}>топ-200</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild><Button size="sm" variant="ghost" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId}>проверки Shiu</Button></DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuLabel>Проверки без лезий</DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => void startScriptInProject(scopeId, "24_compare_shiu_connectivity.py", [])}>сравнить связность</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void runV630(false)}>проверить файлы v630</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setCheckDialog("control")}>пробный контроль v630</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setCheckDialog("original")}>сверка с model.py</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {runId && <Button size="sm" variant="outline" onClick={() => void fly!.killRun(runId).catch((e) => setRunNote(`Не удалось остановить прогон: ${(e as Error).message}`))}>остановить расчёт</Button>}
+            {(preparing || startingRuns[scopeId]) && <span role="status" className="font-mono text-[10px]">подготовка запуска…</span>}
+            {!workspaceIdeaId && <span className="text-[10px] text-muted-foreground">Для расчётов выберите идею.</span>}
             {selRun ? (
               <>
                 <span className="max-w-[200px] truncate font-mono text-[10px] text-muted-foreground">{selRun.label}</span>
@@ -1342,7 +1353,7 @@ function Workspace({
                 )}
               </>
             ) : (
-              <span className="label">прогон не выбран</span>
+              <span className="label">{runId ? "идёт расчёт, лог ниже" : "выберите прогон в дереве"}</span>
             )}
             <div className="ml-auto flex items-center gap-1.5">
               <Select value={ideaId} onValueChange={setIdeaId}>
@@ -1367,15 +1378,38 @@ function Workspace({
             </div>
           </div>
 
+          {(runNote || missingPackage) && <div role="status" className="flex shrink-0 flex-wrap items-center gap-2 border-b px-2 py-1.5 text-[11px]">
+            <span className="min-w-0 break-words">{runNote}</span>
+            {missingPackage && <><span>Не найден пакет {missingPackage}.</span><Button size="sm" variant="outline" onClick={onOpenSetup}>данные и окружение</Button></>}
+          </div>}
+          <Dialog open={topDialog} onOpenChange={setTopDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Отбор топ-200 на v630</DialogTitle>
+                <DialogDescription>21 правый sugar GRN, 200 Гц. Это не лезии. Полная сеть может потребовать несколько гигабайтов памяти. 30 повторов могут выполняться долго. Каждый завершённый повтор сохраняется.</DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-start gap-2">
+                <Button onClick={() => { setTopDialog(false); void runTop200(false, true); }}>пилот: 1 повтор</Button>
+                <Button variant="outline" onClick={() => { setTopDialog(false); void runTop200(false); }}>начать полный расчёт: 30 повторов</Button>
+                <Button variant="outline" onClick={() => { setTopDialog(false); void runTop200(true); }}>продолжить из папки прогона</Button>
+              </div>
+              <p className="text-[11px] text-muted-foreground">Пилот не создаёт список топ-200. Для продолжения выберите папку с checkpoint.json и файлами повторов.</p>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={checkDialog !== null} onOpenChange={(open) => { if (!open) setCheckDialog(null); }}>
+            <DialogContent>
+              <DialogHeader><DialogTitle>{checkDialog === "control" ? "Пробный контроль v630" : "Сверка с model.py"}</DialogTitle>
+                <DialogDescription>Один повтор, 100 Гц, 10 левых GRN. Полная сеть может занять несколько гигабайтов памяти. Сверка с model.py дополнительно записывает все спайки.</DialogDescription>
+              </DialogHeader>
+              <div className="flex gap-2"><Button onClick={() => { const selected = checkDialog; setCheckDialog(null); if (selected === "control") void runV630(true); else if (selected === "original") void runShiuOriginal(); }}>запустить</Button><Button variant="outline" onClick={() => setCheckDialog(null)}>отмена</Button></div>
+            </DialogContent>
+          </Dialog>
+
           <div ref={logRef} className="max-h-[40%] min-h-[130px] shrink-0 overflow-y-auto p-2">
             <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
               <span className="min-w-0 break-all font-mono text-[10px] text-muted-foreground">{selectedArtifact ? `выбран файл: ${selectedArtifact}` : `лог выполнения · ${scopeLabel}`}</span>
               <div className="flex items-center gap-1">
-                {missingPackage && (
-                  <Button size="sm" variant="outline" className="h-6 px-2 text-[10.5px]" onClick={() => void installPackageAndRetry()} disabled={installingPackages}>
-                    {installingPackages ? "устанавливаю…" : `установить ${missingPackage} и повторить`}
-                  </Button>
-                )}
+
                 <Button size="sm" variant="ghost" className="h-6 max-w-[230px] truncate px-2 text-[10.5px]" title={selectedArtifact ? `Копировать содержимое ${selectedArtifact}` : "Копировать лог"} onClick={() => void copyCurrentResult()} disabled={copyBusy || (!selectedArtifact && !displayLog && !(selRun?.files.includes("log.txt")))}>
                   {selectedArtifact ? `копировать ${selectedArtifact}` : "копировать лог"}
                 </Button>
@@ -2735,7 +2769,7 @@ function DataPanel() {
             );
           })}
           <p className="text-[11px] leading-relaxed text-muted-foreground">Авторские файлы можно скачать на GitHub: <button type="button" className="cursor-pointer underline" onClick={() => void fly!.openExternal("https://github.com/philshiu/Drosophila_brain_model/blob/91bdd1e7dcf193f3e7ca5a8933497fcef63b7960/2023_03_23_connectivity_630_final.parquet")}>2023_03_23_connectivity_630_final.parquet</button> и <button type="button" className="cursor-pointer underline" onClick={() => void fly!.openExternal("https://github.com/philshiu/Drosophila_brain_model/blob/91bdd1e7dcf193f3e7ca5a8933497fcef63b7960/2023_03_23_completeness_630_final.csv")}>2023_03_23_completeness_630_final.csv</button>. На GitHub нажмите Download raw file, затем выберите скачанные файлы выше. Ваши файлы Princeton остаются подключёнными отдельно.</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">Для сравнения откройте выбранную идею в «Код и результаты» и нажмите «сравнить связность». Нужны все три таблицы: ваши связи и два авторских файла. Нейромедиаторы нужны только для сравнения знаков. Для отдельного контроля на v630 выберите идею и нажмите «проверить v630», затем «пробный контроль v630».</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">Для сравнения откройте идею в «Код и результаты» и используйте меню «проверки Shiu». Нужны ваши связи и два авторских файла. Нейромедиаторы нужны только для сравнения знаков. Там же доступны проверка файлов и пробный контроль v630.</p>
           {linkError && <p role="alert" className="text-[11px] text-destructive">{linkError}</p>}
           <p className="text-[11px] leading-relaxed text-muted-foreground">Выберите CSV, TSV, CSV.GZ, TSV.GZ или Parquet. Файлы остаются на месте. Пути доступны скриптам через переменные выше; только скрипты, поддерживающие эти переменные, используют их. Проверить таблицу можно в любой идее через 21_check_linked_data.py.</p>
           <p className="text-[11px] leading-relaxed text-muted-foreground">Готовые анализы 10..19 и старые скрипты пока не читают эти выбранные файлы автоматически. Им нужны их исходные форматы в папке данных. Доступность файла не подтверждает его состав, версию или пригодность для baseline Shiu.</p>
@@ -2953,7 +2987,7 @@ function AgentPanel() {
   );
 }
 
-function EnvPanel() {
+function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | null; onResolved: () => void }) {
   const [env, setEnv] = useState<EnvInfo | null>(null);
   const [pythons, setPythons] = useState<PythonCandidate[]>([]);
   const [loading, setLoading] = useState(false);
@@ -2990,6 +3024,7 @@ function EnvPanel() {
       const result = await fly!.setupPythonEnv(mode);
       setEnv(result);
       setPythons(await fly!.listPythons());
+      if (missingPackage && result.packages[missingPackage]) onResolved();
     } catch (e) {
       setSetupError((e as Error).message);
     } finally {
@@ -3055,13 +3090,14 @@ function EnvPanel() {
             <p className="text-[11px] text-destructive">Python 3 не найден. Установи Python 3.11 или 3.12 с python.org и отметь Add Python to PATH, затем перезапусти программу.</p>
           )}
 
+          {missingPackage && <p role="status" className="border px-2 py-1.5 text-[11px]">Последний прогон сообщил, что не найден пакет <code>{missingPackage}</code>. Установите нужный набор ниже, затем вернитесь к расчёту и запустите его вручную. Если пакет не входит в эти наборы, потребуется отдельная установка.</p>}
           <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={() => void setup("core")} disabled={settingUp || !env?.python || missing.length === 0}>
-              {settingUp ? "устанавливаю…" : missing.length ? "установить пакеты для анализов" : "основные пакеты установлены"}
+            <Button onClick={() => void setup("core")} disabled={settingUp || !env?.python || (missing.length === 0 && !missingPackage)}>
+              {settingUp ? "устанавливаю…" : missing.length || missingPackage ? "установить пакеты для анализов" : "основные пакеты установлены"}
             </Button>
-            {!!env?.python && !env.packages.brian2 && (
+            {!!env?.python && (!env.packages.brian2 || !env.packages.joblib || missingPackage === "brian2" || missingPackage === "joblib") && (
               <Button variant="outline" onClick={() => void setup("full")} disabled={settingUp}>
-                установить Brian2
+                установить Brian2 и joblib
               </Button>
             )}
             <span className="label">

@@ -633,7 +633,7 @@ async function checkEnv() {
   if (py) {
     const probe = `
 import json, importlib
-mods = ["numpy","pandas","pyarrow","brian2","torch","matplotlib","scipy","duckdb"]
+mods = ["numpy","pandas","pyarrow","brian2","joblib","torch","matplotlib","scipy","duckdb"]
 out = {}
 for m in mods:
     try:
@@ -761,6 +761,7 @@ async function setupPythonEnv(win, mode = "core") {
 // Запуск скриптов
 // ------------------------------------------------------------
 const runs = new Map();
+const runningScopes = new Map();
 
 async function runScript(win, projectId, name, args) {
   assertNotSyncing();
@@ -769,8 +770,10 @@ async function runScript(win, projectId, name, args) {
   assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
+  if (runningScopes.has(ws.projectId)) throw new Error("В этом пространстве уже выполняется расчёт. Дождитесь его завершения.");
   const file = path.join(ws.code, path.basename(name));
   if (!within(ws.code, file)) throw new Error("Скрипт вне папки рабочего пространства.");
+  if (!fs.existsSync(file)) throw new Error(`Скрипт ${path.basename(name)} не найден в выбранной идее.`);
   const { cmd, prefix } = parsePySpec(py.exe || py.cmd);
   const baseId = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "_" + path.basename(name).replace(/\.py$/, "");
   let runId = baseId;
@@ -810,6 +813,7 @@ async function runScript(win, projectId, name, args) {
   const useShell = process.platform === "win32" && !path.isAbsolute(cmd) && /\.(cmd|bat)$/i.test(cmd);
   const p = spawn(cmd, [...prefix, script, ...scriptArgs], { cwd: ws.code, env, windowsHide: true, shell: useShell });
   runs.set(runId, p);
+  runningScopes.set(ws.projectId, { runId, runDir });
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
   const send = (stream, text) => {
     log.write(text);
@@ -822,6 +826,7 @@ async function runScript(win, projectId, name, args) {
   p.on("close", (code) => {
     log.end();
     runs.delete(runId);
+    if (runningScopes.get(ws.projectId)?.runId === runId) runningScopes.delete(ws.projectId);
     runStatus.set(runId, { code, dir: runDir, projectId: ws.projectId, finishedAt: new Date().toISOString() });
     win?.webContents.send("fly:runOutput", { runId, projectId: ws.projectId, runDir, stream: "exit", code, text: `\n[завершено, код ${code}]\n` });
   });
@@ -1561,6 +1566,7 @@ function registerIpc(getWin) {
     return true;
   });
   handle("fly:runScript", (_e, projectId, name, args) => runScript(getWin(), projectId, path.basename(name), args));
+  handle("fly:getActiveRun", (_e, projectId) => runningScopes.get(parseScope(projectId).scopeId) || null);
   handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });
 
   handle("fly:getSecret", (_e, k) => { const s = readSecrets(); return s[k] ? `${s[k].slice(0, 6)}…${s[k].slice(-4)}` : null; });

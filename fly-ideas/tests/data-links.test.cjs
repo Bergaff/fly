@@ -35,6 +35,7 @@ test('IPC связывает файлы, передаёт пути запуще�
     const call = (name, ...args) => handlers.get(`fly:${name}`)(null, ...args);
     const env = await call('checkEnv');
     assert.ok(Object.hasOwn(env.packages, 'duckdb'), 'duckdb must be included in environment diagnostics');
+    assert.ok(Object.hasOwn(env.packages, 'joblib'), 'joblib must be included in environment diagnostics');
     const file = path.join(dir, 'ручные связи.csv.gz');
     const contents = zlib.gzipSync('pre_root_id,post_root_id,syn_count\n720575940000000001,720575940000000002,7\n');
     await fsp.writeFile(file, contents);
@@ -94,6 +95,15 @@ test('IPC связывает файлы, передаёт пути запуще�
     const topReady = await call('prepareTop200', 'idea:other');
     assert.equal(topReady.matches, true); assert.equal(topReady.added.length, 2);
     assert.equal((await call('prepareTop200', 'idea:other')).added.length, 0);
+    await fsp.writeFile(path.join(ws.code, 'wait_test.py'), 'import time\ntime.sleep(0.5)\n');
+    const waitCompleted = new Promise((resolve) => { onExit = resolve; });
+    const waiting = await call('runScript', 'idea:example', 'wait_test.py', []);
+    assert.equal((await call('getActiveRun', 'idea:example')).runId, waiting.runId);
+    assert.equal(await call('getActiveRun', 'idea:other'), null);
+    await assert.rejects(call('runScript', 'idea:example', 'wait_test.py', []), /уже выполняется/);
+    assert.equal((await waitCompleted).code, 0);
+    assert.equal(await call('getActiveRun', 'idea:example'), null);
+    await assert.rejects(call('runScript', 'idea:example', 'not_present.py', []), /не найден/);
     await fsp.copyFile(script, path.join(ws.code, '21_check_linked_data.py'));
     const completed = new Promise((resolve) => { onExit = resolve; });
     const run = await call('runScript', 'idea:example', '21_check_linked_data.py', []);

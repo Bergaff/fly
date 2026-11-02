@@ -153,6 +153,7 @@ export interface FlyBridge {
   writeAssistantScript(projectId: string, name: string, content: string, opts: { expectedDir: string; expectedContent?: string }): Promise<{ file: string; path: string; created: boolean; backup?: string }>;
   deleteScript(projectId: string, name: string): Promise<boolean>;
   runScript(projectId: string, name: string, args: string[]): Promise<{ runId: string; runDir: string }>;
+  getActiveRun(projectId: string): Promise<{ runId: string; runDir: string } | null>;
   killRun(runId: string): Promise<void>;
   onRunOutput(cb: (p: RunOutput) => void): () => void;
 

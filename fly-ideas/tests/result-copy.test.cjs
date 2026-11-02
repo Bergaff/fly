@@ -106,7 +106,7 @@ test('переключение выбирает отдельный резуль�
   assert.match(source, /показать \{f\}/);
   assert.match(source, /resultFiles = selRun \? selRun\.files\.filter\(\(f\) => f !== "log\.txt"\)/);
   const start = source.indexOf('  const copyCurrentResult = async () => {');
-  const end = source.indexOf('  const installPackageAndRetry', start);
+  const end = source.indexOf('\n  return (\n    <div className="flex h-full min-h-0 flex-col">', start);
   assert.ok(start >= 0 && end > start);
   const code = ts.transpile(source.slice(start, end), { target: ts.ScriptTarget.ES2022 });
   const calls = [], status = [], context = {

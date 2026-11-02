@@ -61,6 +61,7 @@ contextBridge.exposeInMainWorld("fly", {
   writeAssistantScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeAssistantScript", projectId, name, content, opts),
   deleteScript: (projectId, name) => ipcRenderer.invoke("fly:deleteScript", projectId, name),
   runScript: (projectId, name, args) => ipcRenderer.invoke("fly:runScript", projectId, name, args),
+  getActiveRun: (projectId) => ipcRenderer.invoke("fly:getActiveRun", projectId),
   killRun: (runId) => ipcRenderer.invoke("fly:killRun", runId),
   onRunOutput: (cb) => {
     const h = (_e, p) => cb(p);
