@@ -57,6 +57,7 @@ contextBridge.exposeInMainWorld("fly", {
   prepareShiuOriginal: (projectId) => ipcRenderer.invoke("fly:prepareShiuOriginal", projectId),
   prepareTop200: (projectId) => ipcRenderer.invoke("fly:prepareTop200", projectId),
   prepareLesions: (projectId) => ipcRenderer.invoke("fly:prepareLesions", projectId),
+  prepareParallelLesions: (projectId) => ipcRenderer.invoke("fly:prepareParallelLesions", projectId),
   readScript: (projectId, name) => ipcRenderer.invoke("fly:readScript", projectId, name),
   writeScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeScript", projectId, name, content, opts),
   writeAssistantScript: (projectId, name, content, opts) => ipcRenderer.invoke("fly:writeAssistantScript", projectId, name, content, opts),
@@ -64,6 +65,7 @@ contextBridge.exposeInMainWorld("fly", {
   runScript: (projectId, name, args) => ipcRenderer.invoke("fly:runScript", projectId, name, args),
   runTop200: (projectId, args) => ipcRenderer.invoke("fly:runTop200", projectId, args),
   runLesions: (projectId, args) => ipcRenderer.invoke("fly:runLesions", projectId, args),
+  runParallelLesions: (projectId, args) => ipcRenderer.invoke("fly:runParallelLesions", projectId, args),
   getActiveRun: (projectId) => ipcRenderer.invoke("fly:getActiveRun", projectId),
   killRun: (runId) => ipcRenderer.invoke("fly:killRun", runId),
   onRunOutput: (cb) => {

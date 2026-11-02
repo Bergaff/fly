@@ -133,6 +133,26 @@ open(os.path.join(os.environ['FLY_RUN_DIR'],'summary.json'),'w').write(json.dump
     assert.equal(lesionReport.script, path.join(lesionReady.code, lesionName));
     assert.deepEqual(lesionReport.args, ['--simulate', '--top-run', 'C:/top with spaces', '--pilot']);
     assert.equal(lesionReport.base, 'b5f200a3e9472c9aa6318acab8b5fb928d23af3b458c2d43fc29909241e95711');
+    const parallelName = '29_shiu_lesions_parallel.py';
+    const parallelStub = `import json,os,time
+out=os.environ['FLY_RUN_DIR']
+while not os.path.exists(os.path.join(out,'stop.request')): time.sleep(0.02)
+with open(os.path.join(out,'summary.json'),'w') as f: json.dump({'status':'stopped','args':__import__('sys').argv[1:]},f)
+`;
+    await fsp.writeFile(path.join(templateDir, parallelName), parallelStub);
+    const parallelReady = await call('prepareParallelLesions', 'idea:example');
+    assert.equal(parallelReady.name, parallelName); assert.equal(parallelReady.added.length, 1);
+    assert.equal(parallelReady.code, lesionReady.code);
+    await assert.rejects(call('runParallelLesions','idea:example',['--simulate','--top-run','x','--pilot']), /предыдущего/);
+    const parallelCompleted = new Promise((resolve) => { onExit = resolve; });
+    const parallelArgs = ['--simulate','--top-run','C:/top folder','--resume-from','C:/old lesions'];
+    const parallelRun = await call('runParallelLesions','idea:example',parallelArgs);
+    assert.equal((await call('getActiveRun','idea:example')).runId,parallelRun.runId);
+    await call('killRun',parallelRun.runId);
+    assert.equal((await parallelCompleted).code,0, 'graceful stop must not kill the process');
+    const parallelReport=JSON.parse(await fsp.readFile(path.join(parallelRun.runDir,'summary.json'),'utf8'));
+    assert.equal(parallelReport.status,'stopped'); assert.deepEqual(parallelReport.args,parallelArgs);
+    assert.equal(await fsp.readFile(path.join(parallelRun.runDir,'stop.request'),'utf8'),'stop');
     await fsp.writeFile(path.join(ws.code, 'wait_test.py'), 'import time\ntime.sleep(0.5)\n');
     const waitCompleted = new Promise((resolve) => { onExit = resolve; });
     const waiting = await call('runScript', 'idea:example', 'wait_test.py', []);

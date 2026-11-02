@@ -73,7 +73,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
-const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py"]);
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py"]);
 
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
@@ -762,6 +762,7 @@ const TOP200_DIR = ".shiu-top200-v630";
 const TOP200_FILES = ["25_shiu_v630_control.py", "27_shiu_top200_v630.py"];
 const LESIONS_DIR = ".shiu-lesions-v630";
 const LESIONS_FILES = [...TOP200_FILES, "28_shiu_lesions_v630.py"];
+const PARALLEL_FILES = [...LESIONS_FILES, "29_shiu_lesions_parallel.py"];
 async function prepareProtectedFiles(ws, dirName, files) {
   const dir = path.join(ws.code, dirName);
   try { await fsp.mkdir(dir); } catch (e) { if (e.code !== "EEXIST") throw e; }
@@ -802,7 +803,7 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
-  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : null;
+  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : null;
   const protectedDir = protectedMode === "top200" ? TOP200_DIR : LESIONS_DIR;
   if (protectedFiles) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
@@ -843,6 +844,7 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
     FLY_SHIU_CONNECTIONS: links.shiu_connections.path,
     FLY_SHIU_NEURONS: links.shiu_neurons.path,
     FLY_RUN_DIR: runDir,
+    ...(protectedMode === "parallel" ? { FLY_PARENT_PID: String(process.pid) } : {}),
     FLY_SCRIPTS: ws.code,
     FLY_PROJECT: ws.projectId,
     ...(ws.ideaId ? { FLY_IDEA: ws.ideaId } : {}),
@@ -852,6 +854,7 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   };
   const useShell = process.platform === "win32" && !path.isAbsolute(cmd) && /\.(cmd|bat)$/i.test(cmd);
   const p = spawn(cmd, [...prefix, script, ...scriptArgs], { cwd: ws.code, env, windowsHide: true, shell: useShell });
+  if (protectedMode === "parallel") p.flyStopDir = runDir;
   runs.set(runId, p);
   runningScopes.set(ws.projectId, { runId, runDir });
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
@@ -1292,7 +1295,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:prepareParallelLesions", "fly:runParallelLesions", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1558,6 +1561,10 @@ function registerIpc(getWin) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
     return prepareProtectedFiles(projectPaths(projectId), LESIONS_DIR, LESIONS_FILES);
   });
+  handle("fly:prepareParallelLesions", async (_e, projectId) => {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    return prepareProtectedFiles(projectPaths(projectId), LESIONS_DIR, PARALLEL_FILES);
+  });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);
     const full = path.join(ws.code, path.basename(name));
@@ -1607,8 +1614,19 @@ function registerIpc(getWin) {
     if (!valid) throw new Error("Недопустимые параметры лезий.");
     return runScript(getWin(), projectId, LESIONS_FILES[2], args, { protectedMode: "lesions" });
   });
+  handle("fly:runParallelLesions", (_e, projectId, args) => {
+    const valid = Array.isArray(args) && args.length === 5 && args[0] === "--simulate" && args[1] === "--top-run" &&
+      typeof args[2] === "string" && args[2].length > 0 && args[3] === "--resume-from" && typeof args[4] === "string" && args[4].length > 0;
+    if (!valid) throw new Error("Для двух процессов нужна папка отбора и папка предыдущего расчёта лезий.");
+    return runScript(getWin(), projectId, PARALLEL_FILES[3], args, { protectedMode: "parallel" });
+  });
   handle("fly:getActiveRun", (_e, projectId) => runningScopes.get(parseScope(projectId).scopeId) || null);
-  handle("fly:killRun", (_e, runId) => { runs.get(runId)?.kill(); });
+  handle("fly:killRun", async (_e, runId) => {
+    const process = runs.get(runId);
+    if (!process) return;
+    if (process.flyStopDir) await fsp.writeFile(path.join(process.flyStopDir, "stop.request"), "stop", "utf8");
+    else process.kill();
+  });
 
   handle("fly:getSecret", (_e, k) => { const s = readSecrets(); return s[k] ? `${s[k].slice(0, 6)}…${s[k].slice(-4)}` : null; });
   handle("fly:setSecret", (_e, k, v) => { const s = readSecrets(); if (v) s[k] = v; else delete s[k]; writeSecrets(s); return true; });

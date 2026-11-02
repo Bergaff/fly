@@ -302,6 +302,7 @@ function Workspace({
   const [checkDialog, setCheckDialog] = useState<"control" | "original" | null>(null);
   const [preparing, setPreparing] = useState(false);
   const [startingRuns, setStartingRuns] = useState<Record<string, boolean>>({});
+  const [stoppingRuns, setStoppingRuns] = useState<Record<string, boolean>>({});
   const pendingOpenScript = useRef<{ pid: string; file: string; autoRunArgs?: string } | null>(null);
   const pendingOpenRun = useRef<{ pid: string; runPath: string } | null>(null);
   const pendingPresetIdea = useRef<string | null>(null);
@@ -401,7 +402,7 @@ function Workspace({
     }
   }
 
-  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | null = null) => {
+  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | "parallel" | null = null) => {
     const bridge = fly;
     if (!bridge) return;
     if (!launchTracker.current.begin(targetPid)) {
@@ -418,7 +419,7 @@ function Workspace({
       onMissingPackage(null);
     }
     try {
-      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
+      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : protectedMode === "parallel" ? await bridge.runParallelLesions(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
       if (launchTracker.current.resolved(targetPid, r.runId)) {
         setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
         if (pidRef.current === targetPid) setRunNote(`Расчёт выполняется. Папка: ${r.runDir}`);
@@ -517,7 +518,7 @@ function Workspace({
     } finally { preparingV630.current = false; setPreparing(false); }
   };
 
-  const runLesions = async (mode: "pilot" | "full" | "resume") => {
+  const runLesions = async (mode: "pilot" | "full" | "resume" | "parallel") => {
     const bridge = fly; const target = scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
     preparingV630.current = true; setPreparing(true);
@@ -525,17 +526,29 @@ function Workspace({
     try {
       const top = await bridge.pickFolder("Выберите папку полного прогона топ-200 с summary.json и checkpoint.json");
       if (!top) { setRunNote("Запуск отменён: папка отбора не выбрана."); return; }
-      const previous = mode === "resume" ? await bridge.pickFolder("Выберите папку прерванного или пилотного прогона лезий с lesions.sqlite3") : null;
-      if (mode === "resume" && !previous) { setRunNote("Продолжение отменено: папка лезий не выбрана."); return; }
+      const previous = mode === "resume" || mode === "parallel" ? await bridge.pickFolder("Выберите папку прерванного или пилотного прогона лезий с lesions.sqlite3") : null;
+      if ((mode === "resume" || mode === "parallel") && !previous) { setRunNote("Продолжение отменено: папка лезий не выбрана."); return; }
       setRunNote("Подготовка проверенных копий лезий…");
-      const prepared = await bridge.prepareLesions(target);
+      const prepared = mode === "parallel" ? await bridge.prepareParallelLesions(target) : await bridge.prepareLesions(target);
       if (pidRef.current !== target) return;
       if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
       const args = ["--simulate", "--top-run", top, ...(mode === "pilot" ? ["--pilot"] : previous ? ["--resume-from", previous] : [])];
-      await startScriptInProject(target, prepared.name, args, "lesions");
+      await startScriptInProject(target, prepared.name, args, mode === "parallel" ? "parallel" : "lesions");
     } catch (e) {
       if (pidRef.current === target) setRunNote(`Не удалось подготовить лезии: ${(e as Error).message}`);
     } finally { preparingV630.current = false; setPreparing(false); }
+  };
+
+  const stopCurrentRun = async () => {
+    const target = scopeId; const id = runId;
+    if (!id || stoppingRuns[target]) return;
+    setStoppingRuns((prev) => ({ ...prev, [target]: true }));
+    setRunNote("Остановка запрошена. Дождитесь завершения процесса; незавершённый повтор может потребовать пересчёта.");
+    try { await fly!.killRun(id); }
+    catch (e) {
+      if (pidRef.current === target) setRunNote(`Не удалось остановить расчёт: ${(e as Error).message}`);
+      setStoppingRuns((prev) => ({ ...prev, [target]: false }));
+    }
   };
 
   useEffect(() => {
@@ -641,6 +654,7 @@ function Workspace({
         [evPid]: ((prev[evPid] ?? "") + p.text).slice(-60000),
       }));
       if (p.stream === "exit") {
+        setStoppingRuns((prev) => ({ ...prev, [evPid]: false }));
         exitVersions.current[evPid] = (exitVersions.current[evPid] ?? 0) + 1;
         launchTracker.current.exit(evPid, p.runId);
         if (evPid === pidRef.current) setRunNote(`Прогон завершён, код ${p.code ?? "неизвестен"}. Проверьте лог и summary.json.`);
@@ -1259,8 +1273,8 @@ function Workspace({
                   копия
                 </Button>
                 {runId ? (
-                  <Button size="sm" variant="outline" onClick={() => fly!.killRun(runId)}>
-                    остановить
+                  <Button size="sm" variant="outline" disabled={!!stoppingRuns[scopeId]} onClick={() => void stopCurrentRun()}>
+                    {stoppingRuns[scopeId] ? "останавливается" : "остановить"}
                   </Button>
                 ) : (
                   <Button
@@ -1327,7 +1341,7 @@ function Workspace({
                 <DropdownMenuItem onSelect={() => setCheckDialog("original")}>сверка с model.py</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            {runId && <Button size="sm" variant="outline" onClick={() => void fly!.killRun(runId).catch((e) => setRunNote(`Не удалось остановить прогон: ${(e as Error).message}`))}>остановить расчёт</Button>}
+            {runId && <Button size="sm" variant="outline" disabled={!!stoppingRuns[scopeId]} onClick={() => void stopCurrentRun()}>{stoppingRuns[scopeId] ? "останавливается" : "остановить расчёт"}</Button>}
             {(preparing || startingRuns[scopeId]) && <span role="status" className="font-mono text-[10px]">подготовка запуска…</span>}
             {!workspaceIdeaId && <span className="text-[10px] text-muted-foreground">Для расчётов выберите идею.</span>}
             {selRun ? (
@@ -1425,8 +1439,9 @@ function Workspace({
                 <Button onClick={() => { setLesionDialog(false); void runLesions("pilot"); }}>пилот: контроль и одна лезия</Button>
                 <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("full"); }}>начать полный расчёт</Button>
                 <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("resume"); }}>продолжить из папки лезий</Button>
+                <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("parallel"); }}>продолжить: 2 процесса</Button>
               </div>
-              <p className="text-[11px] text-muted-foreground">Это лезии исходящих связей в модели, а не доказательство необходимости нейрона у животного.</p>
+              <p className="text-[11px] text-muted-foreground">Перед продолжением остановите прежний расчёт и дождитесь его завершения. Выберите папку самого последнего прогона лезий. Два процесса работают с пониженным приоритетом, но создают две большие сети. На Windows перед стартом требуется не менее 8 ГиБ свободной RAM; при падении ниже 2 ГиБ новые повторы прекращаются. Это не гарантия отзывчивости или достаточной памяти: сохраните работу в Word и следите за RAM. При замедлении используйте один процесс. Модельная лезия не доказывает необходимость нейрона у животного.</p>
             </DialogContent>
           </Dialog>
           <Dialog open={checkDialog !== null} onOpenChange={(open) => { if (!open) setCheckDialog(null); }}>

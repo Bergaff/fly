@@ -2,3 +2,4 @@
 experiments/templates/26_shiu_author_model.py text eol=lf
 experiments/templates/27_shiu_top200_v630.py text eol=lf
 experiments/templates/28_shiu_lesions_v630.py text eol=lf
+experiments/templates/29_shiu_lesions_parallel.py text eol=lf

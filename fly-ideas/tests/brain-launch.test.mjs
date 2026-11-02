@@ -109,6 +109,16 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     fireEvent.click(screen.getByRole('button',{name:'продолжить из папки лезий'}));
     await waitFor(()=>assert.equal(calls.length,7));
     assert.deepEqual(calls[6].args,['--simulate','--top-run','C:\\top folder','--resume-from','C:\\lesion folder']);
+    await waitFor(()=>assert.equal(screen.getByRole('button',{name:'лезии v630'}).disabled,false));
+    dom.window.fly.prepareParallelLesions=async()=>({name:'29_shiu_lesions_parallel.py',matches:true,conflict:null,added:[],code:'C:\\lesions'});
+    dom.window.fly.runParallelLesions=(scope,args)=>dom.window.fly.runScript(scope,'29_shiu_lesions_parallel.py',args);
+    selectedFolders=['C:\\top folder','C:\\last lesion run'];
+    fireEvent.click(screen.getByRole('button',{name:'лезии v630'}));
+    assert.match(screen.getByRole('dialog').textContent,/8 ГиБ свободной RAM/);
+    fireEvent.click(screen.getByRole('button',{name:'продолжить: 2 процесса'}));
+    await waitFor(()=>assert.equal(calls.length,8));
+    assert.equal(calls[7].name,'29_shiu_lesions_parallel.py');
+    assert.deepEqual(calls[7].args,['--simulate','--top-run','C:\\top folder','--resume-from','C:\\last lesion run']);
     // При возвращении на вкладку уже идущий процесс снова доступен для остановки.
     cleanup();
     dom.window.fly.getActiveRun=async()=>({runId:'old-run',runDir:'C:\\old'});

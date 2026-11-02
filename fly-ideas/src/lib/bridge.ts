@@ -149,6 +149,7 @@ export interface FlyBridge {
   prepareShiuOriginal(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[] }>;
   prepareTop200(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
   prepareLesions(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
+  prepareParallelLesions(projectId: string): Promise<{ name: string; matches: boolean; conflict: string | null; added: string[]; code: string }>;
   readScript(projectId: string, name: string): Promise<string>;
   writeScript(projectId: string, name: string, content: string, opts?: { allowOverwrite?: boolean }): Promise<{ file: string; path: string; created: boolean }>;
   writeAssistantScript(projectId: string, name: string, content: string, opts: { expectedDir: string; expectedContent?: string }): Promise<{ file: string; path: string; created: boolean; backup?: string }>;
@@ -156,6 +157,7 @@ export interface FlyBridge {
   runScript(projectId: string, name: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   runTop200(projectId: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   runLesions(projectId: string, args: string[]): Promise<{ runId: string; runDir: string }>;
+  runParallelLesions(projectId: string, args: string[]): Promise<{ runId: string; runDir: string }>;
   getActiveRun(projectId: string): Promise<{ runId: string; runDir: string } | null>;
   killRun(runId: string): Promise<void>;
   onRunOutput(cb: (p: RunOutput) => void): () => void;
