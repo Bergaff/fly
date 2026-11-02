@@ -576,7 +576,7 @@ function Workspace({
     } catch (e) { setRunNote(`Не удалось прочитать общую папку: ${(e as Error).message}`); }
   };
 
-  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality") => {
+  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review") => {
     const bridge=fly; const target=scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
     preparingV630.current=true;setPreparing(true);
@@ -592,10 +592,15 @@ function Workspace({
         if (!sharedStudy) { setRunNote("Сначала выберите общий набор."); return; }
         args=["--stage",stage,"--study",sharedStudy];
       }
-      const prepared=await bridge.prepareSharedStudy(target);
-      if (pidRef.current!==target) return;
-      if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
-      await startScriptInProject(target,prepared.name,args,"shared");
+      if (stage.startsWith("pilot-")) {
+        // The main process creates a separate protected copy and checks it before launch.
+        await startScriptInProject(target,"33_shiu_individuality_pilot.py",args,"shared");
+      } else {
+        const prepared=await bridge.prepareSharedStudy(target);
+        if (pidRef.current!==target) return;
+        if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
+        await startScriptInProject(target,prepared.name,args,"shared");
+      }
     } catch (e) {
       if (pidRef.current===target) setRunNote(`Не удалось подготовить общий набор: ${(e as Error).message}`);
     } finally { preparingV630.current=false;setPreparing(false); }
@@ -1522,6 +1527,10 @@ function Workspace({
               </div> : <p className="text-[11px] text-muted-foreground">Общих наборов пока нет. Создайте набор в идее лезий.</p>}
               {sharedDialog === "individuality" ? <div className="flex flex-col items-start gap-2">
                 <Button disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("individuality"); }}>построить обзор общих контролей</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("pilot-plan"); }}>план пилота без симуляций</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("pilot-run"); }}>рассчитать или продолжить пилот</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("pilot-review"); }}>обзор сохранённого пилота</Button>
+                <p className="text-[11px] text-muted-foreground">Пилот: 10 фиксированных вариантов весов ±5%, 3 seed, 50 Гц. До 30 новых повторов последовательно. Выбор плана и обзор ничего не рассчитывают; кнопка расчёта запускает или продолжает пилот. 5% не подтверждены биологически; это не животные.</p>
               </div> : <div className="flex flex-col items-start gap-2">
                 <Button onClick={() => { setSharedDialog(null); void runShared("init"); }}>создать набор из топ-200</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("plan"); }}>план без симуляций</Button>
@@ -1529,7 +1538,7 @@ function Workspace({
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("all"); }}>рассчитать или продолжить пары и группу</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("review"); }}>обзор сохранённых лезий</Button>
               </div>}
-              <p className="text-[11px] text-muted-foreground">Сначала рассчитываются 30 новых контролей и до 300 одиночных лезий. Пять пар и группа добавляют 180 повторов; если одиночный этап не завершён, он будет продолжен. Расчёт занимает несколько часов и несколько гигабайтов RAM. Остановите другие тяжёлые расчёты перед симуляцией. В общей папке остаются данные и периодические резервные снимки; это не копия на другом устройстве.</p>
+              {sharedDialog === "lesions" && <p className="text-[11px] text-muted-foreground">Сначала рассчитываются 30 новых контролей и до 300 одиночных лезий. Пять пар и группа добавляют 180 повторов; если одиночный этап не завершён, он будет продолжен. Расчёт занимает несколько часов и несколько гигабайтов RAM. Остановите другие тяжёлые расчёты перед симуляцией. В общей папке остаются данные и периодические резервные снимки; это не копия на другом устройстве.</p>}
               <Button size="sm" variant="ghost" onClick={() => { const kind=sharedDialog; setSharedDialog(null);setFocusedDialog(kind); }}>ручной режим для прежних баз</Button>
             </DialogContent>
           </Dialog>

@@ -65,7 +65,48 @@ def main():
     assert len(list((study/shared.BACKUP_DIR).glob('controls*.sqlite3')))>=3
     stop[0]=False;calls.clear();code,_,report=run('resume','singles',['--study',study_id]);assert code==0 and report['result']['completed']==330 and len(calls)==295
     code,_,report=run('individuality','individuality',['--study',study_id]);assert code==0 and report['result']['included_trials']==30
-    calls.clear();code,complete,report=run('all','all',['--study',study_id]);assert code==0 and report['result']['completed']==510 and len(calls)==180
+    # Изолированный новый пилот: план не симулирует, прерывание и продолжение не трогают общий набор.
+    import numpy as np
+    pilot=load('individuality_pilot',templates/'33_shiu_individuality_pilot.py');pilot.check_memory=lambda:None
+    control_path=study/shared.CONTROL_DIR/'lesions.sqlite3';selected_path=study/shared.SELECTED_DIR/'selected_lesions.sqlite3'
+    protected=(view.digest(control_path),view.digest(selected_path));original_weights=data['weights'].copy()
+    def pilot_run(name,stage):
+        output=tmp/name;output.mkdir();pilot.execute(shared,view,module,study,manifest,output,stage);return output
+    calls.clear();plan_out=pilot_run('pilot-plan','pilot-plan');assert not calls
+    assert json.loads((plan_out/'summary.json').read_text(encoding='utf8'))['status']=='plan_ready'
+    assert not (tmp/'shiu-v630-individuality').exists()
+    first=pilot.weights_for_variant(original_weights,0);again=pilot.weights_for_variant(original_weights,0);second=pilot.weights_for_variant(original_weights,1)
+    assert np.array_equal(first,again) and not np.array_equal(first,second)
+    assert np.all(np.sign(first)==np.sign(original_weights)) and np.all((first/original_weights>=.95)&(first/original_weights<1.05))
+    attempted=[]
+    def interrupted(l,b,d,targets,seed):
+        attempted.append((d['weights'].copy(),seed))
+        if len(attempted)>1: raise RuntimeError('pilot interrupted')
+        return actual_trial(l,b,d,targets,seed)
+    module.run_trial=interrupted
+    try: pilot_run('pilot-interrupt','pilot-run');raise AssertionError('interruption not raised')
+    except RuntimeError as e: assert str(e)=='pilot interrupted'
+    pilot_db=tmp/'shiu-v630-individuality'/study_id/'pilot.sqlite3'
+    with sqlite3.connect(pilot_db) as db: assert db.execute('SELECT count(*) FROM trials').fetchone()[0]==1
+    assert np.array_equal(attempted[0][0],attempted[1][0])
+    stopped=tmp/'pilot-stop';stopped.mkdir();(stopped/'stop.request').write_text('stop',encoding='utf8')
+    calls.clear();module.run_trial=fake;pilot.execute(shared,view,module,study,manifest,stopped,'pilot-run')
+    assert not calls and json.loads((stopped/'summary.json').read_text(encoding='utf8'))['status']=='stopped'
+    calls.clear();out_pilot=pilot_run('pilot-resume','pilot-run')
+    info=json.loads((out_pilot/'summary.json').read_text(encoding='utf8'))
+    assert info['status']=='complete' and info['completed']==30 and len(calls)==29 and 'report.txt' in info['files']
+    with sqlite3.connect(out_pilot/'pilot_snapshot.sqlite3') as snap: assert snap.execute('SELECT count(*) FROM trials').fetchone()[0]==30
+    assert np.array_equal(data['weights'],original_weights)
+    assert (view.digest(control_path),view.digest(selected_path))==protected
+    calls.clear();pilot_run('pilot-repeat','pilot-run');assert not calls
+    calls.clear();pilot_run('pilot-review','pilot-review');assert not calls
+    with sqlite3.connect(pilot_db) as db:
+        saved=db.execute('SELECT value FROM metadata WHERE key="protocol"').fetchone()[0];meta_p=json.loads(saved)
+    altered=dict(meta_p);altered['control_rows_sha256']='0'*64
+    try: pilot.open_db(pilot_db.parent,altered,False);raise AssertionError('mismatched protocol accepted')
+    except ValueError as e: assert 'Протокол' in str(e)
+    assert (view.digest(control_path),view.digest(selected_path))==protected
+    calls.clear();module.run_trial=fake;code,complete,report=run('all','all',['--study',study_id]);assert code==0 and report['result']['completed']==510 and len(calls)==180
     assert (complete/'selected_conditions.csv').is_file() and (complete/'pair_interactions.csv').is_file()
     assert (Path(report['shared_report'])/'selected_conditions.csv').is_file() and (Path(report['shared_report'])/'summary.json').is_file()
     selected_path=study/shared.SELECTED_DIR/'selected_lesions.sqlite3';before=view.digest(selected_path)

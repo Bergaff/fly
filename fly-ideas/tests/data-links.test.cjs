@@ -203,6 +203,26 @@ with open(os.path.join(out,'summary.json'),'w') as f: json.dump({'status':'stopp
     const concurrentShared=new Promise((resolve)=>{onExit=resolve;});await call('runSharedStudy','idea:i-lesions',['--stage','singles','--study',sharedId]);
     await assert.rejects(call('runScript','idea:other',longName,[]),/остановите другие/);
     assert.equal((await concurrentShared).code,0);
+    // Пилот получает изолированные копии, только внутри идеи индивидуальности.
+    const individualName='33_shiu_individuality_pilot.py';
+    await fsp.writeFile(path.join(templateDir,individualName),`import os,sys,json,time\nout=os.environ['FLY_RUN_DIR']\nif sys.argv[2]=='pilot-run':\n while not os.path.exists(os.path.join(out,'stop.request')): time.sleep(0.02)\nwith open(os.path.join(out,'summary.json'),'w') as f: json.dump({'args':sys.argv[1:],'script':__file__,'root':os.environ['FLY_SHIU_SHARED_ROOT'],'threads':os.environ['OPENBLAS_NUM_THREADS']},f)\n`);
+    await assert.rejects(call('runSharedStudy','idea:i-lesions',['--stage','pilot-run','--study',sharedId]),/идею/);
+    await assert.rejects(call('runSharedStudy','idea:i-individuality',['--stage','pilot-plan','--study','../wrong']),/набор/);
+    const individualDone=new Promise((resolve)=>{onExit=resolve;});
+    const individualArgs=['--stage','pilot-plan','--study',sharedId];
+    const individualRun=await call('runSharedStudy','idea:i-individuality',individualArgs);
+    assert.equal((await individualDone).code,0);
+    const individualReport=JSON.parse(await fsp.readFile(path.join(individualRun.runDir,'summary.json'),'utf8'));
+    assert.deepEqual(individualReport.args,individualArgs);assert.match(individualReport.script,/\.shiu-individuality-v630/);
+    assert.equal(individualReport.root,sharedRoot);assert.equal(individualReport.threads,'1');
+    const pilotOther=new Promise((resolve)=>{onExit=resolve;});await call('runScript','idea:other',longName,[]);
+    await assert.rejects(call('runSharedStudy','idea:i-individuality',['--stage','pilot-run','--study',sharedId]),/остановите другие/);
+    assert.equal((await pilotOther).code,0);
+    const pilotDone=new Promise((resolve)=>{onExit=resolve;});
+    const pilotRun=await call('runSharedStudy','idea:i-individuality',['--stage','pilot-run','--study',sharedId]);
+    await assert.rejects(call('runScript','idea:other',longName,[]),/остановите другие/);
+    await call('killRun',pilotRun.runId);assert.equal((await pilotDone).code,0);
+    assert.equal(await fsp.readFile(path.join(pilotRun.runDir,'stop.request'),'utf8'),'stop');
     await fsp.writeFile(path.join(ws.code, 'wait_test.py'), 'import time\ntime.sleep(0.5)\n');
     const waitCompleted = new Promise((resolve) => { onExit = resolve; });
     const waiting = await call('runScript', 'idea:example', 'wait_test.py', []);

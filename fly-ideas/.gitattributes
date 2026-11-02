@@ -6,6 +6,7 @@ experiments/templates/29_shiu_lesions_parallel.py text eol=lf
 experiments/templates/30_shiu_lesion_overview.py text eol=lf
 experiments/templates/31_shiu_selected_lesions.py text eol=lf
 experiments/templates/32_shiu_shared_study.py text eol=lf
+experiments/templates/33_shiu_individuality_pilot.py text eol=lf
 experiments/templates/25_shiu_v630_control.py text eol=lf
 colab/fly_colab.py text eol=lf
 colab/make_notebook.py text eol=lf
