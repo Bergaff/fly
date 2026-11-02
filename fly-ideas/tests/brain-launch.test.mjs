@@ -135,5 +135,32 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     await act(async()=>releaseStatus({runId:'stale',runDir:'C:\\old'}));
     assert.equal(screen.getByRole('button',{name:'топ-200'}).disabled,false);
     assert.equal(screen.queryByRole('button',{name:'остановить расчёт'}),null);
+    // Отдельные пространства идеи лезий и индивидуальности используют один проверенный снимок.
+    cleanup();dom.window.fly.getActiveRun=async()=>null;
+    dom.window.fly.prepareFocusedLesions=async(_scope,mode)=>({name:mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
+    dom.window.fly.runFocusedLesions=(scope,mode,args)=>dom.window.fly.runScript(scope,mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',args);
+    const commonProps={projects:[{id:'p',name:'Проект',color:'#777'}],activeProject:'p',onSelectProject:noop,onAddProject:noop,onAddIdea:noop,onOpenIdeaCard:noop,onUpdateIdea:noop,onCompleteStages:noop,onAddJournalEntry:noop,onAddReferences:noop,onDirtyChange:noop};
+    render(React.createElement(BrainView,{...commonProps,ideas:[{id:'i-lesions',projectId:'p',title:'Лезии',checklist:[],citations:[],links:[]}]}));
+    selectedFolders=['C:\\top','C:\\full'];
+    fireEvent.click(await screen.findByRole('button',{name:'выборочные лезии'}));
+    assert.match(screen.getByRole('dialog').textContent,/330 повторов/);
+    fireEvent.click(screen.getByRole('button',{name:'посмотреть план без симуляций'}));
+    await waitFor(()=>assert.equal(calls.length,9));
+    assert.deepEqual(calls[8],{scope:'idea:i-lesions',name:'31_shiu_selected_lesions.py',args:['--source','C:\\full','--top-run','C:\\top','--stage','plan']});
+    await waitFor(()=>assert.equal(screen.getByRole('button',{name:'выборочные лезии'}).disabled,false));
+    selectedFolders=['C:\\top','C:\\full','C:\\selected'];
+    fireEvent.click(screen.getByRole('button',{name:'выборочные лезии'}));
+    fireEvent.click(screen.getByRole('button',{name:'продолжить: пары и группа'}));
+    await waitFor(()=>assert.equal(calls.length,10));
+    assert.deepEqual(calls[9].args,['--source','C:\\full','--top-run','C:\\top','--stage','all','--resume-from','C:\\selected']);
+    cleanup();
+    render(React.createElement(BrainView,{...commonProps,ideas:[{id:'i-individuality',projectId:'p',title:'Индивидуальность',checklist:[],citations:[],links:[]}]}));
+    selectedFolders=['C:\\top','C:\\full'];
+    fireEvent.click(await screen.findByRole('button',{name:'контроли v630'}));
+    assert.match(screen.getByRole('dialog').textContent,/не доказывают устойчивых/);
+    fireEvent.click(screen.getByRole('button',{name:'построить обзор контролей'}));
+    await waitFor(()=>assert.equal(calls.length,11));
+    assert.deepEqual(calls[10],{scope:'idea:i-individuality',name:'30_shiu_lesion_overview.py',args:['--source','C:\\full','--top-run','C:\\top','--mode','individuality']});
+
   } catch (e) { if (e.errors) console.error(e.errors); throw e; } finally {cleanup();await vite.close();dom.window.close();}
 });

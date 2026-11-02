@@ -73,7 +73,7 @@ const IDEA_TEMPLATE_MAP = {
   "i-pci": ["19_pci_integration.py", "06_brian2_shiu.py"],
 };
 
-const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py"]);
+const ON_DEMAND_TEMPLATES = new Set(["25_shiu_v630_control.py", "26_shiu_original_check.py", "26_shiu_author_model.py", "27_shiu_top200_v630.py", "28_shiu_lesions_v630.py", "29_shiu_lesions_parallel.py", "30_shiu_lesion_overview.py", "31_shiu_selected_lesions.py"]);
 
 function copyTemplates(scriptsDir, opts) {
   if (!fs.existsSync(TEMPLATES)) return [];
@@ -763,6 +763,9 @@ const TOP200_FILES = ["25_shiu_v630_control.py", "27_shiu_top200_v630.py"];
 const LESIONS_DIR = ".shiu-lesions-v630";
 const LESIONS_FILES = [...TOP200_FILES, "28_shiu_lesions_v630.py"];
 const PARALLEL_FILES = [...LESIONS_FILES, "29_shiu_lesions_parallel.py"];
+const FOCUSED_DIR = ".shiu-focused-v630";
+const OVERVIEW_FILES = [...LESIONS_FILES, "30_shiu_lesion_overview.py"];
+const SELECTED_FILES = [...OVERVIEW_FILES, "31_shiu_selected_lesions.py"];
 async function prepareProtectedFiles(ws, dirName, files) {
   const dir = path.join(ws.code, dirName);
   try { await fsp.mkdir(dir); } catch (e) { if (e.code !== "EEXIST") throw e; }
@@ -803,14 +806,17 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   assertNotSyncing();
   if (!getPermissions().runScripts) throw new Error("Запуск скриптов выключен в правах рабочего места.");
   const ws = projectPaths(projectId);
-  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : null;
-  const protectedDir = protectedMode === "top200" ? TOP200_DIR : LESIONS_DIR;
+  const protectedFiles = protectedMode === "top200" ? TOP200_FILES : protectedMode === "lesions" ? LESIONS_FILES : protectedMode === "parallel" ? PARALLEL_FILES : protectedMode === "overview" ? OVERVIEW_FILES : protectedMode === "selected" ? SELECTED_FILES : null;
+  const protectedDir = protectedMode === "top200" ? TOP200_DIR : protectedMode === "overview" || protectedMode === "selected" ? FOCUSED_DIR : LESIONS_DIR;
   if (protectedFiles) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
     const prepared = await prepareProtectedFiles(ws, protectedDir, protectedFiles);
     if (!prepared.matches) throw new Error(`Проверенная копия ${prepared.conflict} изменена. Она не перезаписана, запуск остановлен.`);
     assertNotSyncing();
   }
+  const focusedSimulation = protectedMode === "selected" && ["singles", "all"].includes(args?.[5]);
+  if ((focusedSimulation && runs.size > 0) || [...runs.values()].some((active) => active.flyFocusedSimulation))
+    throw new Error("Перед новой симуляцией остановите другие расчёты в приложении и дождитесь завершения.");
   if (runningScopes.has(ws.projectId)) throw new Error("В этом пространстве уже выполняется расчёт. Дождитесь его завершения.");
   const file = protectedFiles ? path.join(ws.code, protectedDir, protectedFiles[protectedFiles.length-1]) : path.join(ws.code, path.basename(name));
   if (!within(ws.code, file)) throw new Error("Скрипт вне папки рабочего пространства.");
@@ -855,6 +861,7 @@ async function runScript(win, projectId, name, args, { protectedMode = null } = 
   const useShell = process.platform === "win32" && !path.isAbsolute(cmd) && /\.(cmd|bat)$/i.test(cmd);
   const p = spawn(cmd, [...prefix, script, ...scriptArgs], { cwd: ws.code, env, windowsHide: true, shell: useShell });
   if (protectedMode === "parallel") p.flyStopDir = runDir;
+  if (focusedSimulation) p.flyFocusedSimulation = true;
   runs.set(runId, p);
   runningScopes.set(ws.projectId, { runId, runDir });
   const log = fs.createWriteStream(path.join(runDir, "log.txt"));
@@ -1295,7 +1302,7 @@ function stopAgentServer() {
 // IPC
 // ------------------------------------------------------------
 function registerIpc(getWin) {
-  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:prepareParallelLesions", "fly:runParallelLesions", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
+  const mutations = new Set(["fly:writeScript", "fly:writeAssistantScript", "fly:deleteScript", "fly:transferRun", "fly:syncTemplates", "fly:prepareV630Template", "fly:prepareShiuOriginal", "fly:prepareTop200", "fly:runTop200", "fly:prepareLesions", "fly:runLesions", "fly:prepareParallelLesions", "fly:runParallelLesions", "fly:prepareFocusedLesions", "fly:runFocusedLesions", "fly:chooseProjectFolder", "fly:resetProjectFolder", "fly:chooseDataFile", "fly:clearDataFile", "fly:chooseFolder", "fly:resetFolder"]);
   const handle = (name, fn) => ipcMain.handle(name, mutations.has(name) ? async (...args) => {
     assertNotSyncing(); mutationsInFlight++;
     try { return await fn(...args); } finally { mutationsInFlight--; }
@@ -1565,6 +1572,11 @@ function registerIpc(getWin) {
     if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
     return prepareProtectedFiles(projectPaths(projectId), LESIONS_DIR, PARALLEL_FILES);
   });
+  handle("fly:prepareFocusedLesions", async (_e, projectId, mode) => {
+    if (parseScope(projectId).kind !== "idea") throw new Error("Сначала выберите конкретную идею.");
+    if (mode !== "overview" && mode !== "selected") throw new Error("Неизвестный режим анализа.");
+    return prepareProtectedFiles(projectPaths(projectId), FOCUSED_DIR, mode === "overview" ? OVERVIEW_FILES : SELECTED_FILES);
+  });
   handle("fly:readScript", (_e, projectId, name) => {
     const ws = projectPaths(projectId);
     const full = path.join(ws.code, path.basename(name));
@@ -1619,6 +1631,22 @@ function registerIpc(getWin) {
       typeof args[2] === "string" && args[2].length > 0 && args[3] === "--resume-from" && typeof args[4] === "string" && args[4].length > 0;
     if (!valid) throw new Error("Для двух процессов нужна папка отбора и папка предыдущего расчёта лезий.");
     return runScript(getWin(), projectId, PARALLEL_FILES[3], args, { protectedMode: "parallel" });
+  });
+  handle("fly:runFocusedLesions", (_e, projectId, mode, args) => {
+    const str = (x) => typeof x === "string" && x.length > 0;
+    const common = Array.isArray(args) && args[0] === "--source" && str(args[1]) && args[2] === "--top-run" && str(args[3]);
+    if (mode === "overview") {
+      if (!common || args.length !== 6 || args[4] !== "--mode" || !["lesions", "individuality"].includes(args[5])) throw new Error("Некорректные параметры обзора.");
+      return runScript(getWin(), projectId, OVERVIEW_FILES[3], args, { protectedMode: "overview" });
+    }
+    if (mode === "selected") {
+      const stage = args?.[5];
+      const prior = args?.length === 8 && args[6] === "--resume-from" && str(args[7]);
+      if (!common || args[4] !== "--stage" || !["plan", "singles", "all", "review"].includes(stage) || !(args.length === 6 || prior) || (stage === "review" && !prior) || (stage === "plan" && prior)) throw new Error("Некорректные параметры выборочного исследования.");
+      if ((stage === "singles" || stage === "all") && runs.size) throw new Error("Перед новой симуляцией остановите другие расчёты в приложении и дождитесь завершения.");
+      return runScript(getWin(), projectId, SELECTED_FILES[4], args, { protectedMode: "selected" });
+    }
+    throw new Error("Неизвестный режим анализа.");
   });
   handle("fly:getActiveRun", (_e, projectId) => runningScopes.get(parseScope(projectId).scopeId) || null);
   handle("fly:killRun", async (_e, runId) => {

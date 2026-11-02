@@ -299,6 +299,7 @@ function Workspace({
   const [runNote, setRunNote] = useState("");
   const [topDialog, setTopDialog] = useState(false);
   const [lesionDialog, setLesionDialog] = useState(false);
+  const [focusedDialog, setFocusedDialog] = useState<"lesions" | "individuality" | null>(null);
   const [checkDialog, setCheckDialog] = useState<"control" | "original" | null>(null);
   const [preparing, setPreparing] = useState(false);
   const [startingRuns, setStartingRuns] = useState<Record<string, boolean>>({});
@@ -402,7 +403,7 @@ function Workspace({
     }
   }
 
-  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | "parallel" | null = null) => {
+  const startScriptInProject = useCallback(async (targetPid: string, scriptName: string, argList: string[], protectedMode: "top200" | "lesions" | "parallel" | "overview" | "selected" | null = null) => {
     const bridge = fly;
     if (!bridge) return;
     if (!launchTracker.current.begin(targetPid)) {
@@ -419,7 +420,7 @@ function Workspace({
       onMissingPackage(null);
     }
     try {
-      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : protectedMode === "parallel" ? await bridge.runParallelLesions(targetPid, argList) : await bridge.runScript(targetPid, scriptName, argList);
+      const r = protectedMode === "top200" ? await bridge.runTop200(targetPid, argList) : protectedMode === "lesions" ? await bridge.runLesions(targetPid, argList) : protectedMode === "parallel" ? await bridge.runParallelLesions(targetPid, argList) : protectedMode === "overview" || protectedMode === "selected" ? await bridge.runFocusedLesions(targetPid, protectedMode, argList) : await bridge.runScript(targetPid, scriptName, argList);
       if (launchTracker.current.resolved(targetPid, r.runId)) {
         setActiveRuns((prev) => ({ ...prev, [targetPid]: { runId: r.runId, runDir: r.runDir } }));
         if (pidRef.current === targetPid) setRunNote(`Расчёт выполняется. Папка: ${r.runDir}`);
@@ -536,6 +537,30 @@ function Workspace({
       await startScriptInProject(target, prepared.name, args, mode === "parallel" ? "parallel" : "lesions");
     } catch (e) {
       if (pidRef.current === target) setRunNote(`Не удалось подготовить лезии: ${(e as Error).message}`);
+    } finally { preparingV630.current = false; setPreparing(false); }
+  };
+
+  const runFocused = async (mode: "lesions" | "individuality" | "plan" | "singles" | "singles-resume" | "all-resume" | "review") => {
+    const bridge = fly; const target = scopeId;
+    if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
+    preparingV630.current = true; setPreparing(true);
+    try {
+      setRunNote("Выберите папку полного отбора топ-200.");
+      const top = await bridge.pickFolder("Выберите папку полного отбора топ-200");
+      if (!top) { setRunNote("Запуск отменён: папка топ-200 не выбрана."); return; }
+      setRunNote("Выберите папку последнего прогона полных лезий.");
+      const source = await bridge.pickFolder("Выберите папку прогона лезий с lesions.sqlite3");
+      if (!source) { setRunNote("Запуск отменён: папка лезий не выбрана."); return; }
+      const prior = ["singles-resume", "all-resume", "review"].includes(mode) ? await bridge.pickFolder("Выберите последний выборочный прогон с selected_lesions.sqlite3") : null;
+      if (["singles-resume", "all-resume", "review"].includes(mode) && !prior) { setRunNote("Запуск отменён: папка выборочного прогона не выбрана."); return; }
+      const kind = mode === "lesions" || mode === "individuality" ? "overview" : "selected";
+      const prepared = await bridge.prepareFocusedLesions(target, kind);
+      if (pidRef.current !== target) return;
+      if (!prepared.matches) { setRunNote(`Проверочная копия ${prepared.conflict} изменена в папке ${prepared.code}. Она не перезаписана; запуск остановлен.`); return; }
+      const args = ["--source", source, "--top-run", top, ...(kind === "overview" ? ["--mode", mode] : ["--stage", mode === "singles-resume" ? "singles" : mode === "all-resume" ? "all" : mode]), ...(prior ? ["--resume-from", prior] : [])];
+      await startScriptInProject(target, prepared.name, args, kind);
+    } catch (e) {
+      if (pidRef.current === target) setRunNote(`Не удалось подготовить анализ: ${(e as Error).message}`);
     } finally { preparingV630.current = false; setPreparing(false); }
   };
 
@@ -1331,6 +1356,8 @@ function Workspace({
             <span className="label">результат · {scopeLabel}</span>
             <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setTopDialog(true)}>топ-200</Button>
             <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId} onClick={() => setLesionDialog(true)}>лезии v630</Button>
+            {workspaceIdeaId === "i-lesions" && <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing} onClick={() => setFocusedDialog("lesions")}>выборочные лезии</Button>}
+            {workspaceIdeaId === "i-individuality" && <Button size="sm" variant="outline" disabled={!!runId || !!startingRuns[scopeId] || preparing} onClick={() => setFocusedDialog("individuality")}>контроли v630</Button>}
             <DropdownMenu>
               <DropdownMenuTrigger asChild><Button size="sm" variant="ghost" disabled={!!runId || !!startingRuns[scopeId] || preparing || !workspaceIdeaId}>проверки Shiu</Button></DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -1442,6 +1469,22 @@ function Workspace({
                 <Button variant="outline" onClick={() => { setLesionDialog(false); void runLesions("parallel"); }}>продолжить: 2 процесса</Button>
               </div>
               <p className="text-[11px] text-muted-foreground">Перед продолжением остановите прежний расчёт и дождитесь его завершения. Выберите папку самого последнего прогона лезий. Два процесса работают с пониженным приоритетом, но создают две большие сети. На Windows перед стартом требуется не менее 8 ГиБ свободной RAM; при падении ниже 2 ГиБ новые повторы прекращаются. Это не гарантия отзывчивости или достаточной памяти: сохраните работу в Word и следите за RAM. При замедлении используйте один процесс. Модельная лезия не доказывает необходимость нейрона у животного.</p>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={focusedDialog !== null} onOpenChange={(open) => { if (!open) setFocusedDialog(null); }}>
+            <DialogContent>
+              <DialogHeader><DialogTitle>{focusedDialog === "individuality" ? "Контрольные повторы v630" : "Обзор и выборочные лезии"}</DialogTitle>
+                <DialogDescription>{focusedDialog === "individuality" ? "Без новых симуляций: согласованный снимок базы, разброс MN9 между seed и таблицы в пространстве этой идеи. Односекундные повторы не доказывают устойчивых индивидуальных фенотипов." : "Обзор и план не запускают симуляции. Выборка: 10 клеток из разных частей рейтинга 200 Гц, без стимулируемых GRN и MN9; 5 соседних пар по рангу и группа из десяти, при 50 Гц. Это не случайная выборка мозга."}</DialogDescription>
+              </DialogHeader>
+              {focusedDialog === "individuality" ? <Button onClick={() => { setFocusedDialog(null); void runFocused("individuality"); }}>построить обзор контролей</Button> : <div className="flex flex-col items-start gap-2">
+                <Button onClick={() => { setFocusedDialog(null); void runFocused("lesions"); }}>обзор сохранённых повторов</Button>
+                <Button variant="outline" onClick={() => { setFocusedDialog(null); void runFocused("plan"); }}>посмотреть план без симуляций</Button>
+                <Button variant="outline" onClick={() => { setFocusedDialog(null); void runFocused("singles"); }}>рассчитать 10 клеток</Button>
+                <Button variant="outline" onClick={() => { setFocusedDialog(null); void runFocused("singles-resume"); }}>продолжить 10 клеток</Button>
+                <Button variant="outline" onClick={() => { setFocusedDialog(null); void runFocused("all-resume"); }}>продолжить: пары и группа</Button>
+                <Button variant="outline" onClick={() => { setFocusedDialog(null); void runFocused("review"); }}>обзор выборочной базы</Button>
+              </div>}
+              <p className="text-[11px] text-muted-foreground">Одиночные: до 330 повторов с контролем. Пять пар и группа добавляют до 180. Готовые исходные повторы используются повторно. Новая симуляция выполняется последовательно и может потребовать несколько часов и гигабайтов RAM. Перед ней остановите другие тяжёлые расчёты. Исходная база не изменяется, при прерывании сохраните папку выборочного прогона.</p>
             </DialogContent>
           </Dialog>
           <Dialog open={checkDialog !== null} onOpenChange={(open) => { if (!open) setCheckDialog(null); }}>
