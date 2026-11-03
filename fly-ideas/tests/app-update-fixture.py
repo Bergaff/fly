@@ -3,6 +3,11 @@ import importlib.util
 import io
 import json
 import os
+import ssl
+import sys
+import types
+import urllib.error
+from unittest import mock
 import subprocess
 import shutil
 from pathlib import Path
@@ -14,6 +19,39 @@ ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('app_update',ROOT/'electron/app-update.py')
 u=importlib.util.module_from_spec(spec);spec.loader.exec_module(u)
 
+
+class TLSRequestTest(unittest.TestCase):
+    def test_certifi_retry_keeps_verification_and_hostname(self):
+        class Response:
+            def __enter__(self): return self
+            def __exit__(self,*args): pass
+            def geturl(self): return 'https://api.github.com/test'
+            def read(self,limit): return b'ok'
+        contexts=[]
+        def open_url(req, timeout, context):
+            contexts.append(context)
+            if len(contexts)==1: raise urllib.error.URLError(ssl.SSLCertVerificationError('untrusted'))
+            self.assertEqual(context.verify_mode,ssl.CERT_REQUIRED)
+            self.assertTrue(context.check_hostname)
+            return Response()
+        cert_file=ssl.get_default_verify_paths().cafile
+        if not cert_file: self.skipTest('test system has no CA file')
+        with mock.patch.object(u.urllib.request,'urlopen',side_effect=open_url), mock.patch.dict(sys.modules,{'certifi':types.SimpleNamespace(where=lambda:cert_file)}):
+            self.assertEqual(u.request('https://api.github.com/test',100),b'ok')
+        self.assertEqual(len(contexts),2);self.assertIsNone(contexts[0])
+
+    def test_certifi_retry_failure_is_not_ignored(self):
+        cert_file=ssl.get_default_verify_paths().cafile
+        if not cert_file: self.skipTest('test system has no CA file')
+        failure=urllib.error.URLError(ssl.SSLCertVerificationError('untrusted'))
+        with mock.patch.object(u.urllib.request,'urlopen',side_effect=failure) as func, mock.patch.dict(sys.modules,{'certifi':types.SimpleNamespace(where=lambda:cert_file)}):
+            with self.assertRaises(urllib.error.URLError): u.request('https://api.github.com/test',100)
+            self.assertEqual(func.call_count,2)
+
+    def test_non_certificate_failure_never_retries(self):
+        with mock.patch.object(u.urllib.request,'urlopen',side_effect=urllib.error.URLError('connection refused')) as func:
+            with self.assertRaises(urllib.error.URLError): u.request('https://api.github.com/test',100)
+            self.assertEqual(func.call_count,1)
 
 class UpdateTest(unittest.TestCase):
     def setUp(self):

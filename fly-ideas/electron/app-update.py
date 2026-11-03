@@ -8,10 +8,12 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import ssl
 import stat
 import sys
 import tarfile
 import tempfile
+import urllib.error
 import urllib.request
 import uuid
 
@@ -34,11 +36,25 @@ def permitted(rel):
 
 def request(url,limit):
     req=urllib.request.Request(url,headers={'User-Agent':'fly-ideas-update','Accept':'application/vnd.github+json'})
-    with urllib.request.urlopen(req,timeout=60) as response:
-        if not response.geturl().startswith(('https://api.github.com/', 'https://codeload.github.com/')): raise ValueError('Недопустимый адрес загрузки.')
-        data=response.read(limit+1)
-    if len(data)>limit: raise ValueError('Слишком большой ответ GitHub; обновление остановлено.')
-    return data
+    def read(context=None):
+        with urllib.request.urlopen(req,timeout=60,context=context) as response:
+            if not response.geturl().startswith(('https://api.github.com/', 'https://codeload.github.com/')): raise ValueError('Недопустимый адрес загрузки.')
+            data=response.read(limit+1)
+        if len(data)>limit: raise ValueError('Слишком большой ответ GitHub; обновление остановлено.')
+        return data
+    try:
+        return read()
+    except (urllib.error.URLError, ssl.SSLCertVerificationError) as error:
+        if not isinstance(getattr(error,'reason',error),ssl.SSLCertVerificationError): raise
+        try:
+            import certifi
+        except ImportError:
+            raise error
+        # Добавляем общедоступные корневые CA к системным, не отключая проверку
+        # сертификата и имени сервера; иные SSL-ошибки остаются ошибками.
+        context=ssl.create_default_context()
+        context.load_verify_locations(cafile=certifi.where())
+        return read(context)
 
 
 def blob_hash(data): return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
