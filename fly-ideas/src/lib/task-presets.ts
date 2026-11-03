@@ -214,9 +214,9 @@ export const TASK_PRESETS: TaskPreset[] = [
     ideaId: "i-observational",
     script: "16_observational_learning.py",
     companionScripts: ["09_mb_circuit_v783.py"],
-    shortTitle: "Социальное обучение через наблюдение (D -> O) и культурная цепочка",
+    shortTitle: "Прежняя условная модель социального обучения",
     summary:
-      "Проводит анатомический аудит путей 1..3 шага от зрительных проекционных нейронов LC/VPN к клеткам Кеньона и дофаминовым нейронам PPL1/PAM, моделирует пару муха-демонстратор D и муха-наблюдатель O со всеми 4 контролями и проверяет затухание традиции вдоль цепочки D -> O1 -> O2 -> O3 -> O4.",
+      "Условная ассоциативная модель, не сцена с двумя телами; при нехватке данных возможен переход на синтетику. Для новой сцены используйте experiments/SETUP-TWO-FLIES.bat и experiments/RUN-TWO-FLIES.bat после завершения текущего расчёта.",
     requiredData: ["2025_Completeness_783.csv", "2025_Connectivity_783.parquet", "Supplemental_file1_neuron_annotations.tsv"],
     outputs: ["observational_conditions.csv", "cultural_chain.csv", "visual_to_dan_paths.csv", "observational_learning.png", "summary.json"],
     modes: [
@@ -230,7 +230,7 @@ export const TASK_PRESETS: TaskPreset[] = [
         id: "connectome",
         label: "Аудит путей зрение->DAN и тест D->O на v783",
         args: "--max-neurons 6000 --n-direct 6 --n-obs 14 --seed 0",
-        hint: "Оценивает реальную силу зрительно-дофаминового канала на таблицах FlyWire v783.",
+        hint: "Условный коэффициент статических путей, не измерение силы передачи. Возможен переход на синтетику.",
       },
       {
         id: "amplified",
