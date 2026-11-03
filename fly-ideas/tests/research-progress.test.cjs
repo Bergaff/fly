@@ -148,3 +148,17 @@ test('новый импорт добавляет завершённые 510 ле
   assert.deepEqual(plain(again),first);
   assert.equal(again.verification.done,false);
 });
+
+test('итоги частот и путей добавляются вручную, не дублируются и не меняют отметки', () => {
+  const a=idea('i-lesions');
+  a.researchProgress={ observation: { done:false,evidence:'моя запись' }, verification:{done:true,evidence:'моя проверка'} };
+  const next=v630.addFrequency62Evidence(a);
+  assert.match(next.observation.evidence,/моя запись/);
+  assert.match(next.observation.evidence,/630\/630/);
+  assert.match(next.interpretation.evidence,/424/);
+  assert.equal(next.observation.done,false);
+  assert.equal(next.interpretation.done,false);
+  assert.equal(next.verification.done,true);
+  assert.deepEqual(plain(v630.addFrequency62Evidence({...a,researchProgress:next})), plain(next));
+  assert.equal(v630.addFrequency62Evidence(idea('else')), undefined);
+});

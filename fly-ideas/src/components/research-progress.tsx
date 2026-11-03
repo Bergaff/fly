@@ -1,6 +1,6 @@
 import type { Idea, ResearchStageId } from "@/data/types";
 import { RESEARCH_STAGES, researchProgress } from "@/data/types";
-import { addV630Checklist, addV630Evidence, v630EvidenceAvailable } from "@/lib/v630-progress";
+import { addFrequency62Evidence, addV630Checklist, addV630Evidence, v630EvidenceAvailable } from "@/lib/v630-progress";
 
 export function ResearchProgress({ idea, onUpdateIdea }: { idea: Idea; onUpdateIdea: (id: string, patch: Partial<Idea>) => void }) {
   const progress = researchProgress(idea);
@@ -15,7 +15,8 @@ export function ResearchProgress({ idea, onUpdateIdea }: { idea: Idea; onUpdateI
     </div>
     <div className="border-t px-2 py-1.5">
       <p className="mb-1.5 text-[10px] text-muted-foreground">Самооценка по этой идее, не доказательство результата. Отмечайте этапы вручную и указывайте основание. Прежние этапы статьи сохранены отдельно.</p>
-      {v630EvidenceAvailable(idea.id) && <div className="mb-2"><button type="button" className="border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent" onClick={() => onUpdateIdea(idea.id, { researchProgress: addV630Evidence(idea), checklist: addV630Checklist(idea) })}>добавить результаты исследования v630</button><p className="mt-1 text-[10px] text-muted-foreground">Добавляет результаты набора и отмечает стандартные этапы окружения, протокола и выполненных прогонов. Серия лезий завершена: 510/510; проверка других частот идёт отдельно. Свои записи сохраняются. Проверьте и сохраните карточку.</p></div>}
+      {v630EvidenceAvailable(idea.id) && <div className="mb-2"><button type="button" className="border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent" onClick={() => onUpdateIdea(idea.id, { researchProgress: addV630Evidence(idea), checklist: addV630Checklist(idea) })}>добавить результаты исследования v630</button><p className="mt-1 text-[10px] text-muted-foreground">Добавляет результаты набора и отмечает стандартные этапы окружения, протокола и выполненных прогонов. Серия лезий завершена: 510/510; проверка других частот хранится отдельно. Свои записи сохраняются. Проверьте и сохраните карточку.</p></div>}
+      {idea.id === "i-lesions" && <div className="mb-2"><button type="button" className="border px-1.5 py-0.5 font-mono text-[10px] cursor-pointer hover:bg-accent" onClick={() => onUpdateIdea(idea.id, { researchProgress: addFrequency62Evidence(idea) })}>добавить итоги частот и путей ранга 62</button><p className="mt-1 text-[10px] text-muted-foreground">Для набора Study_20261102_135659_26e34eaf по присланному результату и анализу авторского v630. Свои записи и отметки сохраняются. Проверьте и сохраните карточку.</p></div>}
       {RESEARCH_STAGES.map((stage, index) => {
         const value = idea.researchProgress?.[stage.id];
         const done = value?.done === true;

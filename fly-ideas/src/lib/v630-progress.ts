@@ -54,3 +54,18 @@ export function addV630Checklist(idea: Idea, at = new Date().toISOString()): Ide
     ? { ...item, done: true, doneAt: at }
     : item);
 }
+
+/** Пользователь явно импортирует результат только своего набора; статусы не меняются. */
+export function addFrequency62Evidence(idea: Idea): Idea["researchProgress"] {
+  if (idea.id !== "i-lesions") return idea.researchProgress;
+  const result = { ...(idea.researchProgress ?? {}) };
+  const notes: Partial<Record<ResearchStageId, string>> = {
+    observation: `v630 ${STUDY}: по присланной таблице завершены 630/630 новых повторов и 90 исходных при 50 Гц. Лезия ранга 62: левый MN9 68,4–73,5% среднего контроля на 50–120 Гц; ранг 22 выбран также после просмотра 50 Гц. Источник и ограничения: experiments/reports/v630-rank62-mn9.md.`,
+    interpretation: `v630 ${STUDY}: по закреплённой авторской таблице у клетки 720575940623211725 прямая связь к левому MN9: Connectivity 424, знак модели +1, ранг 3 из 229 входящих партнёров; также 75 двухшаговых путей. Статическая связность не устанавливает причинный механизм и не проверяет биологию.`,
+  };
+  for (const [key, text] of Object.entries(notes) as [ResearchStageId, string][]) {
+    const old: ResearchStageState = result[key] ?? { done: false, evidence: "" };
+    result[key] = { ...old, evidence: old.evidence.includes(text) ? old.evidence : [old.evidence.trim(), text].filter(Boolean).join("\n\n") };
+  }
+  return result;
+}

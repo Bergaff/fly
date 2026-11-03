@@ -61,7 +61,7 @@ const DIRS = new Proxy({}, { get: (_t, k) => getDirs()[k] });
 
 /** Стартовый набор скриптов для каждой из 10 базовых идей (в папку идеи кладутся только нужные ей файлы + flylib.py + 00_check_env.py) */
 const IDEA_TEMPLATE_MAP = {
-  "i-lesions": ["10_virtual_lesions.py", "03_shiu_activate.py", "06_brian2_shiu.py"],
+  "i-lesions": ["10_virtual_lesions.py", "03_shiu_activate.py", "06_brian2_shiu.py", "39_shiu_rank62_mn9_paths.py"],
   "i-interference": ["11_mb_interference_connectome.py", "02_mb_toy_interference.py", "04_mb_sweep_heatmap.py", "09_mb_circuit_v783.py"],
   "i-benchmark": ["12_backend_benchmark.py", "00_check_env.py", "06_brian2_shiu.py"],
   "i-mb-learning": ["13_whole_brain_mb_learning.py", "09_mb_circuit_v783.py", "06_brian2_shiu.py"],
