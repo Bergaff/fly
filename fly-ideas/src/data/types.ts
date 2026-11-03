@@ -1,3 +1,5 @@
+import type { ResearchMemoryState } from "./research-memory";
+
 export type IdeaStatus = "backlog" | "exploring" | "active" | "drafting" | "submitted" | "done" | "parked";
 
 export const STATUS_LABELS: Record<IdeaStatus, string> = {
@@ -161,6 +163,8 @@ export interface Project {
 
 export interface AppState {
  version: 1;
+ /** Записи архива, отделены от идей и исходных данных. */
+ researchMemory?: ResearchMemoryState;
  projects: Project[];
  ideas: Idea[];
  references: Reference[];

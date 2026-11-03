@@ -1,0 +1,57 @@
+/** Архив по материалам, сообщённым пользователем. Не является исходной базой. */
+export interface ResearchMemoryEntry {
+  id: string;
+  ideaId: string;
+  title: string;
+  status: string;
+  source: string;
+  results: string;
+  limitations: string;
+  files: string[];
+}
+
+export const MEMORY_VERSION = "v630-session-2026-11-03-v1";
+const study = "Study_20261102_135659_26e34eaf";
+export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
+  { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
+    source: "Shiu v630, контрольные суммы авторских таблиц; топ-200, 30 повторов. Исходную SQLite на компьютере пользователя этот архив не проверяет.",
+    results: "127 400 нейронов, 14 687 178 строк связей. Стимуляция 21 правого sugar GRN, 200 Гц, 1 с, seed 0–29. Топ-200 ранжирован по средней активности. checkpoint.json SHA-256 0eba2ada21510cd50946f06f7ee482ceac7a7ab33dd3422312747363b24c338b; top200.csv SHA-256 da1df5085d53c9dd28c1394673a4ddbd8c795502d7e8d2d58044d190c5eb081b.",
+    limitations: "Python 3.12.0, NumPy 1.26.4, Brian2 2.9.0. Это не полная биологическая валидация и не полный результат Figure 1.",
+    files: ["01_top200/checkpoint.json", "01_top200/top200.csv", "01_top200/counts_seed_00.npy ... counts_seed_29.npy", "experiments/templates/27_shiu_top200_v630.py"] },
+  { id: "session-v630-lesions-510", ideaId: "i-lesions", title: "Лезии 50 Гц: 510 повторов", status: "510/510, по сообщению пользователя", source: `Общий набор ${study}; 30 seed на условие, 1 с.`,
+    results: "Контроль левый/правый MN9: 19,10 ± 6,48 / 14,17 ± 5,00 Гц (SD). Ранг 22, 720575940622695448: 29,67 ± 5,59 / 22,87 Гц, слева 155,3% контроля, +10,57 Гц; по одноимённым seed выше/равно/ниже 28/0/2. Ранг 62, 720575940623211725: 13,07 ± 4,65 / 9,60 Гц, слева 68,4%, −6,03 Гц; ниже/равно/выше 27/0/3. Ранг 200: числа обоих MN9 равны контролю на 30 seed; времена спайков не проверены. Пары 1–5: слева 30,40; 13,10; 22,23; 18,87; 18,77 Гц; разность с аддитивным ожиданием +0,67; −0,33; +0,60; −0,17; 0,00 Гц. Группа десяти 23,83 ± 4,71 Гц, 124,8% контроля. Корреляция активности при 200 Гц и отношения к контролю при 50 Гц для 10 клеток Pearson 0,63346; без ранга 22 −0,28589, без ранга 62 0,86915.",
+    limitations: "Лезия обнуляет исходящие веса; одинаковый seed не гарантирует одинакового входа. Пары и корреляции описательные; клетки и исключения анализировались после просмотра результатов. Не животные, не доказательство компенсации или биологической необходимости.",
+    files: ["02_controls_50Hz/lesions.sqlite3", "03_selected_lesions/selected_lesions.sqlite3", "05_reports/all_20261103_105142_9c5315e1", "selected_trials.csv", "selected_conditions.csv", "pair_interactions.csv"] },
+  { id: "session-v630-frequencies", ideaId: "i-lesions", title: "Частоты: 630 новых повторов", status: "630/630 новых и 90 прежних, по присланной таблице", source: `frequency_trials.csv пользователя, ${study}; исходная SQLite независимо не проверялась.`,
+    results: "Частота | контроль левый/правый | лезия 22 левый/правый | лезия 62 левый/правый | 62, % контроля слева\n50 | 19,10/14,17 | 29,67/22,87 | 13,07/9,60 | 68,4%\n60 | 36,60/27,60 | 43,33/32,63 | 26,17/18,53 | 71,5%\n70 | 49,03/36,53 | 56,17/41,33 | 35,00/24,80 | 71,4%\n80 | 56,77/41,67 | 62,80/45,73 | 41,37/28,07 | 72,9%\n90 | 63,67/47,53 | 69,10/49,60 | 44,87/31,53 | 70,5%\n100 | 69,57/51,13 | 70,87/49,97 | 49,13/33,17 | 70,6%\n110 | 70,43/50,40 | 74,60/52,27 | 51,73/35,40 | 73,5%\n120 | 74,87/53,97 | 77,70/54,97 | 53,57/38,13 | 71,5%. Разница ранга 22 при 100 Гц +1,30 Гц, ориентировочный интервал Уэлча [−1,18; 3,78].",
+    limitations: "Клетки выбраны post hoc по 50 Гц, дополнительные частоты исследовательские. Порог 80% не тест значимости; одинаковый seed не гарантирует одинакового входа. Интервалы Уэлча предполагают независимость и не исправлены на множественные сравнения.",
+    files: ["shiu-v630-frequency-check/<Study_ID>/frequencies.sqlite3", "frequency_trials.csv", "frequency_conditions.csv", "experiments/reports/v630-rank62-mn9.md", "experiments/templates/37_shiu_frequency_check.py"] },
+  { id: "session-v630-paths62", ideaId: "i-lesions", title: "Связи ранга 62 с MN9", status: "структурный анализ авторских файлов", source: "Авторские файлы Shiu v630, Git commit 91bdd1e7dcf193f3e7ca5a8933497fcef63b7960; SHA-256 связей 94db8c650533bc36ffa3223f2e62325d5648b8d6bd31c3a4e1c804628c7557b3; списка e6b71e17671a9bdb05f55e4bc6774640a1418cb7a05125e0fc994ad40f9bfdfb.",
+    results: "720575940623211725 → левый MN9 720575940660219265: прямое Connectivity 424, знак модели +1, ранг 3 из 229 входящих; 75 простых двухшаговых путей, из них второй знак +1 у 39 и −1 у 36. К правому MN9 720575940645521262: прямое Connectivity 1, +1, ранг 151 из 242 (92 партнёра делят ранг); 79 двухшаговых путей, второй знак +1 у 37 и −1 у 42. У исходной клетки 255 исходящих партнёров.",
+    limitations: "Статическая связность и знак, назначенный в модели, не измеряют активность или причинный вклад. Отключение всех исходящих весов не изолирует прямое ребро. Не исследованы типы клеток, пути длиннее двух шагов и биологическая верификация.",
+    files: ["experiments/reports/v630-rank62-mn9.md", "experiments/reports/v630-rank62-direct.csv", "experiments/reports/v630-rank62-two-step.csv", "experiments/templates/39_shiu_rank62_mn9_paths.py"] },
+  { id: "session-individuality", ideaId: "i-individuality", title: "Индивидуальность: 10 вариантов × 20 seed", status: "30/30 + 70/70 + 100/100, по сообщению пользователя", source: `Набор ${study}; 50 Гц, 1 с; искусственные фиксированные множители весов ±5%.`,
+    results: "Контроль seed 0–19 левый/правый 18,20/13,40 Гц; среднее вариантов 18,92/14,96. Левый/правый MN9, среднее ± SD по 20 seed:\n1: 18,75±5,96 / 14,00±5,19\n2: 19,50±5,61 / 15,85±4,70\n3: 20,70±5,81 / 16,40±4,58\n4: 18,60±4,37 / 14,10±4,00\n5: 19,10±5,57 / 15,60±4,60\n6: 18,95±6,45 / 14,80±4,88\n7: 19,75±6,37 / 15,20±4,93\n8: 16,60±4,73 / 13,75±5,15\n9: 15,80±5,62 / 12,45±4,57\n10: 21,45±5,65 / 17,45±4,85. Spearman первых и новых десяти seed слева 0,657, справа 0,736. Вариант 10 минус 9 слева +5,65 Гц на 20 seed; на новых десяти +4,20, выше в 9/10. Суммы квадратов слева: всего 6578,72, варианты 517,52, seed 3211,52, остаток 2849,68; справа: 4679,68 / 379,68 / 2299,28 / 2000,72.",
+    limitations: "Пара 10 и 9 выбрана после первой серии. Повторы одной модели не животные; 5% не калиброваны по биологии. Остаток разложения смешивает взаимодействия и шум; одинаковый seed не гарантирует одинаковый вход.",
+    files: ["shiu-v630-individuality/<Study_ID>/pilot.sqlite3", "shiu-v630-individuality/<Study_ID>/extension_10seeds_v1/extension.sqlite3", "shiu-v630-individuality/<Study_ID>/holdout_10seeds_v1/holdout.sqlite3", "experiments/templates/33_shiu_individuality_pilot.py", "experiments/templates/34_shiu_individuality_extension.py", "experiments/templates/35_shiu_individuality_holdout.py", "experiments/templates/36_shiu_individuality_analysis.py"] },
+  { id: "session-colab", ideaId: "i-benchmark", title: "Colab CPU и отдельная проба GPU", status: "последнее известное состояние, может измениться", source: "Пользовательские запуски Colab; локальную копию Drive программа не проверяла.",
+    results: "План CPU 8 × 30 × 201 = 48 240; последнее известное сообщение: 14/48240, снимок 12, не считать завершённым. T4 compile-once: сборка 335,755 с; контроль 67/55 за 75,838 с, лезия 66/51 за 75,297 с, восстановленный контроль 67/55 за 78,977 с.",
+    limitations: "Это не эквивалентный CPU/GPU benchmark; backend и входы не доказаны одинаковыми. Результаты CPU и GPU не объединять до отдельной проверки. Путь папки Drive и текущее состояние неизвестны.",
+    files: ["colab/fly_colab.py", "colab/Shiu_v630_Colab.ipynb", "colab/gpu_reuse_pilot.py", "colab/gpu_cuda13_pilot.py"] },
+  { id: "session-observation", ideaId: "i-observational", title: "Две мухи и наблюдение крыльев", status: "подготовлен прототип, выполнение пользователем не подтверждено", source: "Локальный эксперимент 38, MuJoCo и Brian2; запуск на Windows не подтверждён.",
+    results: "Первая муха управляемо машет крыльями; вторая получает изображения. Сохраняются вход, геометрия, времена и ID спайков 32 условных нейронов. Контроли: неподвижные крылья, серый вход и перемешанный порядок кадров.",
+    limitations: "Кинематические эллипсоиды и условные камеры; не FlyGym/FlyBody и не мозг FlyWire. Нейроны не доказанные зеркальные, движение не повторяется и обучение не моделируется. Шаблон 16 не является двухагентной сценой и может переходить к синтетике.",
+    files: ["experiments/SETUP-TWO-FLIES.bat", "experiments/RUN-TWO-FLIES.bat", "experiments/templates/38_two_flies_observation.py", "workspace/runs/ideas/i-observational/two-flies"] },
+];
+
+export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
+export function installResearchMemory(existing?: ResearchMemoryState): ResearchMemoryState {
+  if (existing?.version === MEMORY_VERSION && Array.isArray(existing.entries)) return existing;
+  const entries = Array.isArray(existing?.entries) ? existing.entries : [];
+  const present = new Set(entries.map((entry) => entry?.id));
+  return { version: MEMORY_VERSION, entries: [...entries, ...RESEARCH_MEMORY.filter((entry) => !present.has(entry.id)).map((entry) => ({ ...entry, files: [...entry.files] }))] };
+}
+
+export function memoryForIdea(memory: ResearchMemoryState | undefined, ideaId: string): ResearchMemoryEntry[] {
+  return (memory?.entries ?? []).filter((entry) => entry && entry.ideaId === ideaId);
+}

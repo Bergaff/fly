@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BrainView } from "@/views/brain-view";
+import { ResearchMemoryView } from "@/views/research-memory-view";
 import { useTheme } from "@/lib/theme";
 import { fly, isElectron } from "@/lib/bridge";
 import { useStore } from "@/data/store";
@@ -167,6 +168,7 @@ export default function App() {
     compare: compare.length ? `${compare.length} из 3` : "",
     library: String(state.references.length),
     brain: "",
+    memory: "",
   };
 
   return (
@@ -237,6 +239,7 @@ export default function App() {
                     ["compare", "Сравнение"],
                     ["library", "Библиотека"],
                     ["brain", "Мозг"],
+                    ["memory", "Память"],
                   ] as const
                 ).map(([key, label]) => (
                   <TabsTrigger key={key} value={key}>
@@ -342,9 +345,13 @@ export default function App() {
                 }}
               />
             </TabsContent>
+            <TabsContent value="memory" className="min-h-0 overflow-hidden">
+              <ResearchMemoryView memory={state.researchMemory} />
+            </TabsContent>
             <TabsContent value="brain" className="min-h-0 overflow-hidden">
               <BrainView
                 ideas={state.ideas}
+                researchMemory={state.researchMemory}
                 projects={state.projects}
                 activeProject={active}
                 focusIdeaId={brainIdeaId}

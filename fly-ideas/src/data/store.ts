@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AppState, ExperimentEntry, Idea, IdeaStatus, Project, Reference } from "./types";
 import { SEED_STATE, makeChecklist } from "./seed";
+import { installResearchMemory } from "./research-memory";
 import { uid } from "@/lib/utils";
 
 export { uid };
@@ -44,12 +45,13 @@ function load(): AppState {
  sessionStorage.removeItem("fly-ideas:sync-applying");
  try {
  const raw = localStorage.getItem(KEY);
- if (!raw) return structuredClone(SEED_STATE);
+ if (!raw) return { ...structuredClone(SEED_STATE), researchMemory: installResearchMemory() };
  const parsed = JSON.parse(raw) as AppState;
- if (parsed.version !== 1 || !Array.isArray(parsed.ideas)) return structuredClone(SEED_STATE);
- return withNewSeed(normalize(parsed));
+ if (parsed.version !== 1 || !Array.isArray(parsed.ideas)) return { ...structuredClone(SEED_STATE), researchMemory: installResearchMemory() };
+ const state = withNewSeed(normalize(parsed));
+ return { ...state, researchMemory: installResearchMemory(state.researchMemory) };
  } catch {
- return structuredClone(SEED_STATE);
+ return { ...structuredClone(SEED_STATE), researchMemory: installResearchMemory() };
  }
 }
 
@@ -249,10 +251,11 @@ export function useStore() {
  if (parsed.version !== 1 || !Array.isArray(parsed.ideas) || !Array.isArray(parsed.projects)) {
  throw new Error("Неверный формат файла");
  }
- setState(normalize(parsed));
+ const next = normalize(parsed);
+ setState({ ...next, researchMemory: installResearchMemory(next.researchMemory) });
  }, []);
 
- const reset = useCallback(() => setState(structuredClone(SEED_STATE)), []);
+ const reset = useCallback(() => setState({ ...structuredClone(SEED_STATE), researchMemory: installResearchMemory() }), []);
 
  const api = useMemo(
  () => ({ addIdea, updateIdea, completeStages, deleteIdea, toggleCheck, duplicateIdea, moveIdea, setStatus, addExperiment, updateExperiment, deleteExperiment, addReference, updateReference, deleteReference, setCitations, addProject, updateProject, deleteProject, exportJson, importJson, reset }),
