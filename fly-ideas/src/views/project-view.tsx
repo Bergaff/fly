@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Idea, Project, Reference } from "@/data/types";
-import { OUTCOME_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress } from "@/data/types";
+import { OUTCOME_LABELS, STATUS_COLORS, STATUS_LABELS, STATUS_ORDER, checklistProgress, checklistTotals } from "@/data/types";
 import { priorityOf } from "@/lib/priority";
 import { presetForIdea } from "@/lib/task-presets";
 import { fly, type ProjectPaths, type RunInfo } from "@/lib/bridge";
@@ -73,9 +73,8 @@ export function ProjectView({
   const stats = useMemo(() => {
     const inWork = ideas.filter((i) => ["exploring", "active", "drafting"].includes(i.status)).length;
     const done = ideas.filter((i) => ["submitted", "done"].includes(i.status)).length;
-    const progress = ideas.map((i) => checklistProgress(i));
-    const pct = progress.length ? Math.round(progress.reduce((s, p) => s + p.pct, 0) / progress.length) : 0;
-    const steps = progress.reduce((s, p) => ({ done: s.done + p.done, total: s.total + p.total }), { done: 0, total: 0 });
+    const steps = checklistTotals(ideas);
+    const pct = steps.pct;
     const refs = new Set(ideas.flatMap((i) => i.citations.map((c) => c.refId)));
     const experiments = ideas.reduce((s, i) => s + i.experiments.length, 0);
     const deadlines = ideas
@@ -152,7 +151,7 @@ export function ProjectView({
 
           <div className="grid grid-cols-2 border-b sm:grid-cols-3 lg:grid-cols-6">
             <Cell label="идей" value={ideas.length} hint={`в работе ${stats.inWork}`} />
-            <Cell label="этапов пройдено" value={`${stats.steps.done}/${stats.steps.total}`} hint={`готовность ${stats.pct}%`} />
+            <Cell label="этапы чеклистов" value={`${stats.steps.done}/${stats.steps.total}`} hint={`${stats.pct}% задач по всем идеям`} />
             <Cell label="прогонов" value={stats.experiments} hint={runs.length ? `в папке ${runs.length}` : "записей журнала"} />
             <Cell label="источников" value={stats.refs.size} hint={`в библиотеке ${references.length}`} />
             <Cell label="доведено" value={stats.done} hint="подано и опубликовано" />

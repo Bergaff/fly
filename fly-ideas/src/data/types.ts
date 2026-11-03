@@ -59,6 +59,13 @@ export function researchProgress(idea: Pick<Idea, "researchProgress">) {
  return { done, total: RESEARCH_STAGES.length, pct: Math.round(done / RESEARCH_STAGES.length * 100) };
 }
 
+/** Доля задач во всех чеклистах, а не среднее округлённых процентов идей. */
+export function checklistTotals(ideas: Pick<Idea, "checklist">[]) {
+ const total = ideas.reduce((sum, idea) => sum + idea.checklist.length, 0);
+ const done = ideas.reduce((sum, idea) => sum + idea.checklist.filter((item) => item.done).length, 0);
+ return { done, total, pct: total ? Math.round(100 * done / total) : 0 };
+}
+
 /** Стандартный конвейер «от идеи до статьи» */
 export const DEFAULT_CHECKLIST: string[] = [
  "Прочитать ключевые статьи по теме",

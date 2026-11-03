@@ -96,3 +96,43 @@ test('результаты v630 добавляются явно, сохраня�
   const lesions=v630.addV630Evidence(idea('i-lesions'));assert.match(lesions.reproduction.evidence,/330\/510/);assert.equal(lesions.reproduction.done,false);
   assert.equal(v630.v630EvidenceAvailable('другая идея'),false);
 });
+
+test('добавление v630 отмечает только подтверждённые стандартные этапы двух идей', () => {
+  for (const id of ['i-individuality', 'i-lesions']) {
+    const a = idea(id);
+    a.checklist = types.DEFAULT_CHECKLIST.map((text, index) => ({ id: 'step'+index, text, done: index === 0, doneAt: index === 0 ? 'existing-date' : null }));
+    a.checklist.push({ id:'custom', text:'Мой собственный пункт', done:false, doneAt:null });
+    const when='2026-11-03T10:00:00.000Z';
+    const result=v630.addV630Checklist(a,when);
+    assert.equal(result.filter(x=>x.done).length,4);
+    assert.equal(result[0].doneAt,'existing-date');
+    for (const index of [1,3,4]) { assert.equal(result[index].done,true);assert.equal(result[index].doneAt,when); }
+    for (const index of [2,5,6,7,8,9]) assert.equal(result[index].done,false);
+    assert.equal(a.checklist[1].done,false);
+    const repeated=v630.addV630Checklist({...a,checklist:result},'2099-01-01');
+    assert.deepEqual(plain(repeated),plain(result));
+  }
+  const other=idea('другая идея');assert.deepEqual(plain(v630.addV630Checklist(other)),plain(other.checklist));
+});
+
+test('кнопка импортирует одновременно научные данные и этапы, не меняя другие идеи', () => {
+  const a=idea('i-individuality');a.checklist=types.DEFAULT_CHECKLIST.map((text,index)=>({id:String(index),text,done:false}));
+  let patch;const tree=component.ResearchProgress({idea:a,onUpdateIdea:(_id,value)=>{patch=value;}});
+  function buttons(node) {
+    if (!node || typeof node !== 'object') return [];
+    return [...(node.type==='button'?[node]:[]), ...[node.props?.children].flat(Infinity).flatMap(buttons)];
+  }
+  const action=buttons(tree).find(b=>b.props.children==='добавить результаты исследования v630');
+  assert.ok(action);action.props.onClick();
+  assert.equal(patch.checklist.filter(x=>x.done).length,3);
+  assert.match(patch.researchProgress.interpretation.evidence,/итог 20 seed/);
+  assert.equal(a.checklist.filter(x=>x.done).length,0);
+});
+
+test('общий процент считается от всех пунктов, а не среднего процентов идей', () => {
+  const ideas=[{checklist:[{done:true},...Array.from({length:9},()=>({done:false}))]}, {checklist:[{done:true},{done:true},{done:true}]}];
+  assert.deepEqual(plain(types.checklistTotals(ideas)),{done:4,total:13,pct:31});
+  assert.deepEqual(plain(types.checklistTotals([])),{done:0,total:0,pct:0});
+  const source=fs.readFileSync(path.join(root,'src/views/project-view.tsx'),'utf8');
+  assert.match(source,/этапы чеклистов/);assert.doesNotMatch(source,/готовность \$\{stats\.pct\}%/);
+});

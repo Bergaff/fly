@@ -29,5 +29,23 @@ export function addV630Evidence(idea: Idea): Idea["researchProgress"] {
     const evidence = old.evidence.includes(item.evidence) ? old.evidence : [old.evidence.trim(), item.evidence].filter(Boolean).join("\n\n");
     result[key] = { ...old, done: old.done || item.completed, evidence };
   }
+  if (idea.id === "i-individuality") {
+    const extra = `v630 ${STUDY}, итог 20 seed: 200 повторов; контроль слева 18,20 Гц, среднее вариантов 18,92 Гц. Вариант 10 минус 9: 5,65 Гц, выше в 18/20 случаев; пара выбрана после просмотра первой серии. Это описание модельного эксперимента, не доказательство биологической индивидуальности.`;
+    const stage = result.interpretation!;
+    if (!stage.evidence.includes(extra)) result.interpretation = { ...stage, evidence: [stage.evidence.trim(), extra].filter(Boolean).join("\n\n") };
+  }
   return result;
+}
+
+/** Отмечает только совпадающие стандартные этапы; пользовательские пункты не меняются. */
+export function addV630Checklist(idea: Idea, at = new Date().toISOString()): Idea["checklist"] {
+  if (!v630EvidenceAvailable(idea.id)) return idea.checklist;
+  const completed = new Set([
+    "Поднять окружение (conda, Brian2 / fly-brain)",
+    "Написать протокол эксперимента",
+    "Сделать прогоны, сохранить сырые данные и сиды",
+  ]);
+  return idea.checklist.map((item) => !item.done && completed.has(item.text)
+    ? { ...item, done: true, doneAt: at }
+    : item);
 }
