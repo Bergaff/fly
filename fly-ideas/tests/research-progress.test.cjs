@@ -136,3 +136,15 @@ test('общий процент считается от всех пунктов,
   const source=fs.readFileSync(path.join(root,'src/views/project-view.tsx'),'utf8');
   assert.match(source,/этапы чеклистов/);assert.doesNotMatch(source,/готовность \$\{stats\.pct\}%/);
 });
+
+
+test('новый импорт добавляет завершённые 510 лезий, сохраняя историческую запись', () => {
+  const a=idea('i-lesions');
+  a.researchProgress=v630.addV630Evidence(a);
+  const first=plain(a.researchProgress);
+  const again=v630.addV630Evidence(a);
+  assert.match(again.reproduction.evidence,/510\/510/);
+  assert.match(again.reproduction.evidence,/330\/510/);
+  assert.deepEqual(plain(again),first);
+  assert.equal(again.verification.done,false);
+});

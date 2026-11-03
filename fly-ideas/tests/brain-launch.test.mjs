@@ -144,7 +144,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     const studyId='Study_20261102_123456_abcdef12';
     dom.window.fly.listSharedStudies=async()=>({root:'C:\\data\\shiu-v630-shared',studies:[{id:studyId,label:'Новый набор',path:'C:\\data\\study',created:1,progress:null}]});
     dom.window.fly.prepareSharedStudy=async()=>({name:'32_shiu_shared_study.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
-    dom.window.fly.runSharedStudy=(scope,args)=>dom.window.fly.runScript(scope,args[1]==='analyze-20'?'36_shiu_individuality_analysis.py':args[1].startsWith('holdout-')?'35_shiu_individuality_holdout.py':args[1].startsWith('extend-')?'34_shiu_individuality_extension.py':args[1].startsWith('pilot-')?'33_shiu_individuality_pilot.py':'32_shiu_shared_study.py',args);
+    dom.window.fly.runSharedStudy=(scope,args)=>dom.window.fly.runScript(scope,args[1].startsWith('frequency-')?'37_shiu_frequency_check.py':args[1]==='analyze-20'?'36_shiu_individuality_analysis.py':args[1].startsWith('holdout-')?'35_shiu_individuality_holdout.py':args[1].startsWith('extend-')?'34_shiu_individuality_extension.py':args[1].startsWith('pilot-')?'33_shiu_individuality_pilot.py':'32_shiu_shared_study.py',args);
     dom.window.fly.prepareFocusedLesions=async(_scope,mode)=>({name:mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',matches:true,conflict:null,added:[],code:'C:\\focused'});
     dom.window.fly.runFocusedLesions=(scope,mode,args)=>dom.window.fly.runScript(scope,mode==='overview'?'30_shiu_lesion_overview.py':'31_shiu_selected_lesions.py',args);
     const commonProps={projects:[{id:'p',name:'Проект',color:'#777'}],activeProject:'p',onSelectProject:noop,onAddProject:noop,onAddIdea:noop,onOpenIdeaCard:noop,onUpdateIdea:noop,onCompleteStages:noop,onAddJournalEntry:noop,onAddReferences:noop,onDirtyChange:noop};
@@ -210,6 +210,16 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     await waitFor(()=>assert.equal(analysis.disabled,false));fireEvent.click(analysis);
     await waitFor(()=>assert.equal(calls.length,22));
     assert.deepEqual(calls[21],{scope:'idea:i-individuality',name:'36_shiu_individuality_analysis.py',args:['--stage','analyze-20','--study',studyId]});
+    cleanup();
+    render(React.createElement(BrainView,{...commonProps,ideas:[{id:'i-lesions',projectId:'p',title:'Лезии',checklist:[],citations:[],links:[]}]}));
+    for (const [name,stage,index] of [['план проверки частот без симуляций','frequency-plan',22],['рассчитать или продолжить 630 повторов','frequency-run',23],['обзор проверки частот','frequency-review',24]]) {
+      await waitFor(()=>assert.equal(screen.getByRole('button',{name:'выборочные лезии'}).disabled,false));
+      fireEvent.click(screen.getByRole('button',{name:'выборочные лезии'}));
+      const button=await screen.findByRole('button',{name});await waitFor(()=>assert.equal(button.disabled,false));fireEvent.click(button);
+      await waitFor(()=>assert.equal(calls.length,index+1));
+      assert.deepEqual(calls[index],{scope:'idea:i-lesions',name:'37_shiu_frequency_check.py',args:['--stage',stage,'--study',studyId]});
+    }
+
 
 
   } catch (e) { if (e.errors) console.error(e.errors); throw e; } finally {cleanup();await vite.close();dom.window.close();}

@@ -576,7 +576,7 @@ function Workspace({
     } catch (e) { setRunNote(`Не удалось прочитать общую папку: ${(e as Error).message}`); }
   };
 
-  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review" | "holdout-plan" | "holdout-run" | "holdout-review" | "analyze-20") => {
+  const runShared = async (stage: "init" | "plan" | "singles" | "all" | "review" | "individuality" | "pilot-plan" | "pilot-run" | "pilot-review" | "extend-plan" | "extend-run" | "extend-review" | "holdout-plan" | "holdout-run" | "holdout-review" | "analyze-20" | "frequency-plan" | "frequency-run" | "frequency-review") => {
     const bridge=fly; const target=scopeId;
     if (!bridge || !workspaceIdeaId || runId || preparingV630.current) return;
     preparingV630.current=true;setPreparing(true);
@@ -592,9 +592,9 @@ function Workspace({
         if (!sharedStudy) { setRunNote("Сначала выберите общий набор."); return; }
         args=["--stage",stage,"--study",sharedStudy];
       }
-      if (stage.startsWith("pilot-") || stage.startsWith("extend-") || stage.startsWith("holdout-") || stage === "analyze-20") {
+      if (stage.startsWith("pilot-") || stage.startsWith("extend-") || stage.startsWith("holdout-") || stage === "analyze-20" || stage.startsWith("frequency-")) {
         // The main process creates a separate protected copy and checks it before launch.
-        await startScriptInProject(target,stage === "analyze-20" ? "36_shiu_individuality_analysis.py" : stage.startsWith("holdout-") ? "35_shiu_individuality_holdout.py" : stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
+        await startScriptInProject(target,stage.startsWith("frequency-") ? "37_shiu_frequency_check.py" : stage === "analyze-20" ? "36_shiu_individuality_analysis.py" : stage.startsWith("holdout-") ? "35_shiu_individuality_holdout.py" : stage.startsWith("extend-") ? "34_shiu_individuality_extension.py" : "33_shiu_individuality_pilot.py",args,"shared");
       } else {
         const prepared=await bridge.prepareSharedStudy(target);
         if (pidRef.current!==target) return;
@@ -1523,7 +1523,7 @@ function Workspace({
                 <span className="text-[11px]">набор</span>
                 <Select value={sharedStudy} onValueChange={setSharedStudy}><SelectTrigger className="min-w-[220px] max-w-full"><SelectValue placeholder="выберите набор" /></SelectTrigger><SelectContent>{sharedInfo.studies.map((item) => <SelectItem key={item.id} value={item.id}>{item.label}</SelectItem>)}</SelectContent></Select>
                 {sharedStudy && <Button size="sm" variant="outline" onClick={() => void fly!.openPath(sharedInfo.studies.find((item) => item.id === sharedStudy)!.path)}>открыть папку набора</Button>}
-                {sharedInfo.studies.find((item) => item.id === sharedStudy)?.progress && <span className="font-mono text-[10px] text-muted-foreground">последний прогресс: {sharedInfo.studies.find((item) => item.id === sharedStudy)!.progress!.completed}/{sharedInfo.studies.find((item) => item.id === sharedStudy)!.progress!.total}</span>}
+                {sharedInfo.studies.find((item) => item.id === sharedStudy)?.progress && <span className="font-mono text-[10px] text-muted-foreground">прогресс общего набора: {sharedInfo.studies.find((item) => item.id === sharedStudy)!.progress!.completed}/{sharedInfo.studies.find((item) => item.id === sharedStudy)!.progress!.total}</span>}
               </div> : <p className="text-[11px] text-muted-foreground">Общих наборов пока нет. Создайте набор в идее лезий.</p>}
               {sharedDialog === "individuality" ? <div className="flex flex-col items-start gap-2">
                 <Button disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("individuality"); }}>построить обзор общих контролей</Button>
@@ -1547,6 +1547,11 @@ function Workspace({
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("singles"); }}>рассчитать или продолжить 10 клеток</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("all"); }}>рассчитать или продолжить пары и группу</Button>
                 <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("review"); }}>обзор сохранённых лезий</Button>
+                <div className="border-t pt-2 mt-1 w-full text-[11px]">Проверка клеток ранга 22 и 62 на 60–120 Гц</div>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("frequency-plan"); }}>план проверки частот без симуляций</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("frequency-run"); }}>рассчитать или продолжить 630 повторов</Button>
+                <Button variant="outline" disabled={!sharedStudy} onClick={() => { setSharedDialog(null); void runShared("frequency-review"); }}>обзор проверки частот</Button>
+                <p className="text-[11px] text-muted-foreground">Две клетки выбраны после просмотра 50 Гц. Отдельная база, один процесс; 50 Гц используются из сохранённых данных. План и обзор не запускают симуляции. Перед новым повтором нужно не менее 4 ГиБ свободной RAM; это не гарантия достаточной памяти.</p>
               </div>}
               {sharedDialog === "lesions" && <p className="text-[11px] text-muted-foreground">Сначала рассчитываются 30 новых контролей и до 300 одиночных лезий. Пять пар и группа добавляют 180 повторов; если одиночный этап не завершён, он будет продолжен. Расчёт занимает несколько часов и несколько гигабайтов RAM. Остановите другие тяжёлые расчёты перед симуляцией. В общей папке остаются данные и периодические резервные снимки; это не копия на другом устройстве.</p>}
               <Button size="sm" variant="ghost" onClick={() => { const kind=sharedDialog; setSharedDialog(null);setFocusedDialog(kind); }}>ручной режим для прежних баз</Button>

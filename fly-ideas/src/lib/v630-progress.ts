@@ -29,6 +29,11 @@ export function addV630Evidence(idea: Idea): Idea["researchProgress"] {
     const evidence = old.evidence.includes(item.evidence) ? old.evidence : [old.evidence.trim(), item.evidence].filter(Boolean).join("\n\n");
     result[key] = { ...old, done: old.done || item.completed, evidence };
   }
+  if (idea.id === "i-lesions") {
+    const extra = `v630 ${STUDY}: обновление после сообщения о 330/510: завершены 510/510 повторов при 50 Гц: контроль, 10 одиночных лезий, 5 пар и группа; по 30 seed. Левый MN9: контроль 19,10 Гц, лезия ранга 22: 29,67 Гц, ранга 62: 13,07 Гц. Пары и группа описательны; это не биологическая верификация и не результат на всех частотах.`;
+    const stage = result.reproduction!;
+    if (!stage.evidence.includes(extra)) result.reproduction = { ...stage, evidence: [stage.evidence.trim(), extra].filter(Boolean).join("\n\n") };
+  }
   if (idea.id === "i-individuality") {
     const extra = `v630 ${STUDY}, итог 20 seed: 200 повторов; контроль слева 18,20 Гц, среднее вариантов 18,92 Гц. Вариант 10 минус 9: 5,65 Гц, выше в 18/20 случаев; пара выбрана после просмотра первой серии. Это описание модельного эксперимента, не доказательство биологической индивидуальности.`;
     const stage = result.interpretation!;

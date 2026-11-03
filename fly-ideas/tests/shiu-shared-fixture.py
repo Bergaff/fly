@@ -65,6 +65,74 @@ def main():
     assert len(list((study/shared.BACKUP_DIR).glob('controls*.sqlite3')))>=3
     stop[0]=False;calls.clear();code,_,report=run('resume','singles',['--study',study_id]);assert code==0 and report['result']['completed']==330 and len(calls)==295
     code,_,report=run('individuality','individuality',['--study',study_id]);assert code==0 and report['result']['included_trials']==30
+    # Проверка двух лезий на новых частотах; вся серия ниже синтетическая, кроме одного реального повтора Brian2.
+    frequency=load('frequency_check',templates/'37_shiu_frequency_check.py')
+    assert frequency.load_pilot().sha(templates/'33_shiu_individuality_pilot.py')==frequency.PILOT_SHA
+    fpilot=load('frequency_pilot',templates/'33_shiu_individuality_pilot.py');fpilot.check_memory=lambda:None
+    frequency.TARGETS=[manifest['selected'][0],manifest['selected'][2]]
+    control_path=study/shared.CONTROL_DIR/'lesions.sqlite3';selected_path=study/shared.SELECTED_DIR/'selected_lesions.sqlite3'
+    protected_frequency=(view.digest(control_path),view.digest(selected_path))
+    def freq_run(name,stage,stop=False):
+        output=tmp/name;output.mkdir()
+        if stop: (output/'stop.request').write_text('stop',encoding='utf8')
+        frequency.execute(fpilot,shared,view,module,study,manifest,output,stage);return output
+    original_trial=lesion.trial;freq_calls=[]
+    def fail_real(b,d,f,seed,target):
+        freq_calls.append((f,target,seed))
+        if len(freq_calls)>1: raise RuntimeError('frequency interruption')
+        return original_trial(b,d,f,seed,target)
+    lesion.trial=fail_real
+    plan_frequency=freq_run('frequency-plan','frequency-plan')
+    assert not freq_calls and json.loads((plan_frequency/'summary.json').read_text())['new_planned']==630
+    assert not (tmp/'shiu-v630-frequency-check').exists()
+    source_bytes=selected_path.read_bytes()
+    with sqlite3.connect(selected_path) as db:
+        db.execute('UPDATE trials SET left_count=left_count+1 WHERE condition=? AND seed=0',('single:'+frequency.TARGETS[0],));db.commit()
+    try: freq_run('frequency-source-corrupt','frequency-plan');raise AssertionError('corrupt baseline accepted')
+    except ValueError as e: assert 'Некорректный повтор' in str(e)
+    selected_path.write_bytes(source_bytes)
+    try: freq_run('frequency-interrupted','frequency-run');raise AssertionError('interruption not raised')
+    except RuntimeError as e: assert str(e)=='frequency interruption'
+    frequency_db=tmp/'shiu-v630-frequency-check'/study_id/'frequencies.sqlite3'
+    with sqlite3.connect(frequency_db) as db: assert db.execute('SELECT frequency,target,seed FROM trials').fetchall()==[(60,'',0)]
+    freq_calls.clear();stopped_freq=freq_run('frequency-stopped','frequency-run',True);assert not freq_calls
+    assert json.loads((stopped_freq/'summary.json').read_text())['status']=='stopped'
+    import csv
+    with (stopped_freq/'frequency_conditions.csv').open(encoding='utf-8-sig',newline='') as file: partial=list(csv.DictReader(file))
+    assert next(x for x in partial if x['frequency_hz']=='60' and x['target']==frequency.TARGETS[0])['left_ratio_to_control']==''
+    try:
+        with shared.lock(frequency_db.parent): freq_run('frequency-locked','frequency-review')
+        raise AssertionError('concurrent frequency session accepted')
+    except ValueError as e: assert 'уже используется' in str(e)
+    def fake_frequency(b,d,f,seed,target):
+        assert f in frequency.FREQUENCIES and target in ['',*frequency.TARGETS]
+        freq_calls.append((f,target,seed));return (100+f//10+seed%3-(10 if target==frequency.TARGETS[0] else 20 if target else 0),50+seed%3,1.0)
+    lesion.trial=fake_frequency
+    done_freq=freq_run('frequency-resume','frequency-run')
+    info=json.loads((done_freq/'summary.json').read_text());assert info['status']=='complete' and info['new_completed']==630 and len(freq_calls)==629
+    assert len(set(freq_calls))==629 and (60,'',0) not in freq_calls and len(list((frequency_db.parent/'backups').glob('*.sqlite3')))>=21
+    import csv
+    with (done_freq/'frequency_conditions.csv').open(encoding='utf-8-sig',newline='') as file: conditions=list(csv.DictReader(file))
+    assert len(conditions)==24 and all(x['trials']=='30' for x in conditions)
+    assert len([x for x in conditions if x['frequency_hz']=='50'])==3
+    with (done_freq/'frequency_trials.csv').open(encoding='utf-8-sig',newline='') as file: trials=list(csv.DictReader(file))
+    assert len(trials)==720 and sum(x['origin']=='source_50' for x in trials)==90
+    freq_calls.clear();freq_run('frequency-repeat','frequency-run');freq_run('frequency-review','frequency-review');assert not freq_calls
+    with sqlite3.connect(frequency_db) as db:
+        raw_protocol=db.execute('SELECT value FROM metadata WHERE key="protocol"').fetchone()[0]
+        modified=json.loads(raw_protocol);modified['source_50_rows_sha256']='0'*64
+        db.execute('UPDATE metadata SET value=? WHERE key="protocol"',(json.dumps(modified),));db.commit()
+    try: freq_run('frequency-protocol-mismatch','frequency-review');raise AssertionError('changed protocol accepted')
+    except ValueError as e: assert 'протокол изменился' in str(e)
+    with sqlite3.connect(frequency_db) as db:
+        db.execute('UPDATE metadata SET value=? WHERE key="protocol"',(raw_protocol,));db.commit()
+    with sqlite3.connect(frequency_db) as db:
+        saved=db.execute('SELECT value FROM metadata WHERE key="protocol"').fetchone()[0]
+        db.execute('UPDATE trials SET left_count=left_count+1 WHERE frequency=60 AND target="" AND seed=0');db.commit()
+    try: freq_run('frequency-corrupt','frequency-review');raise AssertionError('corrupted trial accepted')
+    except ValueError as e: assert 'Некорректный повтор' in str(e)
+    assert (view.digest(control_path),view.digest(selected_path))==protected_frequency
+    lesion.trial=original_trial
     # Изолированный новый пилот: план не симулирует, прерывание и продолжение не трогают общий набор.
     import numpy as np
     pilot=load('individuality_pilot',templates/'33_shiu_individuality_pilot.py');pilot.check_memory=lambda:None
