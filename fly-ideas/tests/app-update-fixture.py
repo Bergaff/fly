@@ -23,10 +23,11 @@ u=importlib.util.module_from_spec(spec);spec.loader.exec_module(u)
 class TLSRequestTest(unittest.TestCase):
     def test_certifi_retry_keeps_verification_and_hostname(self):
         class Response:
+            def __init__(self): self.buf=io.BytesIO(b'ok')
             def __enter__(self): return self
             def __exit__(self,*args): pass
             def geturl(self): return 'https://api.github.com/test'
-            def read(self,limit): return b'ok'
+            def read(self,limit): return self.buf.read(limit)
         contexts=[]
         def open_url(req, timeout, context):
             contexts.append(context)
@@ -53,6 +54,30 @@ class TLSRequestTest(unittest.TestCase):
             with self.assertRaises(urllib.error.URLError): u.request('https://api.github.com/test',100)
             self.assertEqual(func.call_count,1)
 
+class StreamingRequestTest(unittest.TestCase):
+    def response(self, data, length=None):
+        class Response:
+            def __init__(self):
+                self.buf=io.BytesIO(data)
+                self.headers={} if length is None else {'Content-Length':str(length)}
+            def __enter__(self): return self
+            def __exit__(self,*args): pass
+            def geturl(self): return 'https://codeload.github.com/test'
+            def read(self,n): return self.buf.read(n)
+        return Response()
+    def test_download_progress_known_and_unknown(self):
+        for length in (70000,None):
+            with self.subTest(length=length), mock.patch.object(u.urllib.request,'urlopen',return_value=self.response(b'x'*70000,length)), mock.patch.object(u,'emit_progress') as emit:
+                self.assertEqual(len(u.request('https://codeload.github.com/test',100000,progress=True)),70000)
+                self.assertEqual(emit.call_args_list[0].args,('archive',0,length,'bytes'))
+                self.assertEqual(emit.call_args_list[-1].args,('archive',70000,length,'bytes'))
+    def test_truncated_and_oversized_responses_fail(self):
+        with mock.patch.object(u.urllib.request,'urlopen',return_value=self.response(b'abc',4)):
+            with self.assertRaisesRegex(ValueError,'Неполная загрузка'): u.request('https://codeload.github.com/test',10,progress=True)
+        for length in (None,5):
+            with mock.patch.object(u.urllib.request,'urlopen',return_value=self.response(b'abcde',length)):
+                with self.assertRaisesRegex(ValueError,'Слишком большой ответ'): u.request('https://codeload.github.com/test',4)
+
 class UpdateTest(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.app=Path(self.tmp.name)/'app';self.app.mkdir()
@@ -69,7 +94,7 @@ class UpdateTest(unittest.TestCase):
         self.archive=buf.getvalue()
         self.tree={'truncated':False,'tree':[{'path':'fly-ideas/'+rel,'type':'blob','mode':'100644','sha':u.blob_hash(data)} for rel,data in self.files.items()]}
         self.real_request=u.request
-        u.request=lambda url,limit: json.dumps({'sha':self.commit}).encode() if '/commits/' in url else json.dumps(self.tree).encode() if '/git/trees/' in url else self.archive
+        u.request=lambda url,limit,progress=False: json.dumps({'sha':self.commit}).encode() if '/commits/' in url else json.dumps(self.tree).encode() if '/git/trees/' in url else self.archive
         (self.app/'electron').mkdir();(self.app/'electron/main.cjs').write_bytes(b'local edits')
         (self.app/'START.bat').write_bytes(b'custom launcher')
         (self.app/'workspace/data').mkdir(parents=True);(self.app/'workspace/data/protected.txt').write_bytes(b'user data')
@@ -145,11 +170,26 @@ class UpdateTest(unittest.TestCase):
     def test_start_helper_applies_staged_update(self):
         shutil.copyfile(ROOT/'electron/app-update.py',self.app/'electron/app-update.py')
         shutil.copyfile(ROOT/'electron/app-update-start.cjs',self.app/'electron/app-update-start.cjs')
+        shutil.copyfile(ROOT/'electron/app-update-status.cjs',self.app/'electron/app-update-status.cjs')
         self.prepare()
         result=subprocess.run(['node',str(self.app/'electron/app-update-start.cjs')],capture_output=True,text=True,timeout=30)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         self.assertEqual((self.app/'electron/main.cjs').read_bytes(),b'new main')
         self.assertEqual((self.app/'workspace/data/protected.txt').read_bytes(),b'user data')
+
+    def test_start_helper_preserves_failure_details(self):
+        shutil.copyfile(ROOT/'electron/app-update.py',self.app/'electron/app-update.py')
+        shutil.copyfile(ROOT/'electron/app-update-start.cjs',self.app/'electron/app-update-start.cjs')
+        shutil.copyfile(ROOT/'electron/app-update-status.cjs',self.app/'electron/app-update-status.cjs')
+        self.prepare();m=self.pending()
+        (self.app/'workspace/.app-updates'/m['stage']/'src/App.tsx').write_text('corrupt')
+        result=subprocess.run(['node',str(self.app/'electron/app-update-start.cjs')],capture_output=True,text=True,timeout=30)
+        self.assertNotEqual(result.returncode,0)
+        status=json.loads((self.app/'workspace/.app-updates/update-status.json').read_text(encoding='utf8'))
+        self.assertEqual(status['state'],'error')
+        self.assertIn('Повреждён файл обновления',status['message'])
+        self.assertEqual((self.app/'electron/main.cjs').read_bytes(),b'local edits')
+        self.assertTrue((self.app/'workspace/.app-updates/pending.json').exists())
 
     def test_invalid_symlink_in_tree(self):
         self.tree['tree'][0]['mode']='120000'

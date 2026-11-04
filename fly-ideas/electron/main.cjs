@@ -4,12 +4,14 @@ const path = require("node:path");
 const fs = require("node:fs");
 const fsp = require("node:fs/promises");
 const { spawn } = require("node:child_process");
+const readline = require("node:readline");
 const https = require("node:https");
 const http = require("node:http");
 const crypto = require("node:crypto");
 const { writeAssistantFile } = require("./assistant-files.cjs");
 const folderSync = require("./folder-sync.cjs");
 const { copyRunFile } = require("./result-copy.cjs");
+const updateStatusStore = require("./app-update-status.cjs");
 
 const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
@@ -27,6 +29,8 @@ const SECRETS = path.join(app.getPath("userData"), "secrets.json");
 const CONFIG = path.join(app.getPath("userData"), "config.json");
 const API_CALLS_FILE = path.join(app.getPath("userData"), "api-calls.json");
 let apiCallWriteQueue = Promise.resolve();
+let updateTaskActive = false;
+let currentUpdateStatus = null;
 
 function readConfig() {
   try { return JSON.parse(fs.readFileSync(CONFIG, "utf8")); } catch { return {}; }
@@ -1390,27 +1394,66 @@ function registerIpc(getWin) {
     if (reload) getWin().webContents.reload();
   });
 
+  const publishUpdateStatus = (data) => {
+    const status = { ...data, updatedAt: new Date().toISOString(), logPath: path.join(WS, ".app-updates", "update-status.json") };
+    try { updateStatusStore.writeStatus(appRoot, status); }
+    catch (error) { status.logPath = ""; status.persistenceWarning = `Не удалось сохранить журнал: ${error.message}`; }
+    currentUpdateStatus = status;
+    const win = getWin();
+    if (win && !win.isDestroyed?.()) { try { win.webContents.send("fly:appUpdateProgress", status); } catch { /* Renderer may have closed while the update continues. */ } }
+    return status;
+  };
+  handle("fly:getAppUpdateStatus", () => {
+    const status = currentUpdateStatus || updateStatusStore.readStatus(appRoot);
+    if (!status) return null;
+    if (status.state === "running" && !updateTaskActive) return { ...status, state: "interrupted", message: "Предыдущее скачивание прервано или приложение было закрыто. Проверьте, не подготовлено ли обновление, прежде чем повторять." };
+    return status;
+  });
   handle("fly:prepareAppUpdate", async () => {
     if (!isDev) throw new Error("Обновление доступно только в версии, запускаемой через START.bat, не в portable exe.");
     const choice = await dialog.showMessageBox(getWin(), { type: "question", title: "Обновление приложения", buttons: ["Отмена", "Скачать"], defaultId: 0, cancelId: 0,
       message: "Скачать снимок ветки arena/01a0b34a-fly?", detail: "При следующем запуске START.bat файлы приложения будут заменены, а предыдущие версии сохранены в workspace/.app-updates. Данные и рабочие проекты не заменяются. START.bat автоматически не обновляется. Сохраните работу, завершите расчёты и закройте все окна Fly Ideas перед перезапуском. Код из этой ветки будет выполняться на компьютере." });
     if (choice.response !== 1) return { canceled: true };
-    return withSyncLock(async () => {
-      const py = await pickPython();
-      if (!py) throw new Error("Для скачивания нужен доступный Python 3.");
-      const {cmd,prefix}=parsePySpec(py.exe || py.cmd);
-      const script=path.join(appRoot,"electron","app-update.py");
-      const output=await new Promise((resolve,reject) => {
-        const child=spawn(cmd,[...prefix,script,"--prepare","--app",appRoot,"--config",CONFIG,"--owner-pid",String(process.pid)],{windowsHide:true,env:{...process.env,PYTHONIOENCODING:"utf-8"}});
-        let out="",err=""; const timer=setTimeout(()=>child.kill(),180000);
-        child.stdout.on("data", b => { out=(out+b.toString()).slice(-100000); });
-        child.stderr.on("data", b => { err=(err+b.toString()).slice(-100000); });
-        child.on("error", e => { clearTimeout(timer);reject(e); });
-        child.on("close", code => { clearTimeout(timer); if (code!==0) reject(new Error(err.trim() || `Загрузка остановлена (код ${code}).`)); else resolve(out); });
-      });
-      const result=JSON.parse(output.trim());
-      return { canceled: false, commit: result.commit, files: result.files, skippedLauncher: result.skipped_launcher };
-    });
+    let started = false;
+    try { return await withSyncLock(async () => {
+      started = true;
+      updateTaskActive = true;
+      publishUpdateStatus({ state: "running", phase: "python", message: "Проверка Python", done: 0, total: null, unit: null });
+      try {
+        const py = await pickPython();
+        if (!py) throw new Error("Для скачивания нужен доступный Python 3.");
+        const {cmd,prefix}=parsePySpec(py.exe || py.cmd);
+        const script=path.join(appRoot,"electron","app-update.py");
+        const output=await new Promise((resolve,reject) => {
+          const child=spawn(cmd,[...prefix,script,"--prepare","--app",appRoot,"--config",CONFIG,"--owner-pid",String(process.pid)],{windowsHide:true,env:{...process.env,PYTHONIOENCODING:"utf-8",PYTHONUNBUFFERED:"1"}});
+          let out="",err="",timedOut=false;
+          const timer=setTimeout(()=>{ timedOut=true;child.kill(); },180000);
+          child.stdout.setEncoding("utf8");
+          child.stdout.on("data", text => { out=(out+text).slice(-100000); });
+          const lines=readline.createInterface({ input: child.stderr });
+          const labels={commit:"Определение коммита",tree:"Получение списка файлов",archive:"Скачивание архива",unpack:"Распаковка архива",verify:"Проверка файлов",finalize:"Подготовка к применению"};
+          lines.on("line", line => {
+            if (line.startsWith("FLY_UPDATE_PROGRESS ")) {
+              try {
+                const p=JSON.parse(line.slice("FLY_UPDATE_PROGRESS ".length));
+                if (Object.hasOwn(labels,p.phase)) publishUpdateStatus({ state:"running", phase:p.phase, message:labels[p.phase], done:Math.max(0,Number(p.done)||0), total:Number.isFinite(p.total) && p.total>0 ? p.total : null, unit:p.unit === "bytes" || p.unit === "files" ? p.unit : null });
+              } catch { /* A malformed progress line is not an update result. */ }
+            } else err=(err+line+"\n").slice(-100000);
+          });
+          child.on("error", e => { clearTimeout(timer);reject(e); });
+          child.on("close", code => { clearTimeout(timer); if (timedOut) reject(new Error(`Превышено время ожидания (180 с). ${err.trim()}`)); else if (code!==0) reject(new Error(err.trim() || `Загрузка остановлена (код ${code}).`)); else resolve(out); });
+        });
+        const result=JSON.parse(output.trim());
+        publishUpdateStatus({state:"completed", phase:"prepared", done:result.files, total:result.files, unit:"files", message:`Скачан коммит ${result.commit.slice(0,12)}, файлов: ${result.files}. Закройте все окна Fly Ideas и снова откройте START.bat. Данные не заменяются.`});
+        return { canceled: false, commit: result.commit, files: result.files, skippedLauncher: result.skipped_launcher };
+      } catch (error) {
+        publishUpdateStatus({state:"error", phase:"prepare", done:0, total:null, unit:null, message:`Не удалось подготовить обновление: ${String(error.message || error).slice(-16000)}`});
+        throw error;
+      } finally { updateTaskActive = false; }
+    }); } catch (error) {
+      if (!started && !updateTaskActive) publishUpdateStatus({state:"error", phase:"prepare", done:0, total:null, unit:null, message:`Не удалось подготовить обновление: ${String(error.message || error).slice(-16000)}`});
+      throw error;
+    }
   });
 
   handle("fly:getPaths", () => ({ workspace: WS, ...getDirs(), defaults: DEFAULT_DIRS, templates: TEMPLATES }));

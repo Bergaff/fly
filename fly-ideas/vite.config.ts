@@ -14,5 +14,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     allowedHosts: true,
+    // Staged snapshots contain source/config files; never hot-reload on workspace data.
+    watch: { ignored: ["**/workspace/**"] },
   },
 });

@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld("fly", {
   // --- пути / окружение ---
   getPaths: () => ipcRenderer.invoke("fly:getPaths"),
   prepareAppUpdate: () => ipcRenderer.invoke("fly:prepareAppUpdate"),
+  getAppUpdateStatus: () => ipcRenderer.invoke("fly:getAppUpdateStatus"),
+  onAppUpdateProgress: (cb) => { const h = (_e, p) => cb(p); ipcRenderer.on("fly:appUpdateProgress", h); return () => ipcRenderer.removeListener("fly:appUpdateProgress", h); },
   getDataFileLinks: () => ipcRenderer.invoke("fly:getDataFileLinks"),
   chooseDataFile: (role) => ipcRenderer.invoke("fly:chooseDataFile", role),
   clearDataFile: (role) => ipcRenderer.invoke("fly:clearDataFile", role),

@@ -5,7 +5,7 @@ import { checklistProgress } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
   type DataItem, type AgentInfo, type EnvInfo, type EnvSetupOutput, type PythonCandidate, type ExternalSource, type LlmMessage, type LlmProvider,
-  type Paths, type DataFileLinks, type DataFileRole, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage,
+  type Paths, type DataFileLinks, type DataFileRole, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage, type AppUpdateStatus,
 } from "@/lib/bridge";
 import { extractAssistantFiles, extractSelectedAssistantFile, formatAssistantResponse } from "@/lib/assistant-code";
 import { RunLaunchTracker } from "@/lib/run-launch";
@@ -2873,6 +2873,8 @@ function DataPanel() {
   const [items, setItems] = useState<DataItem[]>([]);
   const [updateBusy, setUpdateBusy] = useState(false);
   const [updateMessage, setUpdateMessage] = useState("");
+  const [updateStatus, setUpdateStatus] = useState<AppUpdateStatus | null>(null);
+  const [updateCopyMessage, setUpdateCopyMessage] = useState("");
   const [progress, setProgress] = useState<Record<string, { got: number; total: number }>>({});
   const [busy, setBusy] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -2893,6 +2895,12 @@ function DataPanel() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+  useEffect(() => {
+    let mounted = true, eventSeen = false;
+    const unsubscribe = fly!.onAppUpdateProgress((status) => { eventSeen = true; if (mounted) setUpdateStatus(status); });
+    void fly!.getAppUpdateStatus().then((status) => { if (mounted && !eventSeen) setUpdateStatus(status); }).catch(() => {});
+    return () => { mounted = false; unsubscribe(); };
+  }, []);
   useEffect(
     () =>
       fly!.onDownloadProgress((p) =>
@@ -2947,16 +2955,31 @@ function DataPanel() {
       <section className="border">
         <div className="border-b px-2 py-1.5 text-[12px] font-medium">Обновление приложения</div>
         <div className="space-y-2 p-2">
-          <Button size="sm" variant="outline" disabled={updateBusy} onClick={async () => {
-            setUpdateBusy(true); setUpdateMessage("");
+          <Button size="sm" variant="outline" disabled={updateBusy || updateStatus?.state === "running"} onClick={async () => {
+            setUpdateBusy(true); setUpdateMessage(""); setUpdateCopyMessage("");
             try {
               const result=await fly!.prepareAppUpdate();
               if (!result.canceled) setUpdateMessage(`Скачан коммит ${result.commit?.slice(0,12)}, файлов: ${result.files}. Закройте все окна Fly Ideas и снова откройте START.bat. Данные не заменяются.`);
             } catch (error) { setUpdateMessage(`Не удалось подготовить обновление: ${(error as Error).message}`); }
             finally { setUpdateBusy(false); }
-          }}>{updateBusy ? "скачиваю обновление…" : "скачать обновление ветки"}</Button>
+          }}>{updateBusy || updateStatus?.state === "running" ? "скачиваю обновление…" : "скачать обновление ветки"}</Button>
           <p className="text-[11px] text-muted-foreground">Ветка arena/01a0b34a-fly. Перед загрузкой завершите расчёты; при следующем запуске будут созданы резервные копии изменяемых файлов приложения. START.bat автоматически не заменяется. Только версия через START.bat.</p>
-          {updateMessage && <p role="status" className="break-all text-[11px]">{updateMessage}</p>}
+          {updateStatus && <div role={updateStatus.state === "error" ? "alert" : "status"} className="space-y-1 border p-2 text-[11px]">
+            <p className="whitespace-pre-wrap break-words">{updateStatus.message}</p>
+            {updateStatus.state === "running" && updateStatus.unit && <div>
+              {updateStatus.total ? <progress className="h-2 w-full" max={updateStatus.total} value={Math.min(updateStatus.done, updateStatus.total)} aria-label={updateStatus.message} /> : <progress className="h-2 w-full" aria-label={updateStatus.message} />}
+              <p className="font-mono">{updateStatus.unit === "bytes" ? fmtBytes(updateStatus.done) : updateStatus.done} {updateStatus.total ? `/ ${updateStatus.unit === "bytes" ? fmtBytes(updateStatus.total) : updateStatus.total}` : "(общий размер неизвестен)"}{updateStatus.total ? ` · ${Math.min(100, Math.floor(updateStatus.done * 100 / updateStatus.total))}%` : ""}</p>
+            </div>}
+            {updateStatus.persistenceWarning && <p className="text-destructive">{updateStatus.persistenceWarning}</p>}
+            {updateStatus.logPath && <p className="break-all font-mono text-muted-foreground">Журнал: {updateStatus.logPath}</p>}
+            {(updateStatus.state === "error" || updateStatus.state === "interrupted") && <Button size="sm" variant="outline" onClick={async () => {
+              try { await navigator.clipboard.writeText(`${updateStatus.message}\n${updateStatus.logPath ? `Журнал: ${updateStatus.logPath}` : ""}`); setUpdateCopyMessage("Сообщение скопировано."); }
+              catch { setUpdateCopyMessage("Не удалось скопировать. Выделите текст или откройте журнал."); }
+            }}>копировать ошибку</Button>}
+            {updateCopyMessage && <p>{updateCopyMessage}</p>}
+          </div>}
+          {updateMessage && !updateStatus && <p role="status" className="break-words text-[11px]">{updateMessage}</p>}
+          {updateMessage && updateStatus && updateMessage.startsWith("Не удалось") && updateStatus.state !== "error" && <p role="alert" className="break-words text-[11px]">{updateMessage}</p>}
         </div>
       </section>
       <section className="border">

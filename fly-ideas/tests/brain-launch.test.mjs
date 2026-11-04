@@ -14,6 +14,8 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
   dom.window.HTMLElement.prototype.scrollTo = function() {};
   dom.window.HTMLElement.prototype.scrollIntoView = function() {};
   globalThis.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
+  let updateEvent = () => {}, storedUpdate = null, clipboardText = '';
+  Object.defineProperty(dom.window.navigator, 'clipboard', { value: {writeText: async text => { clipboardText = text; }}, configurable:true });
   let output = () => {}, calls = [], quick = true, failStart = false, delayStart = false, releaseStart, prepare = {name:'27_shiu_top200_v630.py',matches:true,conflict:null,added:[],code:'C:\\idea\\code\\.shiu-top200-v630'}, resumePath='C:\\run with space';
   const py={exe:'python',cmd:'python',version:'3.11',source:'test',majorMinor:[3,11],hasCore:true,okMap:{},note:''};
   const env={python:py,packages:{numpy:'1',pandas:'1',scipy:'1',matplotlib:'1',pyarrow:'1',duckdb:'1',brian2:'1',joblib:'1'},conda:null,gpu:null};
@@ -32,7 +34,7 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     },
     readRun:async()=>({log:'',summary:null}),readRunFile:async()=>({kind:'text',text:''}),
     checkEnv:async()=>env,listPythons:async()=>[py],onEnvSetupOutput:()=>()=>{},
-    agentInfo:async()=>null,listData:async()=>[],getPaths:async()=>null,listExternal:async()=>[],getDataFileLinks:async()=>({}),onDownloadProgress:()=>()=>{},
+    getAppUpdateStatus:async()=>storedUpdate,onAppUpdateProgress:cb=>{updateEvent=cb;return()=>{updateEvent=()=>{}}},agentInfo:async()=>null,listData:async()=>[],getPaths:async()=>null,listExternal:async()=>[],getDataFileLinks:async()=>({}),onDownloadProgress:()=>()=>{},
   };
   dom.window.fly.runTop200=(scope,args)=>dom.window.fly.runScript(scope,'27_shiu_top200_v630.py',args);
   const vite=await createServer({configFile: new URL('../vite.config.ts', import.meta.url).pathname,server:{middlewareMode:true},appType:'custom'});
@@ -95,6 +97,26 @@ test('кнопки топ-200: выбор, запуск, быстрый выхо
     await waitFor(()=>assert.equal(updateCalls,1));
     await screen.findByText(/Скачан коммит aaaaaaaaaaaa/);
     assert.equal(calls.length,5);
+    // Прогресс и сохранённая ошибка доступны после повторного открытия вкладки.
+    let finishUpdate;
+    dom.window.fly.prepareAppUpdate=()=>new Promise((resolve,reject)=>{finishUpdate={resolve,reject};});
+    const emitUpdate = status => {storedUpdate=status; act(()=>updateEvent(status));};
+    fireEvent.click(screen.getByRole('button',{name:'скачать обновление ветки'}));
+    await waitFor(()=>assert.ok(finishUpdate));
+    emitUpdate({state:'running',phase:'archive',message:'Скачивание архива',done:25,total:100,unit:'bytes',updatedAt:'now',logPath:'C:\\updates\\update-status.json'});
+    assert.match(document.body.textContent,/25%/);
+    assert.equal(screen.getByRole('progressbar').getAttribute('value'),'25');
+    emitUpdate({state:'running',phase:'archive',message:'Скачивание архива',done:25,total:null,unit:'bytes',updatedAt:'now',logPath:'C:\\updates\\update-status.json'});
+    assert.match(document.body.textContent,/общий размер неизвестен/);
+    assert.equal(screen.getByRole('progressbar').hasAttribute('value'),false);
+    emitUpdate({state:'error',phase:'prepare',message:'Не удалось подготовить обновление: сеть недоступна',done:0,total:null,unit:null,updatedAt:'now',logPath:'C:\\updates\\update-status.json'});
+    await act(async()=>finishUpdate.reject(new Error('сеть недоступна')));
+    fireEvent.click(await screen.findByRole('button',{name:'копировать ошибку'}));
+    await waitFor(()=>assert.match(clipboardText,/сеть недоступна/));
+    fireEvent.click(screen.getByRole('button',{name:'Код и результаты'}));
+    fireEvent.click(screen.getByRole('button',{name:'данные и окружение'}));
+    await screen.findByText(/Не удалось подготовить обновление: сеть недоступна/);
+    assert.ok(screen.getByRole('button',{name:'копировать ошибку'}));
     // Запуск лезий требует выбор проверенного источника и явный выбор режима.
     failStart=false;quick=true;resumePath='C:\\top run';
     dom.window.fly.prepareLesions=async()=>({name:'28_shiu_lesions_v630.py',matches:true,conflict:null,added:[],code:'C:\\lesions'});

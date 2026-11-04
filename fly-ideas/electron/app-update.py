@@ -13,6 +13,7 @@ import stat
 import sys
 import tarfile
 import tempfile
+import time
 import urllib.error
 import urllib.request
 import uuid
@@ -34,14 +35,33 @@ def permitted(rel):
     return (len(parts)==1 and rel in ALLOWED_ROOT) or (len(parts)>1 and parts[0] in ALLOWED_DIRS and not any(x in {'node_modules','workspace','.git','__pycache__'} for x in parts))
 
 
-def request(url,limit):
+def emit_progress(phase, done=0, total=None, unit=None):
+    print('FLY_UPDATE_PROGRESS '+json.dumps({'phase':phase,'done':done,'total':total,'unit':unit},ensure_ascii=False),file=sys.stderr,flush=True)
+
+
+def request(url,limit, progress=False):
     req=urllib.request.Request(url,headers={'User-Agent':'fly-ideas-update','Accept':'application/vnd.github+json'})
     def read(context=None):
         with urllib.request.urlopen(req,timeout=60,context=context) as response:
             if not response.geturl().startswith(('https://api.github.com/', 'https://codeload.github.com/')): raise ValueError('Недопустимый адрес загрузки.')
-            data=response.read(limit+1)
-        if len(data)>limit: raise ValueError('Слишком большой ответ GitHub; обновление остановлено.')
-        return data
+            headers=getattr(response,'headers',None)
+            length=headers.get('Content-Length') if headers else None
+            total=int(length) if length and length.isdigit() and int(length)>0 else None
+            if total is not None and total>limit: raise ValueError('Слишком большой ответ GitHub; обновление остановлено.')
+            chunks=[];got=0;last=0.
+            if progress: emit_progress('archive',0,total,'bytes')
+            while True:
+                chunk=response.read(min(65536,limit+1-got))
+                if not chunk: break
+                got+=len(chunk)
+                if got>limit: raise ValueError('Слишком большой ответ GitHub; обновление остановлено.')
+                chunks.append(chunk)
+                now=time.monotonic()
+                if progress and (now-last>=0.2 or (total is not None and got>=total)):
+                    emit_progress('archive',got,total,'bytes');last=now
+            if total is not None and got!=total: raise ValueError('Неполная загрузка GitHub: размер не совпадает с Content-Length.')
+            if progress: emit_progress('archive',got,total,'bytes')
+            return b''.join(chunks)
     try:
         return read()
     except (urllib.error.URLError, ssl.SSLCertVerificationError) as error:
@@ -50,8 +70,7 @@ def request(url,limit):
             import certifi
         except ImportError:
             raise error
-        # Добавляем общедоступные корневые CA к системным, не отключая проверку
-        # сертификата и имени сервера; иные SSL-ошибки остаются ошибками.
+        # Добавляем корневые CA, не отключая проверку сертификата и имени сервера.
         context=ssl.create_default_context()
         context.load_verify_locations(cafile=certifi.where())
         return read(context)
@@ -90,8 +109,10 @@ def atomic_json(path,value):
 def prepare(app,config,owner_pid):
     app=Path(app).resolve();base=update_root(app)
     if (base/'pending.json').exists() or (base/'journal.json').exists(): raise ValueError('Уже есть ожидающее или незавершённое обновление. Закройте приложение и запустите START.bat.')
+    emit_progress('commit')
     commit=json.loads(request(API+'/commits/arena%2F01a0b34a-fly',4*1024*1024))['sha']
     if not re.fullmatch('[0-9a-f]{40}',commit): raise ValueError('Некорректный идентификатор коммита.')
+    emit_progress('tree')
     tree=json.loads(request(API+'/git/trees/'+commit+'?recursive=1',10*1024*1024))
     if tree.get('truncated'): raise ValueError('GitHub вернул неполный список файлов.')
     expected={}
@@ -105,11 +126,13 @@ def prepare(app,config,owner_pid):
             raise ValueError(f'Недопустимый объект в обновлении: {rel}')
         expected[rel]=x['sha']
     if not {'package.json','package-lock.json','electron/main.cjs','src/App.tsx'}<=expected.keys(): raise ValueError('Неполный список файлов приложения.')
-    archive=request(ARCHIVE+commit,MAX_DOWNLOAD)
+    archive=request(ARCHIVE+commit,MAX_DOWNLOAD,progress=True)
+    emit_progress('unpack')
     with gzip.GzipFile(fileobj=io.BytesIO(archive)) as zipped:
         unpacked=zipped.read(MAX_TOTAL+8*1024*1024+1)
     if len(unpacked)>MAX_TOTAL+8*1024*1024: raise ValueError('Распакованный архив слишком велик.')
     staged=Path(tempfile.mkdtemp(prefix='download-',dir=base));total=0;files={}
+    emit_progress('verify',0,len(expected),'files')
     try:
         with tarfile.open(fileobj=io.BytesIO(unpacked),mode='r:') as tar:
             for member in tar:
@@ -131,11 +154,13 @@ def prepare(app,config,owner_pid):
                 if blob_hash(data)!=expected[rel]: raise ValueError(f'Контрольная сумма Git не совпадает: {rel}')
                 target=staged.joinpath(*PurePosixPath(rel).parts);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
                 files[rel]=sha(data)
+                if len(files)%10==0 or len(files)==len(expected): emit_progress('verify',len(files),len(expected),'files')
         if set(files)!=set(expected): raise ValueError('Архив не содержит все файлы из дерева коммита.')
         final=base/('stage-'+commit+'-'+uuid.uuid4().hex)
         os.replace(staged,final)
         manifest={'version':1,'branch':BRANCH,'commit':commit,'app':str(app),'config':str(Path(config).resolve()),
                   'stage':final.name,'files':files,'python':sys.executable,'owner_pid':owner_pid}
+        emit_progress('finalize')
         atomic_json(base/'pending.json',manifest)
         return {'commit':commit,'files':len(files),'stage':str(final),'skipped_launcher':'START.bat'}
     except Exception:

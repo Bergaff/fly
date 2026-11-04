@@ -101,6 +101,7 @@ export interface SyncUi { state: AppState; chats: Record<string, string>; rates:
 export interface SyncSnapshot { id: string; createdAt: string; includeData: boolean; fileCount: number; kind: string }
 export interface SyncInfo { folder: string; shared: SyncSnapshot[]; backups: SyncSnapshot[]; backupRoot: string; error: string }
 export interface SyncProgress { phase: string; done: number; total: number; file: string }
+export interface AppUpdateStatus { state: "running" | "completed" | "error" | "interrupted"; phase: string; message: string; done: number; total: number | null; unit: "bytes" | "files" | null; updatedAt: string; logPath: string; persistenceWarning?: string }
 export interface FlyBridge {
   syncInfo(): Promise<SyncInfo>;
   chooseSyncFolder(): Promise<string | null>;
@@ -111,6 +112,8 @@ export interface FlyBridge {
   isElectron: true;
   getPaths(): Promise<Paths>;
   prepareAppUpdate(): Promise<{ canceled: boolean; commit?: string; files?: number; skippedLauncher?: string }>;
+  getAppUpdateStatus(): Promise<AppUpdateStatus | null>;
+  onAppUpdateProgress(cb: (progress: AppUpdateStatus) => void): () => void;
   getDataFileLinks(): Promise<DataFileLinks>;
   chooseDataFile(role: DataFileRole): Promise<DataFileLinks>;
   clearDataFile(role: DataFileRole): Promise<DataFileLinks>;
