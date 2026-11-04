@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-03-v1";
+export const MEMORY_VERSION = "v630-session-2026-11-04-v2";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -38,6 +38,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "План CPU 8 × 30 × 201 = 48 240; последнее известное сообщение: 14/48240, снимок 12, не считать завершённым. T4 compile-once: сборка 335,755 с; контроль 67/55 за 75,838 с, лезия 66/51 за 75,297 с, восстановленный контроль 67/55 за 78,977 с.",
     limitations: "Это не эквивалентный CPU/GPU benchmark; backend и входы не доказаны одинаковыми. Результаты CPU и GPU не объединять до отдельной проверки. Путь папки Drive и текущее состояние неизвестны.",
     files: ["colab/fly_colab.py", "colab/Shiu_v630_Colab.ipynb", "colab/gpu_reuse_pilot.py", "colab/gpu_cuda13_pilot.py"] },
+  { id: "session-observation-20261104", ideaId: "i-observational", title: "Две мухи: запуск пользователя 04.11.2026", status: "завершён, по присланным metadata.json и четырём summary.json", source: "Пользовательский запуск от 2026-11-04T06:23:16.588769Z, Windows, Python 3.12.0, NumPy 1.26.4, MuJoCo 3.3.7, Brian2 2.9.0, Pillow 11.3.0; seed 0; SHA-256 скрипта 2f7d4ed860abe2cd97aec19ce93012d608501fa85acbfd6ae7aec9b46d673290. Этот запуск уточняет раннюю запись, где выполнение на Windows ещё не было подтверждено.",
+    results: "2 с, 40 кадров, 20 Гц, шаг сети 1 мс; 32 модельных нейрона. Общее число спайков: moving 1558, stationary 800, occluded 800, shuffled 1609. Среднее изменение яркости в условных областях изображения: 0,0091847973; 0; 0; 0,0094158370 соответственно. На нейрон за секунду: 24,34; 12,50; 12,50; 25,14 спайка/с соответственно. Moving больше неподвижного на 758 спайков; shuffled больше moving на 51. В occluded крылья движутся, но нейросеть получает серое поле.",
+    limitations: "Модель искусственно построена так, чтобы нейроны реагировали на абсолютное изменение изображения. Условия детерминированы и имеют одинаковые начальные состояния; shuffle меняет temporal differences. Данные показывают работу прототипа, но не подтверждают ни биологию, ни обучение, ни зеркальные нейроны. Представлены только общие числа спайков; выводы по отдельным клеткам и времени пока невозможны. Пользовательские файлы лично не проверены.",
+    files: ["workspace/runs/ideas/i-observational/two-flies/<папка_запуска>/metadata.json", "moving/summary.json", "stationary/summary.json", "occluded/summary.json", "shuffled/summary.json", "<условие>/spikes.csv", "<условие>/visual_input.csv", "neuron_map.csv", "<условие>/vision.npz"] },
   { id: "session-observation", ideaId: "i-observational", title: "Две мухи и наблюдение крыльев", status: "подготовлен прототип, выполнение пользователем не подтверждено", source: "Локальный эксперимент 38, MuJoCo и Brian2; запуск на Windows не подтверждён.",
     results: "Первая муха управляемо машет крыльями; вторая получает изображения. Сохраняются вход, геометрия, времена и ID спайков 32 условных нейронов. Контроли: неподвижные крылья, серый вход и перемешанный порядок кадров.",
     limitations: "Кинематические эллипсоиды и условные камеры; не FlyGym/FlyBody и не мозг FlyWire. Нейроны не доказанные зеркальные, движение не повторяется и обучение не моделируется. Шаблон 16 не является двухагентной сценой и может переходить к синтетике.",
