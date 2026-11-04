@@ -18,3 +18,5 @@ colab/bootstrap.py text eol=lf
 colab/gpu_cuda13_pilot.py text eol=lf
 colab/gpu_reuse_pilot.py text eol=lf
 experiments/templates/37_shiu_frequency_check.py text eol=lf
+
+experiments/templates/38_two_flies_observation.py text eol=lf
