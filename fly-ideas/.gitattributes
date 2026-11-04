@@ -20,3 +20,4 @@ colab/gpu_reuse_pilot.py text eol=lf
 experiments/templates/37_shiu_frequency_check.py text eol=lf
 
 experiments/templates/38_two_flies_observation.py text eol=lf
+experiments/templates/41_two_flies_visual_controls.py text eol=lf

@@ -14,3 +14,7 @@ test('фаза, независимые перестановки, воспрои�
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-phase-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('контроли объекта, фаз и частот с неизменностью прежних результатов', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-visual-controls-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
