@@ -30,3 +30,11 @@ test('большая серия: реальная пауза, SQLite-контр�
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-large-study-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('блокировка progress.json: повтор записи и сохранность остальных ошибок', () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'long-study-progress-compat-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 15000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
+test('после ошибки progress.json расчёт продолжает прежнюю контрольную точку', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'long-study-progress-recovery-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
