@@ -18,3 +18,7 @@ test('контроли объекта, фаз и частот с неизмен�
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-visual-controls-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('управление крыльями, контроль readout и защита исходной серии', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-motor-bridge-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
