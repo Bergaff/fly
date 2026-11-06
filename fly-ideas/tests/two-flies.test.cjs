@@ -22,3 +22,7 @@ test('управление крыльями, контроль readout и защ�
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-motor-bridge-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 90000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('покадрово сопоставленные зрительные контроли и спайки каждого нейрона', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-matched-controls-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
