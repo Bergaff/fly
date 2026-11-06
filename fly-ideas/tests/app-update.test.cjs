@@ -35,3 +35,7 @@ test('снимок обновления не инициирует Vite watcher',
   assert.equal(r.status, 0, r.stdout + '\n' + r.stderr);
   assert.match(r.stdout, /# pass 1/);
 });
+test('диагностика конфликта и безопасная пауза снимка без потери данных', {skip: !python && 'нужен Python'}, () => {
+  const r = spawnSync(python, [path.join(__dirname, 'update-recovery-fixture.py')], {encoding:'utf8',timeout:30000});
+  assert.equal(r.status, 0, r.stdout+'\n'+r.stderr);
+});

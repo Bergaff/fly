@@ -126,6 +126,9 @@ def prepare(app,config,owner_pid):
             raise ValueError(f'Недопустимый объект в обновлении: {rel}')
         expected[rel]=x['sha']
     if not {'package.json','package-lock.json','electron/main.cjs','src/App.tsx'}<=expected.keys(): raise ValueError('Неполный список файлов приложения.')
+    # Detect protected locations before downloading or creating pending.json. Apply rechecks.
+    protected=protected_paths(app,Path(config).resolve())
+    for rel in sorted(expected): check_target(app,rel,protected)
     archive=request(ARCHIVE+commit,MAX_DOWNLOAD,progress=True)
     emit_progress('unpack')
     with gzip.GzipFile(fileobj=io.BytesIO(archive)) as zipped:
@@ -211,7 +214,10 @@ def check_target(app,rel,protected):
         current=current/part
         if is_link(current): raise ValueError(f'Ссылка в пути обновления: {current}')
     full=target.resolve()
-    if any(full==p or p in full.parents for p in protected): raise ValueError(f'Путь обновления пересекается с пользовательскими данными: {target}')
+    overlaps=[p for p in protected if full==p or p in full.parents]
+    if overlaps:
+        conflict=max(overlaps,key=lambda p:len(str(p)))
+        raise ValueError(f'Путь обновления пересекается с пользовательскими данными: {target}\nЗащищённый путь: {conflict}\nИзмените выбранный путь в настройках, не отключая защиту.')
     if target.exists() and not target.is_file(): raise ValueError(f'Ожидался файл: {target}')
     return target
 

@@ -103,6 +103,21 @@ class UpdateTest(unittest.TestCase):
     def prepare(self,pid=99999999): return u.prepare(self.app,self.config,pid)
     def pending(self): return json.loads((self.app/'workspace/.app-updates/pending.json').read_text(encoding='utf8'))
 
+    def test_conflict_stops_before_download_and_names_protected_folder(self):
+        self.config.write_text(json.dumps({'dirs':{'data':str(self.app.resolve())}}),encoding='utf8')
+        calls=[]
+        existing=u.request
+        def logged(url,limit,progress=False):
+            calls.append(url)
+            return existing(url,limit,progress=progress)
+        u.request=logged
+        with self.assertRaisesRegex(ValueError,'Защищённый путь') as exc:
+            self.prepare()
+        self.assertIn(str(self.app.resolve()),str(exc.exception))
+        self.assertFalse(any('codeload' in url for url in calls))
+        self.assertFalse((self.app/'workspace/.app-updates/pending.json').exists())
+        self.assertEqual((self.app/'workspace/data/protected.txt').read_bytes(),b'user data')
+
     def test_update_and_backups(self):
         p=self.prepare();self.assertEqual(p['commit'],self.commit)
         self.assertEqual(u.apply(self.app),0)
