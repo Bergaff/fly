@@ -24,3 +24,5 @@ experiments/templates/41_two_flies_visual_controls.py text eol=lf
 experiments/templates/42_two_flies_motor_bridge.py text eol=lf
 
 experiments/templates/43_two_flies_matched_controls.py text eol=lf
+
+experiments/templates/44_two_flies_large_study.py text eol=lf
