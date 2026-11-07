@@ -38,3 +38,7 @@ test('после ошибки progress.json расчёт продолжает п
   const result = spawnSync(python, [path.join(root, 'tests', 'long-study-progress-recovery-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('парный анализ: реальные и искусственные спайки, целостность, частичный результат и блокировка', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-paired-analysis-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
