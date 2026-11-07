@@ -50,3 +50,7 @@ test('извлечение отличий tile_scramble из готовых CSV 
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-tile-exception-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 30000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('обучение наблюдением: разделение данных, контроль утечек, сохранение и честные метрики', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-imitation-learning-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
