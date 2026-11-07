@@ -58,3 +58,7 @@ test('замороженная модель: новый фиксированны
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-frozen-holdout-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 180000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('большая серия обучения: статистики, пауза, продолжение, честные метрики и защита контрольной точки', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-long-imitation-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 180000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
