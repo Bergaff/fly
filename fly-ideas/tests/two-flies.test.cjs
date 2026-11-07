@@ -46,3 +46,7 @@ test('запуск большой серии: блокировки progress и C
   const result = spawnSync(python, [path.join(root, 'tests', 'long-study-safe-launcher-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 180000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+test('извлечение отличий tile_scramble из готовых CSV без доступа к SQLite', () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-tile-exception-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 30000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
