@@ -1,0 +1,28 @@
+*.bat text eol=crlf
+experiments/templates/26_shiu_author_model.py text eol=lf
+experiments/templates/27_shiu_top200_v630.py text eol=lf
+experiments/templates/28_shiu_lesions_v630.py text eol=lf
+experiments/templates/29_shiu_lesions_parallel.py text eol=lf
+experiments/templates/30_shiu_lesion_overview.py text eol=lf
+experiments/templates/31_shiu_selected_lesions.py text eol=lf
+experiments/templates/32_shiu_shared_study.py text eol=lf
+experiments/templates/33_shiu_individuality_pilot.py text eol=lf
+experiments/templates/34_shiu_individuality_extension.py text eol=lf
+experiments/templates/35_shiu_individuality_holdout.py text eol=lf
+experiments/templates/36_shiu_individuality_analysis.py text eol=lf
+experiments/templates/25_shiu_v630_control.py text eol=lf
+colab/fly_colab.py text eol=lf
+colab/make_notebook.py text eol=lf
+colab/Shiu_v630_Colab.ipynb text eol=lf
+colab/bootstrap.py text eol=lf
+colab/gpu_cuda13_pilot.py text eol=lf
+colab/gpu_reuse_pilot.py text eol=lf
+experiments/templates/37_shiu_frequency_check.py text eol=lf
+
+experiments/templates/38_two_flies_observation.py text eol=lf
+experiments/templates/41_two_flies_visual_controls.py text eol=lf
+experiments/templates/42_two_flies_motor_bridge.py text eol=lf
+
+experiments/templates/43_two_flies_matched_controls.py text eol=lf
+
+experiments/templates/44_two_flies_large_study.py text eol=lf
