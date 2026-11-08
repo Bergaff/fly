@@ -2,7 +2,7 @@ export type Angles = [number, number, number, number, number, number];
 export type Keyframe = { t: number; angles_deg: Angles };
 export type Trajectory = { schema: "fly-wings-trajectory-v1"; fps: 25; duration_s: number; keyframes: Keyframe[] };
 export type WingSample = { t: number; teacher_deg: Angles; prediction_deg: Angles | null };
-export type WingResult = { schema: "fly-wings-result-v1"; fps: 25; duration_s: number; trajectory: Trajectory; samples: WingSample[]; user_metrics: { new: { rmse_rad: number }; zero: { rmse_rad: number }; axis_new: Record<string, { rmse_rad: number }> }; holdout_metrics: { new: { rmse_rad: number }; zero: { rmse_rad: number } } };
+export type WingResult = { schema: "fly-wings-result-v1"; fps: 25; duration_s: number; trajectory: Trajectory; samples: WingSample[]; holdout_label?: string; user_metrics: { new: { rmse_rad: number }; zero: { rmse_rad: number }; axis_new: Record<string, { rmse_rad: number }> }; holdout_metrics: { new: { rmse_rad: number }; zero: { rmse_rad: number } } };
 export const ZERO: Angles = [0, 0, 0, 0, 0, 0];
 export const initialTrajectory: Trajectory = { schema: "fly-wings-trajectory-v1", fps: 25, duration_s: 2, keyframes: [
   { t: 0, angles_deg: [0, 0, 0, 0, 0, 0] },
@@ -58,5 +58,6 @@ export function parseResult(value: unknown): WingResult {
     return [a.new, a.zero].every(x => !!x && typeof x === "object" && finite((x as Record<string, unknown>).rmse_rad));
   }
   if (!validMetrics(o.user_metrics) || !validMetrics(o.holdout_metrics)) throw new Error("Нет показателей ошибки в результате.");
+  if (o.holdout_label !== undefined && (typeof o.holdout_label !== "string" || o.holdout_label.length > 100)) throw new Error("Некорректная подпись проверочного набора.");
   return { ...o, trajectory, samples } as WingResult;
 }

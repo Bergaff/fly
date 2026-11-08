@@ -62,3 +62,8 @@ test('большая серия обучения: статистики, пауз
   const result = spawnSync(python, [path.join(root, 'tests', 'two-flies-long-imitation-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 180000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+
+test('обучение на пользовательских траекториях, раздельная проверка и настоящие входы модели', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result = spawnSync(python, [path.join(root, 'tests', 'user-wing-learning-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});

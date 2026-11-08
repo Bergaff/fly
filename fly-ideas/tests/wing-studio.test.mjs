@@ -65,6 +65,23 @@ test('редактор, независимые оси, сохранение, з�
         await waitFor(()=>assert.match(screen.getByRole('status').textContent,/Загружен рассчитанный результат/));
       } finally {fs.rmSync(dir,{recursive:true,force:true});}
     }
+    if (ready.status === 0) {
+      const dir=fs.mkdtempSync(path.join(os.tmpdir(),'fly-user-train-'));
+      try {
+        const objects=[t,structuredClone(t),structuredClone(t)];
+        objects[1].keyframes[0].angles_deg[1]=15;
+        objects[2].keyframes[0].angles_deg[1]=30;
+        const paths=objects.map((obj,i)=>{const file=path.join(dir,`${i}.json`);fs.writeFileSync(file,JSON.stringify(obj));return file;});
+        const actual=spawnSync(python,['experiments/templates/51_two_flies_user_trajectory_learning.py','--train',paths[0],paths[1],'--test',paths[2],'--output',dir],{encoding:'utf8',timeout:60000});
+        assert.equal(actual.status,0,`${actual.stdout}\n${actual.stderr}`);
+        const run=fs.readdirSync(dir).find(name=>name.startsWith('user_wing_learning_'));
+        const playback=JSON.parse(fs.readFileSync(path.join(dir,run,'test_001/playback.json'),'utf8'));
+        assert.equal(lib.parseResult(playback).holdout_label,'Все проверочные траектории пользователя');
+        opened={content:JSON.stringify(playback),path:'playback.json'};
+        fireEvent.click(screen.getByRole('button',{name:'Открыть playback.json'}));
+        await waitFor(()=>assert.match(document.body.textContent,/Все проверочные траектории пользователя/));
+      } finally {fs.rmSync(dir,{recursive:true,force:true});}
+    }
     const samples=Array.from({length:51},(_,i)=>({t:i/25,teacher_deg:lib.interpolate(i/25,t),prediction_deg:i<2?null:[2,4,6,8,10,12]}));
     const metric={new:{rmse_rad:.2},zero:{rmse_rad:.3}};
     opened={content:JSON.stringify({schema:'fly-wings-result-v1',fps:25,duration_s:2,trajectory:t,samples,user_metrics:metric,holdout_metrics:metric}),path:'playback.json'};

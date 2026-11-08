@@ -31,3 +31,4 @@ experiments/templates/48_two_flies_frozen_holdout.py text eol=lf
 experiments/templates/49_two_flies_long_imitation.py text eol=lf
 
 experiments/templates/50_two_flies_wing_studio_pilot.py text eol=lf
+experiments/templates/51_two_flies_user_trajectory_learning.py text eol=lf
