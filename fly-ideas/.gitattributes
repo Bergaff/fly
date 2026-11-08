@@ -29,3 +29,5 @@ experiments/templates/44_two_flies_large_study.py text eol=lf
 experiments/templates/47_two_flies_imitation_learning.py text eol=lf
 experiments/templates/48_two_flies_frozen_holdout.py text eol=lf
 experiments/templates/49_two_flies_long_imitation.py text eol=lf
+
+experiments/templates/50_two_flies_wing_studio_pilot.py text eol=lf

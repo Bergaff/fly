@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { WingStudioView } from "@/views/wing-studio-view";
 import { BrainView } from "@/views/brain-view";
 import { ResearchMemoryView } from "@/views/research-memory-view";
 import { useTheme } from "@/lib/theme";
@@ -169,6 +170,7 @@ export default function App() {
     library: String(state.references.length),
     brain: "",
     memory: "",
+    wings: "",
   };
 
   return (
@@ -239,6 +241,7 @@ export default function App() {
                     ["compare", "Сравнение"],
                     ["library", "Библиотека"],
                     ["brain", "Мозг"],
+                    ["wings", "Крылья"],
                     ["memory", "Память"],
                   ] as const
                 ).map(([key, label]) => (
@@ -344,6 +347,9 @@ export default function App() {
                   setOpenId(id);
                 }}
               />
+            </TabsContent>
+            <TabsContent value="wings" className="min-h-0 overflow-hidden">
+              <WingStudioView />
             </TabsContent>
             <TabsContent value="memory" className="min-h-0 overflow-hidden">
               <ResearchMemoryView memory={state.researchMemory} />
