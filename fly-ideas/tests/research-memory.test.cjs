@@ -76,3 +76,31 @@ test('восьмичасовой пользовательский результ
   assert.match(item.limitations, /не проверены/);
   assert.ok(item.files.some((file) => file.includes('two-flies-long-imitation-user-report.md')));
 });
+
+test('выписка 64 последовательностей воспроизводит агрегаты и основные срезы', () => {
+  const lines = fs.readFileSync(path.join(root, 'experiments/reports/two-flies-long-imitation-user-rounded.csv'), 'utf8').trim().split(/\r?\n/);
+  assert.equal(lines.shift(), 'id,shape,freq,phase,distance,offset,amplitude,new,old,zero');
+  const rows = lines.map((line) => {
+    const [id,shape,freq,phase,distance,offset,amplitude,latest,old,zero] = line.split(',');
+    return {id:Number(id),shape,freq:+freq,phase:+phase,distance:+distance,offset:+offset,amplitude:+amplitude,latest:+latest,old:+old,zero:+zero};
+  });
+  assert.equal(rows.length,64);
+  assert.deepEqual(rows.map((row)=>row.id), Array.from({length:64},(_,i)=>i));
+  for (const [key, expected] of [['latest',0.155050],['old',0.214169],['zero',0.362799]]) {
+    const rmse = Math.sqrt(rows.reduce((acc,row)=>acc+row[key]**2,0)/rows.length);
+    assert.ok(Math.abs(rmse-expected)<0.0000006, `${key}: ${rmse}`);
+  }
+  const outcomes = {sine:[6,5],harmonic:[2,9],chirp:[6,4],asymmetric:[22,10]};
+  for (const [shape, [wins, losses]] of Object.entries(outcomes)) {
+    const group=rows.filter((row)=>row.shape===shape);
+    assert.equal(group.filter((row)=>row.latest<row.old).length,wins);
+    assert.equal(group.filter((row)=>row.latest>row.old).length,losses);
+  }
+  assert.deepEqual(rows.filter((row)=>row.latest>row.zero).map((row)=>row.id),[48,62]);
+  const improvement=(row)=>row.old**2-row.latest**2;
+  const contribution=rows.filter((row)=>[34,48,60,62].includes(row.id)).reduce((a,row)=>a+improvement(row),0)/rows.reduce((a,row)=>a+improvement(row),0);
+  assert.ok(Math.abs(contribution-0.793)<0.001);
+  const entry=memory.RESEARCH_MEMORY.find((item)=>item.id==='session-observation-long-imitation-user-sequences');
+  assert.ok(entry);
+  assert.match(entry.limitations,/не слепая/);
+});
