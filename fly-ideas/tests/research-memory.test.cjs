@@ -281,3 +281,29 @@ test('проба 51: длительность GIF и приближённое с
     [path.join(root,'tests/user-wing-learning-user-visual-gif-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });
+
+test('диагностика 51: ограничение перекрытия по округлённым текстовым метрикам', () => {
+  const text=fs.readFileSync(path.join(root,'experiments/reports/user-wing-learning-user-diagnostic-transcribed.txt'),'utf8');
+  const times=[0.08,0.12,0.16,0.20,0.24,0.28,0.32,0.36];
+  const matches=[...text.matchAll(/^(\d+\.\d+) с: ([\d.]+)°;/gm)];
+  assert.equal(matches.length,8); const values=matches.map(m=>Number(m[2]));
+  assert.deepEqual(matches.map(m=>Number(m[1])),times);
+  assert.ok(Math.abs(values.slice(0,4).reduce((a,b)=>a+b,0)/4-22.01531)<0.000005);
+  assert.match(text,/Среднее расстояние остальных 45 кадров: 0\.31075°/);
+  // All distances are nonnegative; each reported decimal has ±0.000005° rounding.
+  const remainingUpper=45*(0.31075+0.000005)-values.slice(4,7).reduce((s,x)=>s+(x-0.000005),0);
+  assert.ok(remainingUpper>0 && remainingUpper<0.001);
+  const csv=fs.readFileSync(path.join(root,'experiments/reports/user-wing-learning-user-predictions-transcribed.csv'),'utf8').trim().split(/\r?\n/);
+  assert.equal(csv.length,50);
+  assert.equal(csv.filter(line=>Number(line.split(',')[0])>=0.36 && Number(line.split(',')[0])<=2).length,42);
+  assert.match(text,/max \|z\|=28\.93422; \|z\|>3: 44 из 301; \|z\|>10: 19/);
+  assert.match(text,/8eba6ceb1c94513f47ad95becb42d8fb0fd6007f81eb0553209b22a12808aeec/);
+  assert.match(text,/f454d4207301286e9321dbad51cc5db4eb04fe6c392e8afb14f68a4151ac9181/);
+  const parts=[...text.matchAll(/свободный=([+-][\d.]+); текущее=([+-][\d.]+); -0,04=([+-][\d.]+); -0,08=([+-][\d.]+); до ограничения=([+-][\d.]+)/g)];
+  assert.equal(parts.length,6);for(const m of parts)assert.ok(Math.abs(m.slice(1,5).map(Number).reduce((a,b)=>a+b,0)-Number(m[5]))<1.1e-8);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-user-wing-learning-diagnostic');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.limitations,/не доказывает обобщение/);
+  const old={version:'v630-session-2026-11-07-v28',entries:[{id:'custom',results:'сохранить',files:[]}]};
+  const migrated=memory.installResearchMemory(old);
+  assert.equal(migrated.entries[0],old.entries[0]);assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
+});

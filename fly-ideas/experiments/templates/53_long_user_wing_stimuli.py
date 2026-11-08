@@ -99,3 +99,31 @@ def accepted_candidate(train, holdout_hashes, sequence_id):
     spec,degrees=candidate(train,sequence_id)
     if spec['sampled_motion_sha256'] in holdout_hashes:return None
     return spec,degrees
+
+
+def assess_history_overlap(train, test):
+    """Describe nearest 3-frame angle histories, without rejecting samples.
+
+    Angles are teacher labels, not visual features. Each nearest match may come
+    from a different training time or sequence. RMS is over 18 values in degrees.
+    """
+    if not train or not test:raise ValueError('Нужны обучающие и проверочные последовательности.')
+    def histories(item):
+        t=np.asarray(item['times'],dtype=float); y=np.asarray(item['angles_deg'],dtype=float)
+        if t.ndim!=1 or y.shape!=(len(t),6) or len(t)<3 or not np.isfinite(y).all() or not np.isfinite(t).all():raise ValueError('Некорректная последовательность.')
+        return np.concatenate([y[2:],y[1:-1],y[:-2]],axis=1)
+    train_hist=np.concatenate([histories(item) for item in train],axis=0)
+    train_id=np.concatenate([np.full(len(item['times'])-2,item['id'],dtype=int) for item in train])
+    train_t=np.concatenate([item['times'][2:] for item in train])
+    result=[]
+    for item in test:
+        h=histories(item);closest=np.empty(len(h));ids=np.empty(len(h),dtype=int);times=np.empty(len(h))
+        # Evaluate one test frame at a time to avoid a test × training × 18 tensor.
+        for i,row in enumerate(h):
+            d=np.sqrt(np.mean((train_hist-row)**2,axis=1));j=int(np.argmin(d))
+            closest[i]=d[j];ids[i]=train_id[j];times[i]=train_t[j]
+        result.append({'test_id':item['id'],'times':np.asarray(item['times'][2:]).copy(),
+                       'nearest_rms_deg':closest,'nearest_train_id':ids,'nearest_train_time_s':times,
+                       'frames':len(closest),'under_0_001_deg':int(np.sum(closest<0.001)),
+                       'under_1_deg':int(np.sum(closest<1.0)), 'under_5_deg':int(np.sum(closest<5.0))})
+    return result

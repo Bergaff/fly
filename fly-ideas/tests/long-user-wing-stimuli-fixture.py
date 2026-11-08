@@ -34,6 +34,20 @@ with tempfile.TemporaryDirectory() as td:
     copied=p/'same.json';copied.write_text(json.dumps(obj(24),indent=3),encoding='utf8')
     try:m.prepare_split(files[:2],[copied]);raise AssertionError('Duplicate crossed split')
     except ValueError as e:assert 'Совпадает' in str(e)
+    # An altered opening can still share nearly all subsequent 3-frame histories.
+    # Comparison is diagnostic only; it must never reject, modify, or fit test data.
+    altered={'id':9,'times':train[0]['times'].copy(),'angles_deg':train[0]['angles_deg'].copy()}
+    altered['angles_deg'][:3] += 30.0
+    split_before=altered['angles_deg'].copy(); audit=m.assess_history_overlap(train,[altered])[0]
+    assert audit['frames']==49 and np.all(audit['nearest_rms_deg'][3:]<1e-12)
+    assert all(audit['nearest_rms_deg'][:3]>0) and audit['under_0_001_deg']==46
+    np.testing.assert_array_equal(altered['angles_deg'],split_before)
+    # Independent naive search for every test row, including arbitrary nearest sequence/time.
+    for k in range(2,len(altered['times'])):
+        target=np.concatenate([altered['angles_deg'][k-d] for d in range(3)])
+        brute=min(np.sqrt(np.mean((target-np.concatenate([tr['angles_deg'][i-d] for d in range(3)]))**2)) for tr in train for i in range(2,len(tr['times'])))
+        assert abs(brute-audit['nearest_rms_deg'][k-2])<1e-12
+    assert m.candidate(train,12)[0]==spec
     for bad in [obj(float('nan')),dict(obj(5),duration_s=2.01),dict(obj(5),fps=50),obj(61)]:
         try:m.sample_trajectory(bad);raise AssertionError('Invalid input accepted')
         except ValueError:pass
