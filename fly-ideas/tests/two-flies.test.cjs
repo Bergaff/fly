@@ -89,3 +89,12 @@ test('длинная серия: короткий локальный pilot ге�
   const result=spawnSync(python,[path.join(root,'tests','long-user-wing-local-pilot.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });
+
+test('заготовка длительной серии: транзакции, восстановление и защита checkpoint', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','user-wing-checkpoint-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:60000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
+test('заготовка длительной серии: checkpoint после реальных кадров двух камер', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','user-wing-checkpoint-scene-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
