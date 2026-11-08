@@ -64,3 +64,15 @@ test('архив виден в программе, пути и ограниче�
   assert.match(brain, /memoryForIdea\(researchMemory, contextIdea\.id\)/);
   assert.match(brain, /пути не передаются/);
 });
+
+test('восьмичасовой пользовательский результат отделён от локального пилота', () => {
+  const item = memory.RESEARCH_MEMORY.find((entry) => entry.id === 'session-observation-long-imitation-user');
+  assert.ok(item);
+  assert.equal(item.ideaId, 'i-observational');
+  assert.match(item.results, /144376|0,155050/);
+  assert.match(item.results, /36.*28/);
+  assert.match(item.results, /0,185470.*0,147418/);
+  assert.match(item.limitations, /не слепой/);
+  assert.match(item.limitations, /не проверены/);
+  assert.ok(item.files.some((file) => file.includes('two-flies-long-imitation-user-report.md')));
+});
