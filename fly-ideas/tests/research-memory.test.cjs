@@ -153,3 +153,45 @@ test('шесть осей: итог пользователя, контроль �
   assert.equal(migrated.entries.filter(entry=>entry.id==='session-wing-studio-user-pilot').length,1);
   assert.strictEqual(memory.installResearchMemory(migrated),migrated);
 });
+
+test('шесть осей: покадровая округлённая выписка согласуется с пользовательскими метриками', () => {
+  const data=fs.readFileSync(path.join(root,'experiments/reports/wing-studio-user-frames-rounded.csv'),'utf8').trim().split(/\r?\n/);
+  const header=data.shift().split(',');
+  assert.equal(header.length,14);
+  assert.equal(header[0],'frame');
+  const rows=data.map(line=>line.split(','));
+  assert.equal(rows.length,51);
+  assert.deepEqual(rows.map(r=>Number(r[0])),Array.from({length:51},(_,i)=>i));
+  assert.ok(rows.every((r,i)=>Math.abs(Number(r[1])-i/25)<1e-9));
+  assert.ok(rows.slice(0,2).every(r=>r.slice(8).every(v=>v==='')));
+  assert.ok(rows.slice(2).every(r=>r.length===14 && r.slice(8).every(v=>v!=='' && Number.isFinite(Number(v)))));
+  const expected=[0.16295304331508692,0.10532898544228013,0.07831520324819559,0.227274583680489,0.08112446408683792,0.0997028970684356];
+  const zeros=[0.33618502875491607,0.2015651106576034,0.1129666131389415,0.2759148254153233,0.10163698404716176,0.08038883822113908];
+  let sum=0, rightX=0;
+  for(let axis=0;axis<6;axis++) {
+    let squared=0,zsquared=0,wins=0,opposite=0,strongOpposite=0,strong=0;
+    for(const r of rows.slice(2)) {
+      const target=Number(r[2+axis]),pred=Number(r[8+axis]);
+      squared+=(pred-target)**2;zsquared+=target**2;
+      if(Math.abs(pred-target)<Math.abs(target))wins++;
+      if(Math.abs(target)>1e-6 && target*pred<0)opposite++;
+      if(Math.abs(target)>=5) {strong++;if(target*pred<0)strongOpposite++;}
+    }
+    assert.ok(Math.abs(Math.sqrt(squared/49)*Math.PI/180-expected[axis])<2e-8);
+    assert.ok(Math.abs(Math.sqrt(zsquared/49)*Math.PI/180-zeros[axis])<2e-8);
+    sum+=squared;if(axis===3) {rightX=squared;assert.equal(wins,22);}
+    if(axis===5) {assert.equal(wins,16);assert.equal(opposite,30);assert.equal(strong,13);assert.equal(strongOpposite,12);}
+  }
+  assert.ok(Math.abs(Math.sqrt(sum/(49*6))*Math.PI/180-0.13659962378188198)<2e-8);
+  assert.ok(Math.abs(rightX/sum-0.4614)<0.0001);
+  for(let frame=9;frame<=18;frame++) assert.deepEqual(rows[frame].slice(8),rows[frame+25].slice(8));
+  const item=memory.RESEARCH_MEMORY.find(entry=>entry.id==='session-wing-studio-user-frames');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.source,/восстановлены/);
+  assert.match(item.limitations,/зависимы/);
+  assert.ok(item.files.includes('experiments/reports/wing-studio-user-frames-rounded.csv'));
+  const old={version:'v630-session-2026-11-07-v24',entries:[{id:'custom',ideaId:'x',results:'сохранить',files:[]}]};
+  const migrated=memory.installResearchMemory(old);
+  assert.equal(migrated.entries[0],old.entries[0]);
+  assert.equal(migrated.entries.filter(entry=>entry.id==='session-wing-studio-user-frames').length,1);
+});
