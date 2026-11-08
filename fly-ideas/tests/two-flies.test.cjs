@@ -113,3 +113,8 @@ test('подготовка длительной серии: неизменяем
   const result=spawnSync(python,[path.join(root,'tests','user-wing-preflight-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });
+
+test('интегрированный короткий прототип: старая модель, пауза, рестарт, парная проверка', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','user-wing-integrated-prototype-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
