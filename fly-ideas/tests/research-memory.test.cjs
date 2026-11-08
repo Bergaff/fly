@@ -130,3 +130,26 @@ test('покадровая выписка воспроизводит смеще�
   assert.match(entry.source,/aafc0f5bd54df465a54b30748635022774af1156c697d04cf4982ba537b5ce57/);
   assert.match(entry.limitations,/не слепая/);
 });
+
+test('шесть осей: итог пользователя, контроль по осям и честные ограничения', () => {
+  const item = memory.RESEARCH_MEMORY.find(entry => entry.id === 'session-wing-studio-user-pilot');
+  assert.ok(item);
+  assert.equal(item.ideaId, 'i-observational');
+  assert.match(item.results, /0,136600 \/ 0,207899/);
+  assert.match(item.results, /правое Z 0,099703 \/ 0,080389/);
+  assert.match(item.source, /не обучающая/);
+  assert.match(item.limitations, /не проверялись/);
+  assert.match(item.limitations, /не автономное/);
+  const model = [0.162953,0.105329,0.078315,0.227275,0.081124,0.099703];
+  const zero  = [0.336185,0.201565,0.112967,0.275915,0.101637,0.080389];
+  const rmse = a => Math.sqrt(a.reduce((sum,v)=>sum+v*v,0)/a.length);
+  assert.ok(Math.abs(rmse(model)-0.136600)<0.0000005);
+  assert.ok(Math.abs(rmse(zero)-0.207899)<0.0000005);
+  assert.equal(model.filter((v,i)=>v<zero[i]).length,5);
+  assert.ok(Math.abs((model[5]/zero[5]-1)*100-24)<.1);
+  const old = { version: 'v630-session-2026-11-07-v23', entries: [{ id:'custom', ideaId:'x', results:'не изменять', files:[] }] };
+  const migrated = memory.installResearchMemory(old);
+  assert.equal(migrated.entries[0],old.entries[0]);
+  assert.equal(migrated.entries.filter(entry=>entry.id==='session-wing-studio-user-pilot').length,1);
+  assert.strictEqual(memory.installResearchMemory(migrated),migrated);
+});
