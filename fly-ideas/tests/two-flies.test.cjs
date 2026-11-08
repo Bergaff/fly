@@ -103,3 +103,8 @@ test('прототип длинного обучения: два процесс�
   const result=spawnSync(python,[path.join(root,'tests','user-wing-resume-prototype-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });
+
+test('подготовка длительной серии: парное сравнение моделей и ограниченный аудит перекрытия', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','user-wing-evaluation-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
