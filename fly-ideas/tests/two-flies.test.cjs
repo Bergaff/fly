@@ -98,3 +98,8 @@ test('заготовка длительной серии: checkpoint после 
   const result=spawnSync(python,[path.join(root,'tests','user-wing-checkpoint-scene-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });
+
+test('прототип длинного обучения: два процесса, сохранение и рестарт с отдельной проверкой', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','user-wing-resume-prototype-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
