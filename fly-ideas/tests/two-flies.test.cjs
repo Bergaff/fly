@@ -124,7 +124,7 @@ test('долгая серия по движениям: короткий инте
   const os = require('node:os');
   const ts = require('typescript');
   const bat = fs.readFileSync(path.join(root,'experiments','RUN-LONG-USER-WING-LEARNING.bat'),'utf8');
-  assert.match(bat,/59_long_user_wing_learning\.py" --choose/);
+  assert.match(bat,/60_long_wing_folder_selector\.py" --choose/);
   assert.match(bat,/\.venv-two-flies/);
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'long-wing-playback-'));
   try {
@@ -136,4 +136,9 @@ test('долгая серия по движениям: короткий инте
     const exports={};new Function('exports',compiled)(exports);
     assert.equal(exports.parseResult(JSON.parse(fs.readFileSync(playback,'utf8'))).samples.length,51);
   } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('проверка выбранной папки 51 до запуска долгой серии и понятная диагностика', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','long-wing-folder-selector-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });

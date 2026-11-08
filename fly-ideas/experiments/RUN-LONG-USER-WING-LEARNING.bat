@@ -14,6 +14,6 @@ if not exist "workspace\.venv-two-flies\Scripts\python.exe" (
   pause
   exit /b 1
 )
-"workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\59_long_user_wing_learning.py" --choose
+"workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\60_long_wing_folder_selector.py" --choose
 if errorlevel 1 echo Операция остановлена. Сохраните сообщение об ошибке.
 pause
