@@ -67,3 +67,16 @@ test('обучение на пользовательских траектори�
   const result = spawnSync(python, [path.join(root, 'tests', 'user-wing-learning-fixture.py')], { cwd: root, env, encoding: 'utf8', timeout: 120000 });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
+
+test('диагностика пользовательского результата запускается через BAT и не переобучает модель', () => {
+  const fs = require('node:fs');
+  const bat = fs.readFileSync(path.join(root,'experiments/ANALYZE-USER-WING-INPUTS.bat'),'utf8');
+  const script = fs.readFileSync(path.join(root,'experiments/templates/52_analyze_user_wing_inputs.py'),'utf8');
+  assert.match(bat,/52_analyze_user_wing_inputs\.py" --choose/);
+  assert.match(bat,/\.venv-two-flies/);
+  assert.match(bat,/if errorlevel 1/);
+  assert.match(script,/allow_pickle=False/);
+  assert.match(script,/metadata\.json/);
+  assert.match(script,/path\.name != 'user_predictions\.csv'|Path\(selected\)\.name != 'user_predictions\.csv'/);
+  assert.doesNotMatch(script,/\.fit\(|scene\.render|np\.savez/);
+});

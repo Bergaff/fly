@@ -1,4 +1,4 @@
-import csv,hashlib,importlib.util,json,math,tempfile
+import csv,hashlib,importlib.util,json,math,tempfile,subprocess,sys,shutil
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -54,4 +54,40 @@ with tempfile.TemporaryDirectory() as td:
         with Image.open(folder/'observer_model_input.gif') as img:
             shown=np.array(img.convert('L'))[::16,::16];original=np.rint(inputs['frame_luminance'][0].reshape(2,8,12).transpose(1,0,2).reshape(8,24)*255).astype('uint8')
             np.testing.assert_array_equal(shown,original)
+    # Diagnostics reads an actual completed series-51 run and never changes it.
+    spec52=importlib.util.spec_from_file_location('user_wing_diagnostic',root/'experiments/templates/52_analyze_user_wing_inputs.py'); d=importlib.util.module_from_spec(spec52);spec52.loader.exec_module(d)
+    filehash=lambda base:{str(p.relative_to(base)):hashlib.sha256(p.read_bytes()).hexdigest() for p in base.rglob('*') if p.is_file()}
+    prior=filehash(a); text=d.analyze(a/'test_001'); assert filehash(a)==prior
+    assert 'ДИАГНОСТИКА ГОТОВОЙ ПРОБЫ 51' in text and 'RGB→блоки / история / нормировка / прогноз CSV' in text
+    assert 'left_x: учитель=' in text and 'БЛИЗОСТЬ ИЗВЕСТНЫХ УГЛОВ' in text and 'не доказательство причины' in text
+    assert str(tmp) not in text and all(p.name not in text for p in paths)
+    outdir=tmp/'отчёты';args=[sys.executable,str(root/'experiments/templates/52_analyze_user_wing_inputs.py'),'--test-folder',str(a/'test_001'),'--output-root',str(outdir)]
+    r=subprocess.run(args,capture_output=True,text=True,timeout=30);assert r.returncode==0,(r.stdout,r.stderr)
+    results=list(outdir.glob('*/ОТЧЕТ.txt'));assert len(results)==1 and results[0].read_text(encoding='utf-8-sig')==text and filehash(a)==prior
+    r=subprocess.run(args,capture_output=True,text=True,timeout=30);assert r.returncode==0 and len(list(outdir.glob('*/ОТЧЕТ.txt')))==2 and filehash(a)==prior
+    # Mixed or modified sources fail closed without creating an output report.
+    bad=tmp/'повреждённый';shutil.copytree(a,bad); bad_csv=bad/'test_001'/'user_predictions.csv';before_csv=bad_csv.read_bytes();bad_csv.write_bytes(before_csv.replace(b'0.08,',b'0.09,',1));assert bad_csv.read_bytes()!=before_csv
+    outbad=tmp/'не-создавать';r=subprocess.run([sys.executable,str(root/'experiments/templates/52_analyze_user_wing_inputs.py'),'--test-folder',str(bad/'test_001'),'--output-root',str(outbad)],capture_output=True,text=True,timeout=30)
+    assert r.returncode!=0 and 'не совпадают' in r.stderr.lower() and not outbad.exists(),(r.stdout,r.stderr)
+    bad_csv.write_bytes(before_csv);npz=bad/'test_001'/'model_inputs.npz'
+    with np.load(npz,allow_pickle=False) as data: arrays={k:data[k].copy() for k in data.files}
+    arrays['normalized_history'][0,0]+=1;np.savez_compressed(npz,**arrays)
+    try:d.analyze(bad/'test_001');raise AssertionError('Изменённый нормированный вход принят')
+    except ValueError as e:assert 'нормировка' in str(e)
+    shutil.rmtree(bad);shutil.copytree(a,bad);model=bad/'model_six_axes.npz';model.write_bytes(model.read_bytes()+b'changed')
+    try:d.analyze(bad/'test_001');raise AssertionError('Изменённая модель принята')
+    except ValueError as e:assert 'SHA модели' in str(e)
+    shutil.rmtree(bad);shutil.copytree(a,bad);src=bad/'input'/'train_001.json';src.write_bytes(src.read_bytes()+b' ')
+    try:d.analyze(bad/'test_001');raise AssertionError('Изменённый учебный JSON принят')
+    except ValueError as e:assert 'SHA не совпадает' in str(e)
+    shutil.rmtree(bad);shutil.copytree(a,bad);rgb=bad/'test_001'/'observer_vision.npz'
+    with np.load(rgb,allow_pickle=False) as data: arrays={k:data[k].copy() for k in data.files}
+    arrays['eye_rgb'][0,0,0,0,0]^=1;np.savez_compressed(rgb,**arrays)
+    try:d.analyze(bad/'test_001');raise AssertionError('Изменённый RGB принят')
+    except ValueError as e:assert 'SHA RGB' in str(e)
+    shutil.rmtree(bad);shutil.copytree(a,bad);(bad/'test_001'/'model_inputs.npz').unlink()
+    try:d.analyze(bad/'test_001');raise AssertionError('Отсутствующий NPZ принят')
+    except ValueError as e:assert 'model_inputs.npz' in str(e)
+    try:d.analyze(bad);raise AssertionError('Папка без test_NNN принята')
+    except ValueError as e:assert 'test_001' in str(e)
     print('user wing fixture passed')
