@@ -80,3 +80,12 @@ test('диагностика пользовательского результа
   assert.match(script,/path\.name != 'user_predictions\.csv'|Path\(selected\)\.name != 'user_predictions\.csv'/);
   assert.doesNotMatch(script,/\.fit\(|scene\.render|np\.savez/);
 });
+
+test('подготовка длинной серии по пользовательским движениям: генерация, разделение и дубли', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','long-user-wing-stimuli-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:60000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
+test('длинная серия: короткий локальный pilot генератора с условными глазами и 6-осевой ridge', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const result=spawnSync(python,[path.join(root,'tests','long-user-wing-local-pilot.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
