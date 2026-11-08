@@ -261,3 +261,23 @@ test('проба 51: транскрипция 49 кадров сверяется
   assert.equal(migrated.entries.filter(e=>e.id==='session-user-wing-learning-frames').length,1);
   assert.match(migrated.entries.find(e=>e.id==='session-user-wing-learning-frames').limitations,/после просмотра/);
 });
+
+test('проба 51: полученные GIF отражены в памяти без утраты прежних записей', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-user-wing-learning-vision');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.results,/9784\/9792/);
+  assert.match(item.limitations,/не доказывает/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+  const old={version:'v630-session-2026-11-07-v27',entries:[{id:'custom',results:'сохранить',files:[]}]};
+  const migrated=memory.installResearchMemory(old);
+  assert.equal(migrated.entries[0],old.entries[0]);
+  assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
+});
+
+test('проба 51: длительность GIF и приближённое соответствие блоков', {
+  skip: require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',['-c','import numpy, PIL']).status !== 0 ? 'нужны NumPy и Pillow' : false,
+}, () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/user-wing-learning-user-visual-gif-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+});
