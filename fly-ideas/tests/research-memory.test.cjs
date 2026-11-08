@@ -195,3 +195,30 @@ test('шесть осей: покадровая округлённая выпи�
   assert.equal(migrated.entries[0],old.entries[0]);
   assert.equal(migrated.entries.filter(entry=>entry.id==='session-wing-studio-user-frames').length,1);
 });
+
+test('проба 51: пользовательские сводки, осевые RMSE и нижняя граница максимума', () => {
+  const text=fs.readFileSync(path.join(root,'experiments/reports/user-wing-learning-user-test-summary.csv'),'utf8').trim().split(/\r?\n/);
+  assert.equal(text.length,2);
+  const labels=text[0].split(','); const values=text[1].split(',').map(Number);
+  assert.equal(labels.length,11);assert.equal(values.length,11);
+  assert.equal(values[0],1);assert.equal(values[1],49);
+  const axes=values.slice(5); const pooled=Math.sqrt(axes.reduce((s,v)=>s+v*v,0)/6);
+  assert.ok(Math.abs(pooled-values[2])<1e-14);
+  assert.ok(Math.abs(values[2]-0.1087124191527928)<1e-14);
+  assert.ok(Math.abs(values[3]-0.21308210046565054)<1e-14);
+  assert.ok(Math.abs(values[4]-0.20489531671412559)<1e-14);
+  const leftMae=0.05144688330350086,rightMae=0.040357272813083635;
+  const leftBound=axes[0]**2/leftMae, rightBound=axes[5]**2/rightMae;
+  assert.ok(Math.abs(leftBound*180/Math.PI-28.5578345)<1e-5);
+  assert.ok(Math.abs(rightBound*180/Math.PI-24.1602543)<1e-5);
+  assert.ok(Math.abs((1-axes[5]/0.13131518707876455)*100-0.65743185)<1e-6);
+  const item=memory.RESEARCH_MEMORY.find(entry=>entry.id==='session-user-wing-learning-pilot');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.source,/независимо не предоставлены/);
+  assert.match(item.results,/не менее/);
+  assert.match(item.limitations,/одним углом|левое Z/);
+  const old={version:'v630-session-2026-11-07-v25',entries:[{id:'custom',ideaId:'x',results:'сохранить',files:[]}]};
+  const migrated=memory.installResearchMemory(old);
+  assert.equal(migrated.entries[0],old.entries[0]);
+  assert.equal(migrated.entries.filter(entry=>entry.id==='session-user-wing-learning-pilot').length,1);
+});
