@@ -104,3 +104,29 @@ test('выписка 64 последовательностей воспроиз�
   assert.ok(entry);
   assert.match(entry.limitations,/не слепая/);
 });
+
+test('покадровая выписка воспроизводит смещение и насыщение для ID 48 и 62', () => {
+  const text = fs.readFileSync(path.join(root,'experiments/reports/two-flies-long-imitation-user-frames-48-62-rounded.csv'),'utf8').trim().split(/\r?\n/);
+  assert.equal(text.shift(),'sequence_id,frame,time_s,teacher_angle_rad,new_angle_rad,old_angle_rad');
+  const rows=text.map(line=>line.split(',').map(Number));
+  assert.equal(rows.length,96);
+  for (const [id, mean, negative, clippedOld, clippedNew, signMismatch, rmse] of [
+    [48,-0.226104,48,35,0,11,0.247379], [62,-0.291867,46,43,1,13,0.324049],
+  ]) {
+    const group=rows.filter(r=>r[0]===id);
+    assert.equal(group.length,48);
+    assert.deepEqual(group.map(r=>r[1]),Array.from({length:48},(_,i)=>i+2));
+    assert.ok(group.every(r=>Math.abs(r[2]-r[1]/25)<1e-8 && Math.abs(r[3])<0.65));
+    const errors=group.map(r=>r[4]-r[3]);
+    assert.ok(Math.abs(errors.reduce((a,b)=>a+b,0)/48-mean)<1e-6);
+    assert.equal(errors.filter(x=>x<0).length,negative);
+    assert.equal(group.filter(r=>r[5]===-0.65).length,clippedOld);
+    assert.equal(group.filter(r=>Math.abs(r[4])===0.65).length,clippedNew);
+    assert.equal(group.filter(r=>r[3]*r[4]<0).length,signMismatch);
+    assert.ok(Math.abs(Math.sqrt(errors.reduce((a,b)=>a+b*b,0)/48)-rmse)<1e-6);
+  }
+  const entry=memory.RESEARCH_MEMORY.find(item=>item.id==='session-observation-long-imitation-frames-48-62');
+  assert.ok(entry);
+  assert.match(entry.source,/aafc0f5bd54df465a54b30748635022774af1156c697d04cf4982ba537b5ce57/);
+  assert.match(entry.limitations,/не слепая/);
+});
