@@ -118,3 +118,22 @@ test('интегрированный короткий прототип: стар
   const result=spawnSync(python,[path.join(root,'tests','user-wing-integrated-prototype-fixture.py')],{cwd:root,env,encoding:'utf8',timeout:120000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
 });
+
+test('долгая серия по движениям: короткий интеграционный тест запуска, паузы, восстановления и результата', { skip: check.status !== 0 ? 'нужны mujoco, numpy, brian2, pillow' : false }, () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const ts = require('typescript');
+  const bat = fs.readFileSync(path.join(root,'experiments','RUN-LONG-USER-WING-LEARNING.bat'),'utf8');
+  assert.match(bat,/59_long_user_wing_learning\.py" --choose/);
+  assert.match(bat,/\.venv-two-flies/);
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'long-wing-playback-'));
+  try {
+    const playback=path.join(dir,'playback.json');
+    const result=spawnSync(python,[path.join(root,'tests','long-user-wing-runner-fixture.py')],{cwd:root,env:{...env,LONG_WING_FIXTURE_PLAYBACK:playback},encoding:'utf8',timeout:150000});
+    assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+    const source=fs.readFileSync(path.join(root,'src','lib','wing-trajectory.ts'),'utf8');
+    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+    const exports={};new Function('exports',compiled)(exports);
+    assert.equal(exports.parseResult(JSON.parse(fs.readFileSync(playback,'utf8'))).samples.length,51);
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
