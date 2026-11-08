@@ -222,3 +222,42 @@ test('проба 51: пользовательские сводки, осевые
   assert.equal(migrated.entries[0],old.entries[0]);
   assert.equal(migrated.entries.filter(entry=>entry.id==='session-user-wing-learning-pilot').length,1);
 });
+
+test('проба 51: транскрипция 49 кадров сверяется с метриками и начальной ошибкой', () => {
+  const file=fs.readFileSync(path.join(root,'experiments/reports/user-wing-learning-user-predictions-transcribed.csv'),'utf8');
+  assert.equal(require('node:crypto').createHash('sha256').update(file).digest('hex'),'3af3c26e4a07b9926bbad37fba684062e2ce067d34bae5a0bee57dba007fde55');
+  const lines=file.trim().split(/\r?\n/); assert.equal(lines.length,50);
+  const rows=lines.slice(1).map(line=>line.split(',').map(Number));
+  const axes=['left_x','left_y','left_z','right_x','right_y','right_z'];
+  const rmseModel=[0.16013300558542773,0.04704157405450404,0.07340626895522592,0.10382024317533987,0.09934805129867715,0.1304518792091887];
+  const maeModel=[0.05144688330350086,0.019740173467985823,0.026974199902111924,0.04272263209506131,0.036555796789760696,0.040357272813083635];
+  const zeroRmse=[0.31695816271467503,0.2015651106576034,0.12616867871813853,0.2696049682537521,0.15307224519763885,0.13891159721496849];
+  const mean=xs=>xs.reduce((s,x)=>s+x,0)/xs.length;
+  const rmse=xs=>Math.sqrt(mean(xs.map(x=>x*x)));
+  const errors=rows.map((r,i)=>{
+    assert.equal(r.length,13); assert.ok(r.every(Number.isFinite));
+    assert.ok(Math.abs(r[0]-(0.08+i*0.04))<1e-12);
+    return axes.map((_,j)=>r[j+7]-r[j+1]);
+  });
+  axes.forEach((_,j)=>{
+    assert.ok(Math.abs(rmse(errors.map(e=>e[j]))-rmseModel[j])<1e-14);
+    assert.ok(Math.abs(mean(errors.map(e=>Math.abs(e[j])))-maeModel[j])<1e-14);
+    assert.ok(Math.abs(rmse(rows.map(r=>r[j+1]))-zeroRmse[j])<1e-14);
+  });
+  const flat=errors.flat(); const ss=es=>es.flat().reduce((s,x)=>s+x*x,0);
+  assert.ok(Math.abs(rmse(flat)-0.1087124191527928)<1e-14);
+  assert.ok(Math.abs(mean(flat.map(Math.abs))-0.03629949306191737)<1e-14);
+  assert.ok(Math.abs(ss(errors.slice(0,4))/ss(errors)-0.9595968755615126)<1e-12);
+  assert.ok(Math.abs(ss(errors.slice(0,1))/ss(errors)-0.6857505275866363)<1e-12);
+  assert.ok(Math.abs(rmse(errors.slice(4).flat())-0.022802287587150732)<1e-14);
+  assert.ok(Math.abs(rmse(rows.slice(4).flatMap(r=>r.slice(1,7)))-0.1920110902821396)<1e-14);
+  assert.ok(Math.abs(rmse(rows.slice(0,4).flatMap(r=>r.slice(1,7)))-0.37607294830714283)<1e-14);
+  const maxLeft=errors.reduce((best,e,i)=>Math.abs(e[0])>Math.abs(errors[best][0])?i:best,0);
+  assert.equal(rows[maxLeft][0],0.08);
+  assert.ok(Math.abs(errors[maxLeft][0]*180/Math.PI-58.6073717683)<1e-8);
+  const old={version:'v630-session-2026-11-07-v26',entries:[{id:'custom',results:'сохранить',files:[]}]};
+  const migrated=memory.installResearchMemory(old);
+  assert.equal(migrated.entries[0],old.entries[0]);
+  assert.equal(migrated.entries.filter(e=>e.id==='session-user-wing-learning-frames').length,1);
+  assert.match(migrated.entries.find(e=>e.id==='session-user-wing-learning-frames').limitations,/после просмотра/);
+});
