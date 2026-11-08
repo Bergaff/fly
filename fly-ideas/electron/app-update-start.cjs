@@ -27,3 +27,16 @@ if (fs.existsSync(pending) || fs.existsSync(journal)) {
     process.exitCode = 1;
   }
 }
+
+// START.bat may be an older copy (updates intentionally do not replace it).
+// Report a missing 3D dependency before Vite shows an opaque import error.
+if (!process.exitCode && fs.existsSync(path.join(app, 'node_modules')) && !fs.existsSync(path.join(base, 'npm-pending'))) {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(app, 'package.json'), 'utf8'));
+    if (pkg.dependencies?.three) require.resolve('three', { paths: [app] });
+  } catch (error) {
+    console.error('Не удалось проверить или найти библиотеку three:', error.message);
+    console.error('Закройте Fly Ideas и запустите двойным щелчком experiments\\REPAIR-THREE.bat.');
+    process.exitCode = 1;
+  }
+}

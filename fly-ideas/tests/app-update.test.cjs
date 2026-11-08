@@ -39,3 +39,6 @@ test('диагностика конфликта и безопасная пауз
   const r = spawnSync(python, [path.join(__dirname, 'update-recovery-fixture.py')], {encoding:'utf8',timeout:30000});
   assert.equal(r.status, 0, r.stdout+'\n'+r.stderr);
 });
+
+// Проверка безопасного восстановления отсутствующей зависимости 3D.
+require('./repair-three.test.cjs');
