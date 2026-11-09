@@ -17,6 +17,7 @@ def load(name,path):
     spec=importlib.util.spec_from_file_location(name,path);mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);return mod
 base=load('runner_base',root/'experiments/templates/51_two_flies_user_trajectory_learning.py')
 runner=load('runner59',root/'experiments/templates/59_long_user_wing_learning.py')
+context=load('context61',root/'experiments/templates/61_long_wing_context_intervention.py')
 ck=load('runner_checkpoint',root/'experiments/templates/54_user_wing_checkpoint.py')
 script=root/'experiments/templates/59_long_user_wing_learning.py'
 examples=root/'experiments/examples/wing-user-training'
@@ -84,6 +85,16 @@ with tempfile.TemporaryDirectory() as d:
         Path(os.environ['LONG_WING_FIXTURE_PLAYBACK']).write_bytes(playback_bytes)
     assert playback['schema']=='fly-wings-result-v1' and len(playback['samples'])==51
     assert (resumed/'result/test_002/observer_vision.gif').exists()
+    # Series 61 rerenders one-axis interventions and must not modify series 59.
+    source_before={p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}
+    intervention=context.run(resumed,2,10,tmp/'context-output')
+    intervention_summary=json.loads((intervention/'summary.json').read_text(encoding='utf-8'))
+    assert intervention_summary['source_test_id']==2 and len(intervention_summary['conditions'])==12
+    assert intervention_summary['conditions'][0]['condition']=='baseline'
+    assert intervention_summary['conditions'][1]['condition']=='only_right_x'
+    with (intervention/'predictions.csv').open(encoding='utf-8-sig',newline='') as f:intervention_rows=list(csv.DictReader(f))
+    assert len(intervention_rows)==12*49
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
     with sqlite3.connect(resumed/'study.sqlite3') as db:db.execute("UPDATE run_phase SET stage='evaluation'")

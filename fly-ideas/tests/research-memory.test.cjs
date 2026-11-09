@@ -379,3 +379,19 @@ test('серия 59: покадровый CSV, проверка сводки и 
   assert.deepEqual(plain(migrated.entries[1].files),['custom']);
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
+
+test('серия 61: план одноосевых контекстных вмешательств сохранён в памяти', () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/long-wing-context-intervention-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-context-plan');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.status,/пользовательский запуск ещё не получен/);
+  assert.match(item.results,/1,44–1,60/);
+  assert.match(item.limitations,/вне обучающего распределения/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+  const custom={id:'custom',results:'сохранить',files:[]};
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-07-v31',entries:[custom]});
+  assert.equal(migrated.entries[0],custom);
+  assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
+});

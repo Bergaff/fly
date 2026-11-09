@@ -656,6 +656,20 @@ workspace\.venv-two-flies\Scripts\python.exe experiments\templates\50_two_flies_
 workspace\.venv-two-flies\Scripts\python.exe experiments\templates\59_long_user_wing_learning.py --new "ПАПКА_НОВОЙ_СЕРИИ" --previous "ПАПКА_СТАРОЙ_ПРОБЫ" --fresh "НОВОЕ_ДВИЖЕНИЕ.json" --hours 4
 ```
 
+### Контроль контекстных осей после серии 59
+
+Для локализации ошибки `right_x` на участке `1,44–1,60` с не нужно заново запускать восьмичасовое обучение. Обновите проект и дважды щёлкните `experiments\RUN-WING-CONTEXT-INTERVENTION.bat`. Выберите целиком завершённую папку `wing_user_long_...`, в которой лежат `study.sqlite3` и папка `result`, затем подтвердите номер проверки с ролью `new_test`.
+
+Короткая серия 61 проверит контрольные суммы старых файлов и сначала обязана точно воспроизвести исходный baseline. Затем она оставит `right_x` неизменным и по одной сдвинет остальные пять осей на `−10°` и `+10°`; дополнительное условие оставит только `right_x`. Старая и новая модели заморожены и не переобучаются. Исходная серия не изменяется. Отдельная папка `workspace\runs\ideas\i-observational\wing-context-intervention\wing_context_...` содержит `ОТЧЕТ.txt`, `summary.json` и полный `predictions.csv`; пришлите текст отчёта.
+
+Сдвиги могут быть вне обучающего распределения. Результат описывает чувствительность искусственной модели к визуальному контексту, но не устанавливает биологическую причинность. Подробный протокол: `experiments/reports/long-user-wing-context-intervention-plan.md`. Windows GUI независимо не проверен.
+
+Запасной ручной запуск:
+
+```powershell
+workspace\.venv-two-flies\Scripts\python.exe experiments\templates\61_long_wing_context_intervention.py --series "ПУТЬ\wing_user_long_..." --test-id 2
+```
+
 ### Диагностика уже завершённой пользовательской пробы
 
 Если чат не принимает NPZ, не нужно повторять обучение. После окончания других расчётов обновите приложение и дважды щёлкните `experiments/ANALYZE-USER-WING-INPUTS.bat`. В открывшемся окне найдите **старый завершённый** каталог `user_wing_learning_...`, внутри откройте `test_001` и выберите `user_predictions.csv`. Можно выбрать другой `test_NNN`, если проверок несколько. Не выбирайте файлы из разных запусков и не переносите их отдельно: диагностика использует модель, манифест, копии траекторий и NPZ из прежней структуры папок.
