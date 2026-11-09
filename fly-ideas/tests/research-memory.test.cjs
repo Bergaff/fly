@@ -358,3 +358,24 @@ test('длительная серия 59: транскрипция соглас�
   assert.deepEqual(plain(migrated.entries[1].files),['custom']);
   assert.equal(migrated.entries.filter(e=>e.id===entry.id).length,1);
 });
+
+test('серия 59: покадровый CSV, проверка сводки и совпадения с прежним тестом', () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/long-user-wing-user-predictions-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-user-frames');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.results,/32\/49/);assert.match(item.results,/67,12%/);
+  assert.match(item.limitations,/не доказывает причинность/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+  const old={id:'session-long-user-wing-user-result',status:'completed по присланным текстам ИТОГ и summary; исходные файлы не проверены',source:'Мои заметки. NPZ, SQLite, имена выбранных JSON и покадровые файлы независимо не получены.',limitations:'Мой текст. Для анализа времён нужен test_002/predictions.csv, NPZ не нужен.',files:['custom']};
+  const custom={id:'custom',results:'сохранить',files:[]};
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-07-v30',entries:[custom,old]});
+  assert.equal(migrated.entries[0],custom);
+  assert.match(migrated.entries[1].source,/Мои заметки\./);
+  assert.match(migrated.entries[1].source,/пользователь приложил CSV/);
+  assert.match(migrated.entries[1].limitations,/Мой текст\./);
+  assert.doesNotMatch(migrated.entries[1].limitations,/нужен test_002/);
+  assert.deepEqual(plain(migrated.entries[1].files),['custom']);
+  assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
+});

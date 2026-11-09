@@ -32,3 +32,6 @@ experiments/templates/49_two_flies_long_imitation.py text eol=lf
 
 experiments/templates/50_two_flies_wing_studio_pilot.py text eol=lf
 experiments/templates/51_two_flies_user_trajectory_learning.py text eol=lf
+
+# Preserve the exact uploaded CSV bytes (including CRLF) for its SHA-256.
+experiments/reports/long-user-wing-user-test-002-predictions.csv -text whitespace=cr-at-eol
