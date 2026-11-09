@@ -381,22 +381,23 @@ test('серия 59: покадровый CSV, проверка сводки и 
 });
 
 test('серия 61: пользовательский контроль контекстных осей сохранён в памяти', () => {
-  for (const fixture of ['long-wing-context-intervention-fixture.py','long-wing-context-user-result-fixture.py']) {
+  for (const fixture of ['long-wing-context-intervention-fixture.py','long-wing-context-user-result-fixture.py','long-wing-context-user-summary-fixture.py']) {
     const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
       [path.join(root,'tests',fixture)], {cwd:root,encoding:'utf8',timeout:30000});
     assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
   }
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-context-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/ОТЧЕТ\.txt/);
-  assert.match(item.results,/80,79%/);assert.match(item.results,/right_y \+10°/);
+  assert.match(item.status,/summary\.json/);
+  assert.match(item.source,/независимо пересчитаны/);
+  assert.match(item.results,/80,79%/);assert.match(item.results,/\+6,63°/);
   assert.match(item.limitations,/вне обучающего распределения/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
-  const old={id:item.id,title:'Старый план',status:'подготовлен BAT и read-only протокол; пользовательский запуск ещё не получен',source:'План',results:'Результатов пользователя пока нет.',limitations:'Ограничения',files:['old']};
-  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-07-v32',entries:[custom,old]});
+  const old={id:item.id,title:'Старый результат',status:'выполнено по присланному тексту ОТЧЕТ.txt; оригинальные файлы серии 61 не получены',source:'Только отчёт',results:'80,79%',limitations:'Ограничения',files:['old']};
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-07-v33',entries:[custom,old]});
   assert.equal(migrated.entries[0],custom);
-  assert.match(migrated.entries[1].status,/ОТЧЕТ\.txt/);
-  assert.match(migrated.entries[1].results,/80,79%/);
+  assert.match(migrated.entries[1].status,/summary\.json/);
+  assert.match(migrated.entries[1].results,/\+6,63°/);
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });

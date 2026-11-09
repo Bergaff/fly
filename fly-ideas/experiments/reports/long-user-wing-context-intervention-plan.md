@@ -30,7 +30,7 @@ workspace\.venv-two-flies\Scripts\python.exe experiments\templates\61_long_wing_
 
 ## Полученный пользовательский результат
 
-Пользователь выполнил серию и прислал текст `ОТЧЕТ.txt`. В `only_right_x` RMSE новой модели на участке уменьшилась с `1,201072` до `0,230682` рад, на 80,79%; среди одиночных сдвигов наибольшую среднюю реакцию дал `right_y +10°`. Оригинальные файлы серии 61 здесь не получены. Анализ и ручная транскрипция: [long-user-wing-context-intervention-user-result.md](long-user-wing-context-intervention-user-result.md).
+Пользователь выполнил серию и вставил `ОТЧЕТ.txt`, затем полный текст `summary.json` и `predictions.csv`. В `only_right_x` RMSE новой модели на участке уменьшилась с `1,2010716665` до `0,2306815555` рад, на 80,79%; среди одиночных сдвигов наибольшую среднюю реакцию дал `right_y +10°`. SHA моделей и baseline согласованы с ранее полученными данными 59, но оригинальные байты файлов 61 и их SHA здесь не получены. Анализ и ручные транскрипции: [long-user-wing-context-intervention-user-result.md](long-user-wing-context-intervention-user-result.md).
 
 ## Ограничения
 
