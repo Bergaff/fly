@@ -131,6 +131,21 @@ with tempfile.TemporaryDirectory() as d:
     ci_repeat=subprocess.run([sys.executable,str(root/'experiments/templates/63_long_wing_context_invariant_training.py'),'--resume',str(ci_folder)],cwd=root,env=env,capture_output=True,text=True,timeout=30)
     assert ci_repeat.returncode==0 and 'уже завершена' in ci_repeat.stdout,ci_repeat.stdout+'\n'+ci_repeat.stderr
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 64 freezes all five new files before the first prediction and only
+    # evaluates the two already frozen series-63 models.
+    replication_holdouts=[]
+    for index in range(5):
+        obj=json.loads(oldtest.read_text(encoding='utf-8'));obj['keyframes'][0]['angles_deg'][3]+=10+index
+        path=tmp/f'replication-holdout-{index+1}.json';path.write_text(json.dumps(obj),encoding='utf-8');replication_holdouts.append(path)
+    rep_root=tmp/'replication-output'
+    rep_run=subprocess.run([sys.executable,str(root/'experiments/templates/64_wing_context_invariant_replication.py'),'--source',str(ci_folder),'--holdouts',*map(str,replication_holdouts),'--output-root',str(rep_root)],cwd=root,env=env,capture_output=True,text=True,timeout=90)
+    assert rep_run.returncode==0,rep_run.stdout+'\n'+rep_run.stderr
+    rep_folders=list(rep_root.glob('wing_context_replication_*'));assert len(rep_folders)==1
+    rep_summary=json.loads((rep_folders[0]/'summary.json').read_text(encoding='utf-8'))
+    assert rep_summary['status']=='completed' and rep_summary['aggregate']['holdouts']==5
+    assert len(rep_summary['holdouts'])==5 and sum(x['frames'] for x in rep_summary['holdouts'])==245
+    assert not (rep_folders[0]/'INCOMPLETE.txt').exists() and (rep_folders[0]/'complete.json').exists()
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
     with sqlite3.connect(resumed/'study.sqlite3') as db:db.execute("UPDATE run_phase SET stage='evaluation'")
