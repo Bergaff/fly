@@ -266,7 +266,18 @@ def process(folder,max_batches=None):
 
 
 def start(folder,source,holdout,fixture_limit=None,max_batches=None):
-    protocol,raw,stats,ids=preregister(source,holdout,fixture_limit);runner=load_runner();proto,ev,pre,stim,ck,base,large=runner.dependencies();free_check(large,Path(folder).parent,fixture_limit is not None);create(folder,protocol,raw,stats,ck);print('Holdout закреплён до прогнозов. SHA-256:',protocol['holdout_sha256'],flush=True);process(folder,max_batches)
+    protocol,raw,stats,ids=preregister(source,holdout,fixture_limit)
+    runner=load_runner();proto,ev,pre,stim,ck,base,large=runner.dependencies()
+    # On a first Windows launch the series-63 output root does not exist yet.
+    # shutil.disk_usage raises WinError 3 for a missing path, so create only the
+    # empty parent before checking resources; the unique run folder is still
+    # created exclusively by create() after all preflight checks pass.
+    parent=Path(folder).parent
+    parent.mkdir(parents=True,exist_ok=True)
+    free_check(large,parent,fixture_limit is not None)
+    create(folder,protocol,raw,stats,ck)
+    print('Holdout закреплён до прогнозов. SHA-256:',protocol['holdout_sha256'],flush=True)
+    process(folder,max_batches)
 def request_pause(folder):
     runner=load_runner();proto,ev,pre,stim,ck,base,large=runner.dependencies();folder=Path(folder).resolve()
     _,_,_,_,state=read_state(folder,ck)
@@ -316,4 +327,4 @@ def main():
 if __name__=='__main__':
     multiprocessing.freeze_support()
     try:sys.exit(main() or 0)
-    except Exception as exc:print(f'ОШИБКА СЕРИИ 63: {type(exc).__name__}: {exc}\nИсходная серия и holdout не изменялись; последняя партия сохранена.',file=sys.stderr,flush=True);sys.exit(1)
+    except Exception as exc:print(f'ОШИБКА СЕРИИ 63: {type(exc).__name__}: {exc}\nИсходная серия и holdout не изменялись. Если новая папка серии уже была создана, последняя завершённая партия сохранена.',file=sys.stderr,flush=True);sys.exit(1)

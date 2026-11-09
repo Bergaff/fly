@@ -114,7 +114,8 @@ with tempfile.TemporaryDirectory() as d:
     holdout_obj=json.loads(oldtest.read_text(encoding='utf-8'))
     holdout_obj['keyframes'][0]['angles_deg'][3]+=2
     holdout=tmp/'context-invariant-holdout.json';holdout.write_text(json.dumps(holdout_obj),encoding='utf-8')
-    ci_folder=tmp/'context-invariant'
+    # The production output root is absent on the first Windows launch.
+    ci_folder=tmp/'missing-context-invariant-root'/'context-invariant'
     ci_run=subprocess.run([sys.executable,str(root/'experiments/templates/63_long_wing_context_invariant_training.py'),
       '--new',str(ci_folder),'--source',str(resumed),'--holdout',str(holdout),'--fixture-limit','1'],
       cwd=root,env=env,capture_output=True,text=True,timeout=90)

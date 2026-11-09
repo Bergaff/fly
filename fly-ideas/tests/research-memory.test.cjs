@@ -426,7 +426,7 @@ test('серия 63: контекст-инвариантный протокол 
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-context-invariant-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/запуск ещё не получен/);
+  assert.match(item.status,/результат ещё не получен/);assert.match(item.status,/WinError 3/);
   assert.match(item.source,/SHA до вычисления прогнозов/);
   assert.match(item.results,/RMSE right_x/);assert.match(item.results,/0–10°/);
   assert.match(item.limitations,/вне распределения/);assert.match(item.limitations,/Windows GUI/);

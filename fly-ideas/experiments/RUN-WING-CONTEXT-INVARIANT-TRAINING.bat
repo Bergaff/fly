@@ -17,5 +17,5 @@ if not exist "workspace\.venv-two-flies\Scripts\python.exe" (
   exit /b 1
 )
 "workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\63_long_wing_context_invariant_training.py" --choose
-if errorlevel 1 echo Расчет остановлен. Сохраните сообщение об ошибке. Последняя завершенная партия остается в базе.
+if errorlevel 1 echo Расчет остановлен. Сохраните сообщение об ошибке. Если новая папка серии уже создана, последняя завершенная партия остается в базе.
 pause
