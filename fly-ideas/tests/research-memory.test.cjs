@@ -307,3 +307,54 @@ test('диагностика 51: ограничение перекрытия п�
   const migrated=memory.installResearchMemory(old);
   assert.equal(migrated.entries[0],old.entries[0]);assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
+
+test('длительная серия 59: транскрипция согласуется по осям и сохраняет ограничения проверки', () => {
+  const p=path.join(root,'experiments/reports/long-user-wing-user-summary-transcribed.json');
+  const summary=JSON.parse(fs.readFileSync(p,'utf8'));
+  assert.match(summary.transcription_note,/not the original/);
+  assert.equal(summary.status,'completed');assert.equal(summary.protocol_mode,'long');
+  assert.equal(summary.candidates,60094);assert.equal(summary.accepted_candidates,60094);
+  assert.equal(summary.training_frames,60094*49);assert.equal(summary.active_training_seconds,28800.937000000005);
+  assert.equal(summary.audit.audited_count,128);assert.equal(summary.audit.is_exhaustive,false);
+  assert.equal(summary.audit.sample_ids.length,128);
+  assert.equal(new Set(summary.audit.sample_ids).size,128);
+  assert.equal(summary.audit.sample_ids[0],0);assert.equal(summary.audit.sample_ids[1],1);
+  assert.equal(summary.audit.sample_ids.at(-1),60093);
+  assert.ok(summary.audit.sample_ids.every((n,i,a)=>i===0||n>a[i-1]));
+  assert.equal(summary.baseline_model_sha256,'8eba6ceb1c94513f47ad95becb42d8fb0fd6007f81eb0553209b22a12808aeec');
+  const axes=['left_x','left_y','left_z','right_x','right_y','right_z'];
+  for (const t of summary.tests) {
+    assert.equal(t.frames,49);
+    for (const model of Object.values(t.metrics)) {
+      const rms=Math.sqrt(axes.reduce((s,a)=>s+model.axis_rmse_rad[a]**2,0)/6);
+      const mae=axes.reduce((s,a)=>s+model.axis_mae_rad[a],0)/6;
+      assert.ok(Math.abs(rms-model.rmse_rad)<1e-14);
+      assert.ok(Math.abs(mae-model.mae_rad)<1e-14);
+    }
+  }
+  const [regression,fresh]=summary.tests;
+  assert.equal(regression.role,'regression');assert.equal(fresh.role,'new_test');
+  assert.deepEqual([regression.overlap_under_0_001_deg,regression.overlap_under_1_deg,regression.overlap_under_5_deg],[42,43,44]);
+  assert.deepEqual([fresh.overlap_under_0_001_deg,fresh.overlap_under_1_deg,fresh.overlap_under_5_deg],[28,29,35]);
+  assert.ok(Math.abs((regression.metrics.new.rmse_rad/regression.metrics.old.rmse_rad-1)*100-44.5816467262)<1e-8);
+  assert.ok(Math.abs((1-fresh.metrics.new.rmse_rad/fresh.metrics.old.rmse_rad)*100-2.2863804995)<1e-8);
+  assert.ok(fresh.metrics.new.mae_rad>fresh.metrics.old.mae_rad);
+  const n=fresh.metrics.new; const share=n.axis_rmse_rad.right_x**2/(6*n.rmse_rad**2)*100;
+  assert.ok(Math.abs(share-58.36294612698)<1e-9);
+  for (const axis of ['left_z','right_x','right_z']) {
+    assert.ok(n.axis_rmse_rad[axis]>fresh.metrics.zero.axis_rmse_rad[axis]);
+    assert.ok(n.axis_rmse_rad[axis]>fresh.metrics.training_mean.axis_rmse_rad[axis]);
+  }
+  const entry=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-user-result');
+  assert.ok(entry && entry.ideaId==='i-observational');
+  assert.match(entry.limitations,/не сравнивает RGB/);
+  for (const name of entry.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+  const diagnostic={id:'session-user-wing-learning-diagnostic',limitations:'Мои данные. Полный долгий прогон ещё не готов.',files:['custom']};
+  const custom={id:'custom',results:'сохранить',files:[]};
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-07-v29',entries:[custom,diagnostic]});
+  assert.equal(migrated.entries[0],custom);
+  assert.match(migrated.entries[1].limitations,/Мои данные\./);
+  assert.doesNotMatch(migrated.entries[1].limitations,/ещё не готов/);
+  assert.deepEqual(plain(migrated.entries[1].files),['custom']);
+  assert.equal(migrated.entries.filter(e=>e.id===entry.id).length,1);
+});

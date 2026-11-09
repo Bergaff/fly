@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-07-v29";
+export const MEMORY_VERSION = "v630-session-2026-11-07-v30";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -56,8 +56,13 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-user-wing-learning-diagnostic", ideaId: "i-observational", title: "Проба 51: перекрытие теста и обучения", status: "по присланному тексту локального отчёта, исходные NPZ и JSON не получены",
     source: "Пользователь выполнил BAT и вставил текст ОТЧЕТ.txt. По сообщению программы хэши модели и манифеста, копии JSON, RGB и истории согласуются; максимальные разности RGB→блоки→история→нормировка→прогноз равны нулю. Оригинальные файлы независимо не проверены. Хэши модели и манифеста в отчёте совпадают с предыдущими присланными метаданными.",
     results: "Первая четвёрка тестовых трёхкадровых историй углов отличается от ближайших обучающих на 22,01531° RMS в среднем; остальные 45 на 0,31075°. По среднему и трём отдельно напечатанным расстояниям 0,24–0,32 с следует, с учётом округления: все 42 истории с 0,36 до 2,00 с имеют ближайшую обучающую историю с разницей <0,001° RMS. Ближайшие моменты могут быть разными, визуальная идентичность не доказана. В 0,08 с у 44 из 301 нормированного признака |z|>3, у 19 |z|>10; max 28,93422.",
-    limitations: "Это косвенный вывод из округлённого текста, не независимый анализ оригиналов; RMS по 18 углам не равен расстоянию зрительных входов. Почти полное перекрытие фрагментов означает, что низкая поздняя ошибка не доказывает обобщение. Связь необычного начала и высокой ошибки не доказывает причинность. Полный долгий прогон ещё не готов.",
+    limitations: "Это косвенный вывод из округлённого текста, не независимый анализ оригиналов; RMS по 18 углам не равен расстоянию зрительных входов. Почти полное перекрытие фрагментов означает, что низкая поздняя ошибка не доказывает обобщение. Связь необычного начала и высокой ошибки не доказывает причинность. На момент диагностики полный долгий прогон ещё не был проведён; результат серии 59 описан отдельно.",
     files: ["experiments/reports/user-wing-learning-user-diagnostic-analysis.md", "experiments/reports/user-wing-learning-user-diagnostic-transcribed.txt", "experiments/reports/long-user-wing-study-preparation.md", "experiments/templates/53_long_user_wing_stimuli.py"] },
+  { id: "session-long-user-wing-user-result", ideaId: "i-observational", title: "Длительная серия 59: пользовательские движения", status: "completed по присланным текстам ИТОГ и summary; исходные файлы не проверены",
+    source: "Пользователь прислал сводки длительной серии 59: 28800,937 с активного обучения, 60094 кандидата, 2944606 кадров, два теста по 49 кадров. Текстовый SHA старой модели совпал с ранее присланным в диагностике 51; NPZ, SQLite, имена выбранных JSON и покадровые файлы независимо не получены. В репозитории ручная транскрипция, не оригинальный summary.json.",
+    results: "RMSE старая/новая/ноль/среднее, рад: прежний тест 0,108712/0,157178/0,213082/0,204821 (новая хуже старой на 44,58%); новая проверка 0,222111/0,217033/0,255376/0,228369 (новая лучше старой на 2,29%). На новой проверке MAE новой 0,097491 против старой 0,096567, на 0,96% хуже. Новая на left_z, right_x, right_z хуже обоих константных контролей; right_x RMSE 0,406134 рад, 58,36% суммы квадратов ошибки. В выборке 128 из 60094 тренировочных движений для 28 из 49 кадров новой проверки найдены угловые истории <0,001° RMS по 18 значениям.",
+    limitations: "Источник пользовательский текст, не независимая проверка базы/модели. Один новый пользовательский тест и временно зависимые кадры; не слепая биологическая проверка. Аудит 128 вариантов неполный, не сравнивает RGB и может пропустить совпадения. Вариации исходных движений, учительские углы и ridge; playback не автономная генерация и это не доказательство зеркальных нейронов. Для анализа времён нужен test_002/predictions.csv, NPZ не нужен.",
+    files: ["experiments/reports/long-user-wing-user-result.md", "experiments/reports/long-user-wing-user-summary-transcribed.json", "experiments/reports/long-user-wing-study-preparation.md", "experiments/templates/59_long_user_wing_learning.py"] },
   { id: "session-wing-studio-user-frames", ideaId: "i-observational", title: "Шесть осей: покадровый разбор показа пользователя", status: "playback.json вставлен текстом; модель, изображения и исходный файл не проверены",
     source: "Пользователь прислал текст playback.json с 51 кадром, 25 FPS; первые два прогноза отсутствуют, 49 кадров оцениваются. Углы учителя в сохранённой выписке восстановлены по девяти ключевым кадрам, прогнозы перенесены вручную и округлены до шести знаков. Общая и шесть отдельных RMSE согласуются с присланными точными метриками, но оригинальные файлы и построчную точность этим не доказали.",
     results: "Правое X: RMSE 13,02° против 15,81° у нуля, средняя ошибка +7,61° и 46,1% суммы квадратов ошибок шести каналов; прогноз ближе нуля в 22/49 кадров. Правое Z: RMSE 5,71° против 4,61°, средняя ошибка +0,31°, ближе нуля в 16/49 и противоположный эталону знак в 30/48 ненулевых кадров; при |эталон| ≥5° противоположный знак в 12/13. В 1,00 с правое Z учитель −10°, прогноз +2,307°. На 0,36–0,72 с и 1,36–1,72 с десять пар округлённых шестиканальных прогнозов одинаковы при повторяющихся участках траектории.",
@@ -174,7 +179,13 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
 export function installResearchMemory(existing?: ResearchMemoryState): ResearchMemoryState {
   if (existing?.version === MEMORY_VERSION && Array.isArray(existing.entries)) return existing;
-  const entries = Array.isArray(existing?.entries) ? existing.entries : [];
+  const entries = Array.isArray(existing?.entries) ? existing.entries.map((entry) => {
+    // Update only the obsolete status sentence; preserve any other user edits.
+    if (entry?.id === "session-user-wing-learning-diagnostic" && typeof entry.limitations === "string" && entry.limitations.includes("Полный долгий прогон ещё не готов.")) {
+      return { ...entry, limitations: entry.limitations.replace("Полный долгий прогон ещё не готов.", "На момент диагностики полный долгий прогон ещё не был проведён; результат серии 59 описан отдельно.") };
+    }
+    return entry;
+  }) : [];
   const present = new Set(entries.map((entry) => entry?.id));
   return { version: MEMORY_VERSION, entries: [...entries, ...RESEARCH_MEMORY.filter((entry) => !present.has(entry.id)).map((entry) => ({ ...entry, files: [...entry.files] }))] };
 }
