@@ -439,16 +439,18 @@ test('серия 63: пользовательский результат кон�
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
 
-test('серия 64: репликация на пяти заранее закреплённых движениях сохранена в памяти', () => {
-  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
-    [path.join(root,'tests/wing-context-replication-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
-  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+test('серия 64: пользовательская репликация на пяти движениях сохранена в памяти', () => {
+  for (const fixture of ['wing-context-replication-fixture.py','wing-context-replication-user-result-fixture.py']) {
+    const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+      [path.join(root,'tests',fixture)], {cwd:root,encoding:'utf8',timeout:30000});
+    assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  }
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-wing-context-replication-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/результат не получен/);
-  assert.match(item.source,/до первого рендера/);assert.match(item.source,/Переобучения/);
-  assert.match(item.results,/парная разность RMSE/);assert.match(item.results,/отрицательное значение лучше/);
-  assert.match(item.limitations,/нельзя исключать/);assert.match(item.limitations,/Windows GUI/);
+  assert.match(item.status,/выполнено пользователем/);
+  assert.match(item.source,/Пять движений 11–15/);assert.match(item.source,/f2ef4321/);
+  assert.match(item.results,/\+0,009276/);assert.match(item.results,/52,14%/);
+  assert.match(item.limitations,/Нельзя исключать/);assert.match(item.limitations,/не тест всех способов/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
   const migrated=memory.installResearchMemory({version:'v630-session-2026-11-09-v39',entries:[custom]});
