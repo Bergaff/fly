@@ -420,16 +420,18 @@ test('серия 62: полный факторный результат конт
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
 
-test('серия 63: контекст-инвариантный протокол и новый holdout сохранены в памяти', () => {
-  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
-    [path.join(root,'tests/long-wing-context-invariant-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
-  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+test('серия 63: пользовательский результат контекст-инвариантного обучения сохранён в памяти', () => {
+  for (const fixture of ['long-wing-context-invariant-fixture.py','long-wing-context-invariant-user-result-fixture.py']) {
+    const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+      [path.join(root,'tests',fixture)], {cwd:root,encoding:'utf8',timeout:30000});
+    assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  }
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-context-invariant-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/результат ещё не получен/);assert.match(item.status,/WinError 3/);
-  assert.match(item.source,/SHA до вычисления прогнозов/);
-  assert.match(item.results,/RMSE right_x/);assert.match(item.results,/0–10°/);
-  assert.match(item.limitations,/вне распределения/);assert.match(item.limitations,/Windows GUI/);
+  assert.match(item.status,/выполнена пользователем/);
+  assert.match(item.source,/30046\/30046/);assert.match(item.source,/9c749066/);
+  assert.match(item.results,/\+0,19%/);assert.match(item.results,/88,66%/);
+  assert.match(item.limitations,/вне распределения/);assert.match(item.limitations,/Не подбирать/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
   const migrated=memory.installResearchMemory({version:'v630-session-2026-11-09-v36',entries:[custom]});
