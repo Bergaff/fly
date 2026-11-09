@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-07-v32";
+export const MEMORY_VERSION = "v630-session-2026-11-07-v33";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -68,11 +68,11 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Новая модель лучше старой по сумме квадратов шести осей в 10 из 49 кадров, хуже в 39. Первые 4 кадра: старая/новая RMSE 0,458667/0,367757 рад; оставшиеся 45: 0,187132/0,198162 рад. Пять кадров 1,44–1,60 с дают 67,12% SSE новой модели; в 1,52 с right_x учитель +25,60°, новая −57,28°, ошибка −82,88°. Два теста совпадают по всем шести углам в одни моменты на 32/49 кадрах; 28 трёхкадровых историй совпадают там, где обе доступны. На 1,48 с right_x/right_z учителя одинаковы, другие три оси различаются, старая модель по right_x даёт +24,37° на прежнем тесте и −51,69° на новом.",
     limitations: "Отрезки выбраны после просмотра; основная оценка учитывает все кадры. Кадры зависимы, сравнение одной пары тестов не доказывает причинность. Совпадение углов и предсказаний не доказывает одинаковых RGB. Прежний CSV транскрибирован, идентичность NPZ/SQLite не проверена. Не доказательство зеркальных нейронов, биологического зрения или автономной генерации.",
     files: ["experiments/reports/long-user-wing-user-frame-analysis.md", "experiments/reports/long-user-wing-user-test-002-predictions.csv", "experiments/reports/long-user-wing-user-result.md", "experiments/reports/user-wing-learning-user-predictions-transcribed.csv"] },
-  { id: "session-long-user-wing-context-plan", ideaId: "i-observational", title: "Серия 59: контроль контекстных осей right_x", status: "подготовлен BAT и read-only протокол; пользовательский запуск ещё не получен",
-    source: "После покадрового разбора подготовлена серия 61 для уже завершённой локальной папки 59. Она проверяет SQLite, модели, сохранённый результат и воспроизводимость baseline, затем без переобучения сохраняет right_x и по одной сдвигает пять остальных осей на −10° и +10°; отдельно оставляет только right_x.",
-    results: "Результатов пользователя пока нет. Плановая метрика на заранее указанном проблемном участке 1,44–1,60 с: RMSE right_x и изменение предсказания относительно неизменённого baseline для старой и новой модели. Создаётся отдельная папка с ОТЧЕТ.txt, summary.json и predictions.csv; исходная серия не перезаписывается.",
-    limitations: "Проблемный участок и target right_x выбраны после просмотра. Сдвиги целой оси и изоляция right_x могут быть вне обучающего распределения. Это чувствительность искусственной supervised ridge модели к перерендеренному контексту, не биологическая причинность, не зеркальные нейроны и не автономное воспроизведение. Windows GUI независимо не проверен.",
-    files: ["experiments/RUN-WING-CONTEXT-INTERVENTION.bat", "experiments/templates/61_long_wing_context_intervention.py", "tests/long-wing-context-intervention-fixture.py", "experiments/reports/long-user-wing-context-intervention-plan.md"] },
+  { id: "session-long-user-wing-context-plan", ideaId: "i-observational", title: "Серия 61: контроль контекстных осей right_x", status: "выполнено по присланному тексту ОТЧЕТ.txt; оригинальные файлы серии 61 не получены",
+    source: "Пользователь выполнил read-only серию 61 для завершённой папки 59 и вставил ОТЧЕТ.txt. По тексту baseline воспроизведён, right_x одинаков, модели не переобучались; пять остальных осей по одной сдвигались на ±10°, отдельно все пять обнулялись в only_right_x. Числа вручную транскрибированы; оригинальные summary.json и predictions.csv не проверены.",
+    results: "На участке 1,44–1,60 с baseline RMSE old/new 1,105086/1,201072 рад. only_right_x: 0,203196/0,230682, улучшение новой на 80,79%, средний сдвиг её прогноза +0,963114 рад (+55,18°). Среди одиночных сдвигов strongest right_y +10°: RMSE new 0,956433, лучше baseline на 20,37%, средний сдвиг +0,249607 рад; right_z +10° улучшил RMSE на 10,08%. Новая хуже старой и в baseline, и в only_right_x.",
+    limitations: "Проблемный участок и target right_x выбраны после просмотра. only_right_x одновременно меняет пять осей; сдвиги и изоляция могут быть вне обучающего распределения. Асимметрия ±10° и общий эффект не поддерживают простой линейный вывод об одной оси. Это чувствительность искусственной supervised ridge модели, не биологическая причинность, не зеркальные нейроны и не автономное воспроизведение.",
+    files: ["experiments/reports/long-user-wing-context-intervention-user-result.md", "experiments/reports/long-user-wing-context-intervention-user-transcribed.json", "experiments/reports/long-user-wing-context-intervention-plan.md", "experiments/RUN-WING-CONTEXT-INTERVENTION.bat", "experiments/templates/61_long_wing_context_intervention.py"] },
   { id: "session-wing-studio-user-frames", ideaId: "i-observational", title: "Шесть осей: покадровый разбор показа пользователя", status: "playback.json вставлен текстом; модель, изображения и исходный файл не проверены",
     source: "Пользователь прислал текст playback.json с 51 кадром, 25 FPS; первые два прогноза отсутствуют, 49 кадров оцениваются. Углы учителя в сохранённой выписке восстановлены по девяти ключевым кадрам, прогнозы перенесены вручную и округлены до шести знаков. Общая и шесть отдельных RMSE согласуются с присланными точными метриками, но оригинальные файлы и построчную точность этим не доказали.",
     results: "Правое X: RMSE 13,02° против 15,81° у нуля, средняя ошибка +7,61° и 46,1% суммы квадратов ошибок шести каналов; прогноз ближе нуля в 22/49 кадров. Правое Z: RMSE 5,71° против 4,61°, средняя ошибка +0,31°, ближе нуля в 16/49 и противоположный эталону знак в 30/48 ненулевых кадров; при |эталон| ≥5° противоположный знак в 12/13. В 1,00 с правое Z учитель −10°, прогноз +2,307°. На 0,36–0,72 с и 1,36–1,72 с десять пар округлённых шестиканальных прогнозов одинаковы при повторяющихся участках траектории.",
@@ -193,6 +193,10 @@ export function installResearchMemory(existing?: ResearchMemoryState): ResearchM
     // Update only the obsolete status sentence; preserve any other user edits.
     if (entry?.id === "session-user-wing-learning-diagnostic" && typeof entry.limitations === "string" && entry.limitations.includes("Полный долгий прогон ещё не готов.")) {
       return { ...entry, limitations: entry.limitations.replace("Полный долгий прогон ещё не готов.", "На момент диагностики полный долгий прогон ещё не был проведён; результат серии 59 описан отдельно.") };
+    }
+    if (entry?.id === "session-long-user-wing-context-plan" && entry.status === "подготовлен BAT и read-only протокол; пользовательский запуск ещё не получен") {
+      const current = RESEARCH_MEMORY.find((item) => item.id === "session-long-user-wing-context-plan");
+      return current ? { ...entry, title: current.title, status: current.status, source: current.source, results: current.results, limitations: current.limitations, files: [...current.files] } : entry;
     }
     if (entry?.id === "session-long-user-wing-user-result") {
       const oldSource = "NPZ, SQLite, имена выбранных JSON и покадровые файлы независимо не получены.";
