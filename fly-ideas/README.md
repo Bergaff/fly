@@ -672,6 +672,16 @@ workspace\.venv-two-flies\Scripts\python.exe experiments\templates\59_long_user_
 workspace\.venv-two-flies\Scripts\python.exe experiments\templates\61_long_wing_context_intervention.py --series "ПУТЬ\wing_user_long_..." --test-id 2
 ```
 
+Следующий расчёт серии 62 разделяет совместный эффект: дважды щёлкните `experiments\RUN-WING-CONTEXT-FACTORIAL.bat` и снова выберите завершённую папку серии 59 и `new_test`. Он проверяет все 32 комбинации обнуления пяти контекстных осей при неизменном `right_x`, считает метрики на всех 49 кадрах и отдельно на участке `1,44–1,60` с, затем даёт точное Shapley-разложение эффекта для старой и новой моделей. Восьмичасовое обучение не повторяется, исходная серия не изменяется. Пришлите `ОТЧЕТ.txt` из новой папки `wing-context-factorial`; NPZ не нужен. Протокол: `experiments/reports/long-user-wing-context-factorial-plan.md`.
+
+Shapley здесь является распределением вычислительного эффекта операции обнуления между осями. Он не превращает post hoc диагностику в биологическую причинность, а обнулённые сочетания могут быть вне обучающего распределения.
+
+Запасной запуск:
+
+```powershell
+workspace\.venv-two-flies\Scripts\python.exe experiments\templates\62_long_wing_context_factorial.py --series "ПУТЬ\wing_user_long_..." --test-id 2
+```
+
 ### Диагностика уже завершённой пользовательской пробы
 
 Если чат не принимает NPZ, не нужно повторять обучение. После окончания других расчётов обновите приложение и дважды щёлкните `experiments/ANALYZE-USER-WING-INPUTS.bat`. В открывшемся окне найдите **старый завершённый** каталог `user_wing_learning_...`, внутри откройте `test_001` и выберите `user_predictions.csv`. Можно выбрать другой `test_NNN`, если проверок несколько. Не выбирайте файлы из разных запусков и не переносите их отдельно: диагностика использует модель, манифест, копии траекторий и NPZ из прежней структуры папок.

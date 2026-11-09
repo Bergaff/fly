@@ -18,6 +18,7 @@ def load(name,path):
 base=load('runner_base',root/'experiments/templates/51_two_flies_user_trajectory_learning.py')
 runner=load('runner59',root/'experiments/templates/59_long_user_wing_learning.py')
 context=load('context61',root/'experiments/templates/61_long_wing_context_intervention.py')
+factorial=load('factorial62',root/'experiments/templates/62_long_wing_context_factorial.py')
 ck=load('runner_checkpoint',root/'experiments/templates/54_user_wing_checkpoint.py')
 script=root/'experiments/templates/59_long_user_wing_learning.py'
 examples=root/'experiments/examples/wing-user-training'
@@ -94,6 +95,18 @@ with tempfile.TemporaryDirectory() as d:
     assert intervention_summary['conditions'][1]['condition']=='only_right_x'
     with (intervention/'predictions.csv').open(encoding='utf-8-sig',newline='') as f:intervention_rows=list(csv.DictReader(f))
     assert len(intervention_rows)==12*49
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 62 checks every zeroing subset and exact order-independent Shapley sums.
+    factorial_out=factorial.run(resumed,2,tmp/'factorial-output')
+    factorial_summary=json.loads((factorial_out/'summary.json').read_text(encoding='utf-8'))
+    assert len(factorial_summary['conditions'])==32
+    for model in ('old','new'):
+        for scope in ('all_frames','segment'):
+            attribution=factorial_summary['shapley'][model][scope]
+            assert abs(sum(x['value'] for x in attribution['sse_reduction_shapley_rad2'])-attribution['total_sse_reduction_rad2'])<1e-10
+            assert abs(sum(x['value'] for x in attribution['mean_prediction_shift_shapley_rad'])-attribution['total_mean_prediction_shift_rad'])<1e-10
+    with (factorial_out/'predictions.csv').open(encoding='utf-8-sig',newline='') as f:factorial_rows=list(csv.DictReader(f))
+    assert len(factorial_rows)==32*49
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
