@@ -1,0 +1,581 @@
+{
+  "schema": "wing-context-factorial-v1",
+  "provenance": "Exact manual extract from user-pasted summary.json; original file bytes were not supplied. Compact condition extract stores new-model RMSE only.",
+  "created_utc": "2026-11-09T08:04:06.486866+00:00",
+  "source_series_basename": "wing_user_long_20261108_220403_52156936",
+  "source_test_id": 2,
+  "source_role": "new_test",
+  "source_protocol_sha256": "a1709c7c853ccaf1f5edcef33e240a0068f2fa17e3031c6297650a7cff889e4c",
+  "baseline_model_sha256": "8eba6ceb1c94513f47ad95becb42d8fb0fd6007f81eb0553209b22a12808aeec",
+  "new_model_sha256": "f2ef4321e3438ac719e2148da3dc6821fb95abc43d537095728c05be214716ad",
+  "source_trajectory_sha256": "462305536541a0165171f32925ae03a4c296f64b4cb4da79946cfd1c8d8d8914",
+  "target_axis": "right_x",
+  "context_axes": [
+    "left_x",
+    "left_y",
+    "left_z",
+    "right_y",
+    "right_z"
+  ],
+  "segment_s": [
+    1.44,
+    1.6
+  ],
+  "active_training_seconds": 28800.937000000005,
+  "conditions_compact": [
+    {
+      "mask": 0,
+      "condition": "baseline",
+      "zeroed_axes": [],
+      "new_all_frames_rmse_rad": 0.40613379518159226,
+      "new_segment_rmse_rad": 1.2010716665362242
+    },
+    {
+      "mask": 1,
+      "condition": "zero_left_x",
+      "zeroed_axes": [
+        "left_x"
+      ],
+      "new_all_frames_rmse_rad": 0.317314476311632,
+      "new_segment_rmse_rad": 0.8345855488823535
+    },
+    {
+      "mask": 2,
+      "condition": "zero_left_y",
+      "zeroed_axes": [
+        "left_y"
+      ],
+      "new_all_frames_rmse_rad": 0.339996921784019,
+      "new_segment_rmse_rad": 0.9798638425828657
+    },
+    {
+      "mask": 3,
+      "condition": "zero_left_x_left_y",
+      "zeroed_axes": [
+        "left_x",
+        "left_y"
+      ],
+      "new_all_frames_rmse_rad": 0.33723067654896405,
+      "new_segment_rmse_rad": 0.9486990861351168
+    },
+    {
+      "mask": 4,
+      "condition": "zero_left_z",
+      "zeroed_axes": [
+        "left_z"
+      ],
+      "new_all_frames_rmse_rad": 0.40984185072744755,
+      "new_segment_rmse_rad": 1.2108177590458886
+    },
+    {
+      "mask": 5,
+      "condition": "zero_left_x_left_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_z"
+      ],
+      "new_all_frames_rmse_rad": 0.327625718799268,
+      "new_segment_rmse_rad": 0.877926272264129
+    },
+    {
+      "mask": 6,
+      "condition": "zero_left_y_left_z",
+      "zeroed_axes": [
+        "left_y",
+        "left_z"
+      ],
+      "new_all_frames_rmse_rad": 0.34034196041965986,
+      "new_segment_rmse_rad": 0.9798293750430983
+    },
+    {
+      "mask": 7,
+      "condition": "zero_left_x_left_y_left_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "left_z"
+      ],
+      "new_all_frames_rmse_rad": 0.3346034042951891,
+      "new_segment_rmse_rad": 0.9452204780224336
+    },
+    {
+      "mask": 8,
+      "condition": "zero_right_y",
+      "zeroed_axes": [
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.2234716674730816,
+      "new_segment_rmse_rad": 0.4738856594306658
+    },
+    {
+      "mask": 9,
+      "condition": "zero_left_x_right_y",
+      "zeroed_axes": [
+        "left_x",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.2164847362199352,
+      "new_segment_rmse_rad": 0.13079011443545044
+    },
+    {
+      "mask": 10,
+      "condition": "zero_left_y_right_y",
+      "zeroed_axes": [
+        "left_y",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.1856091587228293,
+      "new_segment_rmse_rad": 0.25576981188841436
+    },
+    {
+      "mask": 11,
+      "condition": "zero_left_x_left_y_right_y",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.2024565243559515,
+      "new_segment_rmse_rad": 0.22652493554855338
+    },
+    {
+      "mask": 12,
+      "condition": "zero_left_z_right_y",
+      "zeroed_axes": [
+        "left_z",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.22628279021533648,
+      "new_segment_rmse_rad": 0.48380105705050636
+    },
+    {
+      "mask": 13,
+      "condition": "zero_left_x_left_z_right_y",
+      "zeroed_axes": [
+        "left_x",
+        "left_z",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.21903937637003784,
+      "new_segment_rmse_rad": 0.17076841043926538
+    },
+    {
+      "mask": 14,
+      "condition": "zero_left_y_left_z_right_y",
+      "zeroed_axes": [
+        "left_y",
+        "left_z",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.18474897888095607,
+      "new_segment_rmse_rad": 0.25561355648180817
+    },
+    {
+      "mask": 15,
+      "condition": "zero_left_x_left_y_left_z_right_y",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "left_z",
+        "right_y"
+      ],
+      "new_all_frames_rmse_rad": 0.20198417507898425,
+      "new_segment_rmse_rad": 0.22325073673975687
+    },
+    {
+      "mask": 16,
+      "condition": "zero_right_z",
+      "zeroed_axes": [
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.3822445316943626,
+      "new_segment_rmse_rad": 1.1257218304366468
+    },
+    {
+      "mask": 17,
+      "condition": "zero_left_x_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.2959777097148356,
+      "new_segment_rmse_rad": 0.7614570270733075
+    },
+    {
+      "mask": 18,
+      "condition": "zero_left_y_right_z",
+      "zeroed_axes": [
+        "left_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.31659246482119596,
+      "new_segment_rmse_rad": 0.9055991703502437
+    },
+    {
+      "mask": 19,
+      "condition": "zero_left_x_left_y_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.31433581157265233,
+      "new_segment_rmse_rad": 0.8746417022488793
+    },
+    {
+      "mask": 20,
+      "condition": "zero_left_z_right_z",
+      "zeroed_axes": [
+        "left_z",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.38597211419968647,
+      "new_segment_rmse_rad": 1.1356551902165852
+    },
+    {
+      "mask": 21,
+      "condition": "zero_left_x_left_z_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_z",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.30592875320467966,
+      "new_segment_rmse_rad": 0.8048526083372004
+    },
+    {
+      "mask": 22,
+      "condition": "zero_left_y_left_z_right_z",
+      "zeroed_axes": [
+        "left_y",
+        "left_z",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.31694532228632094,
+      "new_segment_rmse_rad": 0.9055331611314051
+    },
+    {
+      "mask": 23,
+      "condition": "zero_left_x_left_y_left_z_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "left_z",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.31162011792310906,
+      "new_segment_rmse_rad": 0.8711637132311653
+    },
+    {
+      "mask": 24,
+      "condition": "zero_right_y_right_z",
+      "zeroed_axes": [
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.22725231928892342,
+      "new_segment_rmse_rad": 0.4826097163674695
+    },
+    {
+      "mask": 25,
+      "condition": "zero_left_x_right_y_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.21711129477021904,
+      "new_segment_rmse_rad": 0.1353651394897447
+    },
+    {
+      "mask": 26,
+      "condition": "zero_left_y_right_y_right_z",
+      "zeroed_axes": [
+        "left_y",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.18779694639766034,
+      "new_segment_rmse_rad": 0.2635418914228429
+    },
+    {
+      "mask": 27,
+      "condition": "zero_left_x_left_y_right_y_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.20423068028340932,
+      "new_segment_rmse_rad": 0.23397091932288908
+    },
+    {
+      "mask": 28,
+      "condition": "zero_left_z_right_y_right_z",
+      "zeroed_axes": [
+        "left_z",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.22996191145631115,
+      "new_segment_rmse_rad": 0.492404678653678
+    },
+    {
+      "mask": 29,
+      "condition": "zero_left_x_left_z_right_y_right_z",
+      "zeroed_axes": [
+        "left_x",
+        "left_z",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.219793747456405,
+      "new_segment_rmse_rad": 0.17621418938854078
+    },
+    {
+      "mask": 30,
+      "condition": "zero_left_y_left_z_right_y_right_z",
+      "zeroed_axes": [
+        "left_y",
+        "left_z",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.1869030341982532,
+      "new_segment_rmse_rad": 0.2634171546520764
+    },
+    {
+      "mask": 31,
+      "condition": "only_right_x",
+      "zeroed_axes": [
+        "left_x",
+        "left_y",
+        "left_z",
+        "right_y",
+        "right_z"
+      ],
+      "new_all_frames_rmse_rad": 0.20374894308371808,
+      "new_segment_rmse_rad": 0.23068155550493546
+    }
+  ],
+  "shapley": {
+    "old": {
+      "all_frames": {
+        "sse_reduction_shapley_rad2": [
+          {
+            "axis": "left_x",
+            "value": 0.14193687421755036
+          },
+          {
+            "axis": "left_y",
+            "value": 1.1883214598712706
+          },
+          {
+            "axis": "left_z",
+            "value": 0.16665373511766338
+          },
+          {
+            "axis": "right_y",
+            "value": 2.3041760093931583
+          },
+          {
+            "axis": "right_z",
+            "value": 0.344589951609086
+          }
+        ],
+        "mean_prediction_shift_shapley_rad": [
+          {
+            "axis": "left_x",
+            "value": 0.16155814418477293
+          },
+          {
+            "axis": "left_y",
+            "value": 0.003655772251889247
+          },
+          {
+            "axis": "left_z",
+            "value": 0.003102518288935287
+          },
+          {
+            "axis": "right_y",
+            "value": 0.038141673160984824
+          },
+          {
+            "axis": "right_z",
+            "value": -0.001426913597693125
+          }
+        ],
+        "total_sse_reduction_rad2": 4.145678030208728,
+        "total_mean_prediction_shift_rad": 0.2050311942888892
+      },
+      "segment": {
+        "sse_reduction_shapley_rad2": [
+          {
+            "axis": "left_x",
+            "value": 1.8659127011982142
+          },
+          {
+            "axis": "left_y",
+            "value": 0.531332661345787
+          },
+          {
+            "axis": "left_z",
+            "value": 0.005706432608402253
+          },
+          {
+            "axis": "right_y",
+            "value": 3.1852986427237315
+          },
+          {
+            "axis": "right_z",
+            "value": 0.31138488968805267
+          }
+        ],
+        "mean_prediction_shift_shapley_rad": [
+          {
+            "axis": "left_x",
+            "value": 0.33807542733361046
+          },
+          {
+            "axis": "left_y",
+            "value": -0.0332986517362429
+          },
+          {
+            "axis": "left_z",
+            "value": 0.021653573354682043
+          },
+          {
+            "axis": "right_y",
+            "value": 0.5433910915258879
+          },
+          {
+            "axis": "right_z",
+            "value": 0.03225296285801977
+          }
+        ],
+        "total_sse_reduction_rad2": 5.899635327564186,
+        "total_mean_prediction_shift_rad": 0.9020744033359573
+      }
+    },
+    "new": {
+      "all_frames": {
+        "sse_reduction_shapley_rad2": [
+          {
+            "axis": "left_x",
+            "value": 0.9575815213476305
+          },
+          {
+            "axis": "left_y",
+            "value": 0.9802356900706178
+          },
+          {
+            "axis": "left_z",
+            "value": -0.0627103984573006
+          },
+          {
+            "axis": "right_y",
+            "value": 3.7841215509212893
+          },
+          {
+            "axis": "right_z",
+            "value": 0.38889199738046
+          }
+        ],
+        "mean_prediction_shift_shapley_rad": [
+          {
+            "axis": "left_x",
+            "value": 0.07839642925664338
+          },
+          {
+            "axis": "left_y",
+            "value": 0.017421506169778986
+          },
+          {
+            "axis": "left_z",
+            "value": 0.000286201254505975
+          },
+          {
+            "axis": "right_y",
+            "value": 0.07965165679182551
+          },
+          {
+            "axis": "right_z",
+            "value": 0.0010911592349799925
+          }
+        ],
+        "total_sse_reduction_rad2": 6.048120361262697,
+        "total_mean_prediction_shift_rad": 0.17684695270773385
+      },
+      "segment": {
+        "sse_reduction_shapley_rad2": [
+          {
+            "axis": "left_x",
+            "value": 1.4500090358785829
+          },
+          {
+            "axis": "left_y",
+            "value": 0.7653266615499542
+          },
+          {
+            "axis": "left_z",
+            "value": -0.06358387803798139
+          },
+          {
+            "axis": "right_y",
+            "value": 4.421546206812478
+          },
+          {
+            "axis": "right_z",
+            "value": 0.3734978143265978
+          }
+        ],
+        "mean_prediction_shift_shapley_rad": [
+          {
+            "axis": "left_x",
+            "value": 0.20093184389147745
+          },
+          {
+            "axis": "left_y",
+            "value": 0.06984780095856383
+          },
+          {
+            "axis": "left_z",
+            "value": -0.008023527773941427
+          },
+          {
+            "axis": "right_y",
+            "value": 0.6663525960895864
+          },
+          {
+            "axis": "right_z",
+            "value": 0.03400482481076691
+          }
+        ],
+        "total_sse_reduction_rad2": 6.9467958405296315,
+        "total_mean_prediction_shift_rad": 0.9631135379764532
+      }
+    }
+  },
+  "selected_exact_metrics": {
+    "zero_left_x_right_y_new_segment": {
+      "sse_rad2": 0.0855302701701911,
+      "rmse_rad": 0.13079011443545044,
+      "mae_rad": 0.12181054559255977,
+      "mean_prediction_rad": 0.24026914154834217,
+      "opposite_sign_frames": 0
+    },
+    "zero_left_y_left_z_right_y_new_all_frames": {
+      "sse_rad2": 1.6724770746802413,
+      "rmse_rad": 0.18474897888095607,
+      "mae_rad": 0.154359603945037,
+      "mean_prediction_rad": -0.03171761163815491,
+      "opposite_sign_frames": 1
+    }
+  },
+  "limitations": [
+    "Exact full condition objects and original file bytes are not stored in this compact manual extract.",
+    "Zeroing may be out of distribution.",
+    "Shapley is computational attribution, not biological causality."
+  ]
+}

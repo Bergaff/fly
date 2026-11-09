@@ -402,15 +402,17 @@ test('серия 61: пользовательский контроль конт�
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
 
-test('серия 62: полный факторный план контекста сохранён в памяти', () => {
-  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
-    [path.join(root,'tests/long-wing-context-factorial-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
-  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+test('серия 62: полный факторный результат контекста сохранён в памяти', () => {
+  for (const fixture of ['long-wing-context-factorial-fixture.py','long-wing-context-factorial-user-result-fixture.py']) {
+    const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+      [path.join(root,'tests',fixture)], {cwd:root,encoding:'utf8',timeout:30000});
+    assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  }
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-long-user-wing-context-factorial-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/результат ещё не получен/);
-  assert.match(item.results,/Shapley/);assert.match(item.results,/49 кадрах/);
-  assert.match(item.limitations,/вне обучающего распределения/);
+  assert.match(item.status,/выполнено пользователем/);
+  assert.match(item.results,/63,65%/);assert.match(item.results,/0,184749/);
+  assert.match(item.limitations,/вне распределения/);assert.match(item.limitations,/новый holdout/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
   const migrated=memory.installResearchMemory({version:'v630-session-2026-11-07-v34',entries:[custom]});
