@@ -19,6 +19,7 @@ base=load('runner_base',root/'experiments/templates/51_two_flies_user_trajectory
 runner=load('runner59',root/'experiments/templates/59_long_user_wing_learning.py')
 context=load('context61',root/'experiments/templates/61_long_wing_context_intervention.py')
 factorial=load('factorial62',root/'experiments/templates/62_long_wing_context_factorial.py')
+context_invariant=load('context_invariant63',root/'experiments/templates/63_long_wing_context_invariant_training.py')
 ck=load('runner_checkpoint',root/'experiments/templates/54_user_wing_checkpoint.py')
 script=root/'experiments/templates/59_long_user_wing_learning.py'
 examples=root/'experiments/examples/wing-user-training'
@@ -107,6 +108,27 @@ with tempfile.TemporaryDirectory() as d:
             assert abs(sum(x['value'] for x in attribution['mean_prediction_shift_shapley_rad'])-attribution['total_mean_prediction_shift_rad'])<1e-10
     with (factorial_out/'predictions.csv').open(encoding='utf-8-sig',newline='') as f:factorial_rows=list(csv.DictReader(f))
     assert len(factorial_rows)==32*49
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 63 freezes a truly new holdout before predictions, replaces a fixed
+    # training subset, and leaves the completed source series byte-identical.
+    holdout_obj=json.loads(oldtest.read_text(encoding='utf-8'))
+    holdout_obj['keyframes'][0]['angles_deg'][3]+=2
+    holdout=tmp/'context-invariant-holdout.json';holdout.write_text(json.dumps(holdout_obj),encoding='utf-8')
+    ci_folder=tmp/'context-invariant'
+    ci_run=subprocess.run([sys.executable,str(root/'experiments/templates/63_long_wing_context_invariant_training.py'),
+      '--new',str(ci_folder),'--source',str(resumed),'--holdout',str(holdout),'--fixture-limit','1'],
+      cwd=root,env=env,capture_output=True,text=True,timeout=90)
+    assert ci_run.returncode==0,ci_run.stdout+'\n'+ci_run.stderr
+    ci_summary=json.loads((ci_folder/'result/summary.json').read_text(encoding='utf-8'))
+    assert ci_summary['status']=='fixture_completed' and ci_summary['replacements_completed']==1
+    assert ci_summary['protocol']['holdout_sha256']==context_invariant.file_sha(holdout)
+    assert ci_summary['primary']['role']=='preregistered_holdout'
+    assert ci_summary['primary']['right_x']['control']['frames']==49
+    assert (ci_folder/'result/test_000/playback-control.json').exists()
+    assert (ci_folder/'result/test_000/playback-context_invariant.json').exists()
+    assert ci_summary['training_frames_each_model']==summary['training_frames']
+    ci_repeat=subprocess.run([sys.executable,str(root/'experiments/templates/63_long_wing_context_invariant_training.py'),'--resume',str(ci_folder)],cwd=root,env=env,capture_output=True,text=True,timeout=30)
+    assert ci_repeat.returncode==0 and 'уже завершена' in ci_repeat.stdout,ci_repeat.stdout+'\n'+ci_repeat.stderr
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
