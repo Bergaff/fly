@@ -479,13 +479,16 @@ test('серия 66: полный автономный путь после за�
   const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
     [path.join(root,'tests/observe-delay-autonomous-replay-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const userResult=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/observe-delay-autonomous-replay-user-result-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(userResult.status,0,`${userResult.stdout}\n${userResult.stderr}`);
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-observe-delay-autonomous-replay-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/долгий запуск ещё не получен/);
-  assert.match(item.source,/ровно пять новых holdout/);assert.match(item.source,/24 фиксированных/);
-  assert.match(item.results,/72 коэффициента/);assert.match(item.results,/0,5 с/);
-  assert.match(item.results,/без кадров, teacher-углов/);assert.match(item.results,/reversed/);
-  assert.match(item.limitations,/искусственные/);assert.match(item.limitations,/не докажет зеркальные нейроны/);
+  assert.match(item.status,/пользовательский запуск завершён/);
+  assert.match(item.source,/60 094/);assert.match(item.source,/разные source и motion SHA/);
+  assert.match(item.results,/\+0,022359/);assert.match(item.results,/1\/5/);
+  assert.match(item.results,/static чуть лучше/);assert.match(item.results,/критерий не пройден/);
+  assert.match(item.limitations,/distribution shift/);assert.match(item.limitations,/нельзя использовать для настройки/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
   const migrated=memory.installResearchMemory({version:'v630-session-2026-11-10-v42',entries:[custom]});
