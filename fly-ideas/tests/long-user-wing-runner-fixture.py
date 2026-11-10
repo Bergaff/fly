@@ -158,6 +158,18 @@ with tempfile.TemporaryDirectory() as d:
     assert len(rep_summary['holdouts'])==5 and sum(x['frames'] for x in rep_summary['holdouts'])==245
     assert not (rep_folders[0]/'INCOMPLETE.txt').exists() and (rep_folders[0]/'complete.json').exists()
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 66 performs the full observation -> state -> delay -> autonomous
+    # replay chain; fixture mode only limits training episodes, not holdouts.
+    autonomous=tmp/'missing-autonomous-root'/'autonomous'
+    auto_run=subprocess.run([sys.executable,str(root/'experiments/templates/66_long_observe_delay_autonomous_replay.py'),'--new',str(autonomous),'--source',str(resumed),'--holdouts',*map(str,replication_holdouts),'--fixture-limit','4'],cwd=root,env=env,capture_output=True,text=True,timeout=90)
+    assert auto_run.returncode==0,auto_run.stdout+'\n'+auto_run.stderr
+    auto_summary=json.loads((autonomous/'result/summary.json').read_text(encoding='utf-8'))
+    assert auto_summary['status']=='fixture_completed' and auto_summary['training_episodes']==4
+    assert len(auto_summary['holdouts'])==5 and auto_summary['protocol']['replay_access'].startswith('internal coefficient state')
+    internal=json.loads((autonomous/'result/holdout_001/internal_state.json').read_text(encoding='utf-8'))
+    assert internal['updates_during_delay']==0 and 'observation images' in internal['forbidden_replay_inputs']
+    assert (autonomous/'result/holdout_001/observer_activity.csv').exists() and (autonomous/'result/holdout_001/playback.json').exists()
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
     with sqlite3.connect(resumed/'study.sqlite3') as db:db.execute("UPDATE run_phase SET stage='evaluation'")
