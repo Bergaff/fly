@@ -170,6 +170,25 @@ with tempfile.TemporaryDirectory() as d:
     assert internal['updates_during_delay']==0 and 'observation images' in internal['forbidden_replay_inputs']
     assert (autonomous/'result/holdout_001/observer_activity.csv').exists() and (autonomous/'result/holdout_001/playback.json').exists()
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 67 uses a fresh preregistered battery, matched independent random
+    # piecewise training, level+delta features and resumable streaming Adam.
+    rich_spec=importlib.util.spec_from_file_location('rich67',root/'experiments/templates/67_piecewise_rich_observer_replay.py');rich=importlib.util.module_from_spec(rich_spec);rich_spec.loader.exec_module(rich)
+    rich_holdouts=[]
+    for index in range(5):
+        candidate,_=rich.piecewise_candidate(1000+index);obj={'schema':'fly-wings-trajectory-v1','fps':25,'duration_s':2,'keyframes':[{'t':i*.5,'angles_deg':angles} for i,angles in enumerate(candidate['keyframes_deg'])]};path=tmp/f'rich-holdout-{index+1}.json';path.write_text(json.dumps(obj),encoding='utf-8');rich_holdouts.append(path)
+    rich_folder=tmp/'missing-rich-root'/'rich'
+    rich_first=subprocess.run([sys.executable,str(root/'experiments/templates/67_piecewise_rich_observer_replay.py'),'--new',str(rich_folder),'--source',str(resumed),'--holdouts',*map(str,rich_holdouts),'--fixture-limit','4','--batches','1'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert rich_first.returncode==0,rich_first.stdout+'\n'+rich_first.stderr
+    assert not (rich_folder/'result').exists()
+    rich_resume=subprocess.run([sys.executable,str(root/'experiments/templates/67_piecewise_rich_observer_replay.py'),'--resume',str(rich_folder)],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert rich_resume.returncode==0,rich_resume.stdout+'\n'+rich_resume.stderr
+    rich_summary=json.loads((rich_folder/'result/summary.json').read_text(encoding='utf-8'))
+    assert rich_summary['status']=='fixture_completed' and rich_summary['training_episodes']==4
+    assert rich_summary['protocol']['observer']['feature_dimensions']==1920 and rich_summary['protocol']['replay_access'].startswith('internal coefficient state')
+    assert set(rich_summary['aggregate']['normal_minus_control_rmse_rad'])=={'zero','static','shuffled','reversed','closed'}
+    rich_internal=json.loads((rich_folder/'result/holdout_001/internal_state.json').read_text(encoding='utf-8'))
+    assert rich_internal['updates_during_delay']==0 and 'observation images' in rich_internal['forbidden_replay_inputs']
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
     with sqlite3.connect(resumed/'study.sqlite3') as db:db.execute("UPDATE run_phase SET stage='evaluation'")
