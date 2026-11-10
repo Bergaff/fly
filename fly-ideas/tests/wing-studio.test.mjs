@@ -32,6 +32,10 @@ test('редактор, независимые оси, сохранение, з�
     assert.throws(()=>lib.parseTrajectory({...lib.initialTrajectory,duration_s:.51}));
     assert.throws(()=>lib.parseTrajectory({...lib.initialTrajectory,keyframes:[]}));
     assert.deepEqual(lib.interpolate(.25,lib.initialTrajectory),[35,12,10,-25,-8,5]);
+    const generated=lib.randomTrajectory(2,()=>.25);
+    assert.deepEqual(generated.keyframes.map(k=>k.t),[0,.5,1,1.5,2]);
+    assert.ok(generated.keyframes.every(k=>k.angles_deg.every(v=>v===-23)));
+    assert.deepEqual(lib.parseTrajectory(generated),generated);
     render(React.createElement(WingStudioView));
     assert.match(document.body.textContent,/ожидает результат/);
     fireEvent.change(screen.getByLabelText('Левое X подъём, градусы'),{target:{value:'25'}});
@@ -91,5 +95,8 @@ test('редактор, независимые оси, сохранение, з�
     assert.match(document.body.textContent,/не автономная генерация/);
     fireEvent.change(screen.getByLabelText('Левое X подъём, градусы'),{target:{value:'18'}});
     assert.match(document.body.textContent,/ожидает результат/);
+    fireEvent.click(screen.getByRole('button',{name:'Случайное движение, шаг 0,5 с'}));
+    assert.match(screen.getByRole('status').textContent,/Создана новая случайная траектория/);
+    assert.equal(screen.getAllByRole('button',{name:/с$/}).filter(b=>/^\d+\.\d{2} с$/.test(b.textContent || '')).length,5);
   } finally { cleanup();console.error=consoleError;await vite.close();dom.window.close(); }
 });
