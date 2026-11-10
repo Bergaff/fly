@@ -457,3 +457,20 @@ test('серия 64: пользовательская репликация на 
   assert.equal(migrated.entries[0],custom);
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
+
+test('серия 65: мягкая consistency-модель без нового holdout сохранена в памяти', () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/wing-soft-context-consistency-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-wing-soft-consistency-plan');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.status,/запуск ещё не получен/);
+  assert.match(item.source,/30046/);assert.match(item.source,/λ=0,1/);
+  assert.match(item.results,/primary_holdout_result/);assert.match(item.results,/не считается оценкой/);
+  assert.match(item.limitations,/не перебирается/);assert.match(item.limitations,/Windows GUI/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+  const custom={id:'custom',results:'сохранить',files:[]};
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-09-v41',entries:[custom]});
+  assert.equal(migrated.entries[0],custom);
+  assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
+});

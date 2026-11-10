@@ -131,6 +131,18 @@ with tempfile.TemporaryDirectory() as d:
     ci_repeat=subprocess.run([sys.executable,str(root/'experiments/templates/63_long_wing_context_invariant_training.py'),'--resume',str(ci_folder)],cwd=root,env=env,capture_output=True,text=True,timeout=30)
     assert ci_repeat.returncode==0 and 'уже завершена' in ci_repeat.stdout,ci_repeat.stdout+'\n'+ci_repeat.stderr
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 65 trains a soft consistency model without loading any new holdout.
+    soft_folder=tmp/'missing-soft-root'/'soft-consistency'
+    soft_run=subprocess.run([sys.executable,str(root/'experiments/templates/65_wing_soft_context_consistency.py'),'--new',str(soft_folder),'--source',str(ci_folder),'--fixture-limit','1'],cwd=root,env=env,capture_output=True,text=True,timeout=90)
+    assert soft_run.returncode==0,soft_run.stdout+'\n'+soft_run.stderr
+    soft_summary=json.loads((soft_folder/'result/summary.json').read_text(encoding='utf-8'))
+    assert soft_summary['status']=='fixture_completed' and soft_summary['pairs_completed']==1
+    assert soft_summary['primary_holdout_result'] is None
+    assert soft_summary['diagnostics']['soft_mean_squared_pair_difference']<soft_summary['diagnostics']['control_mean_squared_pair_difference']
+    with np.load(soft_folder/'result/model_control.npz',allow_pickle=False) as control_npz, np.load(soft_folder/'result/model_soft_consistency.npz',allow_pickle=False) as soft_npz:
+        for axis in (0,1,2,4,5):np.testing.assert_array_equal(control_npz['weights'][:,axis],soft_npz['weights'][:,axis])
+        assert not np.array_equal(control_npz['weights'][:,3],soft_npz['weights'][:,3])
+    assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
     # Series 64 freezes all five new files before the first prediction and only
     # evaluates the two already frozen series-63 models.
     replication_holdouts=[]
