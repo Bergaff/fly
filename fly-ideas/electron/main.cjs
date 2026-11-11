@@ -1531,6 +1531,23 @@ function registerIpc(getWin) {
     if (r.canceled || !r.filePaths[0]) return null;
     return { path: r.filePaths[0], content: await fsp.readFile(r.filePaths[0], "utf8") };
   });
+  handle("fly:loadSeries69Demo", async () => {
+    const r = await dialog.showOpenDialog(getWin(), { title: "Выберите result или holdout_001 серии 69", properties: ["openDirectory"] });
+    if (r.canceled || !r.filePaths[0]) return null;
+    const selected = path.resolve(r.filePaths[0]);
+    const candidates = [selected, path.join(selected, "holdout_001"), path.join(selected, "result", "holdout_001")];
+    let folder = null;
+    for (const c of candidates) { try { if ((await fsp.stat(path.join(c, "playback_rich.json"))).isFile()) { folder = c; break; } } catch {} }
+    if (!folder) throw new Error("В выбранной папке не найден result\\holdout_001 серии 69.");
+    const names = { compact: "playback_compact.json", rich: "playback_rich.json", activity: "observer_activity.csv", metrics: "metrics.json", states: "internal_states.json" };
+    const out = { folder };
+    for (const [key, name] of Object.entries(names)) {
+      const file = path.join(folder, name); const st = await fsp.lstat(file);
+      if (!st.isFile() || st.isSymbolicLink() || st.size > 8 * 1024 * 1024) throw new Error(`Файл ${name} отсутствует, является ссылкой или слишком велик.`);
+      out[key] = await fsp.readFile(file, "utf8");
+    }
+    return out;
+  });
   handle("fly:checkEnv", () => checkEnv());
   handle("fly:listPythons", () => listPythons());
   handle("fly:setPython", async (_e, pyCmd) => {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { fly } from "@/lib/bridge";
 import { initialTrajectory, interpolate, parseResult, parseTrajectory, randomAngles, ZERO, type Angles, type Trajectory, type WingResult } from "@/lib/wing-trajectory";
 import { WingScene } from "@/views/wing-scene";
+import { Series69Demonstrator } from "@/views/series69-demonstrator";
 
 const labels = ["X подъём", "Y наклон", "Z поворот", "X подъём", "Y наклон", "Z поворот"];
 const button = "cursor-pointer border bg-background px-2.5 py-1.5 text-[12px] disabled:cursor-not-allowed disabled:opacity-40";
@@ -80,7 +81,8 @@ export function WingStudioView() {
     } catch (e) { setMessage(`Не удалось открыть: ${String(e)}`); }
   };
   return <div className="h-full overflow-y-auto"><div className="mx-auto max-w-[1600px] px-4 py-4 md:px-6">
-    <div className="flex flex-wrap items-start justify-between gap-3 border-b pb-3">
+    <Series69Demonstrator />
+    <div className="mt-5 flex flex-wrap items-start justify-between gap-3 border-b pb-3">
       <div><div className="font-mono text-[10px] uppercase tracking-[.14em] text-muted-foreground">кинематика / 6 осей / редактор 01</div><h1 className="mt-1 text-xl font-semibold">Движение крыльев</h1><p className="mt-1 max-w-3xl text-[12px] text-muted-foreground">Создайте показ для первой мухи. Трёхмерная муха здесь схематичная, не биомеханическая реконструкция; в расчёте используются упрощённые эллипсоиды.</p></div>
       <div className="flex flex-wrap gap-2"><button className={button} onClick={() => void open("trajectory")}>Открыть траекторию</button><button className={button} onClick={() => void save()}>Сохранить JSON</button><button className={button} onClick={() => void open("result")}>Открыть playback.json</button></div>
       <input ref={browserFile} type="file" accept=".json,application/json" className="hidden" onChange={e => { const file=e.target.files?.[0]; if (file) void file.text().then(s => applyFile(s,fileKind.current)).catch(err => setMessage(String(err))); e.currentTarget.value=""; }} />
