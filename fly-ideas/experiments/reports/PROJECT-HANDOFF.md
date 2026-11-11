@@ -10,7 +10,7 @@
 
 ## Самое последнее состояние
 
-- Пользователь попросил следующий этап и исправление random-кнопки. Подготовлена серия 69: compact 24-unit/240-feature encoder обучается на точных 60 000 candidate IDs, RGB scenes и targets серии 67 с теми же Adam settings, каждый RGB SHA сверяется; затем он парно сравнивается с замороженной rich-моделью на новой батарее. Primary требует rich ниже compact в среднем, минимум 4/5 wins и повторный temporal pass. Есть SQLite checkpoint, pause/resume, два worker и source immutability. Fast fixture и bounded E2E прошли. BAT: `RUN-MATCHED-ENCODER-ABLATION.bat`; протокол: [matched-encoder-ablation-plan.md](matched-encoder-ablation-plan.md).
+- Серия 69 полностью выполнена пользователем на exact 60 000 training episodes. Mean normal RMSE compact/rich `0,276768 / 0,269751` рад; rich-minus-compact `−0,007018` рад, около `2,54%`. Rich выиграл `4/5`, повторно прошёл temporal primary и составной preregistered primary. Эффект небольшой: rich проиграл на holdout 55, compact также прошёл temporal primary и имел меньшую aggregate RMSE во всех static/shuffled/reversed/closed controls. Текстовый summary транскрибирован и арифметически проверен; оригинальные JSON/NPZ/SQLite не получены. Разбор: [matched-encoder-ablation-user-result.md](matched-encoder-ablation-user-result.md).
 
 - Кнопка «Случайное движение, шаг 0,5 с» изменена: каждое нажатие теперь передвигает шкалу вправо `0 → 0,5 → 1,0 → …`, выбирает следующую точку и случайно сдвигает шесть ползунков; в конце предлагается «В начало». UI test прошёл.
 
@@ -68,10 +68,7 @@
 
 ## Ближайший практический шаг
 
-1. Обновить проект; в редакторе оставить 2 секунды, нажимать random-кнопку последовательно до 2,0 с и сохранить пять новых JSON. Не использовать движения 31–35 и 41–45.
-2. Дважды щёлкнуть `experiments\RUN-MATCHED-ENCODER-ABLATION.bat`, выбрать `1`, успешную папку серии 67 `piecewise_rich_replay_...`, затем пять новых JSON.
-3. Для паузы снова открыть BAT и выбрать `3`; для продолжения выбрать `2` и папку `matched_encoder_ablation_...`.
-4. После завершения прислать `result\ОТЧЕТ.txt` и `result\summary.json`. Расчёт заново рендерит 60 000 сцен и может занять несколько часов.
+Серия 69 завершена, повторно запускать её не нужно. Сначала рассматривать результат как небольшой encoder effect в matched synthetic классе: rich лучше normal в среднем на `0,007018` рад и в `4/5`, но compact также использует temporal structure. Не настраивать следующую модель на движениях 21–25, 31–35, 41–45 или 51–55. Новый эксперимент требует отдельной preregistration и новой батареи; текущий результат не является доказательством зеркальных нейронов.
 
 ## Пройденные этапы и опорные результаты
 

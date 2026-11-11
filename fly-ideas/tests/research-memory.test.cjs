@@ -539,18 +539,21 @@ test('серия 68: frozen rich observer replication сохранена в па
 });
 
 test('серия 69: matched encoder ablation сохранён в памяти', () => {
-  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
-    [path.join(root,'tests/matched-encoder-ablation-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
-  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
-  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-matched-encoder-ablation-plan');
+  for (const fixture of ['matched-encoder-ablation-fixture.py','matched-encoder-ablation-user-result-fixture.py']) {
+    const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+      [path.join(root,'tests',fixture)], {cwd:root,encoding:'utf8',timeout:30000});
+    assert.equal(result.status,0,`${fixture}\n${result.stdout}\n${result.stderr}`);
+  }
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-matched-encoder-ablation-result');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/пользовательский запуск ещё не получен/);
-  assert.match(item.source,/60 000 accepted candidate IDs/);assert.match(item.source,/RGB SHA/);
-  assert.match(item.results,/минимум 4\/5/);assert.match(item.results,/два playback/);
-  assert.match(item.limitations,/не полностью наивное/);assert.match(item.limitations,/не докажет зеркальные нейроны/);
+  assert.match(item.status,/primary пройден/);assert.match(item.status,/оригинальные байты не получены/);
+  assert.match(item.source,/60 000 training episodes/);assert.match(item.source,/24 fixed units/);assert.match(item.source,/1920 level\+delta/);
+  assert.match(item.results,/0,276768\/0,269751/);assert.match(item.results,/2,54%/);assert.match(item.results,/4\/5/);
+  assert.match(item.results,/Compact также прошёл/);assert.match(item.results,/holdout 55/);
+  assert.match(item.limitations,/небольшой и не универсален/);assert.match(item.limitations,/не доказывает зеркальные нейроны/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
-  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-11-v48',entries:[custom]});
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-11-v49',entries:[custom]});
   assert.equal(migrated.entries[0],custom);
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
