@@ -189,6 +189,20 @@ with tempfile.TemporaryDirectory() as d:
     rich_internal=json.loads((rich_folder/'result/holdout_001/internal_state.json').read_text(encoding='utf-8'))
     assert rich_internal['updates_during_delay']==0 and 'observation images' in rich_internal['forbidden_replay_inputs']
     assert {p.relative_to(resumed):p.read_bytes() for p in resumed.rglob('*') if p.is_file()}==source_before
+    # Series 68 freezes the series-67 model and evaluates five entirely new
+    # matched movements without any optimizer or source mutation.
+    frozen_before={p.relative_to(rich_folder):p.read_bytes() for p in rich_folder.rglob('*') if p.is_file()};rep68_holdouts=[]
+    for index in range(5):
+        candidate,_=rich.piecewise_candidate(2000+index);obj={'schema':'fly-wings-trajectory-v1','fps':25,'duration_s':2,'keyframes':[{'t':i*.5,'angles_deg':angles} for i,angles in enumerate(candidate['keyframes_deg'])]};path=tmp/f'rep68-holdout-{index+1}.json';path.write_text(json.dumps(obj),encoding='utf-8');rep68_holdouts.append(path)
+    rep68_root=tmp/'rep68-output'
+    rep68_run=subprocess.run([sys.executable,str(root/'experiments/templates/68_frozen_rich_observer_replication.py'),'--source',str(rich_folder),'--holdouts',*map(str,rep68_holdouts),'--output-root',str(rep68_root),'--allow-fixture-source'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert rep68_run.returncode==0,rep68_run.stdout+'\n'+rep68_run.stderr
+    rep68_folders=list(rep68_root.glob('piecewise_rich_replication_*'));assert len(rep68_folders)==1
+    rep68_summary=json.loads((rep68_folders[0]/'result/summary.json').read_text(encoding='utf-8'))
+    assert rep68_summary['status']=='fixture_completed' and len(rep68_summary['holdouts'])==5
+    assert rep68_summary['protocol']['source_model_sha256']==rich_summary['model_sha256']
+    assert not (rep68_folders[0]/'INCOMPLETE.txt').exists() and (rep68_folders[0]/'result/complete.json').exists()
+    assert {p.relative_to(rich_folder):p.read_bytes() for p in rich_folder.rglob('*') if p.is_file()}==frozen_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
     with sqlite3.connect(resumed/'study.sqlite3') as db:db.execute("UPDATE run_phase SET stage='evaluation'")

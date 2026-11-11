@@ -516,3 +516,20 @@ test('серия 67: matched piecewise и rich temporal observer сохране�
   assert.equal(migrated.entries[0],custom);
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
+
+test('серия 68: frozen rich observer replication сохранена в памяти', () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/frozen-rich-observer-replication-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-rich-observer-replication-plan');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.status,/пользовательский запуск ещё не получен/);
+  assert.match(item.source,/primary_pass true/);assert.match(item.source,/Нового обучения/);
+  assert.match(item.results,/zero, static, shuffled и reversed/);assert.match(item.results,/побайтовую неизменность/);
+  assert.match(item.limitations,/matched synthetic/);assert.match(item.limitations,/не докажет зеркальные нейроны/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+  const custom={id:'custom',results:'сохранить',files:[]};
+  const migrated=memory.installResearchMemory({version:'v630-session-2026-11-11-v46',entries:[custom]});
+  assert.equal(migrated.entries[0],custom);
+  assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
+});

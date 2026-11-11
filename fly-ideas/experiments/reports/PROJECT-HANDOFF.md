@@ -10,6 +10,8 @@
 
 ## Самое последнее состояние
 
+- После успешной серии 67 пользователь попросил идти дальше. Подготовлена серия 68: независимая репликация на пяти новых matched движениях с полностью замороженной моделью серии 67 и без Adam training. Runner проверяет успешный full source, complete manifest, model SHA, форму weights `1921 × 72` и точное совпадение projection. Движения 31–35 и все прежние движения блокируются. Повторяются normal/zero/static/shuffled/reversed/closed и тот же составной primary; дополнительно считается число движений, где normal отдельно лучше всех primary-контролей. Fast fixture и bounded E2E подтвердили frozen-source immutability. BAT: `RUN-FROZEN-RICH-OBSERVER-REPLICATION.bat`. Протокол: [frozen-rich-observer-replication-plan.md](frozen-rich-observer-replication-plan.md).
+
 - Пользователь завершил серию 67: 60 000 matched эпизодов, 1 875 Adam steps, пять новых holdout 31–35. Составной primary пройден. Средняя RMSE normal/zero/static/shuffled/reversed/closed: `0,284066/0,379479/0,410413/0,352079/0,377475/0,910310`; normal лучше zero на 5/5. Normal ниже zero и каждого temporal control отдельно на всех пяти движениях. Объединённая осевая RMSE лучше zero по всем шести осям, включая right_x на 40,31%. Это показывает полезное кодирование временного порядка в matched synthetic протоколе, но серия одновременно изменила training distribution и encoder, поэтому их эффекты не разделены. Движения 31–35 нельзя использовать для настройки. Подробности: [piecewise-rich-autonomous-replay-user-result.md](piecewise-rich-autonomous-replay-user-result.md).
 
 - После результата серии 66 пользователь попросил новый код. Подготовлена серия 67 с двумя заранее выбранными изменениями: 60 000 независимых matched кусочно-линейных обучающих движений с шагом 0,5 с и richer level+delta observer encoder `1920 → 72`, обучаемый streaming Adam. Новые пять holdout должны быть созданы до обучения; движения 21–25 и все прежние полные движения блокируются. После задержки 0,5 с replay снова получает только состояние и фазу. Составной primary требует, чтобы normal был лучше zero, static, shuffled и reversed. SQLite хранит веса и моменты Adam, доступны два worker, pause/resume и resource guards. Fast fixture и bounded E2E, включая остановку после первой партии и resume, прошли. BAT: `RUN-PIECEWISE-RICH-AUTONOMOUS-REPLAY.bat`. Протокол: [piecewise-rich-autonomous-replay-plan.md](piecewise-rich-autonomous-replay-plan.md).
@@ -60,10 +62,11 @@
 
 ## Ближайший практический шаг
 
-1. Не переобучать и не настраивать серию 67 по движениям 31–35; сохранить модель и папку результата неизменными.
-2. Следующая подтверждающая серия должна сначала заморозить эту модель и оценить её на новой независимой matched батарее без обучения.
-3. После репликации провести заранее заданную encoder ablation: matched training со старым encoder против rich encoder, чтобы разделить эффект распределения обучения и level+delta представления.
-4. Только при подтверждении расширять распределение длительности, шага ключевых кадров и амплитуд. Не переходить сразу к реальным биологическим выводам.
+1. В редакторе оставить длительность 2 секунды, создать ещё пять random движений шагом 0,5 с и сохранить отдельными JSON. Не использовать движения 31–35.
+2. Обновить проект и дважды щёлкнуть `experiments\RUN-FROZEN-RICH-OBSERVER-REPLICATION.bat`.
+3. Выбрать завершённую успешную папку серии 67 `piecewise_rich_replay_...`, затем одновременно выделить пять новых JSON, удерживая Ctrl.
+4. Это короткая оценка без обучения и pause/resume. После завершения прислать `result\ОТЧЕТ.txt` и `result\summary.json`.
+5. Независимо от результата не исключать движения и не переобучать модель 67 по новой батарее.
 
 ## Пройденные этапы и опорные результаты
 
