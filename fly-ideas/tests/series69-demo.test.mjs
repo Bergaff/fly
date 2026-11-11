@@ -16,7 +16,7 @@ test('демонстратор серии 69 строго читает playback,
     const states=JSON.stringify({compact:Array(72).fill(0),rich:Array(72).fill(1),updates_during_delay:0});
     const parsed=demoLib.parseSeries69Demo({folder:'x',compact:playback,rich:playback,activity,metrics,states});
     assert.equal(parsed.activity.richLevel.length,51);assert.equal(parsed.activity.richLevel[0].length,96);
-    assert.equal(parsed.states.rich.length,72);assert.equal(parsed.metrics.delay_s,.5);
+    assert.equal(parsed.states.rich.length,72);assert.equal(parsed.metrics.delay_s,.5);assert.deepEqual(parsed.availableHoldouts,[1]);
     assert.throws(()=>demoLib.parseAblationActivity(activity.replace('compact_00','bad')),/24 compact/);
     assert.throws(()=>demoLib.parseSeries69Demo({folder:'x',compact:playback,rich:playback,activity,metrics,states:JSON.stringify({compact:[],rich:[],updates_during_delay:1})}),/internal_states/);
   } finally { await vite.close(); }

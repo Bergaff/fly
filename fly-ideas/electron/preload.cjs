@@ -35,7 +35,7 @@ contextBridge.exposeInMainWorld("fly", {
   resetFolder: (kind) => ipcRenderer.invoke("fly:resetFolder", kind),
   saveFile: (opts) => ipcRenderer.invoke("fly:saveFile", opts),
   openFile: (opts) => ipcRenderer.invoke("fly:openFile", opts),
-  loadSeries69Demo: () => ipcRenderer.invoke("fly:loadSeries69Demo"),
+  loadSeries69Demo: (holdoutIndex) => ipcRenderer.invoke("fly:loadSeries69Demo", holdoutIndex),
   chooseSeries69Demo: () => ipcRenderer.invoke("fly:chooseSeries69Demo"),
   listExternal: () => ipcRenderer.invoke("fly:listExternal"),
   readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),

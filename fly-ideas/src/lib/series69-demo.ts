@@ -3,15 +3,17 @@ import { parseTrajectory, type Angles, type Trajectory } from "@/lib/wing-trajec
 export type AblationSample = { t: number; teacher: Angles; prediction: Angles };
 export type AblationPlayback = { trajectory: Trajectory; samples: AblationSample[]; method: string };
 export type AblationActivity = { times: number[]; compact: number[][]; richLevel: number[][]; richDelta: number[][] };
+export type ErrorMetrics = { rmse_rad: number; mae_rad?: number; axis_rmse_rad?: Record<string, number> };
 export type AblationMetrics = {
   holdout_index: number;
   delay_s: number;
   state_unchanged_during_delay: boolean;
-  zero: { rmse_rad: number };
-  conditions: Record<string, { compact: { rmse_rad: number }; rich: { rmse_rad: number } }>;
+  zero: ErrorMetrics;
+  conditions: Record<string, { compact: ErrorMetrics; rich: ErrorMetrics }>;
 };
 export type Series69Demo = {
   folder: string;
+  availableHoldouts: number[];
   compact: AblationPlayback;
   rich: AblationPlayback;
   activity: AblationActivity;
@@ -58,7 +60,7 @@ export function parseAblationActivity(text: string): AblationActivity {
   return { times, compact, richLevel, richDelta };
 }
 
-export function parseSeries69Demo(raw: { folder: string; compact: string; rich: string; activity: string; metrics: string; states: string }): Series69Demo {
+export function parseSeries69Demo(raw: { folder: string; availableHoldouts?: number[]; compact: string; rich: string; activity: string; metrics: string; states: string }): Series69Demo {
   const compact = parseAblationPlayback(JSON.parse(raw.compact.replace(/^\uFEFF/, "")));
   const rich = parseAblationPlayback(JSON.parse(raw.rich.replace(/^\uFEFF/, "")));
   const metrics = JSON.parse(raw.metrics.replace(/^\uFEFF/, "")) as AblationMetrics;
@@ -68,5 +70,6 @@ export function parseSeries69Demo(raw: { folder: string; compact: string; rich: 
   if (compact.samples.length !== rich.samples.length || activity.times.length !== rich.samples.length) throw new Error("Длины playback и activity не совпадают.");
   if (!metrics || !finite(metrics.delay_s) || !metrics.conditions?.normal || !finite(metrics.conditions.normal.compact?.rmse_rad) || !finite(metrics.conditions.normal.rich?.rmse_rad)) throw new Error("metrics.json серии 69 повреждён.");
   if (!states || !Array.isArray(states.compact) || states.compact.length !== 72 || !Array.isArray(states.rich) || states.rich.length !== 72 || !states.compact.every(finite) || !states.rich.every(finite) || states.updates_during_delay !== 0) throw new Error("internal_states.json серии 69 повреждён.");
-  return { folder: raw.folder, compact, rich, activity, metrics, states };
+  const availableHoldouts = Array.isArray(raw.availableHoldouts) ? raw.availableHoldouts.filter(v => Number.isInteger(v) && v >= 1 && v <= 5) : [metrics.holdout_index];
+  return { folder: raw.folder, availableHoldouts, compact, rich, activity, metrics, states };
 }

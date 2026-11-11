@@ -1609,8 +1609,9 @@ function registerIpc(getWin) {
     return null;
   };
   const readSeries69Demo = async (folder) => {
-    const out = { folder };
+    const out = { folder, availableHoldouts: [] };
     for (const [key, name] of Object.entries(series69Names)) out[key] = await fsp.readFile(path.join(folder, name), "utf8");
+    for (let i=1;i<=5;i++) if (await resolveSeries69Folder(path.join(path.dirname(folder), `holdout_${String(i).padStart(3,"0")}`))) out.availableHoldouts.push(i);
     return out;
   };
   const rememberSeries69 = (folder) => { const c = readConfig(); c.series69DemoFolder = folder; writeConfig(c); };
@@ -1627,7 +1628,8 @@ function registerIpc(getWin) {
     for (const item of dirs) { const found = await resolveSeries69Folder(item.p); if (found) return found; }
     return null;
   };
-  handle("fly:loadSeries69Demo", async () => {
+  handle("fly:loadSeries69Demo", async (_e, holdoutIndex = 1) => {
+    if (!Number.isInteger(holdoutIndex) || holdoutIndex < 1 || holdoutIndex > 5) throw new Error("Номер движения серии 69 должен быть от 1 до 5.");
     let folder = await discoverSeries69();
     if (!folder) {
       const r = await dialog.showOpenDialog(getWin(), { title: "Серия 69 не найдена автоматически. Выберите result или holdout_001", properties: ["openDirectory"] });
@@ -1635,7 +1637,9 @@ function registerIpc(getWin) {
       folder = await resolveSeries69Folder(r.filePaths[0]);
       if (!folder) throw new Error("В выбранной папке не найден полный result\\holdout_001 серии 69.");
     }
-    rememberSeries69(folder); return readSeries69Demo(folder);
+    const requested = await resolveSeries69Folder(path.join(path.dirname(folder), `holdout_${String(holdoutIndex).padStart(3,"0")}`));
+    if (!requested) throw new Error(`В результате серии 69 отсутствует holdout_${String(holdoutIndex).padStart(3,"0")}.`);
+    rememberSeries69(folder); return readSeries69Demo(requested);
   });
   handle("fly:chooseSeries69Demo", async () => {
     const r = await dialog.showOpenDialog(getWin(), { title: "Выберите другой result или holdout_001 серии 69", properties: ["openDirectory"] });

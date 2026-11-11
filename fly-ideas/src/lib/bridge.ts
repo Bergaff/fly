@@ -129,8 +129,8 @@ export interface FlyBridge {
   resetFolder(kind: DirKind): Promise<string>;
   saveFile(opts: { defaultName: string; content: string; filters?: FileFilter[]; kind?: DirKind }): Promise<string | null>;
   openFile(opts: { filters?: FileFilter[]; kind?: DirKind }): Promise<{ path: string; content: string } | null>;
-  loadSeries69Demo(): Promise<{ folder: string; compact: string; rich: string; activity: string; metrics: string; states: string } | null>;
-  chooseSeries69Demo(): Promise<{ folder: string; compact: string; rich: string; activity: string; metrics: string; states: string } | null>;
+  loadSeries69Demo(holdoutIndex?: number): Promise<{ folder: string; availableHoldouts: number[]; compact: string; rich: string; activity: string; metrics: string; states: string } | null>;
+  chooseSeries69Demo(): Promise<{ folder: string; availableHoldouts: number[]; compact: string; rich: string; activity: string; metrics: string; states: string } | null>;
   listExternal(): Promise<ExternalSource[]>;
   readRunFile(dir: string, name: string): Promise<{ kind: "image"; dataUrl: string } | { kind: "text"; text: string }>;
   copyRunFile(dir: string, name: string): Promise<{ kind: "text" | "image"; bytes: number }>;
