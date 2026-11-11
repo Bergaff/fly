@@ -500,13 +500,16 @@ test('серия 67: matched piecewise и rich temporal observer сохране�
   const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
     [path.join(root,'tests/piecewise-rich-autonomous-replay-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const userResult=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/piecewise-rich-autonomous-replay-user-result-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(userResult.status,0,`${userResult.stdout}\n${userResult.stderr}`);
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-piecewise-rich-autonomous-replay-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/долгий запуск ещё не получен/);
-  assert.match(item.source,/60 000/);assert.match(item.source,/батарея 21–25/);
-  assert.match(item.results,/1920/);assert.match(item.results,/Streaming Adam/);
-  assert.match(item.results,/static, shuffled и reversed/);assert.match(item.results,/0,5 с/);
-  assert.match(item.limitations,/не являются доказанно оптимальными/);assert.match(item.limitations,/не докажет зеркальные нейроны/);
+  assert.match(item.status,/primary пройден/);
+  assert.match(item.source,/60 000/);assert.match(item.source,/holdout 31–35/);
+  assert.match(item.results,/0,284066/);assert.match(item.results,/25,14%/);
+  assert.match(item.results,/по всем шести осям/);assert.match(item.results,/5\/5/);
+  assert.match(item.limitations,/эффекты не разделены/);assert.match(item.limitations,/нельзя использовать для настройки/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
   const migrated=memory.installResearchMemory({version:'v630-session-2026-11-10-v44',entries:[custom]});
