@@ -1595,22 +1595,54 @@ function registerIpc(getWin) {
     if (r.canceled || !r.filePaths[0]) return null;
     return { path: r.filePaths[0], content: await fsp.readFile(r.filePaths[0], "utf8") };
   });
-  handle("fly:loadSeries69Demo", async () => {
-    const r = await dialog.showOpenDialog(getWin(), { title: "Выберите result или holdout_001 серии 69", properties: ["openDirectory"] });
-    if (r.canceled || !r.filePaths[0]) return null;
-    const selected = path.resolve(r.filePaths[0]);
-    const candidates = [selected, path.join(selected, "holdout_001"), path.join(selected, "result", "holdout_001")];
-    let folder = null;
-    for (const c of candidates) { try { if ((await fsp.stat(path.join(c, "playback_rich.json"))).isFile()) { folder = c; break; } } catch {} }
-    if (!folder) throw new Error("В выбранной папке не найден result\\holdout_001 серии 69.");
-    const names = { compact: "playback_compact.json", rich: "playback_rich.json", activity: "observer_activity.csv", metrics: "metrics.json", states: "internal_states.json" };
-    const out = { folder };
-    for (const [key, name] of Object.entries(names)) {
-      const file = path.join(folder, name); const st = await fsp.lstat(file);
-      if (!st.isFile() || st.isSymbolicLink() || st.size > 8 * 1024 * 1024) throw new Error(`Файл ${name} отсутствует, является ссылкой или слишком велик.`);
-      out[key] = await fsp.readFile(file, "utf8");
+  const series69Names = { compact: "playback_compact.json", rich: "playback_rich.json", activity: "observer_activity.csv", metrics: "metrics.json", states: "internal_states.json" };
+  const resolveSeries69Folder = async (selected) => {
+    if (!selected) return null;
+    const base = path.resolve(selected);
+    const candidates = [base, path.join(base, "holdout_001"), path.join(base, "result", "holdout_001")];
+    for (const folder of candidates) {
+      try {
+        const stats = await Promise.all(Object.values(series69Names).map(name => fsp.lstat(path.join(folder, name))));
+        if (stats.every(st => st.isFile() && !st.isSymbolicLink() && st.size <= 8 * 1024 * 1024)) return folder;
+      } catch {}
     }
+    return null;
+  };
+  const readSeries69Demo = async (folder) => {
+    const out = { folder };
+    for (const [key, name] of Object.entries(series69Names)) out[key] = await fsp.readFile(path.join(folder, name), "utf8");
     return out;
+  };
+  const rememberSeries69 = (folder) => { const c = readConfig(); c.series69DemoFolder = folder; writeConfig(c); };
+  const discoverSeries69 = async () => {
+    const remembered = await resolveSeries69Folder(readConfig().series69DemoFolder);
+    if (remembered) return remembered;
+    const roots = [...new Set([getDirs().runs, path.join(WS, "runs")])].map(r => path.join(r, "ideas", "i-observational", "matched-encoder-ablation"));
+    const dirs = [];
+    for (const root of roots) {
+      let entries = []; try { entries = await fsp.readdir(root, { withFileTypes: true }); } catch { continue; }
+      for (const ent of entries) if (ent.isDirectory() && !ent.isSymbolicLink()) { const p = path.join(root, ent.name); try { dirs.push({ p, mtime: (await fsp.stat(p)).mtimeMs }); } catch {} }
+    }
+    dirs.sort((a,b) => b.mtime-a.mtime);
+    for (const item of dirs) { const found = await resolveSeries69Folder(item.p); if (found) return found; }
+    return null;
+  };
+  handle("fly:loadSeries69Demo", async () => {
+    let folder = await discoverSeries69();
+    if (!folder) {
+      const r = await dialog.showOpenDialog(getWin(), { title: "Серия 69 не найдена автоматически. Выберите result или holdout_001", properties: ["openDirectory"] });
+      if (r.canceled || !r.filePaths[0]) return null;
+      folder = await resolveSeries69Folder(r.filePaths[0]);
+      if (!folder) throw new Error("В выбранной папке не найден полный result\\holdout_001 серии 69.");
+    }
+    rememberSeries69(folder); return readSeries69Demo(folder);
+  });
+  handle("fly:chooseSeries69Demo", async () => {
+    const r = await dialog.showOpenDialog(getWin(), { title: "Выберите другой result или holdout_001 серии 69", properties: ["openDirectory"] });
+    if (r.canceled || !r.filePaths[0]) return null;
+    const folder = await resolveSeries69Folder(r.filePaths[0]);
+    if (!folder) throw new Error("В выбранной папке не найден полный result\\holdout_001 серии 69.");
+    rememberSeries69(folder); return readSeries69Demo(folder);
   });
   handle("fly:checkEnv", () => checkEnv());
   handle("fly:listPythons", () => listPythons());

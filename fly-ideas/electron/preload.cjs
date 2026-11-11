@@ -36,6 +36,7 @@ contextBridge.exposeInMainWorld("fly", {
   saveFile: (opts) => ipcRenderer.invoke("fly:saveFile", opts),
   openFile: (opts) => ipcRenderer.invoke("fly:openFile", opts),
   loadSeries69Demo: () => ipcRenderer.invoke("fly:loadSeries69Demo"),
+  chooseSeries69Demo: () => ipcRenderer.invoke("fly:chooseSeries69Demo"),
   listExternal: () => ipcRenderer.invoke("fly:listExternal"),
   readRunFile: (dir, name) => ipcRenderer.invoke("fly:readRunFile", dir, name),
   copyRunFile: (dir, name) => ipcRenderer.invoke("fly:copyRunFile", dir, name),
