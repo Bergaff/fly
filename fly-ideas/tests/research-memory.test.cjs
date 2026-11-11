@@ -521,12 +521,16 @@ test('серия 68: frozen rich observer replication сохранена в па
   const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
     [path.join(root,'tests/frozen-rich-observer-replication-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
   assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const userResult=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/frozen-rich-observer-replication-user-result-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(userResult.status,0,`${userResult.stdout}\n${userResult.stderr}`);
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-rich-observer-replication-plan');
   assert.ok(item && item.ideaId==='i-observational');
-  assert.match(item.status,/пользовательский запуск ещё не получен/);
-  assert.match(item.source,/primary_pass true/);assert.match(item.source,/Нового обучения/);
-  assert.match(item.results,/zero, static, shuffled и reversed/);assert.match(item.results,/побайтовую неизменность/);
-  assert.match(item.limitations,/matched synthetic/);assert.match(item.limitations,/не докажет зеркальные нейроны/);
+  assert.match(item.status,/primary/);assert.match(item.status,/повторно/);
+  assert.match(item.source,/без обучения/);assert.match(item.source,/holdout 41–45/);
+  assert.match(item.results,/0,243468/);assert.match(item.results,/35,90%/);
+  assert.match(item.results,/10\/10/);assert.match(item.results,/всем шести/);
+  assert.match(item.limitations,/preregistered ablation/);assert.match(item.limitations,/нельзя использовать для настройки/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
   const custom={id:'custom',results:'сохранить',files:[]};
   const migrated=memory.installResearchMemory({version:'v630-session-2026-11-11-v46',entries:[custom]});
