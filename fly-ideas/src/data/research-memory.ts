@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-11-v51";
+export const MEMORY_VERSION = "v630-session-2026-11-11-v52";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -115,7 +115,7 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     files: ["experiments/reports/matched-encoder-ablation-user-result.md", "experiments/reports/matched-encoder-ablation-user-summary-extract.json", "tests/matched-encoder-ablation-user-result-fixture.py", "experiments/RUN-MATCHED-ENCODER-ABLATION.bat", "experiments/templates/69_matched_encoder_ablation.py", "experiments/reports/matched-encoder-ablation-plan.md"] },
   { id: "session-embodied-connectome-integration-plan", ideaId: "i-observational", title: "Серия 70: FlyVis → Shiu → FlyGym и видимый демонстратор", status: "этап 1 реализован; этапы 2–4 имеют isolated setup, preflight и contract fixture, полный научный прогон заблокирован до review mapping/readout",
     source: "Демонстратор read-only загружает пять versioned файлов holdout серии 69: compact/rich playback, observer activity, internal states и metrics. Отдельный preflight проверяет FlyVis 1.2.0, закреплённый Shiu model.py и v630 tables, FlyGym 2.1.1. Fixture использует искусственные данные и явно содержит scientific_result=false.",
-    results: "В Fly Ideas визуально разделены observation, delay 0,5 с без обновлений и autonomous replay; показываются 96 rich level, 96 rich delta, 24 compact units и 72 коэффициента state. Подготовлены отдельные Python 3.11/3.12 среды и BAT. Полный pipeline не объявлен выполненным: reviewed FlyVis-type→FlyWire-ID mapping и preregistered motor readout пока отсутствуют.",
+    results: "В Fly Ideas визуально разделены observation, delay 0,5 с без обновлений и autonomous replay; показываются 96 rich level, 96 rich delta, 24 compact units и 72 коэффициента state. Подготовлена установка через «Данные и окружение»: две отдельные Python 3.12 среды, pretrained FlyVis и потоковый журнал; BAT только открывает приложение. Полный pipeline не объявлен выполненным: reviewed FlyVis-type→FlyWire-ID mapping и preregistered motor readout пока отсутствуют.",
     limitations: "Визуальная убедительность не является проверкой механизма. Нынешние units остаются искусственными. Contract fixture проверяет форматы и прохождение цифровой лезии до body command, но не FlyVis, Shiu или MuJoCo как научную цепь. Нельзя угадывать mapping или выбирать motor readout после просмотра результата.",
     files: ["src/views/series69-demonstrator.tsx", "src/lib/series69-demo.ts", "experiments/SETUP-EMBODIED-FLY-STACK.bat", "experiments/RUN-EMBODIED-CONNECTOME-PREFLIGHT.bat", "experiments/templates/70_embodied_connectome_pipeline.py", "experiments/reports/embodied-connectome-integration-plan.md", "tests/series69-demo.test.mjs", "tests/embodied-connectome-pipeline-fixture.py"] },
   { id: "session-wing-studio-user-frames", ideaId: "i-observational", title: "Шесть осей: покадровый разбор показа пользователя", status: "playback.json вставлен текстом; модель, изображения и исходный файл не проверены",

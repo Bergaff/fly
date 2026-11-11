@@ -42,6 +42,13 @@ export interface EnvSetupOutput {
   done: boolean;
   ok?: boolean;
 }
+export interface EmbodiedEnvPart { python: string; ready: boolean; version: string | null; error?: string | null }
+export interface EmbodiedEnvInfo {
+  flyvis: EmbodiedEnvPart;
+  flygym: EmbodiedEnvPart;
+  pretrained: { folder: string; ready: boolean; bytes: number };
+  ready: boolean;
+}
 
 export interface ScriptInfo { name: string; doc: string; size: number; mtime: number }
 export interface RunInfo { dir: string; path: string; label: string; summary: Record<string, unknown> | null; files: string[]; mtime: number }
@@ -140,6 +147,8 @@ export interface FlyBridge {
   setPython(pyCmd: string | null): Promise<EnvInfo>;
   pickPythonExe(): Promise<EnvInfo | null>;
   setupPythonEnv(mode?: "core" | "full"): Promise<EnvInfo>;
+  checkEmbodiedEnv(): Promise<EmbodiedEnvInfo>;
+  setupEmbodiedEnv(): Promise<EmbodiedEnvInfo>;
   onEnvSetupOutput(cb: (p: EnvSetupOutput) => void): () => void;
   openPath(p: string): Promise<string>;
   openExternal(url: string): Promise<void>;

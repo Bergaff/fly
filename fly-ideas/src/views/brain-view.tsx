@@ -4,7 +4,7 @@ import type { Idea, Project, Reference } from "@/data/types";
 import { checklistProgress } from "@/data/types";
 import {
   fly, fmtBytes, isElectron,
-  type DataItem, type AgentInfo, type EnvInfo, type EnvSetupOutput, type PythonCandidate, type ExternalSource, type LlmMessage, type LlmProvider,
+  type DataItem, type AgentInfo, type EnvInfo, type EnvSetupOutput, type EmbodiedEnvInfo, type PythonCandidate, type ExternalSource, type LlmMessage, type LlmProvider,
   type Paths, type DataFileLinks, type DataFileRole, type Permissions, type ProjectPaths, type RunInfo, type ScriptInfo, type ApiCallRecord, type LlmUsage, type AppUpdateStatus,
 } from "@/lib/bridge";
 import { extractAssistantFiles, extractSelectedAssistantFile, formatAssistantResponse } from "@/lib/assistant-code";
@@ -3223,6 +3223,7 @@ function AgentPanel() {
 
 function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | null; onResolved: () => void }) {
   const [env, setEnv] = useState<EnvInfo | null>(null);
+  const [embodied, setEmbodied] = useState<EmbodiedEnvInfo | null>(null);
   const [pythons, setPythons] = useState<PythonCandidate[]>([]);
   const [loading, setLoading] = useState(false);
   const [settingUp, setSettingUp] = useState(false);
@@ -3232,9 +3233,11 @@ function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | nul
   const check = async () => {
     setLoading(true);
     try {
-      const [nextEnv, found] = await Promise.all([fly!.checkEnv(), fly!.listPythons()]);
+      const embodiedCheck = typeof fly!.checkEmbodiedEnv === "function" ? fly!.checkEmbodiedEnv() : Promise.resolve(null);
+      const [nextEnv, found, nextEmbodied] = await Promise.all([fly!.checkEnv(), fly!.listPythons(), embodiedCheck]);
       setEnv(nextEnv);
       setPythons(found);
+      setEmbodied(nextEmbodied);
     } finally {
       setLoading(false);
     }
@@ -3264,6 +3267,13 @@ function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | nul
     } finally {
       setSettingUp(false);
     }
+  };
+
+  const setupEmbodied = async () => {
+    setSettingUp(true); setSetupError(""); setSetupLog("");
+    try { setEmbodied(await fly!.setupEmbodiedEnv()); }
+    catch (e) { setSetupError((e as Error).message); }
+    finally { setSettingUp(false); }
   };
 
   const selectPython = async (value: string) => {
@@ -3343,6 +3353,27 @@ function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | nul
           </p>
           {setupError && <p className="text-[11px] text-destructive">{setupError}</p>}
           {setupLog && <pre className="max-h-[220px] overflow-auto border bg-muted/40 p-2 font-mono text-[10px] leading-relaxed whitespace-pre-wrap">{setupLog}</pre>}
+        </div>
+      </section>
+
+      <section className="border">
+        <div className="flex flex-wrap items-center gap-2 border-b px-2 py-1.5">
+          <div className="label mr-auto">Зрение и физическое тело: FlyVis + FlyGym</div>
+          <Button variant="outline" size="sm" onClick={() => void check()} disabled={loading || settingUp}>проверить</Button>
+        </div>
+        <div className="space-y-2 p-2">
+          <div className="grid gap-x-4 gap-y-1 md:grid-cols-3">
+            <Row ok={!!embodied?.flyvis.ready} label="FlyVis" value={embodied?.flyvis.ready ? embodied.flyvis.version || "готов" : embodied?.flyvis.error || "не установлен"} />
+            <Row ok={!!embodied?.pretrained.ready} label="модели" value={embodied?.pretrained.ready ? `${fmtBytes(embodied.pretrained.bytes)} · ${embodied.pretrained.folder}` : "не скачаны"} />
+            <Row ok={!!embodied?.flygym.ready} label="FlyGym" value={embodied?.flygym.ready ? embodied.flygym.version || "готов" : embodied?.flygym.error || "не установлен"} />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={() => void setupEmbodied()} disabled={settingUp || !env?.python || !!embodied?.ready}>
+              {settingUp ? "устанавливаю…" : embodied?.ready ? "FlyVis и FlyGym готовы" : "установить всё для зрения и тела"}
+            </Button>
+            <span className="text-[11px] text-muted-foreground">Создаёт отдельные <code>workspace/.venv-flyvis</code> и <code>workspace/.venv-flygym</code>, скачивает официальные pretrained-модели FlyVis. Нужен Python 3.12.</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Все загрузки выполняются здесь с видимым журналом. Существующая среда Shiu и пользовательские результаты не изменяются. Повторное нажатие после сетевой ошибки безопасно продолжает установку.</p>
         </div>
       </section>
 

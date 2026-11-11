@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld("fly", {
   setPython: (pyCmd) => ipcRenderer.invoke("fly:setPython", pyCmd),
   pickPythonExe: () => ipcRenderer.invoke("fly:pickPythonExe"),
   setupPythonEnv: (mode) => ipcRenderer.invoke("fly:setupPythonEnv", mode),
+  checkEmbodiedEnv: () => ipcRenderer.invoke("fly:checkEmbodiedEnv"),
+  setupEmbodiedEnv: () => ipcRenderer.invoke("fly:setupEmbodiedEnv"),
   onEnvSetupOutput: (cb) => {
     const h = (_e, p) => cb(p);
     ipcRenderer.on("fly:envSetupOutput", h);
