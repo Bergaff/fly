@@ -203,6 +203,22 @@ with tempfile.TemporaryDirectory() as d:
     assert rep68_summary['protocol']['source_model_sha256']==rich_summary['model_sha256']
     assert not (rep68_folders[0]/'INCOMPLETE.txt').exists() and (rep68_folders[0]/'result/complete.json').exists()
     assert {p.relative_to(rich_folder):p.read_bytes() for p in rich_folder.rglob('*') if p.is_file()}==frozen_before
+    # Series 69 trains only the compact encoder on the exact source candidate
+    # IDs/RGB stream, then compares it with the frozen rich model.
+    abl_holdouts=[]
+    for index in range(5):
+        candidate,_=rich.piecewise_candidate(3000+index);obj={'schema':'fly-wings-trajectory-v1','fps':25,'duration_s':2,'keyframes':[{'t':i*.5,'angles_deg':angles} for i,angles in enumerate(candidate['keyframes_deg'])]};path=tmp/f'ablation-holdout-{index+1}.json';path.write_text(json.dumps(obj),encoding='utf-8');abl_holdouts.append(path)
+    abl_folder=tmp/'missing-ablation-root'/'ablation'
+    abl_first=subprocess.run([sys.executable,str(root/'experiments/templates/69_matched_encoder_ablation.py'),'--new',str(abl_folder),'--source',str(rich_folder),'--holdouts',*map(str,abl_holdouts),'--fixture','--batches','1'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert abl_first.returncode==0,abl_first.stdout+'\n'+abl_first.stderr
+    assert not (abl_folder/'result').exists()
+    abl_resume=subprocess.run([sys.executable,str(root/'experiments/templates/69_matched_encoder_ablation.py'),'--resume',str(abl_folder)],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert abl_resume.returncode==0,abl_resume.stdout+'\n'+abl_resume.stderr
+    abl_summary=json.loads((abl_folder/'result/summary.json').read_text(encoding='utf-8'))
+    assert abl_summary['status']=='fixture_completed' and abl_summary['compact_training_episodes']==4
+    assert set(abl_summary['aggregate']['models'])=={'compact','rich'} and abl_summary['protocol']['compact_encoder']['level_features']==240
+    assert abl_summary['source_rich_model_sha256']==rich_summary['model_sha256']
+    assert {p.relative_to(rich_folder):p.read_bytes() for p in rich_folder.rglob('*') if p.is_file()}==frozen_before
     # Crash after publishing result but before final phase update: verify and finish without rewriting.
     before={p.relative_to(resumed/'result'):p.read_bytes() for p in (resumed/'result').rglob('*') if p.is_file()}
     with sqlite3.connect(resumed/'study.sqlite3') as db:db.execute("UPDATE run_phase SET stage='evaluation'")

@@ -30,6 +30,9 @@ export function parseTrajectory(value: unknown): Trajectory {
   if (Math.abs(frames[0].t) > 1e-9 || Math.abs(frames[frames.length - 1].t - o.duration_s) > 1e-9 || frames.some((f, i) => i > 0 && f.t - frames[i - 1].t < 1e-6)) throw new Error("Время кадров должно строго возрастать от 0 до конца траектории.");
   return { schema: "fly-wings-trajectory-v1", fps: 25, duration_s: o.duration_s, keyframes: frames };
 }
+export function randomAngles(random: () => number = Math.random): Angles {
+  return Array.from({ length: 6 }, () => Math.floor(Math.max(0, Math.min(.999999999, random())) * 91) - 45) as Angles;
+}
 export function randomTrajectory(duration_s: number, random: () => number = Math.random): Trajectory {
   if (!finite(duration_s) || duration_s < .52 || duration_s > 10 || Math.abs(Math.round(duration_s * 25) - duration_s * 25) > 1e-7) throw new Error("Некорректная длительность случайной траектории.");
   const times = [0];
@@ -37,7 +40,7 @@ export function randomTrajectory(duration_s: number, random: () => number = Math
   if (Math.abs(times[times.length - 1] - duration_s) > 1e-9) times.push(duration_s);
   const keyframes = times.map(t => ({
     t,
-    angles_deg: Array.from({ length: 6 }, () => Math.floor(Math.max(0, Math.min(.999999999, random())) * 91) - 45) as Angles,
+    angles_deg: randomAngles(random),
   }));
   return { schema: "fly-wings-trajectory-v1", fps: 25, duration_s, keyframes };
 }

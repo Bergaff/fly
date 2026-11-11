@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { fly } from "@/lib/bridge";
-import { initialTrajectory, interpolate, parseResult, parseTrajectory, randomTrajectory, ZERO, type Angles, type Trajectory, type WingResult } from "@/lib/wing-trajectory";
+import { initialTrajectory, interpolate, parseResult, parseTrajectory, randomAngles, ZERO, type Angles, type Trajectory, type WingResult } from "@/lib/wing-trajectory";
 import { WingScene } from "@/views/wing-scene";
 
 const labels = ["X подъём", "Y наклон", "Z поворот", "X подъём", "Y наклон", "Z поворот"];
@@ -48,10 +48,14 @@ export function WingStudioView() {
     change({ ...trajectory, keyframes: frames }); setFrame(frames.findIndex(k => k.t === t)); setTime(t); setMessage("Кадр добавлен. Задайте углы ниже.");
   };
   const remove = () => { if (frame === 0 || frame === trajectory.keyframes.length - 1) return; change({ ...trajectory, keyframes: trajectory.keyframes.filter((_, i) => i !== frame) }); setFrame(0); setTime(0); };
-  const generateRandom = () => {
-    const next = randomTrajectory(trajectory.duration_s);
-    change(next); setFrame(0); setTime(0);
-    setMessage("Создана новая случайная траектория: шесть углов меняются каждые 0,5 с в диапазоне ±45°. Сохраните её под новым именем.");
+  const advanceRandom = () => {
+    if (time >= trajectory.duration_s - 1e-9) { setMessage("Достигнут конец траектории. Нажмите «В начало», чтобы начать новый проход."); return; }
+    const nextTime = Math.min(trajectory.duration_s, (Math.floor((time + 1e-9) / .5) + 1) * .5);
+    const keepOnGrid = (t: number) => Math.abs(t / .5 - Math.round(t / .5)) < 1e-7 || Math.abs(t - trajectory.duration_s) < 1e-7;
+    const kept = trajectory.keyframes.filter(k => keepOnGrid(k.t) && Math.abs(k.t - nextTime) > 1e-7);
+    const frames = [...kept, { t: nextTime, angles_deg: randomAngles() }].sort((a,b) => a.t - b.t);
+    change({ ...trajectory, keyframes: frames }); setFrame(frames.findIndex(k => Math.abs(k.t - nextTime) < 1e-7)); setTime(nextTime);
+    setMessage(`Случайные углы заданы в ${nextTime.toFixed(2)} с. Следующее нажатие сдвинет точку ещё на 0,5 с.`);
   };
   const save = async () => {
     try {
@@ -86,7 +90,7 @@ export function WingStudioView() {
       <section className="min-w-0">
         <div className="flex items-baseline justify-between border-b pb-2"><h2 className="text-[13px] font-semibold">Ключевые кадры</h2><span className="font-mono text-[10px] text-muted-foreground">{trajectory.keyframes.length} / 200</span></div>
         <p className="py-2 text-[11px] text-muted-foreground">Выберите кадр, задайте углы двух крыльев. Между кадрами движение линейное. Время точки добавляется ползунком справа.</p>
-        <div className="border-b pb-2"><button className={button} onClick={generateRandom}>Случайное движение, шаг 0,5 с</button><p className="mt-1 text-[10px] text-muted-foreground">Заменяет текущие кадры. Все шесть ползунков получают случайные значения от −45° до +45°.</p></div>
+        <div className="border-b pb-2"><button className={button} onClick={advanceRandom}>Случайное движение, шаг 0,5 с</button><p className="mt-1 text-[10px] text-muted-foreground">Каждое нажатие сдвигает шкалу вправо к следующей точке 0,5 с и случайно меняет все шесть ползунков от −45° до +45°. В конце нажмите «В начало» для нового прохода.</p></div>
         <div className="flex max-h-36 flex-wrap content-start gap-1 overflow-auto border-b py-2">{trajectory.keyframes.map((k,i) => <button key={i} type="button" className={`${button} font-mono ${i === frame ? "bg-secondary" : ""}`} aria-pressed={i === frame} onClick={() => { setFrame(i); setTime(k.t); setPlaying(false); }}>{k.t.toFixed(2)} с</button>)}</div>
         <div className="flex flex-wrap items-center gap-2 border-b py-2"><button className={button} onClick={insert}>Добавить на шкале</button><button className={button} disabled={frame===0 || frame===trajectory.keyframes.length-1} onClick={remove}>Удалить кадр</button></div>
         <div className="flex items-center gap-2 border-b py-2 text-[12px]"><label htmlFor="wing-duration">Длительность, с</label><input id="wing-duration" className={`${field} w-20`} inputMode="decimal" value={durationInput} onChange={e => setDurationInput(e.target.value)} /><button className={button} onClick={updateDuration}>Применить</button></div>

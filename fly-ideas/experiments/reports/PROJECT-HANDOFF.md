@@ -10,6 +10,10 @@
 
 ## Самое последнее состояние
 
+- Пользователь попросил следующий этап и исправление random-кнопки. Подготовлена серия 69: compact 24-unit/240-feature encoder обучается на точных 60 000 candidate IDs, RGB scenes и targets серии 67 с теми же Adam settings, каждый RGB SHA сверяется; затем он парно сравнивается с замороженной rich-моделью на новой батарее. Primary требует rich ниже compact в среднем, минимум 4/5 wins и повторный temporal pass. Есть SQLite checkpoint, pause/resume, два worker и source immutability. Fast fixture и bounded E2E прошли. BAT: `RUN-MATCHED-ENCODER-ABLATION.bat`; протокол: [matched-encoder-ablation-plan.md](matched-encoder-ablation-plan.md).
+
+- Кнопка «Случайное движение, шаг 0,5 с» изменена: каждое нажатие теперь передвигает шкалу вправо `0 → 0,5 → 1,0 → …`, выбирает следующую точку и случайно сдвигает шесть ползунков; в конце предлагается «В начало». UI test прошёл.
+
 - Пользователь завершил серию 68 на новых движениях 41–45 без переобучения модели 67. Составной primary повторно пройден: normal/zero/static/shuffled/reversed/closed `0,243468/0,379802/0,478368/0,350215/0,370485/0,919705`; normal отдельно лучше всех primary-контролей 5/5. По всем шести объединённым осям normal лучше zero. Серии 67–68 вместе дают устойчивый знак на 10/10 matched движениях при одной замороженной модели. Теперь нужна preregistered encoder ablation, потому что серия 67 одновременно изменила training distribution и encoder. Движения 41–45 нельзя использовать для настройки. Подробности: [frozen-rich-observer-replication-user-result.md](frozen-rich-observer-replication-user-result.md).
 
 - После успешной серии 67 пользователь попросил идти дальше. Подготовлена серия 68: независимая репликация на пяти новых matched движениях с полностью замороженной моделью серии 67 и без Adam training. Runner проверяет успешный full source, complete manifest, model SHA, форму weights `1921 × 72` и точное совпадение projection. Движения 31–35 и все прежние движения блокируются. Повторяются normal/zero/static/shuffled/reversed/closed и тот же составной primary; дополнительно считается число движений, где normal отдельно лучше всех primary-контролей. Fast fixture и bounded E2E подтвердили frozen-source immutability. BAT: `RUN-FROZEN-RICH-OBSERVER-REPLICATION.bat`. Протокол: [frozen-rich-observer-replication-plan.md](frozen-rich-observer-replication-plan.md).
@@ -64,10 +68,10 @@
 
 ## Ближайший практический шаг
 
-1. Не использовать движения 31–35 и 41–45 для дальнейшей настройки; модель серии 67 сохранить замороженной.
-2. Следующий расчёт должен быть preregistered encoder ablation на одном matched training stream: old 24-unit representation против rich 96-unit level+delta при одинаковых optimizer, target coefficients и числе эпизодов.
-3. До обучения закрепить новую независимую батарею и оценивать обе модели парно на одних кадрах.
-4. После разделения эффектов расширять генератор на новые длительности, шаги ключевых кадров и диапазоны амплитуд.
+1. Обновить проект; в редакторе оставить 2 секунды, нажимать random-кнопку последовательно до 2,0 с и сохранить пять новых JSON. Не использовать движения 31–35 и 41–45.
+2. Дважды щёлкнуть `experiments\RUN-MATCHED-ENCODER-ABLATION.bat`, выбрать `1`, успешную папку серии 67 `piecewise_rich_replay_...`, затем пять новых JSON.
+3. Для паузы снова открыть BAT и выбрать `3`; для продолжения выбрать `2` и папку `matched_encoder_ablation_...`.
+4. После завершения прислать `result\ОТЧЕТ.txt` и `result\summary.json`. Расчёт заново рендерит 60 000 сцен и может занять несколько часов.
 
 ## Пройденные этапы и опорные результаты
 

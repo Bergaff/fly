@@ -17,7 +17,7 @@ test('шесть суставов, углы, независимое обучен
 test('редактор, независимые оси, сохранение, загрузка и ошибки формата',async()=>{
   const dom=new JSDOM('<!doctype html><html><body></body></html>',{url:'http://localhost/'});
   for (const key of ['window','document','navigator','HTMLElement','HTMLCanvasElement','Element','Node','DocumentFragment','NodeFilter','MutationObserver','CustomEvent','Event','MouseEvent','KeyboardEvent','getComputedStyle']) Object.defineProperty(globalThis,key,{value:dom.window[key],configurable:true,writable:true});
-  globalThis.localStorage=dom.window.localStorage; globalThis.ResizeObserver=class{observe(){} disconnect(){}};
+  globalThis.localStorage=dom.window.localStorage; globalThis.localStorage.clear(); globalThis.ResizeObserver=class{observe(){} disconnect(){}};
   globalThis.IS_REACT_ACT_ENVIRONMENT=true;
   dom.window.HTMLCanvasElement.prototype.getContext=()=>null;
   dom.window.confirm=()=>true; globalThis.confirm=dom.window.confirm;
@@ -95,8 +95,12 @@ test('редактор, независимые оси, сохранение, з�
     assert.match(document.body.textContent,/не автономная генерация/);
     fireEvent.change(screen.getByLabelText('Левое X подъём, градусы'),{target:{value:'18'}});
     assert.match(document.body.textContent,/ожидает результат/);
+    assert.equal(screen.getByLabelText('Длительность, с').value,'2');
     fireEvent.click(screen.getByRole('button',{name:'Случайное движение, шаг 0,5 с'}));
-    assert.match(screen.getByRole('status').textContent,/Создана новая случайная траектория/);
+    assert.match(screen.getByRole('status').textContent,/Случайные углы заданы в 0.50 с/);
+    assert.match(document.body.textContent,/0.50 \/ 2.00 с/);
     assert.equal(screen.getAllByRole('button',{name:/с$/}).filter(b=>/^\d+\.\d{2} с$/.test(b.textContent || '')).length,5);
+    fireEvent.click(screen.getByRole('button',{name:'Случайное движение, шаг 0,5 с'}));
+    assert.match(screen.getByRole('status').textContent,/1.00 с/);
   } finally { cleanup();console.error=consoleError;await vite.close();dom.window.close(); }
 });
