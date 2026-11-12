@@ -6,7 +6,7 @@ can record central output-cell activity from an official pretrained FlyVis netwo
 and creates exact-name mapping candidates that remain blocked until human review.
 """
 from __future__ import annotations
-import argparse, csv, hashlib, json, math, os, platform, sys
+import argparse, csv, hashlib, json, math, os, platform, subprocess, sys, time, traceback
 from datetime import datetime, timezone
 from pathlib import Path
 import importlib.util
@@ -113,11 +113,26 @@ def capture_flyvis(movie_path:Path,out,dt:float,model:str):
  atomic_json(out/"flyvis_manifest.json",meta);return meta
 
 def batch_flyvis(prepared:Path,dt:float,model:str):
+ """Run every movie in a fresh process so FlyVis/datamate closes its HDF5 handles."""
  manifest=json.loads((prepared/"retinal_sources.json").read_text(encoding="utf8"));results=[]
  for item in manifest.get("files",[]):
-  movement=int(item["movement"]);target=prepared/f"flyvis_{movement:03d}";target.mkdir(exist_ok=True)
-  meta=capture_flyvis(prepared/item["file"],target,dt,model);results.append({"movement":movement,"folder":target.name,"activity_sha256":meta["activity_sha256"]});print(f"FlyVis: движение {movement}, готово.",flush=True)
- report={"schema":"series71-flyvis-batch-v1","scientific_result":False,"movements":results,"mapping_reviewed":False};atomic_json(prepared/"flyvis_batch.json",report);return report
+  movement=int(item["movement"]);target=prepared/f"flyvis_{movement:03d}";target.mkdir(exist_ok=True);summary=target/"summary.json";fm=target/"flyvis_manifest.json";activity=target/"flyvis_activity.csv"
+  if summary.is_file() and fm.is_file() and activity.is_file():
+   old=json.loads(summary.read_text(encoding="utf8"));meta=json.loads(fm.read_text(encoding="utf8"))
+   if old.get("status")=="completed" and meta.get("activity_sha256")==digest(activity):
+    results.append({"movement":movement,"folder":target.name,"activity_sha256":meta["activity_sha256"]});print(f"FlyVis: движение {movement} уже готово, SHA проверен.",flush=True);continue
+  command=[sys.executable,str(Path(__file__).resolve()),"--stage","flyvis","--movie",str((prepared/item["file"]).resolve()),"--output",str(target.resolve()),"--dt",str(dt),"--model",model]
+  error=""
+  for attempt in range(1,4):
+   proc=subprocess.run(command,env=os.environ.copy())
+   data=json.loads(summary.read_text(encoding="utf8")) if summary.is_file() else {}
+   if proc.returncode==0 and data.get("status")=="completed":break
+   error=str(data.get("error") or f"child exit {proc.returncode}")
+   if "PermissionError" not in error and "WinError 32" not in error:raise RuntimeError(f"FlyVis movement {movement}: {error}")
+   print(f"FlyVis: файл модели временно занят, попытка {attempt}/3; жду освобождения...",flush=True);time.sleep(3*attempt)
+  else:raise RuntimeError(f"FlyVis movement {movement}: {error}")
+  meta=json.loads((target/"flyvis_manifest.json").read_text(encoding="utf8"));results.append({"movement":movement,"folder":target.name,"activity_sha256":meta["activity_sha256"]});print(f"FlyVis: движение {movement}, готово; отдельный процесс закрыт.",flush=True)
+ report={"schema":"series71-flyvis-batch-v1","scientific_result":False,"movements":results,"mapping_reviewed":False,"process_isolation":"one FlyVis process per movement to release datamate HDF5 handles"};atomic_json(prepared/"flyvis_batch.json",report);return report
 
 def find_col(names,choices):
  low={x.lower():x for x in names}
@@ -178,6 +193,6 @@ def main():
    if not a.mapping:raise ValueError("--mapping is required")
    result["mapping_gate"]=validate_mapping(Path(a.mapping),out)
   result["status"]="completed";code=0
- except Exception as exc:result.update(status="blocked",error=f"{type(exc).__name__}: {exc}");code=1
+ except Exception as exc:result.update(status="blocked",error=f"{type(exc).__name__}: {exc}",traceback=traceback.format_exc());code=1
  atomic_json(out/"summary.json",result);print("Серия 71:",result["status"],"\nПапка:",out.resolve());return code
 if __name__=="__main__":raise SystemExit(main())

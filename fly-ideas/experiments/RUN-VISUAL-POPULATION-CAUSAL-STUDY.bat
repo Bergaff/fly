@@ -28,6 +28,10 @@ if not exist "workspace\.venv-flyvis\Scripts\python.exe" (
  goto done
 )
 if not exist "workspace\.venv-two-flies\Scripts\python.exe" goto nobrain
+if not exist "workspace\runs\ideas\i-observational\visual-population-causality\latest_prepared.txt" goto prepare69
+set /p PREP=<"workspace\runs\ideas\i-observational\visual-population-causality\latest_prepared.txt"
+if exist "%PREP%\retinal_sources.json" goto runprepared69
+:prepare69
 echo Ищу последний полный result серии 69 и готовлю пять движений 51-55...
 "workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\71_visual_population_causal_study.py" --stage prepare
 if errorlevel 1 goto choose69
@@ -37,6 +41,7 @@ if not exist "workspace\runs\ideas\i-observational\visual-population-causality\l
  goto done
 )
 set /p PREP=<"workspace\runs\ideas\i-observational\visual-population-causality\latest_prepared.txt"
+:runprepared69
 echo Папка подготовленных кадров: %PREP%
 echo Запускаю pretrained FlyVis для пяти движений. Это может занять несколько минут.
 "workspace\.venv-flyvis\Scripts\python.exe" "experiments\templates\71_visual_population_causal_study.py" --stage batch-flyvis --output "%PREP%" --prepared "%PREP%"
