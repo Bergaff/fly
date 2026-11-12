@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Long supervised wing study: 4/8 hours, separate test inputs, SQLite resume.
+"""Eight-hour supervised whole-body observation: wings, foreleg grooming and locomotion.
 
 Fixture mode is explicitly limited to 2–8 candidates and is not a long study.
 The model uses teacher angles and artificial cameras, not biological neurons.
@@ -34,10 +34,10 @@ PIN = {
     '57_user_wing_preflight.py': '9395171ff29f134ddfe1c9afa84049b817f9658d203253edfd08a645556f0b2e',
     '58_user_wing_integrated_prototype.py': 'bcde7eafeff57831d908f8a002e3559e4be21f6701331fe8f792dd2ca2c540b7',
 }
-AXES = ('left_x','left_y','left_z','right_x','right_y','right_z')
+AXES = ('left_wing','right_wing','left_foreleg','right_foreleg','body_forward','body_lateral')
 MIN_RAM = 4*1024**3
 MIN_DISK = 2*1024**3
-ROOT = Path('workspace/runs/ideas/i-observational/wing-user-broad-eight-hour')
+ROOT = Path('workspace/runs/ideas/i-observational/whole-body-broad-eight-hour')
 BASELINE_ROOT = Path('workspace/runs/ideas/i-observational/wing-studio-user-learning')
 
 
@@ -61,14 +61,15 @@ def protocol(source_sha, labels, hours, fixture_limit, proto):
     if hours != 8 or type(hours)!=int: raise ValueError('Серия 73 имеет ровно 8 часов активного обучения.')
     if fixture_limit is not None and (type(fixture_limit)!=int or not 2<=fixture_limit<=8):
         raise ValueError('Техническая проба ограничена 2–8 кандидатами.')
-    return {'schema':'eight-hour-broad-motion-observation-v1','mode':'fixture' if fixture_limit is not None else 'long',
+    return {'schema':'eight-hour-whole-body-observation-v2','mode':'fixture' if fixture_limit is not None else 'long',
             'budget_seconds':hours*3600,'fixture_limit':fixture_limit,'workers':2,'batch':2,
             'script_sha256':file_sha(__file__),'dependencies':{**proto.PIN,**PIN},
             'python':platform.python_version(),
             'versions':{p:importlib.metadata.version(p) for p in ('numpy','mujoco','brian2','pillow')},
             'source_sha256':source_sha,'labels':labels,
-            'training_generator':{'seed':7301,'families':['piecewise5','piecewise9','harmonic','chirp'],'angle_clip_deg':[-55,55],'distance_range':[3.6,4.4],'side_offset_range':[-.4,.4]},
-            'primary_rule':'on movements 81-90: pooled new RMSE below both old and zero, with at least 7/10 paired wins against each'}
+            'outputs':list(AXES),'command_units':'rad-equivalent; body commands render as planar displacement',
+            'training_generator':{'seed':7301,'families':['piecewise5','piecewise9','harmonic','chirp'],'command_clip_deg_equivalent':[-55,55],'base_distance':4.0,'base_side_offset':0.0},
+            'primary_rule':'on movements 81-90: pooled new RMSE below zero and training mean, with at least 7/10 paired wins against each'}
 
 
 def verify_pins(proto, saved):
@@ -88,6 +89,34 @@ def free_check(large, folder, fixture):
 
 BROAD_STIM=None;BROAD_PILOT=None;BROAD_SCENE=None;BROAD_HOLD=None
 
+class WholeBodyScene:
+    """Kinematic demonstrator with two wings, two forelegs and planar body motion."""
+    def __init__(self,engine):
+        import mujoco
+        xml=engine.XML
+        for side in ('left','right'):
+            xml=xml.replace(f'<joint name="{side}_hinge" type="hinge" axis="1 0 0"/>',
+                            f'<joint name="{side}_wing_cmd" type="hinge" axis="1 0 0"/>')
+        marker='  </body>\n </body>\n</worldbody>'
+        legs='  </body>\n  <body name="left_foreleg" pos="-0.48 0.22 -0.08">\n   <joint name="left_foreleg_cmd" type="hinge" axis="1 0 0"/>\n   <geom name="demo_left_foreleg" type="capsule" fromto="0 0 0 -0.52 0.12 -0.35" size="0.045" rgba="0.28 0.22 0.16 1"/>\n  </body>\n  <body name="right_foreleg" pos="-0.48 -0.22 -0.08">\n   <joint name="right_foreleg_cmd" type="hinge" axis="1 0 0"/>\n   <geom name="demo_right_foreleg" type="capsule" fromto="0 0 0 -0.52 -0.12 -0.35" size="0.045" rgba="0.28 0.22 0.16 1"/>\n  </body>\n </body>\n</worldbody>'
+        if marker not in xml: raise ValueError('Не удалось добавить передние лапы в сцену.')
+        xml=xml.replace(marker,legs)
+        self.mujoco=mujoco;self.engine=engine;self.model=mujoco.MjModel.from_xml_string(xml);self.data=mujoco.MjData(self.model)
+        self.body=mujoco.mj_name2id(self.model,mujoco.mjtObj.mjOBJ_BODY,'demonstrator')
+        names=('left_wing_cmd','right_wing_cmd','left_foreleg_cmd','right_foreleg_cmd')
+        self.joints=[self.model.jnt_qposadr[mujoco.mj_name2id(self.model,mujoco.mjtObj.mjOBJ_JOINT,n)] for n in names]
+        self.cams=[engine.camera([.85,y,.46],[4,0,.55],48,32) for y in (.13,-.13)]
+    def render(self,commands,distance=4.,offset=0.):
+        commands=np.asarray(commands,float)
+        if commands.ndim!=2 or commands.shape[1]!=6 or not np.isfinite(commands).all(): raise ValueError('Неверные whole-body команды.')
+        images=[]
+        for vec in commands:
+            self.data.qpos[self.joints]=vec[:4]
+            self.model.body_pos[self.body]=[distance+.70*vec[4],offset+.70*vec[5],.4]
+            self.mujoco.mj_forward(self.model,self.data)
+            images.append(np.stack([self.engine.render(self.model,self.data,c,True) for c in self.cams]))
+        return np.stack(images)
+
 def broad_motion_hash(degrees):
     normalized=np.round((np.asarray(degrees,dtype=float)*np.pi/180)*180/np.pi,7);normalized[normalized==0]=0
     return hashlib.sha256(np.asarray(normalized,dtype='<f8').tobytes()).hexdigest()
@@ -103,12 +132,14 @@ def broad_candidate(ident):
             frequency=rng.uniform(.4,3.2,6);degrees=offset+amplitude*np.sin(2*np.pi*t[:,None]*frequency+phase);parameters={'offset_deg':offset.tolist(),'amplitude_deg':amplitude.tolist(),'phase_rad':phase.tolist(),'frequency_hz':frequency.tolist()}
         else:
             f0=rng.uniform(.25,1.2,6);f1=rng.uniform(1.8,4.0,6);sweep=(f1-f0)/2;degrees=offset+amplitude*np.sin(phase+2*np.pi*(t[:,None]*f0+.5*t[:,None]**2*sweep));parameters={'offset_deg':offset.tolist(),'amplitude_deg':amplitude.tolist(),'phase_rad':phase.tolist(),'f0_hz':f0.tolist(),'f1_hz':f1.tolist()}
-    before=degrees;degrees=np.clip(before,-55,55);distance=float(rng.uniform(3.6,4.4));side=float(rng.uniform(-.4,.4));spec={'protocol':'broad-motion-v1','sequence_id':ident,'generator_seed':[7301,ident],'family':family,'parameters':parameters,'distance':distance,'side_offset':side,'clipped_values':int(np.count_nonzero(before!=degrees)),'sampled_motion_sha256':broad_motion_hash(degrees)};return spec,degrees
+    # Opposed foreleg commands create a visible, repeatable grooming/rubbing bout.
+    degrees[:,3]=-degrees[:,2]+.15*degrees[:,3]
+    before=degrees.copy();degrees=np.clip(before,-55,55);distance=4.;side=0.;spec={'protocol':'broad-whole-body-v2','sequence_id':ident,'generator_seed':[7301,ident],'family':family,'parameters':parameters,'foreleg_pattern':'opposed grooming: right=-left+0.15*independent','distance':distance,'side_offset':side,'clipped_values':int(np.count_nonzero(before!=degrees)),'sampled_motion_sha256':broad_motion_hash(degrees)};return spec,degrees
 
 def worker_init(train,hold):
     del train
     global BROAD_STIM,BROAD_PILOT,BROAD_SCENE,BROAD_HOLD
-    worker=load('55_user_wing_resume_prototype.py','broad_worker_proto');BROAD_STIM=worker.load('broad_worker_stim','53_long_user_wing_stimuli.py');studio=worker.load('broad_worker_studio','50_two_flies_wing_studio_pilot.py');BROAD_PILOT=worker.load('broad_worker_pilot','47_two_flies_imitation_learning.py');engine=worker.load('broad_worker_engine','38_two_flies_observation.py');BROAD_PILOT.lower_priority();BROAD_SCENE=studio.Scene(engine);BROAD_HOLD=hold
+    worker=load('55_user_wing_resume_prototype.py','broad_worker_proto');BROAD_STIM=worker.load('broad_worker_stim','53_long_user_wing_stimuli.py');studio=worker.load('broad_worker_studio','50_two_flies_wing_studio_pilot.py');BROAD_PILOT=worker.load('broad_worker_pilot','47_two_flies_imitation_learning.py');engine=worker.load('broad_worker_engine','38_two_flies_observation.py');BROAD_PILOT.lower_priority();BROAD_SCENE=WholeBodyScene(engine);BROAD_HOLD=hold
 
 def worker_generate(ident):
     spec,degrees=broad_candidate(ident)
@@ -213,8 +244,9 @@ def prepared_holdouts():
     rng=np.random.default_rng(7302);paths=[]
     for i in range(1,11):
         path=folder/f'holdout_{80+i:03d}.json';count=5 if i<=5 else 9
-        obj={'schema':'fly-wings-trajectory-v1','fps':25,'duration_s':2,
-             'keyframes':[{'t':2*j/(count-1),'angles_deg':rng.integers(-55,56,size=6).astype(int).tolist()} for j in range(count)]}
+        values=rng.integers(-55,56,size=(count,6)).astype(int);values[:,3]=np.clip(-values[:,2]+np.rint(.15*values[:,3]).astype(int),-55,55)
+        obj={'schema':'fly-wings-trajectory-v1','semantic_schema':'fly-whole-body-six-command-v1','channels':list(AXES),'fps':25,'duration_s':2,
+             'keyframes':[{'t':2*j/(count-1),'angles_deg':values[j].tolist()} for j in range(count)]}
         raw=(json.dumps(obj,ensure_ascii=False,indent=2)+'\n').encode('utf8')
         if path.exists() and path.read_bytes()!=raw:raise ValueError(f'Закреплённый holdout изменён: {path}')
         if not path.exists():path.write_bytes(raw)
@@ -241,14 +273,12 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
         return out
     train,tests=proto.split_from_sources(state['sources'],stim)
     labels={x['copy']:x for x in saved['labels']}
-    with np.load(io.BytesIO(state['sources']['baseline_model.npz']),allow_pickle=False) as model:
-        old=ev.checked_model({k:model[k] for k in model.files})
     mean,scale,intercept,weights=base.fit(state['stats'])
     new=ev.checked_model({'mean':mean,'scale':scale,'intercept':intercept,'weights':weights})
     studio=proto.load('long_studio','50_two_flies_wing_studio_pilot.py')
     engine=proto.load('long_engine','38_two_flies_observation.py')
     pilot=proto.load('long_pilot','47_two_flies_imitation_learning.py')
-    scene=studio.Scene(engine)
+    scene=WholeBodyScene(engine)
     accepted,records=sampled_records(folder/'study.sqlite3',len(train))
     audit=overlap_sample_broad(tests,records,cap=128)
     audit['accepted_total']=accepted;audit['is_exhaustive']=audit['audited_count']==accepted
@@ -258,20 +288,24 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
     for item,overlap in zip(tests,audit['tests']):
         free_check(large,folder,saved['mode']=='fixture')
         ident=item['id'];name=f'test_{ident:03d}.json';label=labels[name]
+        original=label.get('original_basename','');display_id=int(original[8:11]) if original.startswith('holdout_') and original[8:11].isdigit() else ident
         obj=json.loads(state['sources'][name].decode('utf-8-sig'))
         truth=item['angles_deg']*np.pi/180;images=scene.render(truth)
-        compared=ev.compare_models(images,truth,old,new);newpred=compared['predictions']['new']
+        features=ev.feature_history(images);newpred=np.clip((features-new['mean'])/new['scale']@new['weights']+new['intercept'],-np.pi*55/180,np.pi*55/180)
+        predictions={'new':newpred,'zero':np.zeros_like(newpred),'training_mean':np.broadcast_to(new['intercept'],newpred.shape)}
+        metrics={name:{'rmse_rad':float(np.sqrt(np.mean((pred-truth[2:])**2))),'axis_rmse_rad':{axis:float(np.sqrt(np.mean((pred[:,j]-truth[2:,j])**2))) for j,axis in enumerate(AXES)}} for name,pred in predictions.items()}
+        compared={'teacher_rad':truth[2:],'predictions':predictions,'metrics':metrics}
         td=temp/f'test_{ident:03d}';td.mkdir()
         with (td/'predictions.csv').open('w',encoding='utf-8-sig',newline='') as f:
             w=csv.writer(f);w.writerow(['time_s']+[f'teacher_{a}_rad' for a in AXES]+
-                [f'{model}_{a}_rad' for model in ('old','new','zero','training_mean') for a in AXES])
+                [f'{model}_{a}_rad' for model in ('new','zero','training_mean') for a in AXES])
             for k,t in enumerate(item['times'][2:]):
                 w.writerow([float(t),*map(float,compared['teacher_rad'][k]),
-                            *(float(v) for model in ('old','new','zero','training_mean') for v in compared['predictions'][model][k])])
+                            *(float(v) for model in ('new','zero','training_mean') for v in compared['predictions'][model][k])])
         raw=ev.feature_history(images)
         base.save_views(td,images,item['times'],pilot,raw,(raw-mean)/scale)
         scores=base.scores(truth[2:],newpred,intercept)
-        playback={'schema':'fly-wings-result-v1','fps':25,'duration_s':obj['duration_s'],'trajectory':obj,
+        playback={'schema':'fly-whole-body-result-v1','fps':25,'duration_s':obj['duration_s'],'trajectory':obj,'channels':list(AXES),
                   'samples':[{'t':float(t),'teacher_deg':list(map(float,degrees)),
                               'prediction_deg':None if k<2 else list(map(float,newpred[k-2]*180/np.pi))}
                              for k,(t,degrees) in enumerate(zip(item['times'],item['angles_deg']))],
@@ -280,33 +314,46 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
                   'limitations':['Искусственные глаза и кинематика, не биологическое зрение.',
                                  'Playback воспроизводит записанные прогнозы, не автономную генерацию.']}
         save_json(td/'playback.json',playback)
-        result={'test_id':ident,'role':label['role'],'frames':len(truth)-2,'metrics':compared['metrics'],
+        result={'test_id':display_id,'internal_test_id':ident,'role':label['role'],'frames':len(truth)-2,'metrics':compared['metrics'],
                 'overlap_under_0_001_deg':overlap['under_0_001_deg'],
                 'overlap_under_1_deg':overlap['under_1_deg'],'overlap_under_5_deg':overlap['under_5_deg']}
         save_json(td/'metrics.json',result);summary.append(result)
         print(f'Проверено движение {ident}/{len(tests)}.',flush=True)
     status='fixture_completed' if saved['mode']=='fixture' else 'completed'
+    primary_items=[item for item in summary if item['role']=='new_test']
+    if not primary_items: raise ValueError('Нет заранее закреплённых whole-body holdout.')
+    total_frames=sum(item['frames'] for item in primary_items)
+    pooled={name:float(np.sqrt(sum(item['frames']*item['metrics'][name]['rmse_rad']**2 for item in primary_items)/total_frames)) for name in ('new','zero','training_mean')}
+    paired={name:sum(item['metrics']['new']['rmse_rad']<item['metrics'][name]['rmse_rad'] for item in primary_items) for name in ('zero','training_mean')}
+    primary={'pooled_new_below_zero':pooled['new']<pooled['zero'],'pooled_new_below_training_mean':pooled['new']<pooled['training_mean'],
+             'paired_wins_vs_zero':paired['zero'],'paired_wins_vs_training_mean':paired['training_mean'],'holdouts':len(primary_items)}
+    primary['passed']=primary['pooled_new_below_zero'] and primary['pooled_new_below_training_mean'] and paired['zero']>=7 and paired['training_mean']>=7
     report={'status':status,'protocol_mode':saved['mode'],'active_training_seconds':elapsed,
             'candidates':state['next_id'],'accepted_candidates':accepted,'training_frames':state['stats']['n'],
-            'baseline_model_sha256':sha(state['sources']['baseline_model.npz']),
+            'baseline_source_sha256':sha(state['sources']['baseline_model.npz']),
             'new_model_sha256':file_sha(temp/'model_new.npz'),
+            'pooled_rmse_rad_equivalent':pooled,'primary':primary,
             'audit':{'accepted_total':accepted,'audited_count':audit['audited_count'],
                      'is_exhaustive':audit['is_exhaustive'],'sample_ids':audit['sample_ids']},'tests':summary,
             'limitations':['Учительские углы используются при обучении; это supervised ridge, не обучение нейронов.',
                            'Искусственные глаза и кинематическая сцена, не реальная муха или её мозг.',
-                           'Прежний тест регрессионный; движения 81–90 зафиксированы seed 7302 до broad training и остаются синтетическими.',
+                           'Движения 81–90 зафиксированы seed 7302 до whole-body training и остаются синтетическими.',
+                           'Шесть выходов: два крыла, две передние лапы и два направления корпуса; старая wing-only модель семантически несопоставима и не оценивается.',
                            'Выборочный аудит сравнивает только углы, не зрительные входы; он может пропустить совпадение.',
                            'Playback записывает предсказания во время показа, а не автономно создаёт движение.']}
     save_json(temp/'summary.json',report)
-    lines=['ДЛИТЕЛЬНОЕ ОБУЧЕНИЕ НА ТРАЕКТОРИЯХ КРЫЛЬЕВ',
+    lines=['ВОСЬМИЧАСОВОЕ ОБУЧЕНИЕ WHOLE-BODY НАБЛЮДЕНИЮ',
            f'Режим: {status}; активное время обучения: {elapsed/3600:.4f} ч.',
            f'Кандидатов: {state["next_id"]}; принято: {accepted}; обучающих кадров: {state["stats"]["n"]}.',
            f'Проверка похожести углов: {audit["audited_count"]} из {accepted} принятых движений; полная: {audit["is_exhaustive"]}.',
-           'RMSE, рад: старая модель / новая модель / ноль / средний угол обучения.']
+           'RMSE в rad-equivalent единицах: новая модель / ноль / средняя команда обучения.',
+           f'Pooled: {pooled["new"]:.6f} / {pooled["zero"]:.6f} / {pooled["training_mean"]:.6f}.',
+           f'Paired wins new: против нуля {paired["zero"]}/{len(primary_items)}; против средней {paired["training_mean"]}/{len(primary_items)}.',
+           f'Основной критерий 7/10 и оба pooled сравнения: {"ВЫПОЛНЕН" if primary["passed"] else "НЕ ВЫПОЛНЕН"}.']
     for item in summary:
-        m=item['metrics']; lines.append(f'Тест {item["test_id"]} ({item["role"]}), кадров {item["frames"]}: '+ ' / '.join(f'{m[k]["rmse_rad"]:.6f}' for k in ('old','new','zero','training_mean')))
+        m=item['metrics']; lines.append(f'Тест {item["test_id"]} ({item["role"]}), кадров {item["frames"]}: '+ ' / '.join(f'{m[k]["rmse_rad"]:.6f}' for k in ('new','zero','training_mean')))
         for axis in AXES:
-            lines.append('  '+axis+': '+' / '.join(f'{m[k]["axis_rmse_rad"][axis]:.6f}' for k in ('old','new','zero','training_mean')))
+            lines.append('  '+axis+': '+' / '.join(f'{m[k]["axis_rmse_rad"][axis]:.6f}' for k in ('new','zero','training_mean')))
         lines.append(f'  Близкие угловые истории в выбранной выборке (<0,001° / <1° / <5°): {item["overlap_under_0_001_deg"]} / {item["overlap_under_1_deg"]} / {item["overlap_under_5_deg"]} из {item["frames"]} кадров.')
     lines+=['','Покадровые данные и playback.json находятся в папках test_001 и далее.',*report['limitations']]
     (temp/'ИТОГ.txt').write_text('\n'.join(lines)+'\n',encoding='utf-8-sig')
@@ -403,24 +450,24 @@ def choose():
     root=tk.Tk();root.withdraw();root.attributes('-topmost',True)
     def initial(path):return str(path.resolve()) if path.exists() else str(Path.cwd())
     try:
-        action=simpledialog.askinteger('Серия 73: восемь часов широких движений','Ровно 8 часов активного обучения на широком распределении. Введите номер:\n1: начать новую серию\n2: продолжить серию\n3: запросить паузу',minvalue=1,maxvalue=3,parent=root)
+        action=simpledialog.askinteger('Серия 73: восемь часов whole-body наблюдения','Ровно 8 часов: крылья, потирание передних лап и перемещение корпуса. Введите номер:\n1: начать новую серию\n2: продолжить серию\n3: запросить паузу',minvalue=1,maxvalue=3,parent=root)
         if action is None:print('Выбор отменён.');return
         if action in (2,3):
-            folder=filedialog.askdirectory(title='Выберите папку серии wing_user_broad_eight_hour_...',initialdir=initial(ROOT),parent=root)
+            folder=filedialog.askdirectory(title='Выберите папку серии whole_body_broad_eight_hour_...',initialdir=initial(ROOT),parent=root)
             if not folder:print('Выбор отменён.');return
             if action==2:process(folder)
             else:request_pause(folder)
             return
-        messagebox.showinfo('Предыдущая короткая проба','Выберите папку результата короткой пробы 51. В ней должны находиться metadata.json, model_six_axes.npz и папка input. Старые данные изменяться не будут.',parent=root)
+        messagebox.showinfo('Предыдущая короткая проба','Выберите папку результата короткой пробы 51 для закрепления исходной конфигурации. Её wing-only модель не сравнивается с whole-body выходами. В папке нужны metadata.json, model_six_axes.npz и input. Старые данные не изменяются.',parent=root)
         previous=filedialog.askdirectory(title='Папка результата предыдущей пробы user_wing_learning_...',initialdir=initial(BASELINE_ROOT),parent=root)
         if not previous:print('Выбор отменён.');return
         fresh=prepared_holdouts()
-        messagebox.showinfo('Десять проверочных движений закреплены','Программа создала или проверила десять фиксированных движений 81–90 с seed 7302. Они копируются в новую серию до обучения; выбирать JSON вручную не нужно.',parent=root)
+        messagebox.showinfo('Десять проверочных движений закреплены','Программа создала или проверила десять фиксированных whole-body движений 81–90 с seed 7302. Они копируются в новую серию до обучения; выбирать JSON вручную не нужно.',parent=root)
         answer=messagebox.askokcancel('Время обучения','Запустить ровно 8 часов активного обучения?\nПроверка десяти движений после обучения займёт дополнительное время.',parent=root)
         if not answer:print('Выбор отменён.');return
-        hours=5
+        hours=8
         messagebox.showinfo('Перед запуском','Используются 2 вычислительных процесса. Работа в Word может замедлиться. При свободной RAM меньше 4 ГиБ или месте на диске меньше 2 ГиБ расчёт остановится с сохранённой последней партией. Для паузы откройте этот BAT ещё раз и выберите 3.',parent=root)
-        folder=ROOT/('wing_user_broad_eight_hour_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8])
+        folder=ROOT/('whole_body_broad_eight_hour_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8])
         start(folder,previous,fresh,hours)
     finally:root.destroy()
 

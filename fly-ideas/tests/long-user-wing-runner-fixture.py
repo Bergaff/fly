@@ -82,8 +82,11 @@ with tempfile.TemporaryDirectory() as d:
     broad_summary=json.loads((broad_folder/'result/summary.json').read_text(encoding='utf-8'))
     with sqlite3.connect(broad_folder/'study.sqlite3') as broad_db:broad_protocol=json.loads(broad_db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()[0])
     assert broad_summary['status']=='fixture_completed' and broad_protocol['budget_seconds']==28800
+    assert broad_protocol['schema']=='eight-hour-whole-body-observation-v2'
+    assert broad_protocol['outputs']==['left_wing','right_wing','left_foreleg','right_foreleg','body_forward','body_lateral']
     assert broad_protocol['training_generator']['families']==['piecewise5','piecewise9','harmonic','chirp']
     assert broad_protocol['primary_rule'].endswith('at least 7/10 paired wins against each')
+    assert set(broad_summary['primary'])=={'pooled_new_below_zero','pooled_new_below_training_mean','paired_wins_vs_zero','paired_wins_vs_training_mean','holdouts','passed'}
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)
