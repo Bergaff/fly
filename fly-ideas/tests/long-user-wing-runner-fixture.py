@@ -76,6 +76,14 @@ with tempfile.TemporaryDirectory() as d:
     with sqlite3.connect(five_folder/'study.sqlite3') as five_db:
         five_protocol=json.loads(five_db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()[0])
     assert five_protocol['schema']=='five-hour-wing-observation-v1' and five_protocol['budget_seconds']==18000
+    broad_folder=tmp/'eight-hour-broad-fixture'
+    broad_run=subprocess.run([sys.executable,str(root/'experiments/templates/73_eight_hour_broad_motion_observation.py'),'--new',str(broad_folder),'--previous',str(baseline),'--fresh',str(fresh),'--hours','8','--fixture-limit','4'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert broad_run.returncode==0,broad_run.stdout+'\n'+broad_run.stderr
+    broad_summary=json.loads((broad_folder/'result/summary.json').read_text(encoding='utf-8'))
+    with sqlite3.connect(broad_folder/'study.sqlite3') as broad_db:broad_protocol=json.loads(broad_db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()[0])
+    assert broad_summary['status']=='fixture_completed' and broad_protocol['budget_seconds']==28800
+    assert broad_protocol['training_generator']['families']==['piecewise5','piecewise9','harmonic','chirp']
+    assert broad_protocol['primary_rule'].endswith('at least 7/10 paired wins against each')
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)
