@@ -123,15 +123,18 @@ def capture_flyvis(movie_path:Path,out,dt:float,model:str):
   import torch
   from flyvis.datasets.rendering import BoxEye
   gray=movie.astype(np.float32).mean(axis=-1)/255
-  eye=BoxEye(extent=15,kernel_size=13);movie=np.stack([eye(torch.tensor(gray[:,i][None])).detach().cpu().numpy()[0,:,0] for i in range(2)])
- if movie.ndim==2:movie=movie[None,:,:]
- if movie.ndim!=3 or movie.shape[0] not in (1,2):raise ValueError("Movie must have shape (eyes, frames, hexals), or RGB (frames, 2, height, width, 3).")
+  eye=BoxEye(extent=15,kernel_size=13);movie=np.stack([eye(torch.tensor(gray[:,i][None])).detach().cpu().numpy()[0] for i in range(2)])
+ if movie.ndim==2:movie=movie[None,:,None,:]
+ elif movie.ndim==3 and movie.shape[0] in (1,2):movie=movie[:,:,None,:]
+ elif movie.ndim==3 and movie.shape[1]==1:movie=movie[None,:,:,:]
+ if movie.ndim!=4 or movie.shape[0] not in (1,2) or movie.shape[2]!=1:raise ValueError("Movie must have shape (eyes, frames, 1, hexals), or RGB (frames, 2, height, width, 3).")
  if movie.shape[1]<2 or not np.isfinite(movie).all() or float(movie.min())<0 or float(movie.max())>1:raise ValueError("Movie must contain at least two finite frames scaled to [0,1].")
  view=flyvis.NetworkView(flyvis.results_dir/model);network=view.init_network();types=network.connectome.output_cell_types[:].astype(str).tolist()
  indices=network.connectome.central_cells_index[:];all_types=network.connectome.unique_cell_types[:].astype(str).tolist();lookup=dict(zip(all_types,map(int,indices)))
  rows=[]
+ import torch
  for eye in range(movie.shape[0]):
-  x=np.asarray(movie[eye],dtype=np.float32);state=network.fade_in_state(1.0,dt,x[[0]])
+  x=torch.as_tensor(movie[eye],dtype=torch.float32,device=flyvis.device);state=network.fade_in_state(1.0,dt,x[[0]])
   response=network.simulate(x[None],dt,initial_state=state).detach().cpu().numpy()[0]
   for frame in range(response.shape[0]):
    for typ in types:rows.append((eye,frame,frame*dt,typ,float(response[frame,lookup[typ]])))
