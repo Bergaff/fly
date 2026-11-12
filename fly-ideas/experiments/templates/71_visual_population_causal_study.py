@@ -93,9 +93,12 @@ def install_datamate_h5_workaround():
  def safe_write(path,val):
   path=Path(path);array=np.asarray(val)
   if path.is_file():
+   # A datamate Directory name already encodes its config. Reusing a valid cache
+   # is required here: regenerated set ordering can differ between Python
+   # processes and must not make datamate truncate its own open Windows file.
    try:
-    current=io_module._read_h5(path,assert_swmr=False)[()]
-    if current.shape==array.shape and current.dtype==array.dtype and np.array_equal(current,array):return
+    with h5py.File(path,"r",libver="latest",swmr=True) as f:
+     if "data" in f and f["data"].shape==array.shape and f["data"].dtype==array.dtype:return
    except Exception:pass
    path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_name(path.name+f".{os.getpid()}.repair")
    try:
@@ -155,10 +158,11 @@ def batch_flyvis(prepared:Path,dt:float,model:str):
    proc=subprocess.run(command,env=os.environ.copy())
    data=json.loads(summary.read_text(encoding="utf8")) if summary.is_file() else {}
    if proc.returncode==0 and data.get("status")=="completed":break
-   error=str(data.get("error") or f"child exit {proc.returncode}")
-   if "PermissionError" not in error and "WinError 32" not in error:raise RuntimeError(f"FlyVis movement {movement}: {error}")
-   print(f"FlyVis: файл модели временно занят, попытка {attempt}/3; жду освобождения...",flush=True);time.sleep(3*attempt)
-  else:raise RuntimeError(f"FlyVis movement {movement}: {error}")
+   error=str(data.get("error") or f"child exit {proc.returncode}");detail=str(data.get("traceback") or error)
+   print("\nДиагностика дочернего FlyVis:\n"+"\n".join(detail.splitlines()[-18:]),flush=True)
+   if "PermissionError" not in detail and "WinError 32" not in detail:raise RuntimeError(f"FlyVis movement {movement}: {error}")
+   print(f"FlyVis: инициализация HDF5 не завершилась, попытка {attempt}/3; жду перед повтором...",flush=True);time.sleep(3*attempt)
+  else:raise RuntimeError(f"FlyVis movement {movement}: {error}; traceback printed above")
   meta=json.loads((target/"flyvis_manifest.json").read_text(encoding="utf8"));results.append({"movement":movement,"folder":target.name,"activity_sha256":meta["activity_sha256"]});print(f"FlyVis: движение {movement}, готово; отдельный процесс закрыт.",flush=True)
  report={"schema":"series71-flyvis-batch-v1","scientific_result":False,"movements":results,"mapping_reviewed":False,"process_isolation":"one FlyVis process per movement to release datamate HDF5 handles"};atomic_json(prepared/"flyvis_batch.json",report);return report
 
