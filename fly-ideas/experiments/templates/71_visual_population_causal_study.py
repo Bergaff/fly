@@ -89,7 +89,6 @@ def install_datamate_h5_workaround():
  import h5py, numpy as np
  import datamate.directory as directory_module
  import datamate.io as io_module
- original=directory_module._write_h5
  def safe_write(path,val):
   path=Path(path);array=np.asarray(val)
   if path.is_file():
@@ -100,16 +99,17 @@ def install_datamate_h5_workaround():
     with h5py.File(path,"r",libver="latest",swmr=True) as f:
      if "data" in f and f["data"].shape==array.shape and f["data"].dtype==array.dtype:return
    except Exception:pass
-   path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_name(path.name+f".{os.getpid()}.repair")
-   try:
-    if tmp.exists():tmp.unlink()
-    with h5py.File(tmp,"w",libver="latest") as f:
-     f["data"]=array;f.swmr_mode=True;f.flush()
-    os.replace(tmp,path)
-   finally:
-    if tmp.exists():tmp.unlink()
-   return
-  original(path,array)
+  # datamate 1.0's writer is broken even for a new Windows path: it opens
+  # mode='w', immediately reads the not-yet-created dataset, then tries to
+  # unlink the still-open file. Always use a closed temporary file instead.
+  path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_name(path.name+f".{os.getpid()}.repair")
+  try:
+   if tmp.exists():tmp.unlink()
+   with h5py.File(tmp,"w",libver="latest") as f:
+    f["data"]=array;f.swmr_mode=True;f.flush()
+   os.replace(tmp,path)
+  finally:
+   if tmp.exists():tmp.unlink()
  directory_module._write_h5=safe_write;io_module._write_h5=safe_write
  return True
 
