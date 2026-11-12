@@ -1,0 +1,33 @@
+{
+  "transcription": {
+    "source": "summary.json pasted by user; original bytes not received",
+    "schema": "matched-encoder-ablation-result-v1",
+    "created_utc": "2026-11-11T12:19:29.105015+00:00",
+    "status": "completed"
+  },
+  "protocol": {
+    "training_stream_episodes": 60000,
+    "compact_training_episodes": 60000,
+    "compact_optimizer_steps": 1875,
+    "compact": {"units": 24, "projection_seed": 6601, "features": 240, "feature_kind": "level", "model_sha256": "f50531d876e066ad0bb011df05550f8c255bda771f7a7e79147f3a59a984c3c5"},
+    "rich": {"spatial_units": 96, "features": 1920, "feature_kind": "level+delta", "model_sha256": "6c2eb4a1a6f111ad8d6184ca0778e2934ae3a538d33075961ba65bc9f3fd9f96"},
+    "adam": {"learning_rate": 0.002, "weight_decay": 0.000001},
+    "matched_targets_and_adam_settings": true
+  },
+  "normal_rmse_by_holdout": [
+    {"holdout": 51, "compact": 0.2853077815, "rich": 0.2643795723, "winner": "rich"},
+    {"holdout": 52, "compact": 0.2392359629, "rich": 0.2218860976, "winner": "rich"},
+    {"holdout": 53, "compact": 0.2531994564, "rich": 0.2410261813, "winner": "rich"},
+    {"holdout": 54, "compact": 0.3944383406, "rich": 0.3756744345, "winner": "rich"},
+    {"holdout": 55, "compact": 0.2116598322, "rich": 0.2457865191, "winner": "compact"}
+  ],
+  "aggregate": {
+    "compact": {"normal": 0.2767682747, "zero": 0.3878744707, "static": 0.4760952505, "shuffled": 0.3518661539, "reversed": 0.4141704078, "closed": 0.7189195265, "temporal_primary_pass": true},
+    "rich": {"normal": 0.2697505610, "zero": 0.3878744707, "static": 0.5099067300, "shuffled": 0.3622472713, "reversed": 0.4340640658, "closed": 0.8526054124, "temporal_primary_pass": true},
+    "rich_minus_compact_normal_rmse_rad": -0.0070177138,
+    "rich_relative_normal_rmse_reduction_percent": 2.53559181,
+    "rich_better_than_compact": 4,
+    "holdout_count": 5,
+    "primary_pass": true
+  }
+}

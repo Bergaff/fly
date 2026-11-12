@@ -1,0 +1,1 @@
+{"schema": "fly-wings-trajectory-v1", "fps": 25, "duration_s": 2, "keyframes": [{"t": 0, "angles_deg": [0, 0, 0, 0, 0, 0]}, {"t": 1, "angles_deg": [30, 10, 12, -20, 11, -8]}, {"t": 2, "angles_deg": [0, 0, 0, 0, 0, 0]}]}
