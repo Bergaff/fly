@@ -11,5 +11,6 @@ test('этап 70 разделяет демонстратор, runtime и нау
  assert.match(main,/download-pretrained/);assert.match(main,/FLYVIS_ROOT_DIR/);assert.match(main,/\.venv-flyvis/);assert.match(main,/\.venv-flygym/);
  const view=fs.readFileSync(path.join(root,'src/views/brain-view.tsx'),'utf8');assert.match(view,/установить всё для зрения и тела/);assert.match(view,/setupEmbodiedEnv/);
  const demo=fs.readFileSync(path.join(root,'src/views/series69-demonstrator.tsx'),'utf8');assert.match(demo,/Выберите одно из пяти новых движений/);assert.match(demo,/Смотреть повтор/);assert.match(demo,/RMSE по осям/);
- for(const name of ['src/views/series69-demonstrator.tsx','src/lib/series69-demo.ts','experiments/reports/embodied-connectome-integration-plan.md'])assert.ok(fs.existsSync(path.join(root,name)),name);
+ const causal=fs.readFileSync(path.join(root,'experiments/templates/71_visual_population_causal_study.py'),'utf8');assert.match(causal,/T4a/);assert.match(causal,/mapping_permutation/);assert.match(causal,/Do not approve by name equality alone/);
+ for(const name of ['src/views/series69-demonstrator.tsx','src/lib/series69-demo.ts','experiments/reports/embodied-connectome-integration-plan.md','experiments/RUN-VISUAL-POPULATION-CAUSAL-STUDY.bat','experiments/reports/visual-population-causal-study-plan.md'])assert.ok(fs.existsSync(path.join(root,name)),name);
 });

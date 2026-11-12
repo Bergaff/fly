@@ -734,3 +734,7 @@ workspace\.venv-two-flies\Scripts\python.exe experiments\templates\52_analyze_us
 ```powershell
 workspace\.venv-two-flies\Scripts\python.exe experiments\templates\51_two_flies_user_trajectory_learning.py --train "ПУТЬ\обучение1.json" "ПУТЬ\обучение2.json" --test "ПУТЬ\проверка.json"
 ```
+
+### Серия 71: причинные зрительные популяции
+
+Для следующей идеи добавлен `experiments\RUN-VISUAL-POPULATION-CAUSAL-STUDY.bat`. Первый пункт фиксирует preregistration T4a–T4d/T5a–T5d и 15 условий до просмотра Shiu результатов. Следующие пункты записывают центральную активность официальной pretrained FlyVis из retinal movie, создают неутверждённые exact-name кандидаты FlyVis→FlyWire v630 и отдельно проверяют утверждённый mapping. Совпадение названий не открывает научный запуск: требуются reviewer, evidence, IDs, знак и заранее заданное правило activity→Hz для всех восьми типов. Пока gate закрыт, код не сообщает причинный результат. План: `experiments/reports/visual-population-causal-study-plan.md`.
