@@ -113,4 +113,4 @@
 
 ## Серия 71: причинные зрительные популяции
 
-Начат следующий этап идеи наблюдения. `RUN-VISUAL-POPULATION-CAUSAL-STUDY.bat` без консольных команд фиксирует протокол, запускает FlyVis capture на готовом retinal movie, создаёт кандидаты mapping и проверяет его review. Основные популяции T4a–T4d/T5a–T5d и условия лезий закреплены до результатов. Это пока этап A, не причинный результат: retinal movie и reviewed FlyVis→FlyWire mapping отсутствуют, поэтому Shiu lesion run остаётся заблокированным. См. `visual-population-causal-study-plan.md`.
+Начат следующий этап идеи наблюдения. `RUN-VISUAL-POPULATION-CAUSAL-STUDY.bat` без консольных команд фиксирует протокол, автоматически находит серию 69 и создаёт retinal movie для движений 51–55, запускает FlyVis capture, создаёт кандидаты mapping и проверяет его review. Основные популяции T4a–T4d/T5a–T5d и условия лезий закреплены до результатов. Это пока этап A, не причинный результат: retinal movie и reviewed FlyVis→FlyWire mapping отсутствуют, поэтому Shiu lesion run остаётся заблокированным. См. `visual-population-causal-study-plan.md`.

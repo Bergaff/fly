@@ -5,6 +5,7 @@ set PYTHONIOENCODING=utf-8
 set OMP_NUM_THREADS=4
 set OPENBLAS_NUM_THREADS=4
 set MKL_NUM_THREADS=4
+set "FLYVIS_ROOT_DIR=%CD%\workspace\data\flyvis"
 title Series 71 - visual population causal study
 
 echo Серия 71: какие T4/T5 популяции нужны для отложенного повтора.
@@ -26,10 +27,33 @@ if not exist "workspace\.venv-flyvis\Scripts\python.exe" (
  echo Нажмите установить всё для зрения и тела.
  goto done
 )
-for /f "usebackq delims=" %%F in (`powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms;$d=New-Object System.Windows.Forms.OpenFileDialog;$d.Title='Retinal movie NPY: eyes x frames x hexals';$d.Filter='NumPy (*.npy)|*.npy';if($d.ShowDialog() -eq 'OK'){$d.FileName}"`) do set "MOVIE=%%F"
-if not defined MOVIE goto done
-"workspace\.venv-flyvis\Scripts\python.exe" "experiments\templates\71_visual_population_causal_study.py" --stage flyvis --movie "%MOVIE%"
+if not exist "workspace\.venv-two-flies\Scripts\python.exe" goto nobrain
+echo Ищу последний полный result серии 69 и готовлю пять движений 51-55...
+"workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\71_visual_population_causal_study.py" --stage prepare
+if errorlevel 1 goto choose69
+:prepared69
+if not exist "workspace\runs\ideas\i-observational\visual-population-causality\latest_prepared.txt" (
+ echo Не удалось определить папку подготовленных движений.
+ goto done
+)
+set /p PREP=<"workspace\runs\ideas\i-observational\visual-population-causality\latest_prepared.txt"
+echo Папка подготовленных кадров: %PREP%
+echo Запускаю pretrained FlyVis для пяти движений. Это может занять несколько минут.
+"workspace\.venv-flyvis\Scripts\python.exe" "experiments\templates\71_visual_population_causal_study.py" --stage batch-flyvis --output "%PREP%" --prepared "%PREP%"
+if not errorlevel 1 (
+ echo Готово. Активность находится в подпапках flyvis_051 - flyvis_055:
+ echo %PREP%
+ start "" "%PREP%"
+)
 goto done
+
+:choose69
+echo Автоматический поиск не сработал. Выберите папку запуска серии 69, внутри которой есть input и result.
+for /f "usebackq delims=" %%F in (`powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms;$d=New-Object System.Windows.Forms.FolderBrowserDialog;$d.Description='Папка запуска серии 69 с input и result';if($d.ShowDialog() -eq 'OK'){$d.SelectedPath}"`) do set "SERIES69=%%F"
+if not defined SERIES69 goto done
+"workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\71_visual_population_causal_study.py" --stage prepare --series69 "%SERIES69%"
+if errorlevel 1 goto done
+goto prepared69
 
 :mapping
 if not exist "workspace\.venv-two-flies\Scripts\python.exe" goto nobrain

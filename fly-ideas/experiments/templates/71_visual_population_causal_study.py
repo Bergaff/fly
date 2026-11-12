@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse, csv, hashlib, json, math, os, platform, sys
 from datetime import datetime, timezone
 from pathlib import Path
+import importlib.util
 
 ROOT=Path("workspace/runs/ideas/i-observational/visual-population-causality")
 PRIMARY=["T4a","T4b","T4c","T4d","T5a","T5b","T5c","T5d"]
@@ -55,13 +56,45 @@ def write_protocol(out):
   w=csv.writer(f);w.writerow(["condition","kind","targets"]);w.writerows((x["id"],x["kind"],"|".join(x["targets"])) for x in p["conditions"])
  return p
 
+def load_local(name,path):
+ spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+def discover_series69():
+ root=Path("workspace/runs/ideas/i-observational/matched-encoder-ablation")
+ found=[]
+ for result in root.glob("*/result"):
+  if all((result/f"holdout_{i:03d}"/"metrics.json").is_file() for i in range(1,6)) and all((result.parent/"input"/f"holdout_{i:03d}.json").is_file() for i in range(1,6)):found.append(result.parent)
+ if not found:raise ValueError("Не найден полный запуск серии 69 с папками input и result.")
+ return max(found,key=lambda p:p.stat().st_mtime_ns)
+
+def prepare_movies(out,series69=None):
+ import numpy as np
+ here=Path(__file__).resolve().parent;studio=load_local("causal_studio",here/"50_two_flies_wing_studio_pilot.py");engine=load_local("causal_engine",here/"38_two_flies_observation.py");scene=studio.Scene(engine)
+ run=Path(series69).resolve() if series69 else discover_series69().resolve()
+ if run.name=="result":run=run.parent
+ if run.name.startswith("holdout_"):run=run.parent.parent
+ prepared=[]
+ for i in range(1,6):
+  source=run/"input"/f"holdout_{i:03d}.json"
+  if not source.is_file():raise ValueError(f"Не найден {source}")
+  raw=source.read_bytes();obj=json.loads(raw.decode("utf-8-sig"));times,angles=studio.sample(obj);rgb=scene.render(angles)
+  if rgb.shape!=(len(times),2,32,48,3) or rgb.dtype.name!="uint8":raise ValueError("Renderer вернул неожиданный RGB формат.")
+  target=out/f"rgb_holdout_{50+i:03d}.npy";np.save(target,rgb,allow_pickle=False);prepared.append({"movement":50+i,"file":target.name,"sha256":digest(target),"shape":list(rgb.shape),"source_sha256":hashlib.sha256(raw).hexdigest()})
+ manifest={"schema":"series71-retinal-source-v1","series69":str(run),"scientific_result":False,"files":prepared,"note":"RGB двух камер перерендерен из пяти frozen holdout серии 69; следующий этап переводит его в hexal input официальным BoxEye FlyVis."};atomic_json(out/"retinal_sources.json",manifest)
+ ROOT.mkdir(parents=True,exist_ok=True);(ROOT/"latest_prepared.txt").write_text(str(out.resolve()),encoding="utf8");return manifest
+
 def capture_flyvis(movie_path:Path,out,dt:float,model:str):
  import numpy as np
  import flyvis
- from flyvis.utils.activity_utils import LayerActivity
  movie=np.load(movie_path,allow_pickle=False)
+ if movie.ndim==5:
+  if movie.shape[1]!=2 or movie.shape[-1]!=3:raise ValueError("RGB movie must have shape (frames, 2, height, width, 3).")
+  import torch
+  from flyvis.datasets.rendering import BoxEye
+  gray=movie.astype(np.float32).mean(axis=-1)/255
+  eye=BoxEye(extent=15,kernel_size=13);movie=np.stack([eye(torch.tensor(gray[:,i][None])).detach().cpu().numpy()[0,:,0] for i in range(2)])
  if movie.ndim==2:movie=movie[None,:,:]
- if movie.ndim!=3 or movie.shape[0] not in (1,2):raise ValueError("Movie must have shape (eyes, frames, hexals) with one or two eyes.")
+ if movie.ndim!=3 or movie.shape[0] not in (1,2):raise ValueError("Movie must have shape (eyes, frames, hexals), or RGB (frames, 2, height, width, 3).")
  if movie.shape[1]<2 or not np.isfinite(movie).all() or float(movie.min())<0 or float(movie.max())>1:raise ValueError("Movie must contain at least two finite frames scaled to [0,1].")
  view=flyvis.NetworkView(flyvis.results_dir/model);network=view.init_network();types=network.connectome.output_cell_types[:].astype(str).tolist()
  indices=network.connectome.central_cells_index[:];all_types=network.connectome.unique_cell_types[:].astype(str).tolist();lookup=dict(zip(all_types,map(int,indices)))
@@ -78,6 +111,13 @@ def capture_flyvis(movie_path:Path,out,dt:float,model:str):
   "flyvis_version":getattr(flyvis,"__version__","unknown"),"model":model,"dt_s":dt,"output_types":types,"primary_types_present":all(x in types for x in PRIMARY),"activity_sha256":digest(out/"flyvis_activity.csv"),
   "note":"PRETRAINED FlyVis activity; not yet mapped to FlyWire or passed through Shiu."}
  atomic_json(out/"flyvis_manifest.json",meta);return meta
+
+def batch_flyvis(prepared:Path,dt:float,model:str):
+ manifest=json.loads((prepared/"retinal_sources.json").read_text(encoding="utf8"));results=[]
+ for item in manifest.get("files",[]):
+  movement=int(item["movement"]);target=prepared/f"flyvis_{movement:03d}";target.mkdir(exist_ok=True)
+  meta=capture_flyvis(prepared/item["file"],target,dt,model);results.append({"movement":movement,"folder":target.name,"activity_sha256":meta["activity_sha256"]});print(f"FlyVis: движение {movement}, готово.",flush=True)
+ report={"schema":"series71-flyvis-batch-v1","scientific_result":False,"movements":results,"mapping_reviewed":False};atomic_json(prepared/"flyvis_batch.json",report);return report
 
 def find_col(names,choices):
  low={x.lower():x for x in names}
@@ -121,13 +161,16 @@ def validate_mapping(path:Path,out):
  return result
 
 def main():
- ap=argparse.ArgumentParser(description=__doc__);ap.add_argument("--stage",choices=["protocol","flyvis","mapping","validate"],default="protocol");ap.add_argument("--output");ap.add_argument("--movie");ap.add_argument("--activity");ap.add_argument("--neurons");ap.add_argument("--mapping");ap.add_argument("--dt",type=float,default=0.04);ap.add_argument("--model",default="flow/0000/000");a=ap.parse_args()
+ ap=argparse.ArgumentParser(description=__doc__);ap.add_argument("--stage",choices=["protocol","prepare","flyvis","batch-flyvis","mapping","validate"],default="protocol");ap.add_argument("--output");ap.add_argument("--series69");ap.add_argument("--prepared");ap.add_argument("--movie");ap.add_argument("--activity");ap.add_argument("--neurons");ap.add_argument("--mapping");ap.add_argument("--dt",type=float,default=0.04);ap.add_argument("--model",default="flow/0000/000");a=ap.parse_args()
  out=output_dir(a.output);out.mkdir(parents=True,exist_ok=True);result={"stage":a.stage,"scientific_result":False}
  try:
   write_protocol(out)
-  if a.stage=="flyvis":
+  if a.stage=="prepare":result["retinal_sources"]=prepare_movies(out,a.series69)
+  elif a.stage=="flyvis":
    if not a.movie:raise ValueError("--movie is required")
    result["flyvis"]=capture_flyvis(Path(a.movie),out,a.dt,a.model)
+  elif a.stage=="batch-flyvis":
+   prepared=Path(a.prepared or out);result["flyvis_batch"]=batch_flyvis(prepared,a.dt,a.model)
   elif a.stage=="mapping":
    if not a.activity or not a.neurons:raise ValueError("--activity and --neurons are required")
    result["mapping_candidates"]=mapping_candidates(Path(a.activity),Path(a.neurons),out)
