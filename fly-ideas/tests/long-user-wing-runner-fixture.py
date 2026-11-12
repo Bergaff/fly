@@ -66,6 +66,16 @@ with tempfile.TemporaryDirectory() as d:
     run('--new',resumed,'--previous',baseline,'--fresh',fresh,'--hours',4,'--fixture-limit',4,'--batches',1)
     proto,part,_,phase=state(resumed)
     assert phase[0]=='training' and part['next_id']==2 and part['sources']['test_002.json']==fresh_bytes
+    # Series 72 is an isolated five-hour protocol; fixture mode bounds it to two
+    # candidates while preserving the exact 18,000-second production budget.
+    five_folder=tmp/'five-hour-fixture'
+    five_run=subprocess.run([sys.executable,str(root/'experiments/templates/72_five_hour_wing_observation.py'),'--new',str(five_folder),'--previous',str(baseline),'--fresh',str(fresh),'--hours','5','--fixture-limit','2'],cwd=root,env=env,capture_output=True,text=True,timeout=90)
+    assert five_run.returncode==0,five_run.stdout+'\n'+five_run.stderr
+    five_summary=json.loads((five_folder/'result/summary.json').read_text(encoding='utf-8'))
+    assert five_summary['status']=='fixture_completed' and five_summary['protocol_mode']=='fixture'
+    with sqlite3.connect(five_folder/'study.sqlite3') as five_db:
+        five_protocol=json.loads(five_db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()[0])
+    assert five_protocol['schema']=='five-hour-wing-observation-v1' and five_protocol['budget_seconds']==18000
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)
