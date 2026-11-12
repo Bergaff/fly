@@ -83,8 +83,36 @@ def prepare_movies(out,series69=None):
  manifest={"schema":"series71-retinal-source-v1","series69":str(run),"scientific_result":False,"files":prepared,"note":"RGB двух камер перерендерен из пяти frozen holdout серии 69; следующий этап переводит его в hexal input официальным BoxEye FlyVis."};atomic_json(out/"retinal_sources.json",manifest)
  ROOT.mkdir(parents=True,exist_ok=True);(ROOT/"latest_prepared.txt").write_text(str(out.resolve()),encoding="utf8");return manifest
 
+def install_datamate_h5_workaround():
+ """Avoid datamate 1.0 reopening then unlinking its own HDF5 file on Windows."""
+ if os.name!="nt":return False
+ import h5py, numpy as np
+ import datamate.directory as directory_module
+ import datamate.io as io_module
+ original=directory_module._write_h5
+ def safe_write(path,val):
+  path=Path(path);array=np.asarray(val)
+  if path.is_file():
+   try:
+    current=io_module._read_h5(path,assert_swmr=False)[()]
+    if current.shape==array.shape and current.dtype==array.dtype and np.array_equal(current,array):return
+   except Exception:pass
+   path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_name(path.name+f".{os.getpid()}.repair")
+   try:
+    if tmp.exists():tmp.unlink()
+    with h5py.File(tmp,"w",libver="latest") as f:
+     f["data"]=array;f.swmr_mode=True;f.flush()
+    os.replace(tmp,path)
+   finally:
+    if tmp.exists():tmp.unlink()
+   return
+  original(path,array)
+ directory_module._write_h5=safe_write;io_module._write_h5=safe_write
+ return True
+
 def capture_flyvis(movie_path:Path,out,dt:float,model:str):
  import numpy as np
+ workaround=install_datamate_h5_workaround()
  import flyvis
  movie=np.load(movie_path,allow_pickle=False)
  if movie.ndim==5:
@@ -108,7 +136,7 @@ def capture_flyvis(movie_path:Path,out,dt:float,model:str):
   w=csv.writer(f);w.writerow(["eye","frame","time_s","flyvis_type","central_activity_au"]);w.writerows(rows)
  meta={"schema":"flyvis-central-activity-v1","created_utc":datetime.now(timezone.utc).isoformat(),"scientific_result":False,
   "source_movie":{"path":str(movie_path.resolve()),"sha256":digest(movie_path),"shape":list(movie.shape),"range":[float(movie.min()),float(movie.max())]},
-  "flyvis_version":getattr(flyvis,"__version__","unknown"),"model":model,"dt_s":dt,"output_types":types,"primary_types_present":all(x in types for x in PRIMARY),"activity_sha256":digest(out/"flyvis_activity.csv"),
+  "flyvis_version":getattr(flyvis,"__version__","unknown"),"model":model,"dt_s":dt,"windows_datamate_h5_workaround":workaround,"output_types":types,"primary_types_present":all(x in types for x in PRIMARY),"activity_sha256":digest(out/"flyvis_activity.csv"),
   "note":"PRETRAINED FlyVis activity; not yet mapped to FlyWire or passed through Shiu."}
  atomic_json(out/"flyvis_manifest.json",meta);return meta
 
