@@ -87,6 +87,14 @@ with tempfile.TemporaryDirectory() as d:
     assert broad_protocol['training_generator']['families']==['piecewise5','piecewise9','harmonic','chirp']
     assert broad_protocol['primary_rule'].endswith('at least 7/10 paired wins against each')
     assert set(broad_summary['primary'])=={'pooled_new_below_zero','pooled_new_below_training_mean','paired_wins_vs_zero','paired_wins_vs_training_mean','holdouts','passed'}
+    grooming_folder=tmp/'eight-hour-grooming-fixture'
+    grooming_run=subprocess.run([sys.executable,str(root/'experiments/templates/74_eight_hour_foreleg_grooming_observation.py'),'--new',str(grooming_folder),'--previous',str(baseline),'--fresh',str(fresh),'--hours','8','--fixture-limit','4'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert grooming_run.returncode==0,grooming_run.stdout+'\n'+grooming_run.stderr
+    grooming_summary=json.loads((grooming_folder/'result/summary.json').read_text(encoding='utf-8'))
+    with sqlite3.connect(grooming_folder/'study.sqlite3') as grooming_db:grooming_protocol=json.loads(grooming_db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()[0])
+    assert grooming_summary['status']=='fixture_completed' and grooming_protocol['schema']=='eight-hour-foreleg-grooming-observation-v1'
+    assert grooming_protocol['outputs']==['left_proximal','left_middle','left_distal','right_proximal','right_middle','right_distal']
+    assert set(grooming_summary['primary']['axes'])==set(grooming_protocol['outputs'])
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)
