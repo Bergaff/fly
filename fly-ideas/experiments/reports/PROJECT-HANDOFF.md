@@ -142,3 +142,8 @@ Completed: 28 800,36 с, 80 794 кандидата, 3 958 906 кадров. Prim
 ## Серия 75: исправленный visual stimulus
 
 Новая серия не переписывает 74. Capsule заменены six nonzero ellipsoid segments. `visual_preflight` выполняется до создания папки и на resume: ≥10 unique frames, ≥100 changed RGB values, feature std ≥1e-4, каждый сустав +30° меняет ≥10 RGB values. Guard и RGB SHA входят в frozen protocol. Reference: 51 unique, 9727 changed, std 0,13955, joint sensitivity 65–209. Budget 28 800 с, holdout 101–110, строгий primary по каждой оси. Запуск `RUN-EIGHT-HOUR-VISIBLE-FORELEG-GROOMING.bat`. Bounded E2E прошёл; результата пользователя нет.
+
+
+### Результат серии 75
+
+Completed: 28 800,86 с, 54 296 candidates, 2 660 504 frames. Strict primary прошёл combined и по каждой оси: pooled new/zero/mean 0,245347/0,470995/0,471005, combined 10/10. Proximal/middle обеих лап 10/10 и 58–70% reduction; distal 9/10 и около 22%, test 105 хуже controls. Это подтверждает исправление visible stimulus в synthetic close-up постановке, но не биологическое grooming. Не повторять same training; следующий тест — frozen transfer на wider FOV/offset/occlusion без дообучения. Исходная локальная папка не проверена; сохранена текстовая extract.
