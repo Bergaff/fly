@@ -133,3 +133,8 @@
 ## Серия 74: leg-focused продолжение
 
 После осевого отказа grooming в серии 73 подготовлена новая восьмичасовая серия. Корпус/крылья фиксированы, передние лапы имеют по три сегмента и снимаются close-up камерами FOV 35°. Holdout 91–100 seed 7402 закреплены до обучения. Primary намеренно строгий: каждая из шести осей должна иметь pooled new ниже zero/mean и минимум 7/10 wins против каждого; общий score не может скрыть провал лапы. Запуск одним `RUN-EIGHT-HOUR-FORELEG-GROOMING-OBSERVATION.bat`, тот же BAT pause/resume. Bounded E2E с четырьмя кандидатами прошёл. Научного результата пока нет.
+
+
+### Результат и дефект серии 74
+
+Completed: 28 800,36 с, 80 794 кандидата, 3 958 906 кадров. Primary failed; new RMSE 0,468380 практически равна zero 0,468429 и machine-identical mean 0,468380. Не трактовать как невозможность grooming. Локальный diagnostic candidate 0 дал 1/51 unique RGB, 0 changed pixels при std команд >22°. Capsule fromto имеет нулевые geom_size, а renderer 38 делит на каждую size-компоненту; лапы исчезают из RGB. Bounded E2E был недостаточен, потому что не проверял visual sensitivity. Следующая серия обязана использовать совместимые ellipsoid limbs или capsule-aware renderer и до долгого старта блокироваться при constant RGB, feature variance < threshold или отсутствии реакции на каждый сустав.
