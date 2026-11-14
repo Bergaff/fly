@@ -95,6 +95,15 @@ with tempfile.TemporaryDirectory() as d:
     assert grooming_summary['status']=='fixture_completed' and grooming_protocol['schema']=='eight-hour-foreleg-grooming-observation-v1'
     assert grooming_protocol['outputs']==['left_proximal','left_middle','left_distal','right_proximal','right_middle','right_distal']
     assert set(grooming_summary['primary']['axes'])==set(grooming_protocol['outputs'])
+    visible_folder=tmp/'eight-hour-visible-grooming-fixture'
+    visible_run=subprocess.run([sys.executable,str(root/'experiments/templates/75_eight_hour_visible_foreleg_grooming.py'),'--new',str(visible_folder),'--previous',str(baseline),'--fresh',str(fresh),'--hours','8','--fixture-limit','4'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert visible_run.returncode==0,visible_run.stdout+'\n'+visible_run.stderr
+    visible_summary=json.loads((visible_folder/'result/summary.json').read_text(encoding='utf-8'))
+    with sqlite3.connect(visible_folder/'study.sqlite3') as visible_db:visible_protocol=json.loads(visible_db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()[0])
+    guard=visible_protocol['visual_preflight']
+    assert visible_summary['status']=='fixture_completed' and visible_protocol['schema']=='eight-hour-visible-foreleg-grooming-v1'
+    assert guard['unique_frames']==51 and guard['changed_rgb_values']>100 and guard['max_feature_std']>1e-4
+    assert set(guard['joint_changed_rgb_values'])==set(visible_protocol['outputs']) and min(guard['joint_changed_rgb_values'].values())>=10
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)

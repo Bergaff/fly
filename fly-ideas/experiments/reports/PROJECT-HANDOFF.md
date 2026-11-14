@@ -138,3 +138,7 @@
 ### Результат и дефект серии 74
 
 Completed: 28 800,36 с, 80 794 кандидата, 3 958 906 кадров. Primary failed; new RMSE 0,468380 практически равна zero 0,468429 и machine-identical mean 0,468380. Не трактовать как невозможность grooming. Локальный diagnostic candidate 0 дал 1/51 unique RGB, 0 changed pixels при std команд >22°. Capsule fromto имеет нулевые geom_size, а renderer 38 делит на каждую size-компоненту; лапы исчезают из RGB. Bounded E2E был недостаточен, потому что не проверял visual sensitivity. Следующая серия обязана использовать совместимые ellipsoid limbs или capsule-aware renderer и до долгого старта блокироваться при constant RGB, feature variance < threshold или отсутствии реакции на каждый сустав.
+
+## Серия 75: исправленный visual stimulus
+
+Новая серия не переписывает 74. Capsule заменены six nonzero ellipsoid segments. `visual_preflight` выполняется до создания папки и на resume: ≥10 unique frames, ≥100 changed RGB values, feature std ≥1e-4, каждый сустав +30° меняет ≥10 RGB values. Guard и RGB SHA входят в frozen protocol. Reference: 51 unique, 9727 changed, std 0,13955, joint sensitivity 65–209. Budget 28 800 с, holdout 101–110, строгий primary по каждой оси. Запуск `RUN-EIGHT-HOUR-VISIBLE-FORELEG-GROOMING.bat`. Bounded E2E прошёл; результата пользователя нет.
