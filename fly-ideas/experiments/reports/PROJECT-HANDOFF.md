@@ -150,4 +150,14 @@ Completed: 28 800,86 с, 54 296 candidates, 2 660 504 frames. Strict primary п�
 
 ## Серии 76–77: transfer и autonomous state
 
-76 read-only загружает completed series 75, сверяет protocol/model/output hashes и проверяет holdout 101–110 в matched/FOV/camera/body/mask/shuffle условиях без retraining. 77 независимо загружает тот же frozen source, наблюдает holdout 121–130, сжимает framewise estimates в 72 cosine coefficients, держит state неизменным 0,5 с и декодирует replay без RGB/teacher/framewise buffer. Записываются static/shuffled/closed controls и MuJoCo head-contact F1. Contacts после kinematic qpos, не forces/actuators/closed loop. Два отдельных BAT. Полный bounded E2E прошёл. Пользовательские результаты ещё не получены.
+76 read-only загружает completed series 75, сверяет protocol/model/output hashes и проверяет holdout 101–110 в matched/FOV/camera/body/mask/shuffle условиях без retraining. 77 независимо загружает тот же frozen source, наблюдает holdout 121–130, сжимает framewise estimates в 72 cosine coefficients, держит state неизменным 0,5 с и декодирует replay без RGB/teacher/framewise buffer. Записываются static/shuffled/closed controls и MuJoCo head-contact F1. Contacts после kinematic qpos, не forces/actuators/closed loop. Два отдельных BAT. Полный bounded E2E прошёл. Пользовательские результаты обеих серий получены: 76 primary failed, 77 primary passed.
+
+
+### Результат серии 76
+
+Completed frozen transfer, primary failed. Matched на seed7602 подтвердился: six axes 10/10, combined 0,248862 vs zero 0,475738. Но ни одна ось не прошла 2/4 geometric rule. Combined lateral 0,479668; FOV50/65 около 1,013; body shift 1,021. Shuffle 0,487 и 4/10, one-eye/mask 1,127/0,896 и 0/10. Вывод: model75 не view-invariant, а привязана к matched close-up. Не чинить post hoc и не исключать условия. Series77 можно запускать: это отдельная matched autonomous-state гипотеза. Original CSV/RGB не получены.
+
+
+### Результат серии 77
+
+Completed full mode, primary passed. Frozen source SHA совпал с series75; holdout 121–130 seed7702. Все оси ниже zero и 10/10 wins. Combined normal/zero/shuffled/static/closed: 0,248201/0,489004/0,433824/0,612971/1,030952; normal лучше всех трёх controls. В 10/10 тестах SHA 72-coefficient state одинаков до и после delay 0,5 с. Replay использует только state+phase, без RGB/teacher/framewise buffer. Mean contact F1 normal/zero 0,955895/0,886689, normal лучше 8/10; zero лучше на 126 и 130. Вывод только matched: autonomous reconstruction наблюдавшегося действия из compressed state. Это не novel action, neural memory, actuators, forces, muscles, closed-loop control или mirror-neuron evidence. Series76 запрещает view-invariant обобщение. Original result folder/CSV/NPZ не получены. См. `observe-delay-autonomous-grooming-user-result.md`.
