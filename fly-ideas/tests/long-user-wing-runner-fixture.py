@@ -104,6 +104,19 @@ with tempfile.TemporaryDirectory() as d:
     assert visible_summary['status']=='fixture_completed' and visible_protocol['schema']=='eight-hour-visible-foreleg-grooming-v1'
     assert guard['unique_frames']==51 and guard['changed_rgb_values']>100 and guard['max_feature_std']>1e-4
     assert set(guard['joint_changed_rgb_values'])==set(visible_protocol['outputs']) and min(guard['joint_changed_rgb_values'].values())>=10
+    transfer_root=tmp/'frozen-transfer-output'
+    transfer_run=subprocess.run([sys.executable,str(root/'experiments/templates/76_frozen_visible_grooming_transfer.py'),'--source',str(visible_folder),'--output-root',str(transfer_root),'--allow-fixture-source'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert transfer_run.returncode==0,transfer_run.stdout+'\n'+transfer_run.stderr
+    transfer_folders=list(transfer_root.glob('frozen_visible_transfer_*'));assert len(transfer_folders)==1
+    transfer_summary=json.loads((transfer_folders[0]/'result/summary.json').read_text(encoding='utf-8'))
+    assert transfer_summary['status']=='fixture_completed' and len(transfer_summary['tests'])==10
+    autonomous_root=tmp/'autonomous-grooming-output'
+    autonomous_run=subprocess.run([sys.executable,str(root/'experiments/templates/77_observe_delay_autonomous_grooming.py'),'--source',str(visible_folder),'--output-root',str(autonomous_root),'--allow-fixture-source'],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+    assert autonomous_run.returncode==0,autonomous_run.stdout+'\n'+autonomous_run.stderr
+    autonomous_folders=list(autonomous_root.glob('autonomous_visible_grooming_*'));assert len(autonomous_folders)==1
+    autonomous_summary=json.loads((autonomous_folders[0]/'result/summary.json').read_text(encoding='utf-8'))
+    assert autonomous_summary['status']=='fixture_completed' and len(autonomous_summary['tests'])==10
+    assert all(x['state_sha256_before_delay']==x['state_sha256_after_delay'] and x['state_unchanged_during_delay'] for x in autonomous_summary['tests'])
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)

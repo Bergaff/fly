@@ -147,3 +147,7 @@ Completed: 28 800,36 с, 80 794 кандидата, 3 958 906 кадров. Prim
 ### Результат серии 75
 
 Completed: 28 800,86 с, 54 296 candidates, 2 660 504 frames. Strict primary прошёл combined и по каждой оси: pooled new/zero/mean 0,245347/0,470995/0,471005, combined 10/10. Proximal/middle обеих лап 10/10 и 58–70% reduction; distal 9/10 и около 22%, test 105 хуже controls. Это подтверждает исправление visible stimulus в synthetic close-up постановке, но не биологическое grooming. Не повторять same training; следующий тест — frozen transfer на wider FOV/offset/occlusion без дообучения. Исходная локальная папка не проверена; сохранена текстовая extract.
+
+## Серии 76–77: transfer и autonomous state
+
+76 read-only загружает completed series 75, сверяет protocol/model/output hashes и проверяет holdout 101–110 в matched/FOV/camera/body/mask/shuffle условиях без retraining. 77 независимо загружает тот же frozen source, наблюдает holdout 121–130, сжимает framewise estimates в 72 cosine coefficients, держит state неизменным 0,5 с и декодирует replay без RGB/teacher/framewise buffer. Записываются static/shuffled/closed controls и MuJoCo head-contact F1. Contacts после kinematic qpos, не forces/actuators/closed loop. Два отдельных BAT. Полный bounded E2E прошёл. Пользовательские результаты ещё не получены.
