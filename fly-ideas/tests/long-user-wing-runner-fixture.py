@@ -117,6 +117,18 @@ with tempfile.TemporaryDirectory() as d:
     autonomous_summary=json.loads((autonomous_folders[0]/'result/summary.json').read_text(encoding='utf-8'))
     assert autonomous_summary['status']=='fixture_completed' and len(autonomous_summary['tests'])==10
     assert all(x['state_sha256_before_delay']==x['state_sha256_after_delay'] and x['state_unchanged_during_delay'] for x in autonomous_summary['tests'])
+    # Series 78 combines bounded view-augmented training with frozen autonomous replay.
+    robust_holdouts=[]
+    robust_spec=load('robust78',root/'experiments/templates/78_eight_hour_view_robust_autonomous_grooming.py')
+    with patch.object(robust_spec,'ROOT',tmp/'robust-prepared'):
+        robust_holdouts=robust_spec.prepared_holdouts()
+    robust_folder=tmp/'view-robust-autonomous-fixture'
+    robust_run=subprocess.run([sys.executable,str(root/'experiments/templates/78_eight_hour_view_robust_autonomous_grooming.py'),'--new',str(robust_folder),'--previous',str(baseline),'--fresh',*robust_holdouts,'--hours','8','--fixture-limit','4'],cwd=root,env=env,capture_output=True,text=True,timeout=180)
+    assert robust_run.returncode==0,robust_run.stdout+'\n'+robust_run.stderr
+    robust_summary=json.loads((robust_folder/'result/summary.json').read_text(encoding='utf-8'))
+    assert robust_summary['status']=='fixture_completed' and len(robust_summary['tests'])==10
+    assert [x['test_id'] for x in robust_summary['tests']]==list(range(141,151))
+    assert all(x['state_coefficients']==72 and x['state_unchanged_during_delay'] and x['state_sha256_before_delay']==x['state_sha256_after_delay'] for x in robust_summary['tests'])
     fresh.write_text('{"broken":true}',encoding='utf-8')
     run('--resume',resumed)
     pa,a,ra,ph_a=state(continuous);pb,b,rb,ph_b=state(resumed)
