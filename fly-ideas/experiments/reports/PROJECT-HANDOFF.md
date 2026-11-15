@@ -185,3 +185,7 @@ Attached original summary SHA 44463753…; completed full, no retraining, source
 ### Результат серии 80
 
 Attached original summary-2 SHA 95313196…. Completed prototype, go=false. Combined raw/canonical/zero 0,429705/0,426518/0,480002: only 0,74% canonical gain. Feature distance 0,134401→0,126688 (−5,74%). Every outer pooled improves 1,6–1,9% but wins only LP/LD/RP/RD 53/56/55/56 of 96, below 60%; held all-outer 5/16 vs 12 required. Middle degrade 2,0–2,4% but pass safeguard. Strong FOV interaction: FOV30 canonical worse RMSE/features and border-touch 96/96 eyes; FOV70 canonical better and touch 6/96. Training border touch 449/640. Do not launch long replacement-canonical model. Next candidate is short raw+canonical multiscale/gated ablation preserving raw channel.
+
+## Серия 81: multiscale gated prototype
+
+После no-go 80 подготовлен short raw-vs-multiscale ablation. Multiscale dim1154 = raw576 always + canonical576 gated per-eye by image-only border validity +2 flags. For invalid crop, 288 canonical features eye are zero, raw untouched. Same seeds/stream as80: 320 train episodes, 6 motions×16 held odd corners. Blocking go: outer canonical<raw/zero and >=60% wins, middle safeguard, combined improve, FOV30 and FOV70 separately not worse raw, >=12/16 all-outer cells. BAT `RUN-MULTISCALE-GATED-VIEW-PROTOTYPE.bat`. Bounded 8-episode fixture completed, raw dim576/multiscale1154 and manifest validated; numeric equality tolerance 1e-12. User result pending.
