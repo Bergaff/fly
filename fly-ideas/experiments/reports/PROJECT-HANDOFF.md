@@ -193,3 +193,9 @@ Attached original summary-2 SHA 95313196…. Completed prototype, go=false. Comb
 ### Результат серии 81
 
 Attached summary-3 SHA ef7e8b70…. Completed prototype, go=false. Combined raw/multiscale/zero 0,429705/0,426049/0,480002 (0,85% gain). FOV30 0,401454/0,400977 and FOV70 0,456210/0,449725, both safeguards pass. LP/LM/RP/RM pass; LD 0,481310→0,482134, wins45/96; RD 0,461014→0,462651, wins40/96 and worse zero0,461805. All-outer 4/16 vs12. Gate works: 0 valid eyes 48 cases nearly raw; 2 eyes 42 cases improves 0,457295→0,449862, 31/42 wins. Remaining failure is distal resolution, not border crop alone. Do not long-run. Next short hypothesis: standard48 vs high-resolution96 spatial representation with distal-specific gate.
+
+## Roadmap и серия 82
+
+Roadmap 82–90 записан в `digital-mirror-neuron-roadmap.md`. Этапы: distal resolution; conditional 8h high-res; frozen stress; shared observation/execution population; multi-action identity; causal lesions; actuator bridge; embodied validation; optional reviewed FlyVis/Shiu/FlyGym mapping. Нельзя переходить к long/shared/actuator этапу без gates.
+
+Series82 short: same-stream standard48 level dim576 vs highres96×64 level+gradient dim1152. Train320 episodes seeds8201/8203, balanced even corners+uniform. Eval new motions201–206 seed8202 ×16 held odd corners. Go requires both distal highres<standard/zero and >=60% wins, safe axes <=5% worse, combined improve, FOV30/70 <=2% worse, >=12/16 both-distal cells. BAT `RUN-HIGH-RESOLUTION-DISTAL-PROTOTYPE.bat`. Bounded 8 episodes/32 cases completed in ~80s sandbox; unique RGB, model dims, predictions, manifest pass. Fixture go=false non-scientific. User result pending.
