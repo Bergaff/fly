@@ -1,0 +1,526 @@
+{
+  "schema": "high-resolution-distal-prototype-user-extract-v1",
+  "source_file": "summary-4.json",
+  "source_file_sha256": "cda09972ff536cd1789c6c858b4e08849ea31946ffb12181e3103581c24d8066",
+  "status": "completed",
+  "protocol": {
+    "schema": "high-resolution-distal-prototype-v1",
+    "created_utc": "2026-11-15T18:07:11.750075+00:00",
+    "script_sha256": "175b8ee1ef63a2e045fb62bff84bdfc345c05d8285f170397e033424ba3d96b1",
+    "runner78_sha256": "886a2683073b0d8322cf195c88d6904424c8578a52c566420fe4da5684216caa",
+    "mode": "prototype",
+    "training_episodes": 320,
+    "training_motion_seed": 8201,
+    "training_view_seed": 8203,
+    "training_views": "50% balanced even-parity core corners; 50% uniform interior",
+    "evaluation_motion_seed": 8202,
+    "evaluation_motions": 6,
+    "evaluation_views": "16 held odd-parity core corners",
+    "baseline": {
+      "resolution": [
+        48,
+        32
+      ],
+      "features": 576,
+      "type": "level history"
+    },
+    "high_resolution": {
+      "resolution": [
+        96,
+        64
+      ],
+      "features": 1152,
+      "type": "coarse level plus high-resolution gradient-energy history"
+    },
+    "same_stream": true,
+    "go_rule": "both distal highres below standard and zero with >=60% case wins; safe axes highres below zero and <=5% worse standard; combined highres below standard/zero; FOV30 and FOV70 <=2% worse standard; >=12/16 corners improve both distal",
+    "scientific_result": false
+  },
+  "go_for_long_training": false,
+  "axes": {
+    "left_proximal": {
+      "standard": 0.42315726980892565,
+      "highres": 0.3977844406570649,
+      "zero": 0.4624577179452974,
+      "wins_vs_standard": 73,
+      "cases": 96,
+      "passed": true
+    },
+    "left_middle": {
+      "standard": 0.3825324862991604,
+      "highres": 0.29391714339905195,
+      "zero": 0.494647504143635,
+      "wins_vs_standard": 88,
+      "cases": 96,
+      "passed": true
+    },
+    "left_distal": {
+      "standard": 0.47323059483468843,
+      "highres": 0.47346377623218283,
+      "zero": 0.4646868080582997,
+      "wins_vs_standard": 59,
+      "cases": 96,
+      "passed": false
+    },
+    "right_proximal": {
+      "standard": 0.4207220884393422,
+      "highres": 0.39509869578478723,
+      "zero": 0.4616790255592724,
+      "wins_vs_standard": 73,
+      "cases": 96,
+      "passed": true
+    },
+    "right_middle": {
+      "standard": 0.3702165091988959,
+      "highres": 0.2793144087756378,
+      "zero": 0.48425238929224845,
+      "wins_vs_standard": 88,
+      "cases": 96,
+      "passed": true
+    },
+    "right_distal": {
+      "standard": 0.47997097305035546,
+      "highres": 0.479214599232359,
+      "zero": 0.47252121787856244,
+      "wins_vs_standard": 60,
+      "cases": 96,
+      "passed": false
+    }
+  },
+  "combined": {
+    "standard": 0.4269621076686309,
+    "highres": 0.3942405877749241,
+    "zero": 0.47353305487370884
+  },
+  "fov_safeguards": {
+    "30": {
+      "standard": 0.39136710303087935,
+      "highres": 0.37021847551603293,
+      "passed": true
+    },
+    "70": {
+      "standard": 0.45980982311701013,
+      "highres": 0.4168807533154053,
+      "passed": true
+    }
+  },
+  "held_corners_both_distal_improved": 10,
+  "held_corners_total": 16,
+  "cell_results": [
+    {
+      "cell_id": 1,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 2,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": false,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 3,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": false,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 4,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 5,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": false,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 6,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": false,
+        "right_distal": true
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 7,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 8,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 9,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 10,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": false,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 11,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 12,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 13,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 14,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 15,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 16,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    }
+  ],
+  "derived": {
+    "combined_improvement_vs_standard_pct": 7.663799504920532,
+    "both_distal_corners_by_fov": {
+      "30": 3,
+      "70": 7
+    },
+    "distal_by_fov": {
+      "30": {
+        "left_distal": {
+          "standard": 0.4734666484056492,
+          "highres": 0.4774085845943575,
+          "zero": 0.46468680805829965,
+          "wins_vs_standard": 24,
+          "cases": 48
+        },
+        "right_distal": {
+          "standard": 0.4794433230828109,
+          "highres": 0.48072016657449934,
+          "zero": 0.47252121787856227,
+          "wins_vs_standard": 26,
+          "cases": 48
+        }
+      },
+      "70": {
+        "left_distal": {
+          "standard": 0.4729944234583611,
+          "highres": 0.4694858231764717,
+          "zero": 0.46468680805829965,
+          "wins_vs_standard": 35,
+          "cases": 48
+        },
+        "right_distal": {
+          "standard": 0.4804980435892757,
+          "highres": 0.47770428685897987,
+          "zero": 0.47252121787856227,
+          "wins_vs_standard": 34,
+          "cases": 48
+        }
+      }
+    },
+    "diagnostics": {
+      "training_records": 320,
+      "evaluation_records": 96,
+      "min_training_unique_frames": {
+        "standard": 48,
+        "highres": 51
+      },
+      "min_evaluation_unique_frames": {
+        "standard": 51,
+        "highres": 51
+      },
+      "min_training_feature_max_std": {
+        "standard": 0.019160031287142353,
+        "highres": 0.015306924469769001
+      }
+    }
+  },
+  "limitations": [
+    "Short supervised resolution ablation, not a scientific long-run result.",
+    "High-resolution representation changes both sensor sampling and feature type by adding gradient energy.",
+    "Same stream isolates the complete high-resolution representation package, not each component.",
+    "No replay, contacts, actuators, biological brain or mirror-neuron claim."
+  ]
+}
