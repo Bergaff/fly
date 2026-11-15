@@ -189,3 +189,7 @@ Attached original summary-2 SHA 95313196…. Completed prototype, go=false. Comb
 ## Серия 81: multiscale gated prototype
 
 После no-go 80 подготовлен short raw-vs-multiscale ablation. Multiscale dim1154 = raw576 always + canonical576 gated per-eye by image-only border validity +2 flags. For invalid crop, 288 canonical features eye are zero, raw untouched. Same seeds/stream as80: 320 train episodes, 6 motions×16 held odd corners. Blocking go: outer canonical<raw/zero and >=60% wins, middle safeguard, combined improve, FOV30 and FOV70 separately not worse raw, >=12/16 all-outer cells. BAT `RUN-MULTISCALE-GATED-VIEW-PROTOTYPE.bat`. Bounded 8-episode fixture completed, raw dim576/multiscale1154 and manifest validated; numeric equality tolerance 1e-12. User result pending.
+
+### Результат серии 81
+
+Attached summary-3 SHA ef7e8b70…. Completed prototype, go=false. Combined raw/multiscale/zero 0,429705/0,426049/0,480002 (0,85% gain). FOV30 0,401454/0,400977 and FOV70 0,456210/0,449725, both safeguards pass. LP/LM/RP/RM pass; LD 0,481310→0,482134, wins45/96; RD 0,461014→0,462651, wins40/96 and worse zero0,461805. All-outer 4/16 vs12. Gate works: 0 valid eyes 48 cases nearly raw; 2 eyes 42 cases improves 0,457295→0,449862, 31/42 wins. Remaining failure is distal resolution, not border crop alone. Do not long-run. Next short hypothesis: standard48 vs high-resolution96 spatial representation with distal-specific gate.
