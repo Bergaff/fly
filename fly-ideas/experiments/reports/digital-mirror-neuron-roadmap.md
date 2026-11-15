@@ -33,6 +33,18 @@
 
 Fail: не запускать high-resolution long study; пересмотреть геометрию сегментов/occlusion или decoder class.
 
+## Серия 82D: distal observability diagnostic после no-go
+
+Серия 82 завершилась no-go, поэтому перед 83 добавлена диагностическая ветвь, не меняющая нумерацию основного roadmap:
+
+- standard48 level против high96 level, high96 edge и high96 level+edge на одном stream;
+- независимая evaluation battery motions 221–226, seed 8222;
+- controlled +10° perturbation каждой distal axis во всех 16 held corners;
+- RGB/feature sensitivity и gain/correlation/bias/sign diagnostics против zero;
+- заранее заданный routing в geometry/occlusion, новый representation prototype или decoder/temporal prototype.
+
+82D всегда записывает `authorizes_series83=false`. Даже удачный diagnostic candidate должен пройти отдельный новый short prototype с six-axis gate.
+
 ## Серия 83: восьмичасовое balanced high-resolution обучение
 
 Только если 82 go=true.
@@ -172,4 +184,4 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия 82 завершилась `go=false`: обе distal axes остались хуже zero, а both-distal corner gate дал 10/16 вместо 12/16. Серию 83 не запускать и gate post hoc не ослаблять.
 
-Перед продолжением roadmap требуется новая короткая preregistered distal-focused диагностика. Она должна разделить как минимум видимость distal сегментов и преимущество stationary zero, особенно в FOV30; нельзя сразу переходить к ещё одному восьмичасовому обучению. Точный новый protocol, seeds и gate должны быть записаны до запуска.
+Подготовлена preregistered серия 82D, которая разделяет видимость distal сегментов, sampling 48/96 и level/edge channels, а также раскладывает проигрыш stationary zero на gain, correlation, bias и sign. Запустить `RUN-DISTAL-OBSERVABILITY-DIAGNOSTIC.bat`, затем выбрать следующий short prototype строго по frozen routing. К восьмичасовому обучению напрямую не переходить.
