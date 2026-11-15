@@ -45,9 +45,19 @@ Fail: не запускать high-resolution long study; пересмотрет
 
 82D всегда записывает `authorizes_series83=false`. Даже удачный diagnostic candidate должен пройти отдельный новый short prototype с six-axis gate.
 
+## Серия 82G: scale-normalized camera prototype
+
+После route `geometry_or_occlusion` сравниваются на новом stream:
+
+- variable FOV edge representation;
+- fixed FOV35 edge representation с сохранением остальных view coordinates;
+- diagnostic-only body-relative tracked FOV35 camera.
+
+Primary использует только fixed FOV35. Tracked camera не может спасти primary. Gate снова включает все шесть осей, zero, wins, FOV30/FOV70 safeguards, visibility и 12/16 corners.
+
 ## Серия 83: восьмичасовое balanced high-resolution обучение
 
-Только если 82 go=true.
+Только если новый short geometry prototype 82G даст полный `go_for_revised_long_training=true`.
 
 - две мухи;
 - 8 часов active training;
@@ -184,4 +194,4 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия 82 завершилась `go=false`: обе distal axes остались хуже zero, а both-distal corner gate дал 10/16 вместо 12/16. Серию 83 не запускать и gate post hoc не ослаблять.
 
-Серия 82D завершена и по frozen rule выбрала `geometry_or_occlusion`: FOV30 прошёл visibility во всех cells, FOV70 не прошёл ни в одной; ни один representation не дал обе distal ниже zero. Следующий short prototype должен нормализовать apparent distal scale/occlusion между FOV30 и FOV70 без decoder-доступа к teacher или camera metadata. Результат FOV70 показывает ненулевой signal и локальное преимущество level+edge над zero, поэтому задача не сводится к простому увеличению сегмента. Точный protocol и gate следующего geometry prototype требуется зафиксировать до запуска. Серия 83 остаётся запрещённой.
+Серия 82D завершена и по frozen rule выбрала `geometry_or_occlusion`: FOV30 прошёл visibility во всех cells, FOV70 не прошёл ни в одной; ни один representation не дал обе distal ниже zero. Подготовлена серия 82G: primary fixed-FOV35 против variable-FOV edge на новой батарее, tracked camera только diagnostic. Запустить `RUN-SCALE-NORMALIZED-CAMERA-PROTOTYPE.bat`. Серия 83 разрешается только при полном `go_for_revised_long_training=true`; tracked-camera результат отдельно не может открыть gate.
