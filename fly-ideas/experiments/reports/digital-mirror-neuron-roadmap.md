@@ -200,4 +200,6 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия 83 завершилась `primary=false` только из-за corner gate 10/16 при пороге12. Gate post hoc не ослаблять и тот же 8-hour training не повторять.
 
-Серия84 подготовлена и bounded-проверена как read-only stress map frozen model83. Она использует новые motions281–286 и 72 cells на bodyX3,70–4,30; blocking primary ограничен 16 core cells X3,82/4,18, отдельно защищает lower X и требует12/16 uniform six-axis cells. Старые failed motions/corners остаются только exact reproduction diagnostics. Никаких новых weights. Следующее действие: пользователь запускает `RUN-FROZEN-LOWER-BODYX-STRESS-MAP.bat` и передаёт текстовый итог. Серия85 заблокирована до полного frozen go.
+Серия84 завершена как read-only stress map frozen model83 и дала no-go. Combined сигнал полезен, но left distal67/96 не достигает68, lower-X left distal32/48 не достигает34, uniform gate только2/16. По всей карте проходят9/72 cells, ни одной при cameraZ0,56; body X сам по себе не создаёт устойчивую область. Exact source probes36/36 совпали, поэтому отказ не объясняется сменой модели. Не повторять frozen slicing, не выбирать cells post hoc и не ослаблять thresholds.
+
+Серия85 остаётся заблокированной. Следующий preregistered этап должен создать новую distal-robust representation/training модель на balanced geometry, использовать новые holdouts и затем отдельную frozen replication. Только её uniform six-axis go может вернуть маршрут к shared observation/execution population.
