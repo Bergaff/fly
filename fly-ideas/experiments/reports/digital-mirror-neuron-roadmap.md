@@ -55,6 +55,8 @@ Fail: не запускать high-resolution long study; пересмотрет
 
 Primary использует только fixed FOV35. Tracked camera не может спасти primary. Gate снова включает все шесть осей, zero, wins, FOV30/FOV70 safeguards, visibility и 12/16 corners.
 
+Результат: полный `go_for_revised_long_training=true`. Все оси, FOV safeguards и visibility прошли; both-distal corners ровно 12/16. Все четыре failed corners имеют body X=4,18, поэтому серия 83 должна сохранить отдельный upper-body-X safeguard.
+
 ## Серия 83: восьмичасовое balanced high-resolution обучение
 
 Только если новый short geometry prototype 82G даст полный `go_for_revised_long_training=true`.
@@ -194,4 +196,4 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия 82 завершилась `go=false`: обе distal axes остались хуже zero, а both-distal corner gate дал 10/16 вместо 12/16. Серию 83 не запускать и gate post hoc не ослаблять.
 
-Серия 82D завершена и по frozen rule выбрала `geometry_or_occlusion`: FOV30 прошёл visibility во всех cells, FOV70 не прошёл ни в одной; ни один representation не дал обе distal ниже zero. Подготовлена серия 82G: primary fixed-FOV35 против variable-FOV edge на новой батарее, tracked camera только diagnostic. Запустить `RUN-SCALE-NORMALIZED-CAMERA-PROTOTYPE.bat`. Серия 83 разрешается только при полном `go_for_revised_long_training=true`; tracked-camera результат отдельно не может открыть gate.
+Серия 82G завершена с полным `go_for_revised_long_training=true`, поэтому разрешено проектирование переработанной серии 83. До запуска требуется отдельный exact preregistration: 8-hour active budget, новые seeds/motions, FOV35 edge primary, balanced corners, six-axis/zero/temporal gates, body-X=4,18 safeguard и 72-state delay/replay. Tracked camera остаётся diagnostic и не должна подменять primary.
