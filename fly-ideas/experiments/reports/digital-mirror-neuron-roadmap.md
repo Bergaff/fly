@@ -71,7 +71,9 @@ Primary использует только fixed FOV35. Tracked camera не мо�
 - минимум12/16 corners проходят все оси с минимум7/10 wins;
 - 72-state, delay0,5s, shuffled/static/closed controls.
 
-BAT `RUN-EIGHT-HOUR-FIXED-FOV-AUTONOMOUS-GROOMING.bat`; bounded fixture прошёл. Результата long run пока нет.
+BAT `RUN-EIGHT-HOUR-FIXED-FOV-AUTONOMOUS-GROOMING.bat`; bounded fixture прошёл.
+
+Результат long run: primary failed только по corner gate, 10/16 вместо 12/16. Все pooled axis, controls и bodyX4,18 safeguards прошли; отказ сосредоточен в distal repeatability при bodyX3,82. Не повторять training. Серия84 должна быть frozen read-only картой границы model83.
 
 ## Серия 84: frozen high-resolution stress and replay map
 
@@ -194,8 +196,6 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Проценты являются управленческой оценкой зрелости, а не измеренной научной вероятностью.
 
-# Ближайшее действие после результата серии 82
+# Ближайшее действие после результата серии 83
 
-Серия 82 завершилась `go=false`: обе distal axes остались хуже zero, а both-distal corner gate дал 10/16 вместо 12/16. Серию 83 не запускать и gate post hoc не ослаблять.
-
-Exact preregistration и runner серии 83 готовы. Запустить `RUN-EIGHT-HOUR-FIXED-FOV-AUTONOMOUS-GROOMING.bat`; пользователь запускает long run и может паузить/продолжать тем же BAT. До production summary серию84 не проектировать. Tracked camera в серии83 отсутствует.
+Серия 83 завершилась `primary=false` только из-за corner gate 10/16 при пороге12. Gate post hoc не ослаблять и тот же 8-hour training не повторять. Подготовить серию84 как read-only stress map frozen model83: failed corners и motions сохраняются, добавляются соседние body-X values, никаких новых weights. Серия85 заблокирована до uniform six-axis frozen go.
