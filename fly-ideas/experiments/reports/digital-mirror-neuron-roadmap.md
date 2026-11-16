@@ -202,4 +202,6 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия84 завершена как read-only stress map frozen model83 и дала no-go. Combined сигнал полезен, но left distal67/96 не достигает68, lower-X left distal32/48 не достигает34, uniform gate только2/16. По всей карте проходят9/72 cells, ни одной при cameraZ0,56; body X сам по себе не создаёт устойчивую область. Exact source probes36/36 совпали, поэтому отказ не объясняется сменой модели. Не повторять frozen slicing, не выбирать cells post hoc и не ослаблять thresholds.
 
-Серия85 остаётся заблокированной. Следующий preregistered этап должен создать новую distal-robust representation/training модель на balanced geometry, использовать новые holdouts и затем отдельную frozen replication. Только её uniform six-axis go может вернуть маршрут к shared observation/execution population.
+Серия85 остаётся заблокированной. Серия84R подготовлена как новая восьмичасовая distal-robust model: frozen spatial-pyramid edge representation, заранее заданная distal ridge, balanced body-X/camera-Z training geometry и новые motions301–310. Она сравнивается с frozen source83 и имеет отдельные body-X, camera-Z и12/16 uniform-cell gates. Пользователь запускает `RUN-EIGHT-HOUR-DISTAL-ROBUST-GROOMING.bat`.
+
+Даже primary go серии84R не открывает series85 напрямую: сначала нужна независимая frozen replication новой модели. Только два последовательных uniform six-axis go могут вернуть маршрут к shared observation/execution population.
