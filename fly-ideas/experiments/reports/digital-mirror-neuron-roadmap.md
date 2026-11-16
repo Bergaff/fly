@@ -57,19 +57,21 @@ Primary использует только fixed FOV35. Tracked camera не мо�
 
 Результат: полный `go_for_revised_long_training=true`. Все оси, FOV safeguards и visibility прошли; both-distal corners ровно 12/16. Все четыре failed corners имеют body X=4,18, поэтому серия 83 должна сохранить отдельный upper-body-X safeguard.
 
-## Серия 83: восьмичасовое balanced high-resolution обучение
+## Серия 83: восьмичасовое fixed-FOV35 edge обучение
 
-Только если новый short geometry prototype 82G даст полный `go_for_revised_long_training=true`.
+После полного go серии 82G протокол подготовлен:
 
-- две мухи;
-- 8 часов active training;
-- balanced sampling multi-factor corners и continuous interior;
-- high-resolution representation, замороженное после training;
-- новые motion/view holdout;
-- six-axis primary;
-- 72-state delay/replay и controls.
+- две мухи, ровно 28 800 секунд active training, два worker;
+- RGB96×64, FOV35, 576 gradient-energy history features;
+- motion/view seeds 8301/8303;
+- 50% всех 16 exact 4D geometry corners, 50% continuous interior;
+- frozen evaluation seed8302, motions261–270 ×16 corners =160 cases;
+- six-axis primary: ниже zero и минимум112/160 wins;
+- bodyX4,18 safeguard: каждая ось ниже zero и минимум56/80 wins;
+- минимум12/16 corners проходят все оси с минимум7/10 wins;
+- 72-state, delay0,5s, shuffled/static/closed controls.
 
-Цель: устойчивость всех шести осей, не только middle.
+BAT `RUN-EIGHT-HOUR-FIXED-FOV-AUTONOMOUS-GROOMING.bat`; bounded fixture прошёл. Результата long run пока нет.
 
 ## Серия 84: frozen high-resolution stress and replay map
 
@@ -196,4 +198,4 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия 82 завершилась `go=false`: обе distal axes остались хуже zero, а both-distal corner gate дал 10/16 вместо 12/16. Серию 83 не запускать и gate post hoc не ослаблять.
 
-Серия 82G завершена с полным `go_for_revised_long_training=true`, поэтому разрешено проектирование переработанной серии 83. До запуска требуется отдельный exact preregistration: 8-hour active budget, новые seeds/motions, FOV35 edge primary, balanced corners, six-axis/zero/temporal gates, body-X=4,18 safeguard и 72-state delay/replay. Tracked camera остаётся diagnostic и не должна подменять primary.
+Exact preregistration и runner серии 83 готовы. Запустить `RUN-EIGHT-HOUR-FIXED-FOV-AUTONOMOUS-GROOMING.bat`; пользователь запускает long run и может паузить/продолжать тем же BAT. До production summary серию84 не проектировать. Tracked camera в серии83 отсутствует.
