@@ -59,6 +59,22 @@ def prepared_tests(stim,old_labels):
   seen.add(motion);tests.append({'id':ident,'times':times,'angles_deg':angles,'motion_sha256':motion});descriptors.append({'id':ident,'source_sha256':sha(raw),'motion_sha256':motion,'family':'piecewise5' if ident<=345 else 'piecewise9'})
  return tests,descriptors
 
+def existing_result(output_root,model_sha,source_sha,descriptors,fixture):
+ root=Path(output_root)
+ if not root.exists():return None
+ for folder in sorted(root.glob('frozen_lowerx_distal_replication_*'),reverse=True):
+  result=folder/'result';protocol_path=folder/'protocol.json';complete_path=result/'complete.json';summary_path=result/'summary.json'
+  if not all(p.is_file() for p in (protocol_path,complete_path,summary_path)):continue
+  try:
+   protocol=json.loads(protocol_path.read_text(encoding='utf-8'));complete=json.loads(complete_path.read_text(encoding='utf-8'));summary=json.loads(summary_path.read_text(encoding='utf-8'))
+   expected_count=8 if fixture else 160
+   if protocol.get('source84s_model_sha256')!=model_sha or protocol.get('source84r_model_sha256')!=source_sha or protocol.get('motion_seed')!=SEED or protocol.get('holdouts')!=descriptors or protocol.get('mode')!=('fixture' if fixture else 'full'):continue
+   if summary.get('protocol')!=protocol or summary.get('status')!=('fixture_completed' if fixture else 'completed') or len(summary.get('tests',[]))!=expected_count:continue
+   if manifest(result)!=complete.get('files'):continue
+   return result
+  except (OSError,UnicodeError,ValueError,TypeError,json.JSONDecodeError):continue
+ return None
+
 def pooled(items,key,axis=None):
  n=sum(r['frames'] for r in items);return float(np.sqrt(sum(r['frames']*(r[key]['axis_rmse_rad'][axis] if axis else r[key]['rmse_rad'])**2 for r in items)/n))
 def decisions(m,items,fixture):
@@ -89,7 +105,9 @@ def decisions(m,items,fixture):
 
 def run(source,output_root=ROOT,allow_fixture=False):
  print('1/5 Проверяются завершённость, manifest, SQLite и SHA source84S. Это может занять несколько минут...',flush=True)
- m,proto,ev,stim,large,saved,state,source_summary,model_path,source_model_path,before=source_snapshot(source,allow_fixture);print('2/5 Source84S проверена. Создаются новые motions341–350 без обучения...',flush=True);tests,descriptors=prepared_tests(stim,saved['labels']);tests=tests[:2] if allow_fixture else tests
+ m,proto,ev,stim,large,saved,state,source_summary,model_path,source_model_path,before=source_snapshot(source,allow_fixture);print('2/5 Source84S проверена. Создаются новые motions341–350 без обучения...',flush=True);tests,descriptors=prepared_tests(stim,saved['labels']);tests=tests[:2] if allow_fixture else tests;descriptors=descriptors[:len(tests)]
+ recovered=existing_result(output_root,file_sha(model_path),file_sha(source_model_path),descriptors,allow_fixture)
+ if recovered:print('Найден и полностью проверен уже рассчитанный результат предыдущего запуска:',recovered,flush=True);return recovered
  train,_=proto.split_from_sources(state['sources'],stim);accepted,sample=m.sampled_records(Path(source)/'study.sqlite3',len(train));audit=m.overlap_sample_broad(tests,sample,cap=128);audit.update({'accepted_total':accepted,'is_exhaustive':audit['audited_count']==accepted});print(f'3/5 Audit готов: {audit["audited_count"]}/{accepted} training candidates; начинается evaluation {len(tests)} движений.',flush=True)
  with np.load(model_path,allow_pickle=False) as z:candidate=ev.checked_model({k:z[k] for k in z.files})
  with np.load(source_model_path,allow_pickle=False) as z:source_model=ev.checked_model({k:z[k] for k in z.files});print('4/5 Frozen models загружены; рассчитываются изображения и метрики по corners...',flush=True)
@@ -106,7 +124,7 @@ def run(source,output_root=ROOT,allow_fixture=False):
  print('5/5 Все cases рассчитаны; проверяются blocking gates и неизменность source84S...',flush=True);primary=decisions(m,records,allow_fixture);report={'schema':'frozen-lowerx-distal-replication-result-v1','status':'fixture_completed' if allow_fixture else 'completed','protocol':protocol,'primary':primary,'tests':records,'source84s_primary':source_summary['primary'],'audit':audit,'limitations':['Read-only evaluation; model84S and model84R are unchanged.','New motions use the same synthetic generator family and geometry grid.','No natural vision, actuators, closed loop, biological brain or mirror-neuron evidence.']};save(temp/'summary.json',report);(temp/'ИТОГ.txt').write_text('СЕРИЯ 84U: FROZEN REPLICATION 84S\n\nPrimary: '+('ВЫПОЛНЕН' if primary['passed'] else 'НЕ ВЫПОЛНЕН')+'.\nModel84S не переобучалась и не изменялась.\n',encoding='utf-8-sig');save(temp/'complete.json',{'protocol_sha256':sha(json.dumps(protocol,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()),'files':manifest(temp)});temp.rename(folder/'result')
  after={p:file_sha(p) for p in before}
  if before!=after:raise ValueError('Source84S изменился во время read-only replication.')
- if manifest(folder/'result')!=json.loads((folder/'result'/'complete.json').read_text())['files']:raise ValueError('Manifest replication повреждён.')
+ if manifest(folder/'result')!=json.loads((folder/'result'/'complete.json').read_text(encoding='utf-8'))['files']:raise ValueError('Manifest replication повреждён.')
  print('Готово:',folder/'result');return folder/'result'
 
 def choose():
