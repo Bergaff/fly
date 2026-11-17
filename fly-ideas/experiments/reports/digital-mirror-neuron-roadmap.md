@@ -204,4 +204,6 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия84R завершена близким, но строгим no-go. Новая model улучшила source83 по всем global axes, прошла обе distal comparator gates, controls, обе camera-Z groups и13/16 corners. Единственный blocking failure: lower bodyX3,82 right distal55/80 при пороге56. Это нельзя округлять до go. Кроме того, reported active elapsed34320,625с превысил budget28800с на92 минуты; перед следующим долгим обучением нужно прояснить time accounting.
 
-Серия85 остаётся заблокированной. Следующий preregistered design должен адресовать lower-X right-distal consistency, сохранить model84R как frozen comparator, использовать новые holdouts и не повторять тот же architecture/training run. Даже новый model go потребует независимой frozen replication до shared observation/execution population.
+Серия85 остаётся заблокированной. Перед следующим model design выполняется техническая series84T: она отключает Windows QuickEdit для текущей консоли и считает фиксированные128 candidates с раздельными worker CPU и wall clocks. Это проверяет скрытую остановку, при которой нажатие клавиши возобновляет окно, и исключает завершение просто из-за прошедшего wall time.
+
+После 84T следующий preregistered design должен адресовать lower-X right-distal consistency, сохранить model84R как frozen comparator, использовать новые holdouts и не повторять тот же architecture/training run. Даже новый model go потребует независимой frozen replication до shared observation/execution population.
