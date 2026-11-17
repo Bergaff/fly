@@ -209,3 +209,5 @@ Gate: тело должно завершать bounded grooming bout без па
 Серия84S завершена полным preregistered model go: fixed16384 candidates, lower-X right distal73/80 vs zero и62/80 vs frozen84R, обе X/Z groups и16/16 corners. Combined и все global axes прошли; QuickEdit/wall defect не изменил completion. Это первый uniform six-axis model go после серий83–84R.
 
 Model84S теперь frozen; training/ridge/crop не менять и BAT не перезапускать. Следующий этап только независимая read-only replication на новых motions/seeds с теми же absolute, lower-X, X/Z и corner gates. Series85 shared observation/execution остаётся заблокированной до replication go.
+
+Серия84U подготовлена как обязательная frozen replication: exact model84S SHA и runner проверяются, source остаётся read-only, seed8424/motions341–350 не использовались в84S. Все blocking gates повторяются без ослабления. До результата84U переход к series85 запрещён.
