@@ -84,20 +84,22 @@ def decisions(m,items,fixture):
  return primary
 
 def run(source,output_root=ROOT,allow_fixture=False):
- m,proto,ev,stim,large,saved,state,source_summary,model_path,source_model_path,before=source_snapshot(source,allow_fixture);tests,descriptors=prepared_tests(stim,saved['labels']);tests=tests[:2] if allow_fixture else tests
- train,_=proto.split_from_sources(state['sources'],stim);accepted,sample=m.sampled_records(Path(source)/'study.sqlite3',len(train));audit=m.overlap_sample_broad(tests,sample,cap=128);audit.update({'accepted_total':accepted,'is_exhaustive':audit['audited_count']==accepted})
+ print('1/5 Проверяются завершённость, manifest, SQLite и SHA source84S. Это может занять несколько минут...',flush=True)
+ m,proto,ev,stim,large,saved,state,source_summary,model_path,source_model_path,before=source_snapshot(source,allow_fixture);print('2/5 Source84S проверена. Создаются новые motions341–350 без обучения...',flush=True);tests,descriptors=prepared_tests(stim,saved['labels']);tests=tests[:2] if allow_fixture else tests
+ train,_=proto.split_from_sources(state['sources'],stim);accepted,sample=m.sampled_records(Path(source)/'study.sqlite3',len(train));audit=m.overlap_sample_broad(tests,sample,cap=128);audit.update({'accepted_total':accepted,'is_exhaustive':audit['audited_count']==accepted});print(f'3/5 Audit готов: {audit["audited_count"]}/{accepted} training candidates; начинается evaluation {len(tests)} движений.',flush=True)
  with np.load(model_path,allow_pickle=False) as z:candidate=ev.checked_model({k:z[k] for k in z.files})
- with np.load(source_model_path,allow_pickle=False) as z:source_model=ev.checked_model({k:z[k] for k in z.files})
+ with np.load(source_model_path,allow_pickle=False) as z:source_model=ev.checked_model({k:z[k] for k in z.files});print('4/5 Frozen models загружены; рассчитываются изображения и метрики по corners...',flush=True)
  protocol={'schema':'frozen-lowerx-distal-replication-v1','mode':'fixture' if allow_fixture else 'full','script_sha256':file_sha(__file__),'runner84s_sha256':RUNNER84S_SHA,'source84s_model_sha256':file_sha(model_path),'source84r_model_sha256':file_sha(source_model_path),'motion_seed':SEED,'holdouts':descriptors[:len(tests)],'geometry_corners':4 if allow_fixture else 16,'training_allowed':False,'primary_rule':'same absolute, frozen comparator, lower-X, body-X, camera-Z, controls and corner gates as84S'}
  root=Path(output_root);root.mkdir(parents=True,exist_ok=True);folder=root/('frozen_lowerx_distal_replication_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8]);folder.mkdir();temp=folder/'result_incomplete';temp.mkdir();save(folder/'protocol.json',protocol);scene=m.VisibleForelegGroomingScene(proto.load('rep84u_engine','38_two_flies_observation.py'));corners=[m.geometry_corners()[i] for i in (0,2,4,6)] if allow_fixture else m.geometry_corners();records=[]
- for item in tests:
+ for number,item in enumerate(tests,1):
   truth_full=item['angles_deg']*np.pi/180;truth=truth_full[2:]
   for corner in corners:
    cid=corner['corner_id'];images=scene.render(truth_full,view=corner['view']);x=m.edge_history(images);cp=np.clip((x-candidate['mean'])/candidate['scale']@candidate['weights']+candidate['intercept'],-np.pi*55/180,np.pi*55/180);sp=np.clip((x-source_model['mean'])/source_model['scale']@source_model['weights']+source_model['intercept'],-np.pi*55/180,np.pi*55/180);coeff,replay=m.compress_replay(cp);_,source_replay=m.compress_replay(sp);rng=np.random.default_rng(np.random.SeedSequence([842400,item['id'],cid]));controls={}
    for name,img in {'shuffled':images[rng.permutation(len(images))].copy(),'static':np.repeat(images[:1],len(images),axis=0),'closed':np.zeros_like(images)}.items():
     q=m.edge_history(img);q=np.clip((q-candidate['mean'])/candidate['scale']@candidate['weights']+candidate['intercept'],-np.pi*55/180,np.pi*55/180);_,rp=m.compress_replay(q);controls[name]=m.replay_metrics(truth,rp)
    digest=sha(np.asarray(coeff,dtype='<f8').tobytes());r={'test_id':item['id'],'corner_id':cid,'frames':len(truth),'view':corner['view'],'candidate':m.replay_metrics(truth,replay),'source84r':m.replay_metrics(truth,source_replay),'zero':m.replay_metrics(truth,np.zeros_like(truth)),'controls':controls,'state_coefficients':72,'delay_s':.5,'state_unchanged_during_delay':True,'state_sha256_before_delay':digest,'state_sha256_after_delay':digest,'diagnostics':{'rgb_sha256':sha(images.tobytes()),'unique_rgb_frames':len({a.tobytes() for a in images}),'changed_rgb_values':int(np.count_nonzero(images[1:]!=images[:-1])),'candidate_feature_max_std':float(np.max(np.std(x,0))),'candidate_clipped_fraction':float(np.mean(np.abs(cp)>=np.pi*55/180))}};records.append(r);td=temp/f'test_{item["id"]:03d}'/f'corner_{cid:02d}';td.mkdir(parents=True);save(td/'metrics.json',r);save(td/'internal_state.json',{'coefficients':list(map(float,coeff)),'delay_s':.5,'updates_during_delay':0})
- primary=decisions(m,records,allow_fixture);report={'schema':'frozen-lowerx-distal-replication-result-v1','status':'fixture_completed' if allow_fixture else 'completed','protocol':protocol,'primary':primary,'tests':records,'source84s_primary':source_summary['primary'],'audit':audit,'limitations':['Read-only evaluation; model84S and model84R are unchanged.','New motions use the same synthetic generator family and geometry grid.','No natural vision, actuators, closed loop, biological brain or mirror-neuron evidence.']};save(temp/'summary.json',report);(temp/'ИТОГ.txt').write_text('СЕРИЯ 84U: FROZEN REPLICATION 84S\n\nPrimary: '+('ВЫПОЛНЕН' if primary['passed'] else 'НЕ ВЫПОЛНЕН')+'.\nModel84S не переобучалась и не изменялась.\n',encoding='utf-8-sig');save(temp/'complete.json',{'protocol_sha256':sha(json.dumps(protocol,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()),'files':manifest(temp)});temp.rename(folder/'result')
+  print(f'  Проверено движение {item["id"]}: {number}/{len(tests)}, corners {len(corners)}.',flush=True)
+ print('5/5 Все cases рассчитаны; проверяются blocking gates и неизменность source84S...',flush=True);primary=decisions(m,records,allow_fixture);report={'schema':'frozen-lowerx-distal-replication-result-v1','status':'fixture_completed' if allow_fixture else 'completed','protocol':protocol,'primary':primary,'tests':records,'source84s_primary':source_summary['primary'],'audit':audit,'limitations':['Read-only evaluation; model84S and model84R are unchanged.','New motions use the same synthetic generator family and geometry grid.','No natural vision, actuators, closed loop, biological brain or mirror-neuron evidence.']};save(temp/'summary.json',report);(temp/'ИТОГ.txt').write_text('СЕРИЯ 84U: FROZEN REPLICATION 84S\n\nPrimary: '+('ВЫПОЛНЕН' if primary['passed'] else 'НЕ ВЫПОЛНЕН')+'.\nModel84S не переобучалась и не изменялась.\n',encoding='utf-8-sig');save(temp/'complete.json',{'protocol_sha256':sha(json.dumps(protocol,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()),'files':manifest(temp)});temp.rename(folder/'result')
  after={p:file_sha(p) for p in before}
  if before!=after:raise ValueError('Source84S изменился во время read-only replication.')
  if manifest(folder/'result')!=json.loads((folder/'result'/'complete.json').read_text())['files']:raise ValueError('Manifest replication повреждён.')
@@ -105,7 +107,7 @@ def run(source,output_root=ROOT,allow_fixture=False):
 
 def choose():
  import tkinter as tk
- from tkinter import filedialog,messagebox
+ from tkinter import filedialog
  root=tk.Tk();root.title('Серия 84U: frozen replication');root.geometry('560x150+180+140');root.resizable(False,False);root.attributes('-topmost',True)
  tk.Label(root,text='Серия 84U готова к read-only проверке model84S.\nСейчас откроется окно выбора завершённой папки lowerx_distal_fixed_count_....\nОбучения и настройки модели нет.',font=('Arial',11),justify='left',padx=20,pady=20).pack()
  root.update_idletasks();root.deiconify();root.lift();root.focus_force();root.update()
@@ -114,8 +116,8 @@ def choose():
   source=filedialog.askdirectory(title='Серия 84U: выберите завершённую папку series84S',mustexist=True,initialdir=str(SOURCE_ROOT.resolve() if SOURCE_ROOT.exists() else Path.cwd()),parent=root)
   if not source:print('Выбор папки отменён.',flush=True);return
   print('Выбрана source84S:',source,flush=True)
-  messagebox.showinfo('Пререгистрация84U','Новые motions341–350, seed8424, все16 corners. Повторяются absolute, lower-X, X/Z, controls и corner gates без изменения модели. После закрытия этого окна начнётся проверка.',parent=root)
-  root.withdraw();run(source)
+  print('Пререгистрация84U: motions341–350, seed8424, 16 corners; frozen weights не изменяются.',flush=True)
+  root.withdraw();root.update();run(source)
  finally:root.destroy()
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--choose',action='store_true');p.add_argument('--source84s');p.add_argument('--output-root',default=str(ROOT));p.add_argument('--allow-fixture-source',action='store_true',help=argparse.SUPPRESS);a=p.parse_args()
