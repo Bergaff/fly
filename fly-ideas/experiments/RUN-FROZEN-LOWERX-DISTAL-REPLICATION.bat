@@ -16,6 +16,7 @@ if not exist "workspace\.venv-two-flies\Scripts\python.exe" (
   pause
   exit /b 1
 )
-"workspace\.venv-two-flies\Scripts\python.exe" "experiments\templates\84u_frozen_lowerx_distal_replication.py" --choose
+echo Открывается отдельное окно выбора папки. Если оно не видно, переключитесь на окно "Серия 84U" через Alt+Tab.
+"workspace\.venv-two-flies\Scripts\python.exe" -u "experiments\templates\84u_frozen_lowerx_distal_replication.py" --choose
 if errorlevel 1 echo Репликация остановлена. Source84S не изменялась.
 pause

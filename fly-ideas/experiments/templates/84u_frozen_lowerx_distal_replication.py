@@ -106,11 +106,16 @@ def run(source,output_root=ROOT,allow_fixture=False):
 def choose():
  import tkinter as tk
  from tkinter import filedialog,messagebox
- root=tk.Tk();root.withdraw();root.attributes('-topmost',True)
+ root=tk.Tk();root.title('Серия 84U: frozen replication');root.geometry('560x150+180+140');root.resizable(False,False);root.attributes('-topmost',True)
+ tk.Label(root,text='Серия 84U готова к read-only проверке model84S.\nСейчас откроется окно выбора завершённой папки lowerx_distal_fixed_count_....\nОбучения и настройки модели нет.',font=('Arial',11),justify='left',padx=20,pady=20).pack()
+ root.update_idletasks();root.deiconify();root.lift();root.focus_force();root.update()
  try:
-  messagebox.showinfo('Серия 84U','Read-only replication frozen model84S. Обучения и tuning нет. Выберите завершённую папку lowerx_distal_fixed_count_....',parent=root);source=filedialog.askdirectory(title='Завершённая серия84S',initialdir=str(SOURCE_ROOT.resolve() if SOURCE_ROOT.exists() else Path.cwd()),parent=root)
-  if not source:print('Выбор отменён.');return
-  messagebox.showinfo('Пререгистрация','Новые motions341–350, seed8424, все16 corners. Повторяются absolute, lower-X, X/Z, controls и corner gates без изменения модели.',parent=root);run(source)
+  print('Открывается окно выбора завершённой папки series84S...',flush=True)
+  source=filedialog.askdirectory(title='Серия 84U: выберите завершённую папку series84S',mustexist=True,initialdir=str(SOURCE_ROOT.resolve() if SOURCE_ROOT.exists() else Path.cwd()),parent=root)
+  if not source:print('Выбор папки отменён.',flush=True);return
+  print('Выбрана source84S:',source,flush=True)
+  messagebox.showinfo('Пререгистрация84U','Новые motions341–350, seed8424, все16 corners. Повторяются absolute, lower-X, X/Z, controls и corner gates без изменения модели. После закрытия этого окна начнётся проверка.',parent=root)
+  root.withdraw();run(source)
  finally:root.destroy()
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--choose',action='store_true');p.add_argument('--source84s');p.add_argument('--output-root',default=str(ROOT));p.add_argument('--allow-fixture-source',action='store_true',help=argparse.SUPPRESS);a=p.parse_args()
