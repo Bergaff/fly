@@ -206,6 +206,6 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Серия85 остаётся заблокированной. Техническая84T завершилась: QuickEdit был включён до защиты и отключён через WinAPI; fixed128 candidates рассчитаны без blocked batches, с устойчивыми post-startup batch times1,09–1,24с. Это сильно поддерживает console-selection explanation остановки84R и показывает, что wall elapsed нельзя считать полезным compute.
 
-Серия84S подготовлена как этот preregistered design. Architecture/ridge84R остаются frozen, model84R служит comparator; intervention состоит в fixed16384-candidate dataset с50% exact lower-X views,25% upper-X и25% continuous. Новые motions321–330 не входят в training. Runner отключает QuickEdit и не имеет wall-time completion. Lower-X right distal должен достичь60/80 wins vs zero и48/80 vs84R при сохранении X/Z и12/16 corner gates. Запуск только новым `RUN-FIXED-COUNT-LOWERX-DISTAL-GROOMING.bat`, старый84R BAT не повторять.
+Серия84S завершена полным preregistered model go: fixed16384 candidates, lower-X right distal73/80 vs zero и62/80 vs frozen84R, обе X/Z groups и16/16 corners. Combined и все global axes прошли; QuickEdit/wall defect не изменил completion. Это первый uniform six-axis model go после серий83–84R.
 
-Даже 84S model go потребует независимой frozen replication до shared observation/execution population.
+Model84S теперь frozen; training/ridge/crop не менять и BAT не перезапускать. Следующий этап только независимая read-only replication на новых motions/seeds с теми же absolute, lower-X, X/Z и corner gates. Series85 shared observation/execution остаётся заблокированной до replication go.
