@@ -557,3 +557,15 @@ test('серия 69: matched encoder ablation сохранён в памяти',
   assert.equal(migrated.entries[0],custom);
   assert.equal(migrated.entries.filter(e=>e.id===item.id).length,1);
 });
+
+test('серия 84U: frozen replication no-go сохранён в памяти', () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/frozen-lowerx-distal-replication-user-result-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-lowerx-distal-replication');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.status,/replication no-go/);assert.match(item.status,/series85 blocked/);
+  assert.match(item.results,/77\/160/);assert.match(item.results,/44\/80/);assert.match(item.results,/16\/16/);
+  assert.match(item.limitations,/341–350/);assert.match(item.limitations,/Model84S remains frozen/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});

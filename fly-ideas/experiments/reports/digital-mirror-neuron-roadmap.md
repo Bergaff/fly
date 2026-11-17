@@ -210,4 +210,6 @@ Gate: тело должно завершать bounded grooming bout без па
 
 Model84S теперь frozen; training/ridge/crop не менять и BAT не перезапускать. Следующий этап только независимая read-only replication на новых motions/seeds с теми же absolute, lower-X, X/Z и corner gates. Series85 shared observation/execution остаётся заблокированной до replication go.
 
-Серия84U подготовлена как обязательная frozen replication: exact model84S SHA и runner проверяются, source остаётся read-only, seed8424/motions341–350 не использовались в84S. Все blocking gates повторяются без ослабления. До результата84U переход к series85 запрещён.
+Серия84U завершена replication no-go без изменения model84S. Absolute reconstruction и controls устойчивы, обе camera-Z groups и16/16 corners прошли, combined84S немного ниже84R. Но целевая right distal хуже84R pooled global и выиграла лишь77/160 при пороге96; lower-X count44/80 не достиг48, несмотря на немного лучшую pooled RMSE. Значит, улучшение84S не является motion-invariant и не реплицировано.
+
+Series85 остаётся заблокированной. Motions321–350 раскрыты; нельзя дообучать84S на341–350, исключать weak motions344/347 или запускать новые seeds в поиске go. Следующий допустимый шаг: новая preregistered model-development серия, адресующая motion-dependent distal consistency, с полностью новыми blocking holdouts и последующей отдельной frozen replication.
