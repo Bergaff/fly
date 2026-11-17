@@ -18,7 +18,11 @@ IDS=tuple(range(341,351))
 
 def sha(data):return hashlib.sha256(data).hexdigest()
 def file_sha(path):return sha(Path(path).read_bytes())
-def save(path,obj):Path(path).write_text(json.dumps(obj,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf8')
+def numpy_json(value):
+ if isinstance(value,np.ndarray):return value.tolist()
+ if isinstance(value,np.generic):return value.item()
+ raise TypeError(f'Object of type {type(value).__name__} is not JSON serializable')
+def save(path,obj):Path(path).write_text(json.dumps(obj,ensure_ascii=False,indent=2,allow_nan=False,default=numpy_json)+'\n',encoding='utf8')
 def manifest(folder):return {str(p.relative_to(folder)).replace('\\','/'):file_sha(p) for p in sorted(Path(folder).rglob('*')) if p.is_file() and p.name!='complete.json'}
 def load84s():
  if file_sha(RUNNER84S)!=RUNNER84S_SHA:raise ValueError('Закреплённый runner84S изменился.')
