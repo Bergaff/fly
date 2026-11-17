@@ -569,3 +569,12 @@ test('серия 84U: frozen replication no-go сохранён в памяти'
   assert.match(item.limitations,/341–350/);assert.match(item.limitations,/Model84S remains frozen/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия 84V: paired-view model development сохранён в памяти', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-paired-view-distal-consistency');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.status,/prepared/);assert.match(item.source,/4096 new seed8425 base motions/);
+  assert.match(item.source,/motions321–350 excluded/);assert.match(item.results,/96\/160/);assert.match(item.results,/48\/80/);
+  assert.match(item.limitations,/Even go requires frozen replication/);assert.match(item.limitations,/Series85 blocked/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
