@@ -221,3 +221,5 @@ Candidate84V SHA `44b98c31…` теперь frozen; training84V не повто�
 Серия84W завершена строгим near-miss no-go. Улучшение84V над84S/84R реплицировано по всем global axes и combined; right distal129/160 и131/160 против comparators. Но lower-X absolute wins vs zero59/80 не достигли60/80, а corners9/13 дали right distal6/10. Порог нельзя округлять или заменять pooled RMSE.
 
 Model84V остаётся frozen; motions381–390 нельзя использовать для tuning, и новый seed ради go запрещён. Series85 остаётся заблокированной. Следующий model-development шаг должен адресовать absolute lower-X right-distal failures, сохранив dual-comparator advantage, на полностью новых blocking motions.
+
+Серия84X подготовлена как targeted model development после84W: paired-view allocation меняется2+2 на3 lower-X+1 upper-X при том же representation/ridge/count. Четыре workers ускоряют расчёт, но не меняют научную модель. Новые motions401–410 и frozen84V/84S/84R comparators; series85 остаётся заблокированной и даже go потребует frozen replication.
