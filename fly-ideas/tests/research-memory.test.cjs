@@ -581,3 +581,14 @@ test('серия 84V: paired-view model development сохранён в памя
   assert.match(item.limitations,/Freeze candidate84V/);assert.match(item.limitations,/before series85/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия 84W: frozen paired-view replication no-go сохранён в памяти', () => {
+  const result=require('node:child_process').spawnSync(process.env.TWO_FLIES_TEST_PYTHON || 'python3',
+    [path.join(root,'tests/frozen-paired-view-replication-user-result-fixture.py')], {cwd:root,encoding:'utf8',timeout:30000});
+  assert.equal(result.status,0,`${result.stdout}\n${result.stderr}`);
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-paired-view-replication');
+  assert.ok(item && item.ideaId==='i-observational');
+  assert.match(item.status,/near-miss replication no-go/);assert.match(item.results,/59\/80/);
+  assert.match(item.results,/129\/160/);assert.match(item.limitations,/381–390/);assert.match(item.limitations,/Series85 blocked/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
