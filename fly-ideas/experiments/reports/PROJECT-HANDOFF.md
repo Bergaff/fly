@@ -259,3 +259,7 @@ Attached summary-14 SHA `1fa95757…`; full160 read-only cases, exact frozen84V/
 ## Серия84X: completed lower-weighted model-development no-go
 
 Attached summary-15 SHA `540aff2d…`; fixed16384/16384 candidates,802816 frames, wall8820,016s, showing6-worker acceleration worked. Candidate SHA `fd12401a…`. Lower-X intervention passes: RD candidate/84V/zero0,425871/0,432502/0,490911; wins73/80 zero and53/80 vs84V. But upper-X candidate/84V0,436825/0,428139 with only28/80 wins. Global RD0,431383 vs84V0,430326 and81/160 wins, required96; combined0,331909 vs84V0,330785 also fails below-all comparator gate. Absolute X/Z and corners16/16 pass. Strict primary false; do not repeat/tune on disclosed401–410.84V remains frozen but84W replication remains no-go; series85 blocked. See result/extract/fixture.
+
+## Серия84Y: prepared augmented lower paired-view model
+
+One scientific change relative to84V: retain its exact2 lower+2 upper views and add one distinct lower-X view. New seed8431,4096 base motions ×5=20480 candidates/1003520 expected frames. One-click UI selects2/4/6 workers or max=`os.cpu_count()`; batch follows workers and immutable choice restores before protocol verification on resume. Source completed pinned84V; frozen84V/84S/84R comparators. New blocking seed8432 motions411–420 ×16; motions321–410 forbidden. Global RD96/160 against each comparator, lower-X60/80 zero and48/80 each comparator, combined/X/Z/controls/12 corners retained. BAT `RUN-AUGMENTED-LOWER-PAIRED-VIEW.bat`; result pending; series85 blocked.
