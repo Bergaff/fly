@@ -593,10 +593,10 @@ test('серия 84W: frozen paired-view replication no-go сохранён в �
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия84X: faster lower-weighted paired view сохранена в памяти', () => {
+test('серия84X: lower-weighted no-go сохранён в памяти', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-lower-weighted-paired-view');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/model-development no-go/);
   assert.match(item.source,/3 lower-X\+1 upper-X/);assert.match(item.source,/6 workers\/batch6/);
-  assert.match(item.results,/96\/160/);assert.match(item.results,/60\/80/);assert.match(item.limitations,/Even go requires frozen replication/);
+  assert.match(item.results,/73\/80/);assert.match(item.results,/81\/160 instead of96/);assert.match(item.limitations,/disclosed401–410/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
