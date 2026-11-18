@@ -601,10 +601,10 @@ test('серия84X: lower-weighted no-go сохранён в памяти', () 
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия84Y: augmented lower paired view сохранена в памяти', () => {
+test('серия84Y: augmented lower no-go сохранён в памяти', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-augmented-lower-paired-view');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared/);
-  assert.match(item.source,/exact2 lower-X\+2 upper-X/);assert.match(item.source,/20480 candidates/);
-  assert.match(item.results,/2\/4\/6 workers or max logical CPU/);assert.match(item.results,/96\/160/);assert.match(item.limitations,/not a strict RAM-GB cap/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/model-development no-go/);
+  assert.match(item.source,/20480 candidates\/1003520 frames/);assert.match(item.source,/motions411–420/);
+  assert.match(item.results,/43\/80 vs84V misses48/);assert.match(item.results,/53\/160 instead of96/);assert.match(item.limitations,/simple view weighting\/duplication/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
