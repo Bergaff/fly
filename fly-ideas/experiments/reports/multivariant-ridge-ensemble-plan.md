@@ -74,6 +74,18 @@ Motions321–420 раскрыты и запрещены. После расчёт
 
 Для новой серии выбрать завершённую production папку84V, затем2/4/6/МАКСИМУМ. Для resume выбрать созданную папку `multivariant_ridge_ensemble_...`; режим ресурсов будет восстановлен автоматически.
 
+## Recovery первоначального evaluator
+
+Первоначальный runner мог завершить весь training и затем остановиться с `KeyError: original_basename` до development evaluation. Исправленный runner определяет preregistered holdout ID из frozen sequential test index (`421–440`), а не из необязательного label field. Для такой папки разрешена узкая автоматическая migration только если:
+
+- script SHA равен точному первоначальному84Z SHA;
+- stage уже `evaluation`;
+- committed count равен fixed target;
+- candidate row count совпадает;
+- все scientific protocol fields, sources, variants, seeds, development/final holdouts и visual preflight совпадают.
+
+Меняется только `script_sha256`; рядом записывается `evaluation-recovery.json` с `scientific_protocol_changed=false`. Training не повторяется. Для любого другого отличия recovery блокируется.
+
 ## Ограничения claims
 
 Это synthetic supervised reconstruction и linear ensemble в прежнем generator family. Результат не показывает natural vision, самостоятельно созданное действие, actuators, мышцы, силы, closed-loop correction, биологический мозг или mirror neurons.

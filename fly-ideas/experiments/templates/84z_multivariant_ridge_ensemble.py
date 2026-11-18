@@ -12,6 +12,7 @@ import numpy as np
 HERE=Path(__file__).resolve().parent
 RUNNER84V=HERE/'84v_paired_view_distal_consistency.py';RUNNER84V_SHA='05a0cdd4696af5b8901a1d34a205db8a286264f518cb54e93d1e0b9f9e9e4a52'
 MODEL84V_SHA='44b98c31526f5d43bb8eef26fd91ccec827988061df94e01c8aa0a6a19f3b7af'
+RECOVERABLE_SCRIPT_SHA='7c1383acdcfcc3257cb2133398d97c891e2be701f5a7fbdfe1df604fa96138ed'
 AXES=('left_proximal','left_middle','left_distal','right_proximal','right_middle','right_distal');TARGET=16384
 ROOT=Path('workspace/runs/ideas/i-observational/multivariant-ridge-ensemble');SOURCE_ROOT=Path('workspace/runs/ideas/i-observational/paired-view-distal-consistency')
 SELECTED_WORKERS=6;SELECTED_RESOURCE_MODE='6'
@@ -145,13 +146,13 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
   spec=specs[name];new=predict_model(ridge_models[spec['right_distal_ridge']],x);old=predict_model(s84v,x);return np.clip(spec['new_weight']*new+(1-spec['new_weight'])*old,-np.pi*55/180,np.pi*55/180)
  scene=m.VisibleForelegGroomingScene(proto.load('multivariant84z_engine','38_two_flies_observation.py'));accepted,recs=m.sampled_records(folder/'study.sqlite3',len(train));audit=m.overlap_sample_broad(tests,recs,128);test_by_ident={}
  for item,overlap in zip(tests,audit['tests']):
-  label=labels[f'test_{item["id"]:03d}.json'];ident=int(label['original_basename'][8:11]);test_by_ident[ident]=(item,label,overlap)
+  label=labels[f'test_{item["id"]:03d}.json'];ident=420+item['id'];test_by_ident[ident]=(item,label,overlap)
  corners=[m.geometry_corners()[i] for i in(0,2,4,6)] if saved['mode']=='fixture' else m.geometry_corners()
  def render_group(ids,names,seed):
   grouped={name:[] for name in names}
   for ident in ids:
    item,label,overlap=test_by_ident[ident];full=item['angles_deg']*np.pi/180;truth=full[2:]
-   if label['role']!='new_test' or int(label['original_basename'][8:11])!=ident:raise ValueError('Holdout label нарушен.')
+   if label['role']!='new_test' or item['id']!=ident-420:raise ValueError('Holdout label нарушен.')
    for corner in corners:
     cid=corner['corner_id'];images=scene.render(full,view=corner['view']);x=m.edge_history(images);vp=np.clip(predict_model(s84v,x),-np.pi*55/180,np.pi*55/180);sp=np.clip(predict_model(s84,x),-np.pi*55/180,np.pi*55/180);rp=np.clip(predict_model(s84r,x),-np.pi*55/180,np.pi*55/180);_,vr=m.compress_replay(vp);_,sr=m.compress_replay(sp);_,rr=m.compress_replay(rp);rng=np.random.default_rng(np.random.SeedSequence([seed,ident,cid]));control_x={name:m.edge_history(img) for name,img in {'shuffled':images[rng.permutation(len(images))].copy(),'static':np.repeat(images[:1],len(images),axis=0),'closed':np.zeros_like(images)}.items()}
     for name in names:
@@ -170,6 +171,29 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
  for row in final_rows:
   td=temp/f'test_{row["test_id"]:03d}'/f'corner_{row["corner_id"]:02d}';td.mkdir(parents=True);save(td/'metrics.json',row);save(td/'internal_state.json',{'coefficients_sha256':row['state_sha256_before_delay'],'delay_s':.5,'updates_during_delay':0})
  report={'schema':'multivariant-ridge-ensemble-result-v1','status':'fixture_completed' if saved['mode']=='fixture' else 'completed','protocol_mode':saved['mode'],'completion_basis':'committed_candidate_count','wall_diagnostic_seconds':elapsed,'candidates':state['next_id'],'accepted_candidates':accepted,'training_frames':state['stats']['n'],'source84v_model_sha256':saved['source84v_model_sha256'],'source84s_model_sha256':saved['source84s_model_sha256'],'source84r_model_sha256':saved['source84r_model_sha256'],'selected_model_sha256':file_sha(temp/'model_selected.npz'),'selected_variant':selected,'development':{'motions':dev_ids,'selection_keys':{name:list(keys[name]) for name in variant_order},'decisions':development},'primary':primary,'audit':{'accepted_total':accepted,'audited_count':audit['audited_count'],'is_exhaustive':audit['audited_count']==accepted,'sample_ids':audit['sample_ids']},'tests':final_rows,'development_tests':development_rows,'limitations':['Six variants are selected only on development motions421-430; primary uses untouched motions431-440.','Frozen84V,84S,84R comparators; motions321-420 are disclosed and excluded.','Synthetic supervised reconstruction; no actuators, closed loop, biological brain or mirror-neuron evidence.']};save(temp/'summary.json',report);(temp/'ИТОГ.txt').write_text('СЕРИЯ 84Z: MULTIVARIANT RIDGE ENSEMBLE\n\nВыбран: '+selected+'\nPrimary: '+('ВЫПОЛНЕН' if primary['passed'] else'НЕ ВЫПОЛНЕН')+'.\n',encoding='utf-8-sig');verify_pins(proto,saved);psha=sha(json.dumps(saved,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode());save(temp/'complete.json',{'protocol_sha256':psha,'candidates':state['next_id'],'files':m.output_manifest(temp)});temp.rename(out);m.verify_result(out,saved,state);return out
+def migrate_evaluation_recovery(dbpath,proto):
+ """One-time recovery of the completed-training DB made by the original84Z evaluator.
+
+ Only script_sha256 changes after every other protocol field and the evaluation-stage
+ checkpoint are verified. Training data, variants, selection and holdouts stay frozen.
+ """
+ uri=Path(dbpath).resolve().as_uri()+'?mode=rw'
+ with sqlite3.connect(uri,uri=True,timeout=30) as db:
+  meta=dict(db.execute('SELECT key,value FROM metadata'));saved=json.loads(meta.get('protocol','{}'))
+  if saved.get('script_sha256')!=RECOVERABLE_SCRIPT_SHA:return False
+  text=json.dumps(saved,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
+  if meta.get('protocol')!=text or meta.get('protocol_sha256')!=sha(text.encode('utf8')):raise ValueError('Старый protocol повреждён; recovery запрещён.')
+  phase=db.execute('SELECT stage,training_seconds FROM run_phase WHERE id=1').fetchone();state=db.execute('SELECT next_id FROM state WHERE id=1').fetchone();count=db.execute('SELECT COUNT(*) FROM candidates').fetchone()[0]
+  if phase is None or phase[0]!='evaluation' or state is None or state[0]!=saved.get('target_candidates') or count!=state[0]:raise ValueError('Recovery разрешён только после полного training перед evaluation.')
+  expected=protocol(saved['source_sha256'],saved['labels'],saved.get('fixture_limit'),proto,saved['source84r_model_sha256'],saved['quick_edit_action']);expected['visual_preflight']=m.visual_preflight(proto)
+  left=dict(saved);right=dict(expected);left.pop('script_sha256',None);right.pop('script_sha256',None)
+  if left!=right:raise ValueError('Научный protocol отличается; автоматический recovery запрещён.')
+  new_text=json.dumps(expected,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False);db.execute('BEGIN IMMEDIATE');row=db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()
+  if row is None or row[0]!=text:raise ValueError('Protocol изменился во время recovery.')
+  db.execute("UPDATE metadata SET value=? WHERE key='protocol'",(new_text,));db.execute("UPDATE metadata SET value=? WHERE key='protocol_sha256'",(sha(new_text.encode('utf8')),));db.commit()
+ log=Path(dbpath).parent/'evaluation-recovery.json';save(log,{'schema':'84z-evaluation-recovery-v1','old_script_sha256':RECOVERABLE_SCRIPT_SHA,'new_script_sha256':file_sha(__file__),'training_candidates':saved['target_candidates'],'scientific_protocol_changed':False,'reason':'replace fragile original_basename lookup with frozen test index mapping'})
+ print('Применён безопасный recovery evaluator84Z; training не повторяется.',flush=True);return True
+
 def restore_resources(dbpath):
  global SELECTED_WORKERS,SELECTED_RESOURCE_MODE
  with sqlite3.connect(Path(dbpath).resolve().as_uri()+'?mode=ro',uri=True) as db:row=db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()
@@ -181,7 +205,7 @@ def restore_resources(dbpath):
 def process_resources(folder,max_batches=None):
  proto,ev,pre,stim,ck,base,large=m.dependencies();folder=Path(folder).resolve();dbpath=folder/'study.sqlite3'
  if not dbpath.is_file():raise ValueError('В папке нет study.sqlite3 серии84Z.')
- restore_resources(dbpath)
+ restore_resources(dbpath);migrate_evaluation_recovery(dbpath,proto)
  console=m.disable_quick_edit()
  if os.name=='nt' and not console.get('disabled'):raise OSError('QuickEdit не отключён; продолжение запрещено.')
  large.job_guard()
