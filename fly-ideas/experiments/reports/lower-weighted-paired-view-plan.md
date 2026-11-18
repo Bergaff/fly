@@ -13,11 +13,13 @@ Frozen replication84W подтвердила преимущество84V над8
 -4096 новых base motions seed8429;
 -16 384 render-candidates, ожидаемо802 816 frames.
 
+Число16 384 не является биологической константой. Это `4096 ×4`:4096=`2^12` base motions, поровну1024 на каждую из четырёх motion families; четыре views дают `2^14` renders. Такой count сохраняет точный compute budget84S/84V, поэтому эффект view allocation не смешивается с изменением размера dataset. Уменьшение до8192 ускорило бы запуск, но одновременно вдвое уменьшило бы число base motions и создало бы новую причину различий.
+
 Три lower views имеют различные corner bits; один upper view циклически покрывает все восемь upper corners по base IDs. Это заранее выбранное targeted изменение для absolute lower-X consistency. Motions321–390 не используются.
 
 ## Ускорение, не научное изменение
 
-По просьбе пользователя используются4 workers и batch4 вместо2/2. Каждый worker ограничен одним BLAS/OpenMP thread. На компьютере12 logical CPU/16GB RAM это увеличивает загрузку, оставляя ресурсы для Word. Completion остаётся только по fixed count, QuickEdit отключается, SQLite commit/pause/resume сохраняются. Ожидаемое wall time меньше84V, ориентировочно3–5 часов, но это не time gate.
+По просьбе пользователя используются6 workers и batch6 вместо2/2. Каждый worker ограничен одним BLAS/OpenMP thread. На компьютере12 logical CPU/16GB RAM это увеличивает загрузку, оставляя ресурсы для Word. Completion остаётся только по fixed count, QuickEdit отключается, SQLite commit/pause/resume сохраняются. Ожидаемое wall time меньше84V, ориентировочно2,5–4 часа, но это не time gate.
 
 ## Frozen source
 

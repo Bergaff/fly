@@ -49,7 +49,7 @@ def prepared_holdouts():
  return paths
 
 def protocol(source_sha,labels,fixture_limit,proto,source84r_sha,console):
- p=BASE_PROTOCOL(source_sha,labels,fixture_limit,proto,source84r_sha,console);p.update({'schema':'lower-weighted-paired-view-v1','script_sha256':file_sha(__file__),'runner84v_sha256':RUNNER84V_SHA,'source84v_model_sha256':source_sha['source84v_model.npz'],'target_candidates':fixture_limit if fixture_limit is not None else TARGET,'workers':4,'batch':4})
+ p=BASE_PROTOCOL(source_sha,labels,fixture_limit,proto,source84r_sha,console);p.update({'schema':'lower-weighted-paired-view-v1','script_sha256':file_sha(__file__),'runner84v_sha256':RUNNER84V_SHA,'source84v_model_sha256':source_sha['source84v_model.npz'],'target_candidates':fixture_limit if fixture_limit is not None else TARGET,'workers':6,'batch':6})
  p['training_generator'].update({'seed':8429,'view_seed':None,'view_sampling':'4096 base motions x4 paired exact corners:3 lower-X+1 upper-X','base_motions':(fixture_limit+3)//4 if fixture_limit is not None else 4096,'paired_views_per_motion':4,'lower_views_per_motion':3,'upper_views_per_motion':1})
  p['evaluation']={'motion_seed':8430,'holdouts':list(range(401,411)),'geometry_corners':16,'comparators':['source84v','source84s','source84r'],'body_x_safeguards':[3.82,4.18],'camera_z_safeguards':[.36,.56],'lower_x_right_distal_wins_required':60,'state_coefficients':72,'delay_s':.5}
  p['primary_rule']='motions401-410 x16: absolute gates unchanged; right distal below and >=60% wins vs frozen84V,84S,84R globally/lower-X; other axes <=5% worse all; combined below all/zero/controls; both X/Z; >=12/16 corners'
@@ -117,7 +117,7 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
   print(f'Проверено paired-view движение {ident} на {len(corners)} corners.',flush=True)
  p=primary_decision(rows,saved['mode']=='fixture');report={'schema':'lower-weighted-paired-view-result-v1','status':'fixture_completed' if saved['mode']=='fixture' else 'completed','protocol_mode':saved['mode'],'completion_basis':'committed_candidate_count','wall_diagnostic_seconds':elapsed,'candidates':state['next_id'],'accepted_candidates':accepted,'training_frames':state['stats']['n'],'source84v_model_sha256':saved['source84v_model_sha256'],'source84s_model_sha256':saved['source84s_model_sha256'],'source84r_model_sha256':saved['source84r_model_sha256'],'candidate_model_sha256':file_sha(temp/'model_lower_weighted.npz'),'primary':p,'audit':{'accepted_total':accepted,'audited_count':audit['audited_count'],'is_exhaustive':audit['audited_count']==accepted,'sample_ids':audit['sample_ids']},'tests':rows,'limitations':['Single scientific intervention: paired views change from2 lower+2 upper to3 lower+1 upper at fixed render count.','Frozen84V,84S,84R comparators; motions321-390 are disclosed and excluded.','Synthetic supervised reconstruction; no actuators, closed loop, biological brain or mirror-neuron evidence.']};save(temp/'summary.json',report);(temp/'ИТОГ.txt').write_text('СЕРИЯ 84X: LOWER-WEIGHTED PAIRED VIEW\n\nPrimary: '+('ВЫПОЛНЕН' if p['passed'] else'НЕ ВЫПОЛНЕН')+'.\n',encoding='utf-8-sig');verify_pins(proto,saved);psha=sha(json.dumps(saved,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode());save(temp/'complete.json',{'protocol_sha256':psha,'candidates':state['next_id'],'files':m.output_manifest(temp)});temp.rename(out);m.verify_result(out,saved,state);return out
 
-def process4(folder,max_batches=None):
+def process6(folder,max_batches=None):
  proto,ev,pre,stim,ck,base,large=m.dependencies();folder=Path(folder).resolve();dbpath=folder/'study.sqlite3'
  if not dbpath.is_file():raise ValueError('В папке нет study.sqlite3 серии84X.')
  console=m.disable_quick_edit()
@@ -128,9 +128,9 @@ def process4(folder,max_batches=None):
   if max_batches is not None and (not fixture or type(max_batches)!=int or not 1<=max_batches<=4):raise ValueError('Предел партий только для fixture.')
   if stage=='completed':m.verify_result(folder/'result',saved,state);print('Серия уже завершена:',folder/'result');return
   m.free_check(large,folder,fixture);train,tests=proto.split_from_sources(state['sources'],stim);hold={x['motion_sha256'] for x in tests};done=state['next_id'];stats=state['stats'];prior=state['elapsed'];started=time.monotonic();batches=0
-  print(f'Папка: {folder}\nСохранено {done}/{target}; workers4, batch4. Wall не завершает training.',flush=True)
+  print(f'Папка: {folder}\nСохранено {done}/{target}; workers6, batch6. Wall не завершает training.',flush=True)
   if stage=='training':
-   with concurrent.futures.ProcessPoolExecutor(max_workers=4,mp_context=multiprocessing.get_context('spawn'),initializer=worker_init,initargs=(train,hold)) as pool:
+   with concurrent.futures.ProcessPoolExecutor(max_workers=6,mp_context=multiprocessing.get_context('spawn'),initializer=worker_init,initargs=(train,hold)) as pool:
     while True:
      pause=folder/'pause.request'
      if pause.exists():
@@ -142,7 +142,7 @@ def process4(folder,max_batches=None):
       if done!=target or stats['n']<2:raise ValueError('Fixed target нарушен.')
       verify_pins(proto,saved);m.set_phase(dbpath,'training','evaluation',current);seconds=current;stage='evaluation';break
      if max_batches is not None and batches>=max_batches:print('Fixture остановлен после партии.',flush=True);return
-     m.free_check(large,folder,fixture);end=min(done+4,target);ids=list(range(done,end));t0=time.perf_counter();generated=list(pool.map(worker_generate,ids));records=[]
+     m.free_check(large,folder,fixture);end=min(done+6,target);ids=list(range(done,end));t0=time.perf_counter();generated=list(pool.map(worker_generate,ids));records=[]
      for ident,(rec,x,y) in zip(ids,generated):
       expected,_=paired_candidate(ident)
       if rec['id']!=ident or rec['spec']!=expected or rec['motion_sha256']!=expected['sampled_motion_sha256']:raise ValueError('Candidate нарушил protocol.')
@@ -156,7 +156,7 @@ def process4(folder,max_batches=None):
       records.append(rec)
      verify_pins(proto,saved);ck.commit_batch(dbpath,saved,done,records,stats,prior+time.monotonic()-started);batch_wall=time.perf_counter()-t0
      with sqlite3.connect(dbpath,timeout=30) as db:db.execute('PRAGMA synchronous=FULL');db.execute('INSERT INTO batch_timing VALUES (?,?,?,?,?,?)',(done,len(ids),batch_wall,sum(r['worker_cpu_seconds'] for r in records),max(r['worker_wall_seconds'] for r in records),datetime.utcnow().isoformat()+'Z'))
-     done=end;batches+=1;print(f'Сохранено {done}/{target}; batch4 wall {batch_wall:.2f}с; worker CPU {sum(r["worker_cpu_seconds"] for r in records):.2f}с.',flush=True)
+     done=end;batches+=1;print(f'Сохранено {done}/{target}; batch6 wall {batch_wall:.2f}с; worker CPU {sum(r["worker_cpu_seconds"] for r in records):.2f}с.',flush=True)
   if stage=='evaluation':
    m.free_check(large,folder,fixture);state=ck.open_verified(dbpath,saved);print('Fixed count завершён. Evaluation.',flush=True);out=evaluate(folder,state,saved,seconds,proto,ev,stim,base,large);m.set_phase(dbpath,'evaluation','completed',seconds);print('Готово:',out,flush=True)
    if os.name=='nt':
@@ -175,7 +175,7 @@ def candidate_check():
 
 # Reuse the tested fixed-count lifecycle after replacing only preregistered hooks.
 # Worker entry points stay in this executable module so Windows spawn can import them.
-m.ROOT=ROOT;m.SOURCE84R_ROOT=SOURCE_ROOT;m.TARGET_CANDIDATES=TARGET;m.protocol=protocol;m.verify_pins=verify_pins;m.source_snapshot=source_snapshot;m.prepared_holdouts=prepared_holdouts;m.training_view=paired_view;m.broad_candidate=paired_candidate;m.evaluate=evaluate;m.worker_init=worker_init;m.worker_generate=worker_generate;m.process=process4
+m.ROOT=ROOT;m.SOURCE84R_ROOT=SOURCE_ROOT;m.TARGET_CANDIDATES=TARGET;m.protocol=protocol;m.verify_pins=verify_pins;m.source_snapshot=source_snapshot;m.prepared_holdouts=prepared_holdouts;m.training_view=paired_view;m.broad_candidate=paired_candidate;m.evaluate=evaluate;m.worker_init=worker_init;m.worker_generate=worker_generate;m.process=process6
 
 def choose():
  import tkinter as tk
@@ -190,7 +190,7 @@ def choose():
    root.withdraw();root.update();m.process(folder) if action==2 else m.request_pause(folder);return
   print('Открывается окно выбора завершённой папки series84V...',flush=True);source=filedialog.askdirectory(title='Серия84V: выберите завершённую series84V',mustexist=True,initialdir=str(SOURCE_ROOT.resolve() if SOURCE_ROOT.exists() else Path.cwd()),parent=root)
   if not source:print('Выбор отменён.');return
-  print('Выбрана source84V:',source,flush=True);print('Пререгистрация84X: seed8429,4096 motions ×(3 lower+1 upper); holdouts401–410; workers4; comparators84V/84S/84R.',flush=True);root.withdraw();root.update();folder=ROOT/('lower_weighted_paired_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8]);m.start(folder,source)
+  print('Выбрана source84V:',source,flush=True);print('Пререгистрация84X: seed8429,4096 motions ×(3 lower+1 upper); holdouts401–410; workers6; comparators84V/84S/84R.',flush=True);root.withdraw();root.update();folder=ROOT/('lower_weighted_paired_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8]);m.start(folder,source)
  finally:root.destroy()
 def main():
  p=argparse.ArgumentParser(description=__doc__);g=p.add_mutually_exclusive_group(required=True);g.add_argument('--choose',action='store_true');g.add_argument('--new');g.add_argument('--resume');g.add_argument('--pause');g.add_argument('--candidate-check',action='store_true',help=argparse.SUPPRESS);p.add_argument('--source84v');p.add_argument('--fixture-limit',type=int,help=argparse.SUPPRESS);p.add_argument('--batches',type=int,help=argparse.SUPPRESS);a=p.parse_args()
