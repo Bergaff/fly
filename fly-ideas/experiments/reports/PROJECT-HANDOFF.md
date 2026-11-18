@@ -263,3 +263,7 @@ Attached summary-15 SHA `540aff2d…`; fixed16384/16384 candidates,802816 frames
 ## Серия84Y: completed augmented lower model-development no-go
 
 Attached summary-16 SHA `bb5ed966…`; fixed20480/20480 candidates,1003520 frames, wall6961,813s. Candidate SHA `92a26360…`. Lower-X RD candidate/84V/zero0,404821/0,404660/0,464819;73/80 zero passes but43/80 vs84V misses48. Global RD0,409708 vs84V0,406586 and53/160 wins, required96. Combined0,302530 vs84V0,300768 also fails. Upper-X gives only10/80 wins vs84V: adding lower-X samples shifts the single shared ridge optimum despite retaining exact84V examples. Absolute X/Z and corners16/16 pass. Strict primary false; do not repeat/tune on disclosed411–420 or continue render reweighting in the same shared ridge model. Series85 blocked. See result/extract/fixture.
+
+## Серия84Z: prepared preregistered multi-variant ridge/ensemble
+
+One run trains new balanced84V allocation seed8433,4096×4=16384 candidates. Six fixed variants: RD ridge0.175/0.35/0.70/1.40 and frozen84V/new ensembles75/25 and50/50. Development seed8434 motions421–430 ×16 selects deterministically by strict pass, five core conditions, normalized RD wins, normalized pooled error and fixed-order tie-break. Only then selected variant sees untouched final seed8435 motions431–440 ×16 and strict frozen84V/84S/84R gates. UI resources2/4/6/max and immutable resume retained. BAT `RUN-MULTIVARIANT-RIDGE-ENSEMBLE.bat`; result pending; series85 blocked.

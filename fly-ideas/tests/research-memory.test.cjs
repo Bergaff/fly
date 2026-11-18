@@ -608,3 +608,11 @@ test('серия84Y: augmented lower no-go сохранён в памяти', ()
   assert.match(item.results,/43\/80 vs84V misses48/);assert.match(item.results,/53\/160 instead of96/);assert.match(item.limitations,/simple view weighting\/duplication/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия84Z: multi-variant development и isolated final сохранены', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-multivariant-ridge-ensemble');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared/);
+  assert.match(item.source,/Six fixed variants/);assert.match(item.source,/ensembles75\/25,50\/50/);
+  assert.match(item.results,/motions421–430/);assert.match(item.results,/motions431–440/);assert.match(item.limitations,/one selected model on isolated final motions/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
