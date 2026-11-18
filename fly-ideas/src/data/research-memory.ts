@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-17-v84v-result";
+export const MEMORY_VERSION = "v630-session-2026-11-17-v84w-prepared";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -223,6 +223,11 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Primary true. Candidate/84S/84R/zero combined0,337284/0,357569/0,359893/0,473088. Candidate beats both models pooled on all axes. Right distal0,431598/0,454942/0,456612, wins135/160 vs84S and140/160 vs84R. Lower-X0,437139/0,452872/0,457997; wins69/80 zero,61/80 vs84S,65/80 vs84R. Both X/Z and corners16/16 pass; state unchanged160/160.",
     limitations: "Freeze candidate84V; no rerun/tuning. Audit128/16384 non-exhaustive. Motion361 remains weak vs zero locally, so do not claim uniform per-motion success. Motions321–370 are disclosed. Even this go requires read-only frozen replication on new motions before series85. Synthetic supervised reconstruction only; no natural vision, novel action, actuators, closed loop, brain or mirror-neuron evidence.",
     files: ["experiments/RUN-PAIRED-VIEW-DISTAL-CONSISTENCY.bat", "experiments/templates/84v_paired_view_distal_consistency.py", "experiments/reports/paired-view-distal-consistency-plan.md", "experiments/reports/paired-view-distal-consistency-user-result.md", "experiments/reports/paired-view-distal-consistency-user-summary-extract.json", "tests/paired-view-distal-consistency.test.cjs", "tests/paired-view-distal-consistency-user-result-fixture.py"] },
+  { id: "session-frozen-paired-view-replication", ideaId: "i-observational", title: "Серия 84W: frozen replication model84V", status: "prepared read-only; full result pending; series85 blocked",
+    source: "Evaluation-only package pins runner84V SHA05a0cdd4… and production model84V SHA44b98c31…. New seed8428 motions381–390 ×16. Source DB, complete manifest,84V and embedded84S/84R are verified and hashed before/after; no fit/update/training path.",
+    results: "Runner, one-click BAT, plan and static tests prepared. Exact84V gates repeated: RD>=96/160 separately vs84S/84R, lower-X>=60/80 zero and>=48/80 each comparator, plus absolute, X/Z, controls and12/16 corners. Result unknown.",
+    limitations: "Audit max128/16384 is non-exhaustive. Same synthetic family/grid. Even replication go only permits separate preregistration of next stage; no natural vision, novel action, actuators, closed loop, brain or mirror-neuron evidence. Series85 blocked pending result.",
+    files: ["experiments/RUN-FROZEN-PAIRED-VIEW-REPLICATION.bat", "experiments/templates/84w_frozen_paired_view_replication.py", "experiments/reports/frozen-paired-view-replication-plan.md", "tests/frozen-paired-view-replication.test.cjs"] },
   { id: "session-wing-studio-user-frames", ideaId: "i-observational", title: "Шесть осей: покадровый разбор показа пользователя", status: "playback.json вставлен текстом; модель, изображения и исходный файл не проверены",
     source: "Пользователь прислал текст playback.json с 51 кадром, 25 FPS; первые два прогноза отсутствуют, 49 кадров оцениваются. Углы учителя в сохранённой выписке восстановлены по девяти ключевым кадрам, прогнозы перенесены вручную и округлены до шести знаков. Общая и шесть отдельных RMSE согласуются с присланными точными метриками, но оригинальные файлы и построчную точность этим не доказали.",
     results: "Правое X: RMSE 13,02° против 15,81° у нуля, средняя ошибка +7,61° и 46,1% суммы квадратов ошибок шести каналов; прогноз ближе нуля в 22/49 кадров. Правое Z: RMSE 5,71° против 4,61°, средняя ошибка +0,31°, ближе нуля в 16/49 и противоположный эталону знак в 30/48 ненулевых кадров; при |эталон| ≥5° противоположный знак в 12/13. В 1,00 с правое Z учитель −10°, прогноз +2,307°. На 0,36–0,72 с и 1,36–1,72 с десять пар округлённых шестиканальных прогнозов одинаковы при повторяющихся участках траектории.",

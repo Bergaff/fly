@@ -217,3 +217,5 @@ Series85 остаётся заблокированной. Motions321–350 ра�
 Серия84V завершена полным model-development go. Counterfactual view pairing при неизменных representation/ridge/count улучшил обе frozen models по всем осям; right distal135/160 vs84S и140/160 vs84R, lower-X61/80 и65/80, обе X/Z groups и16/16 corners прошли. Это поддерживает гипотезу motion/view confounding, но пока только на одной новой final battery361–370.
 
 Candidate84V SHA `44b98c31…` теперь frozen; training84V не повторять и motions361–370 не использовать для tuning. Следующий этап только read-only replication на новых motions/seeds с теми же dual-comparator blocking gates. Series85 остаётся заблокированной до replication go.
+
+Серия84W подготовлена как frozen replication84V на seed8428/motions381–390. Model84V,84S и84R read-only; thresholds84V повторяются без ослабления. До результата84W series85 остаётся заблокированной.

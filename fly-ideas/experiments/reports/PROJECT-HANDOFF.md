@@ -251,3 +251,7 @@ Attached summary-12 SHA `5733dcfd…`; completed full160 cases, frozen model84S 
 ## Серия 84V: completed paired-view model go
 
 Attached summary-13 SHA `2097ca31…`; fixed16384/16384 accepted,802816 frames, wall24323,328s. Primary true. Candidate84V/84S/84R/zero combined0,337284/0,357569/0,359893/0,473088; candidate beats both frozen models on every axis. Right distal0,431598/0,454942/0,456612, wins135/160 vs84S and140/160 vs84R, required96 each. Lower-X RD0,437139/0,452872/0,457997; wins69/80 zero,61/80 vs84S,65/80 vs84R, required60/48/48. Both body-X, both camera-Z, controls and corners16/16 pass; minimum corner wins8/10; state immutable160/160. Audit128/16384 non-exhaustive. Reported candidate SHA `44b98c31…` now frozen; do not rerun/tune84V. Motions361–370 disclosed. Next only read-only frozen replication on new motions; series85 remains blocked. See result/extract/fixture.
+
+## Серия84W: prepared frozen replication84V
+
+Read-only runner pins runner84V SHA `05a0cdd4…` and production candidate SHA `44b98c31…`; verifies completed source DB/result/manifest and embedded84S/84R, hashes source before/after. No fit/training path. New seed8428 motions381–390 ×16. Reuses exact84V dual-comparator absolute, right-distal96/160 each, lower-X60/80 zero+48/80 each comparator, X/Z, controls and12/16 corners. One BAT `RUN-FROZEN-PAIRED-VIEW-REPLICATION.bat`; result pending, series85 blocked.
