@@ -299,3 +299,7 @@ Attached summary-24 SHA `f4351c05…`; exact pins, development7056 frames, final
 ## Серия89B2: completed strict direct-contact no-go
 
 Attached summary-25 SHA `6e3f9c22…`; exact pins, selected lambda1.0, final216 cases/648 trials. Safety648, recovery645, completion648; all angle gates pass. Contact mean candidate/angle-only0.179762/0.204104. Contact wins angle-only525, uncalibrated446, zero648, shuffled648, open589, lesion640; required584. Four controls pass, but mandatory direct angle-only fails. Direct wins by action209/181/135; reach weakest. Aggregate improvement cannot replace paired gate.89C/90 blocked; motions421–674 disclosed. See result/extract/fixture.
+
+## Серия89B3: prepared, not run
+
+Development675–692×8 fits common angle model,18-D predicted-action prototypes, common contact model and3 action experts with per-expert lambda. Inference uses predicted identity, never final true label. Untouched final693–710×12=216 cases/648 trials. Gates: identity≥195/216; all safety; angle controls; contact vs angle-only and common each≥584 and≥5/7 controls. Go only authorizes frozen89C.90 blocked.
