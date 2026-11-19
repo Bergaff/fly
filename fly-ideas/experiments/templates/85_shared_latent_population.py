@@ -76,9 +76,15 @@ def primary(rows,traces):
    tt=traces[(ident,'execution')][0];obs[ident]=np.mean(traces[(ident,'candidate')],axis=0).reshape(-1);private[ident]=np.mean(traces[(ident,'private')],axis=0).reshape(-1);exe[ident]=tt.reshape(-1)
   rs=rsa(obs,exe,850500+battery);pr=rsa(private,exe,850600+battery);combined={'shared_observation':pooled(rr,'shared_observation'),'private_observation':pooled(rr,'private_observation'),'execution_mode':pooled(rr,'execution_mode'),'zero':pooled(rr,'zero'),**{k:math.sqrt(sum(r['frames']*r['controls'][k]['rmse_rad']**2 for r in rr)/sum(r['frames'] for r in rr)) for k in ('shuffled','static','closed')}};performance=combined['shared_observation']<=1.02*combined['private_observation'] and combined['shared_observation']<min(combined[k] for k in ('zero','shuffled','static','closed'));passed=sum(dual.values())>=4 and rs['passed'] and performance;batteries.append({'battery':battery,'motions':list(range(451 if battery==1 else 461,461 if battery==1 else 471)),'unit_correlations':corrs,'dual_active_units':dual,'dual_active_count':sum(dual.values()),'dual_active_required':4,'shared_rsa':rs,'private_observation_rsa':pr,'combined':combined,'performance_not_worse_private_margin':.02,'performance_passed':performance,'passed':passed})
  return {'batteries':batteries,'shared_units':6,'common_decoder':'same six semantic units -> 72 compressed replay coefficients in both modes','private_controls_equal_unit_budget':True,'batteries_passed':sum(x['passed'] for x in batteries),'batteries_required':2,'passed':all(x['passed'] for x in batteries)}
+def worker_choice(value):
+ raw=str(value).strip().lower()
+ if raw=='max':return 'max',max(1,os.cpu_count() or 1)
+ try:number=int(raw)
+ except ValueError as exc:raise ValueError('Workers должны быть2,4,6 или max.') from exc
+ if number not in (2,4,6):raise ValueError('Workers должны быть2,4,6 или max.')
+ return number,number
 def run(source_folder,workers,output_root=ROOT,fixture=False):
- if workers not in (2,4,6) and workers!='max':raise ValueError('Workers должны быть2,4,6 или max.')
- count=max(1,os.cpu_count() or 1) if workers=='max' else int(workers)
+ workers,count=worker_choice(workers)
  print('1/5 Проверяются frozen go84Z и replication authorization84AA...',flush=True);a,z,b,proto,ev,stim,saved,state,source_summary,paths,tracked,before,bundle,s84v=source(source_folder,fixture);tests,desc=items(stim,saved['labels'],fixture);corners=[b.geometry_corners()[i] for i in (0,2,4,6)] if fixture else b.geometry_corners()
  with sqlite3.connect(Path(source_folder,'study.sqlite3').resolve().as_uri()+'?mode=ro',uri=True) as db:training_hashes={x[0] for x in db.execute("SELECT motion_sha256 FROM candidates WHERE status='accepted'")}
  if any(x['motion_sha256'] in training_hashes for x in tests):raise ValueError('Series85 holdout совпал с training motion84Z.')
