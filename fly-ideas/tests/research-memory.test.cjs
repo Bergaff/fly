@@ -669,3 +669,12 @@ test('серия89: strict operational no-go сохранён', () => {
   assert.match(item.limitations,/Good target tracking88 did not produce truth-correct policy89/);assert.match(item.limitations,/disclosed421–602 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89B: bounded calibration development сохранён', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-bounded-policy-calibration-89b');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered development package/);assert.match(item.status,/series90 blocked/);
+  assert.match(item.source,/Development603–620/);assert.match(item.source,/final621–638/);assert.match(item.source,/648 trials/);
+  assert.match(item.results,/action-agnostic13→6 ridge0.08/);assert.match(item.results,/uncalibrated/);assert.match(item.results,/90% paired gates/);
+  assert.match(item.limitations,/Go allows only frozen89C replication/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});

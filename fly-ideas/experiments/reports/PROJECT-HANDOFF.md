@@ -291,3 +291,7 @@ Attached summary-22 SHA `94fac84c…`; exact runner88/87/go87/model84Z pins, no 
 ## Серия89: completed strict operational no-go
 
 Attached summary-23 SHA `0b44d61b…`; corrected runner89 SHA `e0412778…`, exact runner/go/model pins, no training;432 visual cases,1296 trials. Recovery/completion1296 pass. Safety43/1296:1253 trials hit hard joint bounds; no NaN/torque/energy/tilt/z failures. Normal angle0.793593 vs zero0.391557, shuffled0.596295, open0.880987, lesion0.773247. Wins0/0/1233/449; required1167 each. Contact wins938/951/873/723, none passes. Failure broad across actions/profiles/views. Primary independently recomputed; integration not replayable without trajectories. Not a near-miss. Series90 blocked; motions421–602 disclosed. See result/extract/fixture.
+
+## Серия89B: prepared, not run
+
+New engineering development package, not89 rerun. Development603–620 ×8 views=144 cases fits one common13→6 ridge0.08 calibrator. Untouched final621–638 ×12 views=216 cases/648 trials. Smooth0.78-limit tanh projection, slew0.11 and barrier at0.72 limit address calibration/saturation. Candidate vs uncalibrated/zero/shuffled/open/lesion; all safety, ≥584 paired angle wins against every control, contact against≥4/5, and mean≤0.90 uncalibrated/zero. Go only allows frozen89C. Series90 remains blocked.
