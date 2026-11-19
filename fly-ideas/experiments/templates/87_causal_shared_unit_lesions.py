@@ -18,6 +18,13 @@ def manifest(folder):return {str(p.relative_to(folder)).replace('\\','/'):file_s
 def load86():
  if file_sha(RUNNER86)!=RUNNER86_SHA:raise ValueError('Закреплённый runner86 изменился.')
  s=importlib.util.spec_from_file_location('series87_source',RUNNER86);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
+WORKER86=None
+def worker_init(bundle,s84v):
+ global WORKER86
+ WORKER86=load86();WORKER86.init_worker(bundle,s84v)
+def worker_task(arg):
+ if WORKER86 is None:raise RuntimeError('Series87 worker не инициализирован.')
+ return WORKER86.task(arg)
 def published86_hashes():
  d=json.loads(REPORT86.read_text(encoding='utf8'))
  if d.get('source_file_sha256')!=REPORT86_SOURCE_SHA or [x['id'] for x in d['protocol']['motions']]!=list(range(471,498)):raise ValueError('Published series86 identity изменён.')
@@ -94,8 +101,8 @@ def run(source_folder,workers,output_root=ROOT,fixture=False):
  m86=load86();s85=m86.load85();workers,count=s85.worker_choice(workers);print('1/5 Проверяются frozen86/85/84Z identities...',flush=True);m86,s85,a,z,b,proto,stim,saved,state,source_summary,paths,tracked,before,bundle,s84v=source(source_folder,fixture)
  with sqlite3.connect(Path(source_folder,'study.sqlite3').resolve().as_uri()+'?mode=ro',uri=True) as db:training_hashes={x[0] for x in db.execute("SELECT motion_sha256 FROM candidates WHERE status='accepted'")}
  items,desc=prepare(stim,saved['labels'],training_hashes,fixture);train,_=proto.split_from_sources(state['sources'],stim);accepted,sample=b.sampled_records(Path(source_folder)/'study.sqlite3',len(train));audit=b.overlap_sample_broad(items,sample,128);audit.update({'accepted_total':accepted,'is_exhaustive':audit['audited_count']==accepted});all_corners=b.geometry_corners();blocking=[all_corners[i] for i in (0,4,8,12)] if fixture else all_corners;cal=[all_corners[i] for i in (0,4,8,12)];tasks=[(x,c) for x in items for c in (cal if x['role']=='calibration' else blocking)];protocol={'schema':'causal-shared-unit-lesions-v1','mode':'fixture' if fixture else'full','script_sha256':file_sha(__file__),'runner86_sha256':RUNNER86_SHA,'selected_model_sha256':file_sha(paths[1]),'training_allowed':False,'actions':list(ACTIONS),'calibration_seed':8701,'evaluation_seed_base':870200,'evaluation_replicates':10,'motions':desc,'calibration_corners':[x['corner_id'] for x in cal],'blocking_corners':len(blocking),'lesion_budget_semantic_units':2,'ranking_uses_blocking':False,'workers':count,'worker_choice':str(workers),'primary_rule':'baseline identity>=20/30 and >=private-2; obs-lesion margin loss>0 in>=18/30; shared obs degradation>1.05 random and wins>=18/30; execution lesion RMSE>1.20 baseline and wins>=27/30; double dissociation and no total collapse'};root=Path(output_root);root.mkdir(parents=True,exist_ok=True);folder=root/('causal_shared_unit_lesions_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8]);folder.mkdir();temp=folder/'result_incomplete';temp.mkdir();save(folder/'protocol.json',protocol);print(f'2/5 Запускается {len(tasks)} cases, workers={count}.',flush=True);rows=[]
- with concurrent.futures.ProcessPoolExecutor(max_workers=count,mp_context=multiprocessing.get_context('spawn'),initializer=m86.init_worker,initargs=(bundle,s84v)) as pool:
-  for n,row in enumerate(pool.map(m86.task,tasks),1):rows.append(row);print(f'  Cases {n}/{len(tasks)}',flush=True) if n%16==0 else None
+ with concurrent.futures.ProcessPoolExecutor(max_workers=count,mp_context=multiprocessing.get_context('spawn'),initializer=worker_init,initargs=(bundle,s84v)) as pool:
+  for n,row in enumerate(pool.map(worker_task,tasks),1):rows.append(row);print(f'  Cases {n}/{len(tasks)}',flush=True) if n%16==0 else None
  traces={}
  for row in rows:
   ident=row['id'];traces.setdefault((ident,'shared'),[]).append(row.pop('_shared'));traces.setdefault((ident,'private'),[]).append(row.pop('_private'));traces.setdefault((ident,'execution'),[]).append(row.pop('_execution'));td=temp/row['role']/f'test_{ident:03d}'/f'corner_{row["corner_id"]:02d}';td.mkdir(parents=True);save(td/'metrics.json',row)
