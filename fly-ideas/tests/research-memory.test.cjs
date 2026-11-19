@@ -643,11 +643,11 @@ test('серия86: multi-action compositional go сохранён', () => {
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия87: causal shared-unit lesions сохранена', () => {
+test('серия87: causal operational go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-causal-shared-unit-lesions');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered frozen causal test/);
-  assert.match(item.source,/motions498–506/);assert.match(item.source,/motions507–536/);assert.match(item.source,/Equal lesion budget2/);
-  assert.match(item.results,/observation margin loss/);assert.match(item.results,/shared observation degradation>1.05 random/);assert.match(item.results,/double dissociation/);
-  assert.match(item.limitations,/not biological neuron lesions/);assert.match(item.limitations,/Near-miss is no-go/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/causal operational go/);assert.match(item.status,/series88 allowed/);
+  assert.match(item.source,/SHA033a2fc/);assert.match(item.source,/blocking507–536/);assert.match(item.source,/shared LP\/LM/);
+  assert.match(item.results,/recognition30\/30/);assert.match(item.results,/observation lesion18\/30/);assert.match(item.results,/shared wins30\/30/);assert.match(item.results,/Execution lesion\/intact0.191327\/0.005167/);
+  assert.match(item.limitations,/intervention construction/);assert.match(item.limitations,/Series88 allowed/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });

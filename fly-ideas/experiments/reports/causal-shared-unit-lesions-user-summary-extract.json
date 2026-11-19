@@ -1,0 +1,1420 @@
+{
+  "source_file": "summary-21.json",
+  "source_file_sha256": "033a2fc502c99bfca0b17adee53386bfb9f7fdab989b14a04d6394f2e1c27fa6",
+  "schema": "causal-shared-unit-lesions-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "causal-shared-unit-lesions-v1",
+    "mode": "full",
+    "script_sha256": "105f0c26e0b9fd5e0fa9a6060af48fe4fa900da09ff5e906116da1d12d7caa54",
+    "runner86_sha256": "7dc5686028a2fe82d683f091a1f0a08deab25bcc2be41320b5d52e91de6d9714",
+    "selected_model_sha256": "cb7610514c423372362f6cd3512b19f39c156213728c5ecaafe17fe10734e4b0",
+    "training_allowed": false,
+    "actions": [
+      "foreleg_rubbing",
+      "head_directed_grooming",
+      "reach_withdraw"
+    ],
+    "calibration_seed": 8701,
+    "evaluation_seed_base": 870200,
+    "evaluation_replicates": 10,
+    "motions": [
+      {
+        "role": "calibration",
+        "id": 498,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 9199,
+        "amplitude": 0.75,
+        "speed": 0.85,
+        "motion_sha256": "a15093d346a912cc1acbddfc9d7a2a800fa925eafa401d97023536f8b5062016"
+      },
+      {
+        "role": "calibration",
+        "id": 499,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 9200,
+        "amplitude": 0.75,
+        "speed": 1.1,
+        "motion_sha256": "4fdb20dad7d5bac6534190671febc2b1c74895e6f8552be062fc7221a4c264e0"
+      },
+      {
+        "role": "calibration",
+        "id": 500,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 9201,
+        "amplitude": 0.75,
+        "speed": 1.35,
+        "motion_sha256": "28080a1d5fdaf3631cfd4d15804e712894db89dfa160abe757b0435fe2942fca"
+      },
+      {
+        "role": "calibration",
+        "id": 501,
+        "action": "head_directed_grooming",
+        "lesion_seed": 9202,
+        "amplitude": 0.75,
+        "speed": 0.85,
+        "motion_sha256": "4c45b0d1c17b2e3bb032ceafe6f728e013de00864fbbfb52a30b34d6323ac7e9"
+      },
+      {
+        "role": "calibration",
+        "id": 502,
+        "action": "head_directed_grooming",
+        "lesion_seed": 9203,
+        "amplitude": 0.75,
+        "speed": 1.1,
+        "motion_sha256": "9915717b42b4bc861aae9b78ec1155e4f023c16819dcb392affecc41e217715d"
+      },
+      {
+        "role": "calibration",
+        "id": 503,
+        "action": "head_directed_grooming",
+        "lesion_seed": 9204,
+        "amplitude": 0.75,
+        "speed": 1.35,
+        "motion_sha256": "c67732270f18cdeecb160f1d656bc2d500095fbee5366055f92c5a73f455d061"
+      },
+      {
+        "role": "calibration",
+        "id": 504,
+        "action": "reach_withdraw",
+        "lesion_seed": 9205,
+        "amplitude": 0.75,
+        "speed": 0.85,
+        "motion_sha256": "275b4b34688e25b978a1fc0e7c2e13d18cffb7bea5c3b8b222350ab9a6c61461"
+      },
+      {
+        "role": "calibration",
+        "id": 505,
+        "action": "reach_withdraw",
+        "lesion_seed": 9206,
+        "amplitude": 0.75,
+        "speed": 1.1,
+        "motion_sha256": "455cd17bf1b8043a9a394502aae17b53e83d3b2844a091b96edaaacff63da0fe"
+      },
+      {
+        "role": "calibration",
+        "id": 506,
+        "action": "reach_withdraw",
+        "lesion_seed": 9207,
+        "amplitude": 0.75,
+        "speed": 1.35,
+        "motion_sha256": "9e329d615796b032b8b5463c4c2e1645e331e62e30d18192f50ef0717f871dd6"
+      },
+      {
+        "role": "evaluation",
+        "id": 507,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870200,
+        "amplitude": 0.8,
+        "speed": 0.7,
+        "motion_sha256": "9c4533920da914836960b298a1334add84bff7187d4165aae1e164a97907e47b"
+      },
+      {
+        "role": "evaluation",
+        "id": 508,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870201,
+        "amplitude": 0.9,
+        "speed": 1.0,
+        "motion_sha256": "2fa4907dbddfbf2dea67a8a696c6d354c4d345d69249dda6666735264c90e11e"
+      },
+      {
+        "role": "evaluation",
+        "id": 509,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "lesion_seed": 870202,
+        "amplitude": 1.0,
+        "speed": 1.3,
+        "motion_sha256": "ee38594b16ac21ebb4a06ee2b34bf2b6673b362cb2888f19cc4e056dd99c6020"
+      },
+      {
+        "role": "evaluation",
+        "id": 510,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870210,
+        "amplitude": 0.9,
+        "speed": 1.3,
+        "motion_sha256": "96114c91ce4710c6896897982e1bba935238ccd79ea430a54a1f30eb08813368"
+      },
+      {
+        "role": "evaluation",
+        "id": 511,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870211,
+        "amplitude": 1.0,
+        "speed": 0.7,
+        "motion_sha256": "d7f3c295df526f5370246e96d93bf590c471d5858890b1eb1eeb564a4bd968eb"
+      },
+      {
+        "role": "evaluation",
+        "id": 512,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "lesion_seed": 870212,
+        "amplitude": 0.8,
+        "speed": 1.0,
+        "motion_sha256": "1ef26655de0d7ab20727b13a041d9f173abf7673b204af8c58d56c96f05f2b68"
+      },
+      {
+        "role": "evaluation",
+        "id": 513,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870220,
+        "amplitude": 1.0,
+        "speed": 1.0,
+        "motion_sha256": "fad9b392aaa9f474fec175929667f261abdf2098b137073a4b7d6dbb929e7436"
+      },
+      {
+        "role": "evaluation",
+        "id": 514,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870221,
+        "amplitude": 0.8,
+        "speed": 1.3,
+        "motion_sha256": "6afba027c02bfe03d1037050d8a3a9d4f889b3c593e4c09a25800e5e28aaac4f"
+      },
+      {
+        "role": "evaluation",
+        "id": 515,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "lesion_seed": 870222,
+        "amplitude": 0.9,
+        "speed": 0.7,
+        "motion_sha256": "47d3d82981a8e1a9c385333ae39d55ab8a5f130299a4c78345a612c57b8fd264"
+      },
+      {
+        "role": "evaluation",
+        "id": 516,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870230,
+        "amplitude": 0.8,
+        "speed": 0.7,
+        "motion_sha256": "f5b7e4a8436a78338cd470c7b8a877a05504162fa63eadfefa3cbbb3db983f12"
+      },
+      {
+        "role": "evaluation",
+        "id": 517,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870231,
+        "amplitude": 0.9,
+        "speed": 1.0,
+        "motion_sha256": "e223b5cc566cc1cd9d567d07edf4d432d1f4ded9a0a48c5c479e84a0c8c13478"
+      },
+      {
+        "role": "evaluation",
+        "id": 518,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "lesion_seed": 870232,
+        "amplitude": 1.0,
+        "speed": 1.3,
+        "motion_sha256": "04d114785898948825468b13779d9438c141980464f0d4bf969e47b24846717e"
+      },
+      {
+        "role": "evaluation",
+        "id": 519,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870240,
+        "amplitude": 0.9,
+        "speed": 1.3,
+        "motion_sha256": "a8e782862cd7981e6302c5ee3e76e12cc0e8b9caf0d878bb32c2c26417f6b91f"
+      },
+      {
+        "role": "evaluation",
+        "id": 520,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870241,
+        "amplitude": 1.0,
+        "speed": 0.7,
+        "motion_sha256": "b39668bf225aa3b1f9b090673cb7b419fddc23644603ee7b5c50d76219b007a2"
+      },
+      {
+        "role": "evaluation",
+        "id": 521,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "lesion_seed": 870242,
+        "amplitude": 0.8,
+        "speed": 1.0,
+        "motion_sha256": "70b93bce72159d5989d239c2a965ff561bd3bc9ceb1770017eb010c724354b55"
+      },
+      {
+        "role": "evaluation",
+        "id": 522,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870250,
+        "amplitude": 1.0,
+        "speed": 1.0,
+        "motion_sha256": "4307f71f5e802c5e18a20cdb378833705059f0b5ec5800570fc70749107bf172"
+      },
+      {
+        "role": "evaluation",
+        "id": 523,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870251,
+        "amplitude": 0.8,
+        "speed": 1.3,
+        "motion_sha256": "4ff0138797821f32a35a9e85842372a55cfdbd1d3e4919796f8f2c7929c45d8f"
+      },
+      {
+        "role": "evaluation",
+        "id": 524,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "lesion_seed": 870252,
+        "amplitude": 0.9,
+        "speed": 0.7,
+        "motion_sha256": "6aa115edd0c3d58d7e799b817018cf4459fab36505a781f7545acee69bcb4d5f"
+      },
+      {
+        "role": "evaluation",
+        "id": 525,
+        "replicate": 7,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870260,
+        "amplitude": 0.8,
+        "speed": 0.7,
+        "motion_sha256": "57eec65bd9919112864635f7bb77bf5a4e77cfd6ff7358dd4efa223b45ba612c"
+      },
+      {
+        "role": "evaluation",
+        "id": 526,
+        "replicate": 7,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870261,
+        "amplitude": 0.9,
+        "speed": 1.0,
+        "motion_sha256": "5fb7a47b74137d27639ddbd22601c85270a80894249ad9ffe0f49daa7491cd8e"
+      },
+      {
+        "role": "evaluation",
+        "id": 527,
+        "replicate": 7,
+        "action": "reach_withdraw",
+        "lesion_seed": 870262,
+        "amplitude": 1.0,
+        "speed": 1.3,
+        "motion_sha256": "b4bcbefe3132cf9cedf1aa3f0a64982df51d0204e550473d61c6e88629b7401e"
+      },
+      {
+        "role": "evaluation",
+        "id": 528,
+        "replicate": 8,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870270,
+        "amplitude": 0.9,
+        "speed": 1.3,
+        "motion_sha256": "82896f901da82f98ecb0653137df440c204d07c56b136edd75790d8f3fa2ebef"
+      },
+      {
+        "role": "evaluation",
+        "id": 529,
+        "replicate": 8,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870271,
+        "amplitude": 1.0,
+        "speed": 0.7,
+        "motion_sha256": "ab6ebc78ebb817732637fc7c54b8ce816bc5747cfa5fda7a777e811c7ae392cd"
+      },
+      {
+        "role": "evaluation",
+        "id": 530,
+        "replicate": 8,
+        "action": "reach_withdraw",
+        "lesion_seed": 870272,
+        "amplitude": 0.8,
+        "speed": 1.0,
+        "motion_sha256": "14700970353474d3f4fdedf58ec2d53ea1e6e01696955227bef1067cf3aa3f6e"
+      },
+      {
+        "role": "evaluation",
+        "id": 531,
+        "replicate": 9,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870280,
+        "amplitude": 1.0,
+        "speed": 1.0,
+        "motion_sha256": "dc980572981c0689a4bc3aaa1dd4909e6914ced19f12c88d57f4276d7c546af8"
+      },
+      {
+        "role": "evaluation",
+        "id": 532,
+        "replicate": 9,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870281,
+        "amplitude": 0.8,
+        "speed": 1.3,
+        "motion_sha256": "b1820e87a63568adc31c351d8b6092aad65fad2c6f8505f5081e64764be1372f"
+      },
+      {
+        "role": "evaluation",
+        "id": 533,
+        "replicate": 9,
+        "action": "reach_withdraw",
+        "lesion_seed": 870282,
+        "amplitude": 0.9,
+        "speed": 0.7,
+        "motion_sha256": "0a61a8cf1960b61b51b076ee61fdefcb6e715745be3c2c2bad11cd8a2099859e"
+      },
+      {
+        "role": "evaluation",
+        "id": 534,
+        "replicate": 10,
+        "action": "foreleg_rubbing",
+        "lesion_seed": 870290,
+        "amplitude": 0.8,
+        "speed": 0.7,
+        "motion_sha256": "317d162b09e732d3fc1aeecdde877d0aa74b4fa3382af139663deaea09aa5cdf"
+      },
+      {
+        "role": "evaluation",
+        "id": 535,
+        "replicate": 10,
+        "action": "head_directed_grooming",
+        "lesion_seed": 870291,
+        "amplitude": 0.9,
+        "speed": 1.0,
+        "motion_sha256": "f1f5f8041f47fad3679676360acbd8375c9b6c5c5af75a31071e26985b6e0fd0"
+      },
+      {
+        "role": "evaluation",
+        "id": 536,
+        "replicate": 10,
+        "action": "reach_withdraw",
+        "lesion_seed": 870292,
+        "amplitude": 1.0,
+        "speed": 1.3,
+        "motion_sha256": "3d0a9d7c07526a62de9400e85ca63f1e5ca7d66dae42503ac98af72915fffa5e"
+      }
+    ],
+    "calibration_corners": [
+      1,
+      5,
+      9,
+      13
+    ],
+    "blocking_corners": 16,
+    "lesion_budget_semantic_units": 2,
+    "ranking_uses_blocking": false,
+    "workers": 6,
+    "worker_choice": "6",
+    "primary_rule": "baseline identity>=20/30 and >=private-2; obs-lesion margin loss>0 in>=18/30; shared obs degradation>1.05 random and wins>=18/30; execution lesion RMSE>1.20 baseline and wins>=27/30; double dissociation and no total collapse"
+  },
+  "primary": {
+    "ranking": {
+      "shared_correlation": {
+        "left_proximal": 0.45939128225755077,
+        "left_middle": 0.9651873953580834,
+        "left_distal": 0.40017538572660344,
+        "right_proximal": 0.33250364753539385,
+        "right_middle": 0.7570224079001926,
+        "right_distal": 0.42158250025824484
+      },
+      "shared_impact": {
+        "left_proximal": 0.15172840177986568,
+        "left_middle": 0.1501645770337497,
+        "left_distal": 0.1288838236412783,
+        "right_proximal": 0.11393546137700172,
+        "right_middle": 0.12441728018225494,
+        "right_distal": 0.12206787105398176
+      },
+      "observation_margin_impact": {
+        "left_proximal": 0.13659633572871233,
+        "left_middle": 0.5819825547857861,
+        "left_distal": 0.056133900646434406,
+        "right_proximal": 0.250626047091194,
+        "right_middle": 0.5796239159907806,
+        "right_distal": 0.10936206876235977
+      },
+      "execution_replay_impact": {
+        "left_proximal": 0.13589766369871326,
+        "left_middle": 0.12140816986039339,
+        "left_distal": 0.12220400599819764,
+        "right_proximal": 0.11835707738297414,
+        "right_middle": 0.10912679166343325,
+        "right_distal": 0.113705783375092
+      },
+      "groups": {
+        "shared_selective": [
+          "left_proximal",
+          "left_middle"
+        ],
+        "observation_only": [
+          "left_middle",
+          "right_middle"
+        ],
+        "execution_only": [
+          "left_proximal",
+          "left_distal"
+        ],
+        "random_matched": [
+          "left_distal",
+          "right_proximal"
+        ]
+      },
+      "lesion_budget_semantic_units": 2,
+      "ranking_data": "calibration498-506 only"
+    },
+    "motion_results": [
+      {
+        "id": 507,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 0.4320589713680665,
+        "observation_lesion_margin": -0.48610904010370115,
+        "recognition_margin_loss": 0.9181680114717676,
+        "observation_replay_rmse": {
+          "baseline": 0.2448562349160915,
+          "shared_lesion": 0.2966483913261048,
+          "random_lesion": 0.2753823143757243
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0039514730385019885,
+          "execution_lesion": 0.21321816641368133,
+          "shared_lesion": 0.18142590525831107,
+          "random_lesion": 0.21321816641368133
+        }
+      },
+      {
+        "id": 508,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 1.0301820024902022,
+        "observation_lesion_margin": 0.30186095033043747,
+        "recognition_margin_loss": 0.7283210521597647,
+        "observation_replay_rmse": {
+          "baseline": 0.4455889140981645,
+          "shared_lesion": 0.4742862713638432,
+          "random_lesion": 0.44836044252043883
+        },
+        "production_replay_rmse": {
+          "baseline": 0.003151041398759923,
+          "execution_lesion": 0.2929992363076333,
+          "shared_lesion": 0.30564231524048496,
+          "random_lesion": 0.29299923630763325
+        }
+      },
+      {
+        "id": 509,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.2288249556207043,
+        "observation_lesion_margin": 1.6081556562582757,
+        "recognition_margin_loss": 1.6206692993624285,
+        "observation_replay_rmse": {
+          "baseline": 0.3268682333833481,
+          "shared_lesion": 0.3179124209295637,
+          "random_lesion": 0.3129636747662038
+        },
+        "production_replay_rmse": {
+          "baseline": 0.005291121143399487,
+          "execution_lesion": 0.03661741061871538,
+          "shared_lesion": 0.03979747163446915,
+          "random_lesion": 0.2496346836123859
+        }
+      },
+      {
+        "id": 510,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 2.1182210427895503,
+        "observation_lesion_margin": -0.18634277925057718,
+        "recognition_margin_loss": 2.3045638220401274,
+        "observation_replay_rmse": {
+          "baseline": 0.28559321185882564,
+          "shared_lesion": 0.3351939217632164,
+          "random_lesion": 0.31792607840555054
+        },
+        "production_replay_rmse": {
+          "baseline": 0.010021376875822302,
+          "execution_lesion": 0.24103102585196123,
+          "shared_lesion": 0.19765151386869506,
+          "random_lesion": 0.2410310258519612
+        }
+      },
+      {
+        "id": 511,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.42462439099657834,
+        "observation_lesion_margin": 0.18952390671070685,
+        "recognition_margin_loss": 0.2351004842858715,
+        "observation_replay_rmse": {
+          "baseline": 0.5586213853715449,
+          "shared_lesion": 0.5705604760161371,
+          "random_lesion": 0.5663790090501752
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0037389679598900266,
+          "execution_lesion": 0.37041150404213224,
+          "shared_lesion": 0.3573238421516276,
+          "random_lesion": 0.37041150404213224
+        }
+      },
+      {
+        "id": 512,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.8410088540912612,
+        "observation_lesion_margin": 1.68695297328689,
+        "recognition_margin_loss": 2.1540558808043713,
+        "observation_replay_rmse": {
+          "baseline": 0.26604366874524,
+          "shared_lesion": 0.25795210417546643,
+          "random_lesion": 0.25378255829007595
+        },
+        "production_replay_rmse": {
+          "baseline": 0.003446322961401754,
+          "execution_lesion": 0.029333832602889187,
+          "shared_lesion": 0.031728260041528324,
+          "random_lesion": 0.19611196839509715
+        }
+      },
+      {
+        "id": 513,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 1.4263140891280193,
+        "observation_lesion_margin": -0.3767712220147983,
+        "recognition_margin_loss": 1.8030853111428176,
+        "observation_replay_rmse": {
+          "baseline": 0.31027638964013204,
+          "shared_lesion": 0.35776386054302733,
+          "random_lesion": 0.3439974754885312
+        },
+        "production_replay_rmse": {
+          "baseline": 0.005190559142090677,
+          "execution_lesion": 0.2606822498577155,
+          "shared_lesion": 0.20803909534724402,
+          "random_lesion": 0.2606822498577155
+        }
+      },
+      {
+        "id": 514,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.9502092092282126,
+        "observation_lesion_margin": 0.5518386878615686,
+        "recognition_margin_loss": 0.39837052136664397,
+        "observation_replay_rmse": {
+          "baseline": 0.40914607393094393,
+          "shared_lesion": 0.4369243194707513,
+          "random_lesion": 0.40577306414715997
+        },
+        "production_replay_rmse": {
+          "baseline": 0.006197604624447358,
+          "execution_lesion": 0.27036722297775184,
+          "shared_lesion": 0.2785009173923708,
+          "random_lesion": 0.27036722297775184
+        }
+      },
+      {
+        "id": 515,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.622659186860637,
+        "observation_lesion_margin": 1.6132807791308852,
+        "recognition_margin_loss": 2.0093784077297516,
+        "observation_replay_rmse": {
+          "baseline": 0.2805970401804329,
+          "shared_lesion": 0.2734621605353743,
+          "random_lesion": 0.2656418370278244
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0038758661603437447,
+          "execution_lesion": 0.03452257774999277,
+          "shared_lesion": 0.03748448475558346,
+          "random_lesion": 0.20851228984447448
+        }
+      },
+      {
+        "id": 516,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 0.6088627918060561,
+        "observation_lesion_margin": -0.6823987284418451,
+        "recognition_margin_loss": 1.2912615202479012,
+        "observation_replay_rmse": {
+          "baseline": 0.2601407173379154,
+          "shared_lesion": 0.3027106108431275,
+          "random_lesion": 0.28826891249603825
+        },
+        "production_replay_rmse": {
+          "baseline": 0.003852804732808609,
+          "execution_lesion": 0.22124786545315595,
+          "shared_lesion": 0.16554201675026886,
+          "random_lesion": 0.22124786545315595
+        }
+      },
+      {
+        "id": 517,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 1.039038080550374,
+        "observation_lesion_margin": 0.32299554712627154,
+        "recognition_margin_loss": 0.7160425334241025,
+        "observation_replay_rmse": {
+          "baseline": 0.445612414777133,
+          "shared_lesion": 0.47440855555141836,
+          "random_lesion": 0.4481624423930409
+        },
+        "production_replay_rmse": {
+          "baseline": 0.005019471457515784,
+          "execution_lesion": 0.29311807104928644,
+          "shared_lesion": 0.3045473963835211,
+          "random_lesion": 0.2931180710492865
+        }
+      },
+      {
+        "id": 518,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.4576484362506044,
+        "observation_lesion_margin": 1.404771391447205,
+        "recognition_margin_loss": 2.0528770448033993,
+        "observation_replay_rmse": {
+          "baseline": 0.3289561659928083,
+          "shared_lesion": 0.3203831502731027,
+          "random_lesion": 0.31292096286316445
+        },
+        "production_replay_rmse": {
+          "baseline": 0.005284016603688423,
+          "execution_lesion": 0.0356575507712442,
+          "shared_lesion": 0.03811525457949469,
+          "random_lesion": 0.2497787518152261
+        }
+      },
+      {
+        "id": 519,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 1.6269504677113136,
+        "observation_lesion_margin": -0.14896219154346735,
+        "recognition_margin_loss": 1.775912659254781,
+        "observation_replay_rmse": {
+          "baseline": 0.27049946740770703,
+          "shared_lesion": 0.31443824854190877,
+          "random_lesion": 0.2996952899543253
+        },
+        "production_replay_rmse": {
+          "baseline": 0.008413236468746362,
+          "execution_lesion": 0.22867093405976915,
+          "shared_lesion": 0.18011840751982072,
+          "random_lesion": 0.22867093405976913
+        }
+      },
+      {
+        "id": 520,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.6766693392214709,
+        "observation_lesion_margin": -0.09036054522511794,
+        "recognition_margin_loss": 0.7670298844465888,
+        "observation_replay_rmse": {
+          "baseline": 0.49481657970193776,
+          "shared_lesion": 0.539267240182077,
+          "random_lesion": 0.49655054345751193
+        },
+        "production_replay_rmse": {
+          "baseline": 0.004818850992005036,
+          "execution_lesion": 0.3237437196040259,
+          "shared_lesion": 0.3681480413878055,
+          "random_lesion": 0.3237437196040259
+        }
+      },
+      {
+        "id": 521,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.670689855795611,
+        "observation_lesion_margin": 1.6078150450415434,
+        "recognition_margin_loss": 2.0628748107540678,
+        "observation_replay_rmse": {
+          "baseline": 0.2593805044750796,
+          "shared_lesion": 0.2518432740671733,
+          "random_lesion": 0.25002129989562266
+        },
+        "production_replay_rmse": {
+          "baseline": 0.003449205502281451,
+          "execution_lesion": 0.02940565470860404,
+          "shared_lesion": 0.03187272618079013,
+          "random_lesion": 0.1960925648084212
+        }
+      },
+      {
+        "id": 522,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 1.4625956631215877,
+        "observation_lesion_margin": -0.39217837250129817,
+        "recognition_margin_loss": 1.854774035622886,
+        "observation_replay_rmse": {
+          "baseline": 0.3118709909903913,
+          "shared_lesion": 0.3605673547814775,
+          "random_lesion": 0.3463965432746289
+        },
+        "production_replay_rmse": {
+          "baseline": 0.008570815341757935,
+          "execution_lesion": 0.2621220339575248,
+          "shared_lesion": 0.21150005913116948,
+          "random_lesion": 0.2621220339575248
+        }
+      },
+      {
+        "id": 523,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.9829283210626696,
+        "observation_lesion_margin": 0.5848761914553617,
+        "recognition_margin_loss": 0.39805212960730785,
+        "observation_replay_rmse": {
+          "baseline": 0.4096999385224319,
+          "shared_lesion": 0.4365665893260038,
+          "random_lesion": 0.40599063346533193
+        },
+        "production_replay_rmse": {
+          "baseline": 0.006101354951944363,
+          "execution_lesion": 0.27069400559438533,
+          "shared_lesion": 0.27827918955198633,
+          "random_lesion": 0.27069400559438533
+        }
+      },
+      {
+        "id": 524,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.544595368954859,
+        "observation_lesion_margin": 1.5651719014994114,
+        "recognition_margin_loss": 1.9794234674554474,
+        "observation_replay_rmse": {
+          "baseline": 0.2759227088563092,
+          "shared_lesion": 0.2693118709917123,
+          "random_lesion": 0.2629962113377766
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0038724624664982846,
+          "execution_lesion": 0.03535825551433403,
+          "shared_lesion": 0.038758300696881805,
+          "random_lesion": 0.20845113436527335
+        }
+      },
+      {
+        "id": 525,
+        "replicate": 7,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 0.7110629791036471,
+        "observation_lesion_margin": -0.6219484917782139,
+        "recognition_margin_loss": 1.333011470881861,
+        "observation_replay_rmse": {
+          "baseline": 0.261125830381054,
+          "shared_lesion": 0.30544369199984944,
+          "random_lesion": 0.2897002241509336
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0037064083755395795,
+          "execution_lesion": 0.22256655316981244,
+          "shared_lesion": 0.16906997344129734,
+          "random_lesion": 0.22256655316981244
+        }
+      },
+      {
+        "id": 526,
+        "replicate": 7,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 1.0115073952408782,
+        "observation_lesion_margin": 0.2947993840591847,
+        "recognition_margin_loss": 0.7167080111816935,
+        "observation_replay_rmse": {
+          "baseline": 0.44570117381717755,
+          "shared_lesion": 0.4742907024825735,
+          "random_lesion": 0.44844986906559964
+        },
+        "production_replay_rmse": {
+          "baseline": 0.003156231044083161,
+          "execution_lesion": 0.29303763008753164,
+          "shared_lesion": 0.305719936242153,
+          "random_lesion": 0.29303763008753164
+        }
+      },
+      {
+        "id": 527,
+        "replicate": 7,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.2251303149725574,
+        "observation_lesion_margin": 1.6025010732241958,
+        "recognition_margin_loss": 1.6226292417483617,
+        "observation_replay_rmse": {
+          "baseline": 0.3270381831182436,
+          "shared_lesion": 0.31810848183079965,
+          "random_lesion": 0.31298098131587926
+        },
+        "production_replay_rmse": {
+          "baseline": 0.005294077311446645,
+          "execution_lesion": 0.036826975256088905,
+          "shared_lesion": 0.04007431667180846,
+          "random_lesion": 0.2496397097469037
+        }
+      },
+      {
+        "id": 528,
+        "replicate": 8,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 2.0295928893355946,
+        "observation_lesion_margin": -0.19338983550274813,
+        "recognition_margin_loss": 2.2229827248383427,
+        "observation_replay_rmse": {
+          "baseline": 0.29426452828355765,
+          "shared_lesion": 0.33936902436276184,
+          "random_lesion": 0.32422497748781376
+        },
+        "production_replay_rmse": {
+          "baseline": 0.01011978160049889,
+          "execution_lesion": 0.244610503755673,
+          "shared_lesion": 0.19166145680409252,
+          "random_lesion": 0.244610503755673
+        }
+      },
+      {
+        "id": 529,
+        "replicate": 8,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.5881375604130583,
+        "observation_lesion_margin": -0.10507144386826628,
+        "recognition_margin_loss": 0.6932090042813246,
+        "observation_replay_rmse": {
+          "baseline": 0.5331689929278567,
+          "shared_lesion": 0.5636795457052117,
+          "random_lesion": 0.5384991560939227
+        },
+        "production_replay_rmse": {
+          "baseline": 0.004093535374557808,
+          "execution_lesion": 0.34945070905252673,
+          "shared_lesion": 0.37173211039752974,
+          "random_lesion": 0.34945070905252673
+        }
+      },
+      {
+        "id": 530,
+        "replicate": 8,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.771657969383992,
+        "observation_lesion_margin": 1.6372742880693205,
+        "recognition_margin_loss": 2.1343836813146715,
+        "observation_replay_rmse": {
+          "baseline": 0.2633394807258377,
+          "shared_lesion": 0.2555299810029938,
+          "random_lesion": 0.25222457367083256
+        },
+        "production_replay_rmse": {
+          "baseline": 0.003467016949583871,
+          "execution_lesion": 0.02947511925782239,
+          "shared_lesion": 0.03193376525068324,
+          "random_lesion": 0.19610757053554165
+        }
+      },
+      {
+        "id": 531,
+        "replicate": 9,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 1.4412718531101754,
+        "observation_lesion_margin": -0.35054143335874866,
+        "recognition_margin_loss": 1.791813286468924,
+        "observation_replay_rmse": {
+          "baseline": 0.3093009461206629,
+          "shared_lesion": 0.35716720651961675,
+          "random_lesion": 0.34320208212023445
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0043519842657875904,
+          "execution_lesion": 0.2601368165955573,
+          "shared_lesion": 0.20820223043912256,
+          "random_lesion": 0.2601368165955573
+        }
+      },
+      {
+        "id": 532,
+        "replicate": 9,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.48077661074475797,
+        "observation_lesion_margin": 0.16294853809488075,
+        "recognition_margin_loss": 0.3178280726498772,
+        "observation_replay_rmse": {
+          "baseline": 0.4146322398037223,
+          "shared_lesion": 0.4340543138196304,
+          "random_lesion": 0.4152877935033747
+        },
+        "production_replay_rmse": {
+          "baseline": 0.006950959464580088,
+          "execution_lesion": 0.2740343023842272,
+          "shared_lesion": 0.2730868089198377,
+          "random_lesion": 0.2740343023842272
+        }
+      },
+      {
+        "id": 533,
+        "replicate": 9,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.6218595360402666,
+        "observation_lesion_margin": 1.608178806714422,
+        "recognition_margin_loss": 2.0136807293258445,
+        "observation_replay_rmse": {
+          "baseline": 0.28050616009452917,
+          "shared_lesion": 0.2733846721473739,
+          "random_lesion": 0.2655830581846282
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0038757022996170937,
+          "execution_lesion": 0.03455820584926938,
+          "shared_lesion": 0.03753556980045779,
+          "random_lesion": 0.20851137132441397
+        }
+      },
+      {
+        "id": 534,
+        "replicate": 10,
+        "action": "foreleg_rubbing",
+        "baseline_prediction": "foreleg_rubbing",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "foreleg_rubbing",
+        "baseline_margin": 0.4931481215493134,
+        "observation_lesion_margin": -0.48411250398542105,
+        "recognition_margin_loss": 0.9772606255347345,
+        "observation_replay_rmse": {
+          "baseline": 0.2459110952921687,
+          "shared_lesion": 0.2977021905813066,
+          "random_lesion": 0.2768033331180564
+        },
+        "production_replay_rmse": {
+          "baseline": 0.0038839526775654807,
+          "execution_lesion": 0.2144967954188508,
+          "shared_lesion": 0.18146845718700322,
+          "random_lesion": 0.2144967954188508
+        }
+      },
+      {
+        "id": 535,
+        "replicate": 10,
+        "action": "head_directed_grooming",
+        "baseline_prediction": "head_directed_grooming",
+        "observation_lesion_prediction": "head_directed_grooming",
+        "private_prediction": "head_directed_grooming",
+        "baseline_margin": 0.9831883427793291,
+        "observation_lesion_margin": 0.27460238755591737,
+        "recognition_margin_loss": 0.7085859552234117,
+        "observation_replay_rmse": {
+          "baseline": 0.4506901188737108,
+          "shared_lesion": 0.4776980529286302,
+          "random_lesion": 0.4538767892469301
+        },
+        "production_replay_rmse": {
+          "baseline": 0.006576883741366272,
+          "execution_lesion": 0.296430449812071,
+          "shared_lesion": 0.3067885445721486,
+          "random_lesion": 0.296430449812071
+        }
+      },
+      {
+        "id": 536,
+        "replicate": 10,
+        "action": "reach_withdraw",
+        "baseline_prediction": "reach_withdraw",
+        "observation_lesion_prediction": "reach_withdraw",
+        "private_prediction": "reach_withdraw",
+        "baseline_margin": 3.538168536710759,
+        "observation_lesion_margin": 1.3733163575259382,
+        "recognition_margin_loss": 2.164852179184821,
+        "observation_replay_rmse": {
+          "baseline": 0.32887338272887956,
+          "shared_lesion": 0.32044939474712125,
+          "random_lesion": 0.31249932686386905
+        },
+        "production_replay_rmse": {
+          "baseline": 0.005272062765198986,
+          "execution_lesion": 0.034997578951062355,
+          "shared_lesion": 0.037426348346869164,
+          "random_lesion": 0.24968415629362084
+        }
+      }
+    ],
+    "recognition": {
+      "baseline_correct": 30,
+      "private_correct": 30,
+      "observation_lesion_correct": 18,
+      "cases": 30,
+      "margin_loss_mean": 1.3922301952871297,
+      "margin_loss_wins": 30,
+      "passed": true
+    },
+    "shared_causal_effect": {
+      "baseline_mean": 0.34463475907846125,
+      "shared_lesion_mean": 0.36690260262697844,
+      "random_lesion_mean": 0.3511513819343733,
+      "shared_degradation": 0.022267843548517238,
+      "random_degradation": 0.006516622855912067,
+      "shared_vs_random_wins": 30,
+      "passed": true
+    },
+    "execution_causal_effect": {
+      "baseline_mean": 0.005166504923057632,
+      "execution_lesion_mean": 0.19132743189084322,
+      "degradation": 0.1861609269677855,
+      "degradation_wins": 30,
+      "passed": true
+    },
+    "double_dissociation": {
+      "observation_specific": true,
+      "execution_specific": true,
+      "unaffected_cross_routes_exact_by_design": true,
+      "no_total_observation_collapse": true,
+      "passed": true
+    },
+    "passed": true
+  },
+  "audit": {
+    "accepted_total": 16384,
+    "audited_count": 128,
+    "sample_ids": [
+      0,
+      1,
+      2,
+      133,
+      264,
+      395,
+      526,
+      657,
+      788,
+      919,
+      1050,
+      1181,
+      1312,
+      1443,
+      1574,
+      1705,
+      1836,
+      1967,
+      2098,
+      2229,
+      2360,
+      2491,
+      2622,
+      2754,
+      2885,
+      3016,
+      3147,
+      3278,
+      3409,
+      3540,
+      3671,
+      3802,
+      3933,
+      4064,
+      4195,
+      4326,
+      4457,
+      4588,
+      4719,
+      4850,
+      4981,
+      5112,
+      5243,
+      5374,
+      5506,
+      5637,
+      5768,
+      5899,
+      6030,
+      6161,
+      6292,
+      6423,
+      6554,
+      6685,
+      6816,
+      6947,
+      7078,
+      7209,
+      7340,
+      7471,
+      7602,
+      7733,
+      7864,
+      7995,
+      8126,
+      8258,
+      8389,
+      8520,
+      8651,
+      8782,
+      8913,
+      9044,
+      9175,
+      9306,
+      9437,
+      9568,
+      9699,
+      9830,
+      9961,
+      10092,
+      10223,
+      10354,
+      10485,
+      10616,
+      10747,
+      10878,
+      11010,
+      11141,
+      11272,
+      11403,
+      11534,
+      11665,
+      11796,
+      11927,
+      12058,
+      12189,
+      12320,
+      12451,
+      12582,
+      12713,
+      12844,
+      12975,
+      13106,
+      13237,
+      13368,
+      13499,
+      13630,
+      13762,
+      13893,
+      14024,
+      14155,
+      14286,
+      14417,
+      14548,
+      14679,
+      14810,
+      14941,
+      15072,
+      15203,
+      15334,
+      15465,
+      15596,
+      15727,
+      15858,
+      15989,
+      16120,
+      16251,
+      16383
+    ],
+    "is_exhaustive": false
+  },
+  "derived": {
+    "records": 516,
+    "role_counts": {
+      "calibration": 36,
+      "evaluation": 480
+    },
+    "distinct_pairs": 516,
+    "state_unchanged_and_sha_match": 516,
+    "by_action": {
+      "foreleg_rubbing": {
+        "cases": 10,
+        "baseline_correct": 10,
+        "observation_lesion_correct": 0,
+        "mean_margin_loss": 1.6272833467504142,
+        "mean_shared_observation_degradation": 0.04731650890338908,
+        "mean_random_observation_degradation": 0.031175781864333056,
+        "mean_execution_degradation": 0.23067205520145823
+      },
+      "head_directed_grooming": {
+        "cases": 10,
+        "baseline_correct": 10,
+        "observation_lesion_correct": 8,
+        "mean_margin_loss": 0.5679247648626586,
+        "mean_shared_observation_degradation": 0.027405823502165316,
+        "mean_random_observation_degradation": 0.001965191111886261,
+        "mean_execution_degradation": 0.29844819499024217
+      },
+      "reach_withdraw": {
+        "cases": 10,
+        "baseline_correct": 10,
+        "observation_lesion_correct": 10,
+        "mean_margin_loss": 1.9814824742483164,
+        "mean_shared_observation_degradation": -0.007918801760002685,
+        "mean_random_observation_degradation": -0.013591104408483119,
+        "mean_execution_degradation": 0.02936253071165629
+      }
+    },
+    "observation_lesion_confusions": [
+      {
+        "id": 507,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 510,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 513,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 516,
+        "expected": "foreleg_rubbing",
+        "predicted": "reach_withdraw"
+      },
+      {
+        "id": 519,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 520,
+        "expected": "head_directed_grooming",
+        "predicted": "reach_withdraw"
+      },
+      {
+        "id": 522,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 525,
+        "expected": "foreleg_rubbing",
+        "predicted": "reach_withdraw"
+      },
+      {
+        "id": 528,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 529,
+        "expected": "head_directed_grooming",
+        "predicted": "reach_withdraw"
+      },
+      {
+        "id": 531,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      },
+      {
+        "id": 534,
+        "expected": "foreleg_rubbing",
+        "predicted": "head_directed_grooming"
+      }
+    ],
+    "zero_pooled_evaluation": 0.4133282411884018,
+    "overlap_totals": {
+      "under_0_001_deg": 0,
+      "under_1_deg": 0,
+      "under_5_deg": 458
+    },
+    "minimum_unique_rgb_frames": 50,
+    "minimum_feature_max_std": 0.010999726131558418,
+    "decision_recomputable_from_motion_results": true,
+    "calibration_ranking_raw_traces_exported": false,
+    "unaffected_cross_routes": "exact by intervention construction, not separately measured"
+  },
+  "limitations": [
+    "Interventions target engineered semantic/pathway units, not biological neurons.",
+    "Observation-only lesion masks classifier feature blocks; execution-only lesion zeros proprioceptive channels.",
+    "Synthetic motifs and frozen supervised visual decoder; no natural vision.",
+    "Kinematic replay only; no actuators, forces or closed-loop correction."
+  ]
+}
