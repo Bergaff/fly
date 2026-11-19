@@ -633,3 +633,12 @@ test('серия85: shared latent population prototype go сохранён', () 
   assert.match(item.limitations,/cannot be independently recomputed/);assert.match(item.limitations,/exclude disclosed421–470/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия86: multi-action compositional population сохранена', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-multiaction-compositional-population');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered frozen test/);
+  assert.match(item.source,/motions471–479/);assert.match(item.source,/motions480–491/);assert.match(item.source,/motions492–497/);
+  assert.match(item.results,/identity>=8\/12/);assert.match(item.results,/ordered pairs>=4\/6/);assert.match(item.results,/distance arrays exported/);
+  assert.match(item.limitations,/engineered synthetic/);assert.match(item.limitations,/near-miss is no-go/i);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
