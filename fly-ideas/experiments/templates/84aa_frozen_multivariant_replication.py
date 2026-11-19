@@ -47,7 +47,7 @@ def completed_state(dbpath,z,b,proto,ck,fixture):
   row=db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()
  if not row:raise ValueError('Не найден протокол series84Z в study.sqlite3.')
  saved=json.loads(row[0]);state=ck.open_verified(dbpath,saved);stage,seconds=b.get_phase(dbpath)
- expected_mode='fixture' if fixture else'long'
+ expected_mode='fixture' if fixture else'fixed_count'
  # 84Z commits the complete result atomically before changing run_phase from
  # evaluation to completed. A Windows close in that narrow interval leaves a fully
  # verifiable result with stage=evaluation. Accept it only after verify_result below.
