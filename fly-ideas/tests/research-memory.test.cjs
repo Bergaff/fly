@@ -634,11 +634,11 @@ test('серия85: shared latent population prototype go сохранён', () 
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия86: multi-action compositional population сохранена', () => {
+test('серия86: multi-action compositional go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-multiaction-compositional-population');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered frozen test/);
-  assert.match(item.source,/motions471–479/);assert.match(item.source,/motions480–491/);assert.match(item.source,/motions492–497/);
-  assert.match(item.results,/identity>=8\/12/);assert.match(item.results,/ordered pairs>=4\/6/);assert.match(item.results,/distance arrays exported/);
-  assert.match(item.limitations,/engineered synthetic/);assert.match(item.limitations,/near-miss is no-go/i);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/operational multi-action\/compositional go/);assert.match(item.status,/series87 allowed/);
+  assert.match(item.source,/SHA e66a6b5/);assert.match(item.source,/identity480–491/);assert.match(item.source,/composition492–497/);
+  assert.match(item.results,/11\/12 each/);assert.match(item.results,/RSA0.792970/);assert.match(item.results,/Composition reported6\/6/);assert.match(item.results,/Dual-active5\/6/);
+  assert.match(item.limitations,/cannot be independently classification-replayed/);assert.match(item.limitations,/exclude disclosed421–497/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
