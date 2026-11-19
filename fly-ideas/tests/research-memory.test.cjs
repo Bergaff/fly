@@ -624,3 +624,12 @@ test('серия84AA: independently verified frozen replication go сохран�
   assert.match(item.results,/142\/160/);assert.match(item.results,/73\/80 vs84V/);assert.match(item.results,/corners16\/16/);assert.match(item.limitations,/separately preregistered stage/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия85: shared latent population prototype сохранён', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-shared-latent-population');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);
+  assert.match(item.source,/Six semantic units/);assert.match(item.source,/motions451–470/);
+  assert.match(item.results,/4\/6 dual-active/);assert.match(item.results,/1000-permutation/);assert.match(item.results,/within2%/);
+  assert.match(item.limitations,/Artificial engineer-defined/);assert.match(item.limitations,/Near-miss is no-go/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
