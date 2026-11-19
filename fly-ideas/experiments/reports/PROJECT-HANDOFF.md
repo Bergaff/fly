@@ -311,3 +311,7 @@ Attached summary-27 SHA `334c4a89…`; exact pins, development711–728 and unto
 ## Серия89B5: completed strict no-go
 
 Attached summary-28 SHA `c14bbb13…`; exact pins, development747–764 and untouched final765–782×12=216 cases/648 trials. Identity216/216; safety648, recovery645, completion648; angle pass. Hard candidate mean0.121827 beats soft0.126011 and equals oracle; total angle-only635/common617 pass. Per-action angle-only208/216/211 pass; common foreleg188 fails195 while head216 and reach213 pass. Only6/9 controls pass: soft561, uncal568 and oracle ties0 fail. Means cannot replace paired gates and oracle cannot be removed post-hoc.89C/90 blocked; disclosed421–782 excluded. See result/extract/fixture.
+
+## Серия89B6: prepared, not run
+
+Trend is real but no go:89B3→89B5 mean contact0.141665→0.121827, identity195→216, common579→617, head common162→216. New grouped-CV robust foreleg reweighting selects boost1.5/2/4/8 on development783–800; untouched final801–818. Standard hard is direct control; soft/oracle and all prior controls remain. Gates retain total/per-action direct contact and require7/8 broad controls (89B5 counterfactual6/8), candidate mean≤standard/soft and oracle+0.02. Only full go allows frozen89C;90 blocked.

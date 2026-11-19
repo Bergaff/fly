@@ -714,3 +714,12 @@ test('серия89B5: strict foreleg/control-count no-go сохранён',()=>{
   assert.match(item.limitations,/cannot remove oracle/);assert.match(item.limitations,/disclosed421–782 excluded/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89B6: preregistered robust foreleg development сохранена',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-robust-foreleg-contact-89b6');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/development783–800/);assert.match(item.source,/final801–818/);
+  assert.match(item.results,/boost1.5\/2\/4\/8/);assert.match(item.results,/standard-hard, soft and oracle/);assert.match(item.results,/7\/8 broad controls/);assert.match(item.results,/0.141665→0.121827/);
+  assert.match(item.limitations,/oracle has label leakage/);assert.match(item.limitations,/only full go authorizes frozen89C/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});
