@@ -616,3 +616,11 @@ test('серия84Z: development selection и untouched-final go сохране�
   assert.match(item.results,/5\/5 core gates/);assert.match(item.results,/149\/160/);assert.match(item.results,/77\/80 vs84V/);assert.match(item.limitations,/Separate read-only replication/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия84AA: frozen replication selected84Z сохранена', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-multivariant-replication');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared read-only/);
+  assert.match(item.source,/SHAcb761051/);assert.match(item.source,/motions441–450/);
+  assert.match(item.results,/No training, fitting or development selection/);assert.match(item.results,/96\/160/);assert.match(item.limitations,/Series85 blocked/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});

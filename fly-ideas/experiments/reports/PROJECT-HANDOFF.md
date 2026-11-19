@@ -267,3 +267,7 @@ Attached summary-16 SHA `bb5ed966…`; fixed20480/20480 candidates,1003520 frame
 ## Серия84Z: completed multi-variant model-development go
 
 Attached summary-17 SHA `19f9d1c3…`; fixed16384/16384 candidates,802816 frames, training wall6028,844s. Development421–430: no strict variant pass, but preregistered key selects `ridge_0175`, the only5/5-core variant, RD121/160 and lower-X58/80 vs84V; dev absolute lower-X55/80 explains strict false. Untouched final431–440 primary true: global RD candidate/84V0,441619/0,458562,149/160 wins; lower-X0,445987/0,461998,68/80 zero and77/80 vs84V; upper-X72/80 vs84V; combined0,335848 vs0,340109. All six axes, X/Z, controls and16/16 corners pass; state immutable160/160. Reported selected SHA `cb761051…` frozen; full local manifest not received. Do not rerun/tune on disclosed421–440. Next only read-only frozen replication on new motions; series85 remains blocked. See result/extract/fixture.
+
+## Серия84AA: prepared frozen replication84Z
+
+Read-only runner accepts only completed go84Z and pins runner SHAfa4040d7…, selected model SHAcb761051…, `ridge_0175`, RD ridge0.175, weight1.0, frozen84V/84S/84R and embedded84V exact equality. No fit or variant selection. New seed8436 motions441–450 ×16; same strict primary as final84Z. Source DB/models/summary/manifest/recovery log are hashed before and after. BAT `RUN-FROZEN-MULTIVARIANT-REPLICATION.bat`; result pending; series85 blocked.
