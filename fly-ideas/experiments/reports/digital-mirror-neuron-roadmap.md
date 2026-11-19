@@ -247,3 +247,5 @@ Series89B завершена strict contact no-go. Calibrator снизил angle
 89B3 завершена strict contact no-go. Identity195/216 прошла ровно, все21 ошибки head; safety и angle прошли. Contact mean улучшена, angle-only590 проходит, но mandatory common579<584 и только3/7 controls проходят вместо5. Head contact остаётся слабым. Нельзя округлять579.89C/90 blocked; допустим только new head-focused development89B4 на новых motions/views;421–710 раскрыты.
 
 89B4 завершена strict no-go. Identity216/216 устранила routing/head identity error; hard predicted и oracle совпали648/648. Safety/angle, direct angle-only624, common607 и6/9 contact controls прошли. Soft candidate mean contact0,127288 хуже mandatory hard0,122068 и выиграла hard/oracle только57/648: остаточное mixing разбавляет уже правильный expert. Нельзя постфактум заменить primary hard-policy.89C/90 blocked; motions421–746 раскрыты.
+
+89B5 подготовлена: preregistered predicted-hard primary на development747–764 и untouched final765–782, без true action. Soft и oracle controls сохраняются; gates усилены per-action identity/direct-contact и7/9 controls. Только полный go разрешит frozen89C;90 blocked.

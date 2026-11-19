@@ -307,3 +307,7 @@ Attached summary-26 SHA `dd16e35a…`; exact pins, final216 cases/648 trials. Id
 ## Серия89B4: completed strict no-go
 
 Attached summary-27 SHA `334c4a89…`; exact pins, development711–728 and untouched final729–746×12=216 cases/648 trials. Identity216/216; safety648, recovery645, completion648; angle pass. Contact wins angle-only624, common607, hard/oracle57, uncal559, zero648, shuffled648, open635, lesion648:6/9 controls pass. Candidate mean0.127288 is worse than mandatory hard0.122068, so contact/primary fail. Hard predicted=oracle in all648 records because routing is perfect; soft residual probabilities dilute the correct expert. No post-hoc hard counterfactual can change primary.89C/90 blocked; disclosed421–746 excluded. See result/extract/fixture.
+
+## Серия89B5: prepared, not run
+
+Predicted argmax hard expert is primary; soft mixture and truth-label oracle are controls. New development747–764×8 and untouched final765–782×12. Candidate receives no true action. Gates require identity total/per-action90%, direct angle-only/common contact total/per-action90%,7/9 controls, hard mean≤soft and≤oracle+0.02, plus safety/angle. Only full go allows frozen89C;90 blocked.

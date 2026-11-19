@@ -705,3 +705,12 @@ test('серия89B4: strict mean-vs-hard no-go сохранён',()=>{
   assert.match(item.limitations,/post-hoc hard counterfactual/);assert.match(item.limitations,/disclosed421–746 excluded/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89B5: preregistered predicted-hard development сохранена',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-predicted-hard-contact-89b5');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/development747–764/);assert.match(item.source,/final765–782/);
+  assert.match(item.results,/argmax predicted hard expert/);assert.match(item.results,/without truth action/);assert.match(item.results,/total\/per-action90%/);assert.match(item.results,/7\/9 controls/);
+  assert.match(item.limitations,/oracle has label leakage/);assert.match(item.limitations,/only frozen89C/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});
