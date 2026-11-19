@@ -304,6 +304,6 @@ Attached summary-25 SHA `6e3f9c22…`; exact pins, selected lambda1.0, final216 
 
 Attached summary-26 SHA `dd16e35a…`; exact pins, final216 cases/648 trials. Identity195/216 exactly passes: all21 errors are head. Safety/recovery/completion648 and all angle gates pass. Contact mean candidate/angle-only/common0.141665/0.187608/0.169858. Wins angle-only590 pass, common579 fail by5; uncal530, zero648, shuffled645, open567, lesion522. Only3/7 pass vs required5. Head contact weak. Aggregate gains cannot replace gates.89C/90 blocked; motions421–710 disclosed. See result/extract/fixture.
 
-## Серия89B4: prepared, not run
+## Серия89B4: completed strict no-go
 
-Development711–728×8 fits30-D ridge identity selected grouped-CV, head-weighted experts, per-action lambda and soft-mixture temperature. Untouched final729–746×12=216 cases/648 trials. Candidate has no true label; oracle expert is diagnostic label-leak control. Gates: identity195, safety, angle, contact angle-only/common≥584,≥6/9 controls, candidate mean≤hard and≤oracle+0.02. Go only allows frozen89C;90 blocked.
+Attached summary-27 SHA `334c4a89…`; exact pins, development711–728 and untouched final729–746×12=216 cases/648 trials. Identity216/216; safety648, recovery645, completion648; angle pass. Contact wins angle-only624, common607, hard/oracle57, uncal559, zero648, shuffled648, open635, lesion648:6/9 controls pass. Candidate mean0.127288 is worse than mandatory hard0.122068, so contact/primary fail. Hard predicted=oracle in all648 records because routing is perfect; soft residual probabilities dilute the correct expert. No post-hoc hard counterfactual can change primary.89C/90 blocked; disclosed421–746 excluded. See result/extract/fixture.
