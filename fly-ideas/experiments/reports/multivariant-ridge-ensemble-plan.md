@@ -76,9 +76,9 @@ Motions321–420 раскрыты и запрещены. После расчёт
 
 ## Recovery первоначального evaluator
 
-Первоначальный runner мог завершить весь training и затем остановиться с `KeyError: original_basename` до development evaluation. Исправленный runner определяет preregistered holdout ID из frozen sequential test index (`421–440`), а не из необязательного label field. Для такой папки разрешена узкая автоматическая migration только если:
+Первоначальный runner мог завершить весь training и затем остановиться с `KeyError: original_basename`; первая recovery-версия могла затем остановиться на избыточной проверке `Holdout label нарушен`. Исправленный runner требует ровно20 последовательных test inputs и определяет preregistered ID только из frozen index (`421–440`), без необязательных label fields. Для такой папки разрешена узкая автоматическая migration только если:
 
-- script SHA равен точному первоначальному84Z SHA;
+- script SHA равен одному из двух точных post-training failed84Z SHA;
 - stage уже `evaluation`;
 - committed count равен fixed target;
 - candidate row count совпадает;

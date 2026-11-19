@@ -12,7 +12,7 @@ import numpy as np
 HERE=Path(__file__).resolve().parent
 RUNNER84V=HERE/'84v_paired_view_distal_consistency.py';RUNNER84V_SHA='05a0cdd4696af5b8901a1d34a205db8a286264f518cb54e93d1e0b9f9e9e4a52'
 MODEL84V_SHA='44b98c31526f5d43bb8eef26fd91ccec827988061df94e01c8aa0a6a19f3b7af'
-RECOVERABLE_SCRIPT_SHA='7c1383acdcfcc3257cb2133398d97c891e2be701f5a7fbdfe1df604fa96138ed'
+RECOVERABLE_SCRIPT_SHAS=('7c1383acdcfcc3257cb2133398d97c891e2be701f5a7fbdfe1df604fa96138ed','82bee325e64b7d74f749e3a71fb1b6c21eb309076369368d83bc616816fa8ad4')
 AXES=('left_proximal','left_middle','left_distal','right_proximal','right_middle','right_distal');TARGET=16384
 ROOT=Path('workspace/runs/ideas/i-observational/multivariant-ridge-ensemble');SOURCE_ROOT=Path('workspace/runs/ideas/i-observational/paired-view-distal-consistency')
 SELECTED_WORKERS=6;SELECTED_RESOURCE_MODE='6'
@@ -136,7 +136,8 @@ def development_key(decision,index):
 def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
  folder=Path(folder);out=folder/'result'
  if out.exists():m.verify_result(out,saved,state);return out
- train,tests=proto.split_from_sources(state['sources'],stim);labels={x['copy']:x for x in saved['labels']}
+ train,tests=proto.split_from_sources(state['sources'],stim)
+ if len(tests)!=20 or [x['id'] for x in tests]!=list(range(1,21)):raise ValueError('Нужны ровно20 последовательных development/final holdouts.')
  def frozen(name):
   with np.load(io.BytesIO(state['sources'][name]),allow_pickle=False) as z:return ev.checked_model({k:z[k] for k in z.files})
  s84v=frozen('source84v_model.npz');s84=frozen('source84s_model.npz');s84r=frozen('source84r_model.npz')
@@ -146,13 +147,12 @@ def evaluate(folder,state,saved,elapsed,proto,ev,stim,base,large):
   spec=specs[name];new=predict_model(ridge_models[spec['right_distal_ridge']],x);old=predict_model(s84v,x);return np.clip(spec['new_weight']*new+(1-spec['new_weight'])*old,-np.pi*55/180,np.pi*55/180)
  scene=m.VisibleForelegGroomingScene(proto.load('multivariant84z_engine','38_two_flies_observation.py'));accepted,recs=m.sampled_records(folder/'study.sqlite3',len(train));audit=m.overlap_sample_broad(tests,recs,128);test_by_ident={}
  for item,overlap in zip(tests,audit['tests']):
-  label=labels[f'test_{item["id"]:03d}.json'];ident=420+item['id'];test_by_ident[ident]=(item,label,overlap)
+  ident=420+item['id'];test_by_ident[ident]=(item,overlap)
  corners=[m.geometry_corners()[i] for i in(0,2,4,6)] if saved['mode']=='fixture' else m.geometry_corners()
  def render_group(ids,names,seed):
   grouped={name:[] for name in names}
   for ident in ids:
-   item,label,overlap=test_by_ident[ident];full=item['angles_deg']*np.pi/180;truth=full[2:]
-   if label['role']!='new_test' or item['id']!=ident-420:raise ValueError('Holdout label нарушен.')
+   item,overlap=test_by_ident[ident];full=item['angles_deg']*np.pi/180;truth=full[2:]
    for corner in corners:
     cid=corner['corner_id'];images=scene.render(full,view=corner['view']);x=m.edge_history(images);vp=np.clip(predict_model(s84v,x),-np.pi*55/180,np.pi*55/180);sp=np.clip(predict_model(s84,x),-np.pi*55/180,np.pi*55/180);rp=np.clip(predict_model(s84r,x),-np.pi*55/180,np.pi*55/180);_,vr=m.compress_replay(vp);_,sr=m.compress_replay(sp);_,rr=m.compress_replay(rp);rng=np.random.default_rng(np.random.SeedSequence([seed,ident,cid]));control_x={name:m.edge_history(img) for name,img in {'shuffled':images[rng.permutation(len(images))].copy(),'static':np.repeat(images[:1],len(images),axis=0),'closed':np.zeros_like(images)}.items()}
     for name in names:
@@ -180,7 +180,8 @@ def migrate_evaluation_recovery(dbpath,proto):
  uri=Path(dbpath).resolve().as_uri()+'?mode=rw'
  with sqlite3.connect(uri,uri=True,timeout=30) as db:
   meta=dict(db.execute('SELECT key,value FROM metadata'));saved=json.loads(meta.get('protocol','{}'))
-  if saved.get('script_sha256')!=RECOVERABLE_SCRIPT_SHA:return False
+  old_script_sha=saved.get('script_sha256')
+  if old_script_sha not in RECOVERABLE_SCRIPT_SHAS:return False
   text=json.dumps(saved,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
   if meta.get('protocol')!=text or meta.get('protocol_sha256')!=sha(text.encode('utf8')):raise ValueError('Старый protocol повреждён; recovery запрещён.')
   phase=db.execute('SELECT stage,training_seconds FROM run_phase WHERE id=1').fetchone();state=db.execute('SELECT next_id FROM state WHERE id=1').fetchone();count=db.execute('SELECT COUNT(*) FROM candidates').fetchone()[0]
@@ -191,7 +192,7 @@ def migrate_evaluation_recovery(dbpath,proto):
   new_text=json.dumps(expected,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False);db.execute('BEGIN IMMEDIATE');row=db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()
   if row is None or row[0]!=text:raise ValueError('Protocol изменился во время recovery.')
   db.execute("UPDATE metadata SET value=? WHERE key='protocol'",(new_text,));db.execute("UPDATE metadata SET value=? WHERE key='protocol_sha256'",(sha(new_text.encode('utf8')),));db.commit()
- log=Path(dbpath).parent/'evaluation-recovery.json';save(log,{'schema':'84z-evaluation-recovery-v1','old_script_sha256':RECOVERABLE_SCRIPT_SHA,'new_script_sha256':file_sha(__file__),'training_candidates':saved['target_candidates'],'scientific_protocol_changed':False,'reason':'replace fragile original_basename lookup with frozen test index mapping'})
+ log=Path(dbpath).parent/'evaluation-recovery.json';save(log,{'schema':'84z-evaluation-recovery-v1','old_script_sha256':old_script_sha,'recoverable_script_sha256':list(RECOVERABLE_SCRIPT_SHAS),'new_script_sha256':file_sha(__file__),'training_candidates':saved['target_candidates'],'scientific_protocol_changed':False,'reason':'use frozen sequential test index mapping without optional label fields'})
  print('Применён безопасный recovery evaluator84Z; training не повторяется.',flush=True);return True
 
 def restore_resources(dbpath):
