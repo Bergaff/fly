@@ -609,10 +609,10 @@ test('серия84Y: augmented lower no-go сохранён в памяти', ()
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия84Z: multi-variant development и isolated final сохранены', () => {
+test('серия84Z: development selection и untouched-final go сохранены', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-multivariant-ridge-ensemble');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared/);
-  assert.match(item.source,/Six fixed variants/);assert.match(item.source,/ensembles75\/25,50\/50/);
-  assert.match(item.results,/motions421–430/);assert.match(item.results,/motions431–440/);assert.match(item.results,/narrow verified recovery without retraining/);assert.match(item.results,/without optional label fields/);assert.match(item.limitations,/one selected model on isolated final motions/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/model-development go/);
+  assert.match(item.source,/selects ridge_0175/);assert.match(item.source,/motions431–440/);
+  assert.match(item.results,/5\/5 core gates/);assert.match(item.results,/149\/160/);assert.match(item.results,/77\/80 vs84V/);assert.match(item.limitations,/Separate read-only replication/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
