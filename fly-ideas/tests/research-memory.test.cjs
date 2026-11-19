@@ -661,10 +661,11 @@ test('серия88: actuator bridge prototype go сохранён', () => {
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89: closed-loop validation package сохранён', () => {
+test('серия89: strict operational no-go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-closed-loop-embodied-validation');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered production package/);assert.match(item.status,/not run/);
-  assert.match(item.source,/motions567–602/);assert.match(item.source,/1296 trials/);assert.match(item.results,/zero-state/);assert.match(item.results,/shared-lesion/);assert.match(item.results,/90% blocking gates/);
-  assert.match(item.limitations,/Reduced six-joint actuator\/support surrogate/);assert.match(item.limitations,/Series90 remains blocked/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/strict operational no-go/);assert.match(item.status,/series90 blocked/);
+  assert.match(item.source,/SHA0b44d61b/);assert.match(item.source,/Motions567–602/);assert.match(item.source,/1296 trials/);
+  assert.match(item.results,/Safety43\/1296/);assert.match(item.results,/hard limits/);assert.match(item.results,/wins0\/0\/1233\/449/);assert.match(item.results,/none pass/);
+  assert.match(item.limitations,/Good target tracking88 did not produce truth-correct policy89/);assert.match(item.limitations,/disclosed421–602 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
