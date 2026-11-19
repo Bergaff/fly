@@ -688,11 +688,11 @@ test('серия89B2: strict direct-contact no-go сохранён', () => {
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89B3: action-conditional development сохранён', () => {
+test('серия89B3: strict contact no-go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-action-conditional-contact-89b3');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered development/);assert.match(item.status,/89C\/90 blocked/);
-  assert.match(item.source,/Development675–692/);assert.match(item.source,/final693–710/);assert.match(item.source,/648 trials/);
-  assert.match(item.results,/18-D nearest development prototypes/);assert.match(item.results,/without final truth label/);assert.match(item.results,/total≥5\/7/);
-  assert.match(item.limitations,/Go permits only frozen89C/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/strict contact no-go/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/SHAdd16e35a/);assert.match(item.source,/development675–692/);assert.match(item.source,/final693–710/);
+  assert.match(item.results,/Identity195\/216/);assert.match(item.results,/head51\/72/);assert.match(item.results,/Wins590\/579/);assert.match(item.results,/only3\/7 pass/);
+  assert.match(item.limitations,/All21 identity errors/);assert.match(item.limitations,/disclosed421–710 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
