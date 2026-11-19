@@ -723,3 +723,12 @@ test('серия89B6: independently verified development go сохранён',()
   assert.match(item.limitations,/only~0.026%/);assert.match(item.limitations,/separate frozen89C only/);assert.match(item.limitations,/90 blocked until89C go/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89C: frozen replication подготовлена',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-robust-replication-89c');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered frozen/);assert.match(item.status,/90 blocked/);
+  assert.match(item.source,/Authorized by independently verified89B6/);assert.match(item.source,/model b8beb562/);assert.match(item.source,/motions819–836/);assert.match(item.source,/views721–732/);
+  assert.match(item.results,/No fit\/selection\/threshold change/);assert.match(item.results,/no truth action/);assert.match(item.results,/exact decision89B6/);
+  assert.match(item.limitations,/exact result89B6 plus production84Z/);assert.match(item.limitations,/only full89C go may authorize90/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});

@@ -314,4 +314,8 @@ Attached summary-28 SHA `c14bbb13…`; exact pins, development747–764 and unto
 
 ## Серия89B6: completed full development go
 
-Attached summary-29 SHA `f1c36207…`; exact pins, development783–800 and untouched final801–818×12=216 cases/648 trials. Grouped-CV selected boost4 with46/48 common wins. Identity216/216; safety648, recovery645, completion648; angle pass. Contact soft587, angle638, common633; action angle/common foreleg214/201, head213/216, reach211/216; broad7/8. Mean candidate0.122611≤standard0.122644 and soft0.126982; candidate=oracle648/648. All gates independently reproduced. Standard improvement is only~0.026%, so no large effect claim. Go authorizes preparation of separate frozen89C on new motions/views;89B6 data cannot tune it.90 blocked until89C go.
+Attached summary-29 SHA `f1c36207…`; exact pins, development783–800 and untouched final801–818×12=216 cases/648 trials. Grouped-CV selected boost4 with46/48 common wins. Identity216/216; safety648, recovery645, completion648; angle pass. Contact soft587, angle638, common633; action angle/common foreleg214/201, head213/216, reach211/216; broad7/8. Mean candidate0.122611≤standard0.122644 and soft0.126982; candidate=oracle648/648. All gates independently reproduced. Standard improvement is only~0.026%, so no large effect claim.
+
+## Frozen89C: prepared, not run
+
+Requires exact local completed result89B6: summary SHA f1c36207…, model SHA b8beb562…, complete manifest, boost4; plus source84Z. No fit/selection/threshold change. New motions819–836, views721–732,216 cases/648 trials. Loads frozen angle/identity/common, robust+standard experts, lambdas and temperature; calls exact decision89B6. Candidate has no true action; oracle diagnostic only. Near miss no-go.90 blocked until full89C go.
