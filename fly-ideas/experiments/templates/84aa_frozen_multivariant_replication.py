@@ -48,18 +48,24 @@ def completed_state(dbpath,z,b,proto,ck,fixture):
  if not row:raise ValueError('Не найден протокол series84Z в study.sqlite3.')
  saved=json.loads(row[0]);state=ck.open_verified(dbpath,saved);stage,seconds=b.get_phase(dbpath)
  expected_mode='fixture' if fixture else'long'
- if stage!='completed' or saved.get('mode')!=expected_mode:raise ValueError('Нужна завершённая production series84Z.')
+ # 84Z commits the complete result atomically before changing run_phase from
+ # evaluation to completed. A Windows close in that narrow interval leaves a fully
+ # verifiable result with stage=evaluation. Accept it only after verify_result below.
+ if stage not in ('evaluation','completed') or saved.get('mode')!=expected_mode:raise ValueError(f'Нужна завершённая production series84Z; получено stage={stage!r}, mode={saved.get("mode")!r}.')
  if saved.get('schema')!='multivariant-ridge-ensemble-v1' or saved.get('script_sha256')!=RUNNER84Z_SHA:raise ValueError('Это не exact frozen protocol runner84Z.')
  if not fixture and (saved.get('fixture_limit') is not None or saved.get('target_candidates')!=16384 or state.get('next_id')!=16384):raise ValueError('Нужен полный production protocol84Z: 16384 candidates.')
  variants=saved.get('variants');names=[x.get('name') for x in variants] if isinstance(variants,list) and all(isinstance(x,dict) for x in variants) else []
  if names!=['ridge_0175','ridge_0350','ridge_0700','ridge_1400','ensemble_v75_new25','ensemble_v50_new50']:raise ValueError('Frozen variants protocol84Z отличается.')
  dev=saved.get('development',{});final=saved.get('evaluation',{})
  if dev.get('motion_seed')!=8434 or dev.get('holdouts')!=list(range(421,431)) or final.get('motion_seed')!=8435 or final.get('holdouts')!=list(range(431,441)):raise ValueError('Development/final protocol84Z отличается.')
- return saved,state,seconds
+ return saved,state,stage
 
 def source(folder,fixture=False):
- z=load84z();b=z.m;proto,ev,pre,stim,ck,base,large=b.dependencies();folder=Path(folder).resolve();saved,state,_=completed_state(folder/'study.sqlite3',z,b,proto,ck,fixture)
- result=folder/'result';b.verify_result(result,saved,state);summary=json.loads((result/'summary.json').read_text(encoding='utf8'));expected='fixture_completed' if fixture else'completed'
+ z=load84z();b=z.m;proto,ev,pre,stim,ck,base,large=b.dependencies();folder=Path(folder).resolve();saved,state,stage=completed_state(folder/'study.sqlite3',z,b,proto,ck,fixture)
+ result=folder/'result'
+ try:b.verify_result(result,saved,state)
+ except Exception as exc:raise ValueError(f'Source84Z stage={stage!r}, но complete result/manifest не прошёл проверку: {exc}') from exc
+ summary=json.loads((result/'summary.json').read_text(encoding='utf8'));expected='fixture_completed' if fixture else'completed'
  if summary.get('status')!=expected or not summary.get('primary',{}).get('passed'):raise ValueError('Нужен завершённый go84Z соответствующего режима.')
  paths=(folder/'study.sqlite3',result/'model_selected.npz',result/'source84v_model.npz',result/'source84s_model.npz',result/'source84r_model.npz',result/'summary.json',result/'complete.json');extra=folder/'evaluation-recovery.json';tracked=paths+((extra,) if extra.is_file() else());before={str(p):file_sha(p) for p in tracked};model_sha=file_sha(paths[1])
  if model_sha!=summary.get('selected_model_sha256') or (not fixture and model_sha!=MODEL84Z_SHA):raise ValueError('Нужна frozen production selected model84Z.')
