@@ -617,10 +617,10 @@ test('серия84Z: development selection и untouched-final go сохране�
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия84AA: frozen replication selected84Z сохранена', () => {
+test('серия84AA: independently verified frozen replication go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-multivariant-replication');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared read-only/);
-  assert.match(item.source,/SHAcb761051/);assert.match(item.source,/motions441–450/);
-  assert.match(item.results,/No training, fitting or development selection/);assert.match(item.results,/96\/160/);assert.match(item.limitations,/Series85 blocked/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/independently verified strict replication go/);assert.match(item.status,/series85 unblocked/);
+  assert.match(item.source,/SHA93daa4e4/);assert.match(item.source,/motions441–450/);assert.match(item.source,/no training, fit or selection/);
+  assert.match(item.results,/142\/160/);assert.match(item.results,/73\/80 vs84V/);assert.match(item.results,/corners16\/16/);assert.match(item.limitations,/separately preregistered stage/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
