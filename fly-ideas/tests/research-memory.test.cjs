@@ -660,3 +660,11 @@ test('серия88: actuator bridge prototype go сохранён', () => {
   assert.match(item.limitations,/integration not independently replayable/);assert.match(item.limitations,/disclosed421–566 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89: closed-loop validation package сохранён', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-closed-loop-embodied-validation');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered production package/);assert.match(item.status,/not run/);
+  assert.match(item.source,/motions567–602/);assert.match(item.source,/1296 trials/);assert.match(item.results,/zero-state/);assert.match(item.results,/shared-lesion/);assert.match(item.results,/90% blocking gates/);
+  assert.match(item.limitations,/Reduced six-joint actuator\/support surrogate/);assert.match(item.limitations,/Series90 remains blocked/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});

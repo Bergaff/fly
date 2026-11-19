@@ -287,3 +287,7 @@ Attached summary-21 SHA `033a2fc…`; exact pins, no training,36 calibration+480
 ## Серия88: completed actuator bridge prototype go
 
 Attached summary-22 SHA `94fac84c…`; exact runner88/87/go87/model84Z pins, no training. Motions537–566 ×16 =480 unique cases. Finite/limits/support/torque-energy all pass. Closed/open target tracking0.053664/0.367405, wins480/480; completion479/480 vs required432. Only motion545 corner1 is below completion threshold, despite low tracking0.018344. Output-vs-truth by action0.295614/0.463626/0.287572, so go concerns actuator tracking, not solved visual/task accuracy. Primary independently recomputed from exported case metrics; trajectories/torque series absent, so integration cannot be independently replayed. Reduced geometric contact/support surrogate, not FlyGym, muscles or free-standing body. Series89 allowed separately; motions421–566 disclosed. See result/extract/fixture.
+
+## Серия89: prepared, not run
+
+Preregistered package: `RUN-CLOSED-LOOP-EMBODIED-VALIDATION.bat`, runner89, plan and static tests. Exact go88/runner88 pins; frozen84Z, no training. New motions567–602 ×12 interior views =432 visual cases; three initial profiles =1296 embodied trials. Paired normal/zero/shuffled/open/shared-lesion controls under the same disturbance. Metrics: truth angle, geometric contact MAE, safety, effort, completion, recovery. All normal safety trials; ≥1167/1296 recovery/completion and angle wins against every control; contact wins against≥3 controls. Reduced surrogate only. Series90 remains blocked pending go89.
