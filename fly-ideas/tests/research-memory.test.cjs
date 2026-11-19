@@ -670,11 +670,11 @@ test('серия89: strict operational no-go сохранён', () => {
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89B: bounded calibration development сохранён', () => {
+test('серия89B: strict contact no-go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-bounded-policy-calibration-89b');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered development package/);assert.match(item.status,/series90 blocked/);
-  assert.match(item.source,/Development603–620/);assert.match(item.source,/final621–638/);assert.match(item.source,/648 trials/);
-  assert.match(item.results,/action-agnostic13→6 ridge0.08/);assert.match(item.results,/uncalibrated/);assert.match(item.results,/90% paired gates/);
-  assert.match(item.limitations,/Go allows only frozen89C replication/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/strict contact no-go/);assert.match(item.status,/series89C and90 blocked/);
+  assert.match(item.source,/SHAf4351c05/);assert.match(item.source,/Development603–620/);assert.match(item.source,/final621–638/);
+  assert.match(item.results,/Safety648/);assert.match(item.results,/limits0/);assert.match(item.results,/wins648\/630\/648\/637\/648/);assert.match(item.results,/Contact wins374\/648\/577\/574\/568/);
+  assert.match(item.limitations,/aggregate means cannot replace/);assert.match(item.limitations,/disclosed421–638 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
