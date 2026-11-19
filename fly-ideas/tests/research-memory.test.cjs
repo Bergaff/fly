@@ -625,11 +625,11 @@ test('серия84AA: independently verified frozen replication go сохран�
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия85: shared latent population prototype сохранён', () => {
+test('серия85: shared latent population prototype go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-shared-latent-population');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);
-  assert.match(item.source,/Six semantic units/);assert.match(item.source,/motions451–470/);
-  assert.match(item.results,/4\/6 dual-active/);assert.match(item.results,/1000-permutation/);assert.match(item.results,/within2%/);
-  assert.match(item.limitations,/Artificial engineer-defined/);assert.match(item.limitations,/Near-miss is no-go/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/operational shared-population prototype go/);assert.match(item.status,/series86 allowed/);
+  assert.match(item.source,/SHA f3fc151b/);assert.match(item.source,/motions451–470/);assert.match(item.source,/320 unique cases/);
+  assert.match(item.results,/Dual-active6\/6 each/);assert.match(item.results,/RSA0.749845\/0.793694/);assert.match(item.results,/State immutable320\/320/);
+  assert.match(item.limitations,/cannot be independently recomputed/);assert.match(item.limitations,/exclude disclosed421–470/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
