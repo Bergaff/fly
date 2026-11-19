@@ -651,3 +651,11 @@ test('серия87: causal operational go сохранён', () => {
   assert.match(item.limitations,/intervention construction/);assert.match(item.limitations,/Series88 allowed/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия88: actuator bridge production package сохранён', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-actuator-bridge-prototype');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered production package/);assert.match(item.status,/not run/);
+  assert.match(item.source,/motions537–566/);assert.match(item.source,/480 visual-actuator cases/);assert.match(item.results,/72-coefficient state/);assert.match(item.results,/proprioceptive q\/dq feedback/);
+  assert.match(item.limitations,/Reduced actuator\/support surrogate/);assert.match(item.limitations,/Series89 remains blocked/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
