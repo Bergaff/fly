@@ -696,3 +696,12 @@ test('серия89B3: strict contact no-go сохранён', () => {
   assert.match(item.limitations,/All21 identity errors/);assert.match(item.limitations,/disclosed421–710 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89B4: preregistered head development сохранена',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-head-identity-contact-89b4');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/development711–728/);assert.match(item.source,/final729–746/);
+  assert.match(item.results,/30-D grouped-CV/);assert.match(item.results,/never receives truth action/);assert.match(item.results,/6\/9 controls/);
+  assert.match(item.limitations,/Oracle has label leakage/);assert.match(item.limitations,/only frozen89C/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});

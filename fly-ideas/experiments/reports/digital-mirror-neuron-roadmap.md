@@ -245,3 +245,5 @@ Series89B завершена strict contact no-go. Calibrator снизил angle
 89B2 завершена strict direct-contact no-go. Safety и все angle gates прошли; candidate contact mean улучшен0,204104→0,179762 и4/6 controls проходят. Но mandatory paired benefit vs angle-only525/648 не достиг584; reach только135/216. Aggregate improvement не заменяет paired90%.89C/90 blocked. Следующий допустимый путь только new development89B3 на новых motions/views;421–674 раскрыты.
 
 89B3 завершена strict contact no-go. Identity195/216 прошла ровно, все21 ошибки head; safety и angle прошли. Contact mean улучшена, angle-only590 проходит, но mandatory common579<584 и только3/7 controls проходят вместо5. Head contact остаётся слабым. Нельзя округлять579.89C/90 blocked; допустим только new head-focused development89B4 на новых motions/views;421–710 раскрыты.
+
+89B4 подготовлена: grouped-CV30-D identity, head-weighted experts, soft mixture и oracle diagnostic на development711–728; untouched final729–746. Candidate true label не получает. Только full go разрешит frozen89C;90 blocked.

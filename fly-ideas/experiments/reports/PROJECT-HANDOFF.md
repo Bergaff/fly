@@ -303,3 +303,7 @@ Attached summary-25 SHA `6e3f9c22…`; exact pins, selected lambda1.0, final216 
 ## Серия89B3: completed strict contact no-go
 
 Attached summary-26 SHA `dd16e35a…`; exact pins, final216 cases/648 trials. Identity195/216 exactly passes: all21 errors are head. Safety/recovery/completion648 and all angle gates pass. Contact mean candidate/angle-only/common0.141665/0.187608/0.169858. Wins angle-only590 pass, common579 fail by5; uncal530, zero648, shuffled645, open567, lesion522. Only3/7 pass vs required5. Head contact weak. Aggregate gains cannot replace gates.89C/90 blocked; motions421–710 disclosed. See result/extract/fixture.
+
+## Серия89B4: prepared, not run
+
+Development711–728×8 fits30-D ridge identity selected grouped-CV, head-weighted experts, per-action lambda and soft-mixture temperature. Untouched final729–746×12=216 cases/648 trials. Candidate has no true label; oracle expert is diagnostic label-leak control. Gates: identity195, safety, angle, contact angle-only/common≥584,≥6/9 controls, candidate mean≤hard and≤oracle+0.02. Go only allows frozen89C;90 blocked.
