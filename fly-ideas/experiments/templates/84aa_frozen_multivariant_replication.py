@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Series84AA: read-only frozen replication of selected model84Z on motions441-450."""
 from __future__ import annotations
-import argparse,hashlib,importlib.util,json,sys,uuid
+import argparse,hashlib,importlib.util,json,os,sqlite3,sys,traceback,uuid
 from datetime import datetime
 from pathlib import Path
 import numpy as np
@@ -39,9 +39,26 @@ def selected_bundle(path,ev):
 def predict_model(mod,x):return (x-mod['mean'])/mod['scale']@mod['weights']+mod['intercept']
 def predict_selected(bundle,x):return np.clip(bundle['new_weight']*predict_model(bundle['new'],x)+(1-bundle['new_weight'])*predict_model(bundle['source84v'],x),-np.pi*55/180,np.pi*55/180)
 
+def completed_state(dbpath,z,b,proto,ck,fixture):
+ # A replication must verify the protocol stored during84Z, not regenerate it from
+ # the current Python/package/console environment. Regeneration incorrectly rejects
+ # a valid completed run when only those runtime versions differ.
+ with sqlite3.connect(Path(dbpath).resolve().as_uri()+'?mode=ro',uri=True) as db:
+  row=db.execute("SELECT value FROM metadata WHERE key='protocol'").fetchone()
+ if not row:raise ValueError('Не найден протокол series84Z в study.sqlite3.')
+ saved=json.loads(row[0]);state=ck.open_verified(dbpath,saved);stage,seconds=b.get_phase(dbpath)
+ expected_mode='fixture' if fixture else'long'
+ if stage!='completed' or saved.get('mode')!=expected_mode:raise ValueError('Нужна завершённая production series84Z.')
+ if saved.get('schema')!='multivariant-ridge-ensemble-v1' or saved.get('script_sha256')!=RUNNER84Z_SHA:raise ValueError('Это не exact frozen protocol runner84Z.')
+ if not fixture and (saved.get('fixture_limit') is not None or saved.get('target_candidates')!=16384 or state.get('next_id')!=16384):raise ValueError('Нужен полный production protocol84Z: 16384 candidates.')
+ variants=saved.get('variants');names=[x.get('name') for x in variants] if isinstance(variants,list) and all(isinstance(x,dict) for x in variants) else []
+ if names!=['ridge_0175','ridge_0350','ridge_0700','ridge_1400','ensemble_v75_new25','ensemble_v50_new50']:raise ValueError('Frozen variants protocol84Z отличается.')
+ dev=saved.get('development',{});final=saved.get('evaluation',{})
+ if dev.get('motion_seed')!=8434 or dev.get('holdouts')!=list(range(421,431)) or final.get('motion_seed')!=8435 or final.get('holdouts')!=list(range(431,441)):raise ValueError('Development/final protocol84Z отличается.')
+ return saved,state,seconds
+
 def source(folder,fixture=False):
- z=load84z();b=z.m;proto,ev,pre,stim,ck,base,large=b.dependencies();folder=Path(folder).resolve();saved,state,stage,_=b.saved_state(folder/'study.sqlite3',proto,ck)
- if stage!='completed':raise ValueError('Нужна завершённая series84Z.')
+ z=load84z();b=z.m;proto,ev,pre,stim,ck,base,large=b.dependencies();folder=Path(folder).resolve();saved,state,_=completed_state(folder/'study.sqlite3',z,b,proto,ck,fixture)
  result=folder/'result';b.verify_result(result,saved,state);summary=json.loads((result/'summary.json').read_text(encoding='utf8'));expected='fixture_completed' if fixture else'completed'
  if summary.get('status')!=expected or not summary.get('primary',{}).get('passed'):raise ValueError('Нужен завершённый go84Z соответствующего режима.')
  paths=(folder/'study.sqlite3',result/'model_selected.npz',result/'source84v_model.npz',result/'source84s_model.npz',result/'source84r_model.npz',result/'summary.json',result/'complete.json');extra=folder/'evaluation-recovery.json';tracked=paths+((extra,) if extra.is_file() else());before={str(p):file_sha(p) for p in tracked};model_sha=file_sha(paths[1])
@@ -96,8 +113,24 @@ def choose():
  try:
   folder=filedialog.askdirectory(title='Выберите завершённую series84Z',mustexist=True,initialdir=str(SOURCE_ROOT.resolve() if SOURCE_ROOT.exists() else Path.cwd()),parent=root)
   if not folder:print('Выбор отменён.');return
-  root.withdraw();root.update();run(folder)
+  root.withdraw();root.update();result=run(folder)
+  if os.name=='nt':os.startfile(str(result))
+  from tkinter import messagebox
+  messagebox.showinfo('Серия84AA завершена','Replication завершена. Папка результата открыта.\n\nПередайте файл summary.json.',parent=root)
  finally:root.destroy()
+def failure_report(exc):
+ path=ROOT/'ПОСЛЕДНЯЯ-ОШИБКА-84AA.txt';path.parent.mkdir(parents=True,exist_ok=True)
+ text=('СЕРИЯ 84AA: ОТЧЁТ ОБ ОШИБКЕ\n'+datetime.now().isoformat()+'\n\n'+type(exc).__name__+': '+str(exc)+'\n\n'+traceback.format_exc()+'\nSource84Z не изменялась.\n')
+ path.write_text(text,encoding='utf-8-sig')
+ if os.name=='nt':
+  try:os.startfile(str(path))
+  except OSError:pass
+ try:
+  import tkinter as tk
+  from tkinter import messagebox
+  root=tk.Tk();root.withdraw();root.attributes('-topmost',True);messagebox.showerror('Серия84AA остановлена','Подробная ошибка сохранена и открыта в Блокноте:\n\n'+str(path.resolve())+'\n\nПришлите этот TXT-файл.',parent=root);root.destroy()
+ except Exception:pass
+ return path
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--choose',action='store_true');p.add_argument('--source84z');p.add_argument('--output-root',default=str(ROOT));p.add_argument('--allow-fixture-source',action='store_true',help=argparse.SUPPRESS);a=p.parse_args()
  if a.choose:choose()
@@ -105,4 +138,5 @@ def main():
  else:p.error('Нужен --choose или --source84z.')
 if __name__=='__main__':
  try:main()
- except Exception as exc:print(f'ОШИБКА: {type(exc).__name__}: {exc}\nSource84Z не изменялась.',file=sys.stderr,flush=True);sys.exit(1)
+ except Exception as exc:
+  report=failure_report(exc);print(f'ОШИБКА: {type(exc).__name__}: {exc}\nОтчёт: {report.resolve()}\nSource84Z не изменялась.',file=sys.stderr,flush=True);sys.exit(1)
