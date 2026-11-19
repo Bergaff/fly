@@ -652,10 +652,11 @@ test('серия87: causal operational go сохранён', () => {
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия88: actuator bridge production package сохранён', () => {
+test('серия88: actuator bridge prototype go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-actuator-bridge-prototype');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered production package/);assert.match(item.status,/not run/);
-  assert.match(item.source,/motions537–566/);assert.match(item.source,/480 visual-actuator cases/);assert.match(item.results,/72-coefficient state/);assert.match(item.results,/proprioceptive q\/dq feedback/);
-  assert.match(item.limitations,/Reduced actuator\/support surrogate/);assert.match(item.limitations,/Series89 remains blocked/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/actuator bridge prototype go/);assert.match(item.status,/series89 allowed/);
+  assert.match(item.source,/SHA94fac84c/);assert.match(item.source,/Motions537–566/);assert.match(item.source,/480 unique visual-actuator cases/);
+  assert.match(item.results,/tracking0.053664\/0.367405/);assert.match(item.results,/wins480\/480/);assert.match(item.results,/completed479\/480/);assert.match(item.results,/Output-vs-truth/);
+  assert.match(item.limitations,/integration not independently replayable/);assert.match(item.limitations,/disclosed421–566 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
