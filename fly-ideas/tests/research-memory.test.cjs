@@ -678,3 +678,12 @@ test('серия89B: strict contact no-go сохранён', () => {
   assert.match(item.limitations,/aggregate means cannot replace/);assert.match(item.limitations,/disclosed421–638 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89B2: contact-aware development сохранён', () => {
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-contact-aware-policy-89b2');
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered development/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/development639–656/);assert.match(item.source,/final657–674/);assert.match(item.source,/648 trials/);
+  assert.match(item.results,/13→2 contact predictor/);assert.match(item.results,/angle-only/);assert.match(item.results,/≥4\/6 controls/);
+  assert.match(item.limitations,/Frozen89C was not prepared because89B failed/);
+  for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
+});
