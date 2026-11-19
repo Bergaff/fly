@@ -679,11 +679,11 @@ test('серия89B: strict contact no-go сохранён', () => {
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89B2: contact-aware development сохранён', () => {
+test('серия89B2: strict direct-contact no-go сохранён', () => {
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-contact-aware-policy-89b2');
-  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered development/);assert.match(item.status,/89C\/90 blocked/);
-  assert.match(item.source,/development639–656/);assert.match(item.source,/final657–674/);assert.match(item.source,/648 trials/);
-  assert.match(item.results,/13→2 contact predictor/);assert.match(item.results,/angle-only/);assert.match(item.results,/≥4\/6 controls/);
-  assert.match(item.limitations,/Frozen89C was not prepared because89B failed/);
+  assert.ok(item && item.ideaId==='i-observational');assert.match(item.status,/strict direct-contact no-go/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/SHA6e3f9c22/);assert.match(item.source,/development639–656/);assert.match(item.source,/final657–674/);
+  assert.match(item.results,/Safety648/);assert.match(item.results,/angle wins648\/648\/648\/639\/648/);assert.match(item.results,/angle-only525/);assert.match(item.results,/direct required584 fails/);
+  assert.match(item.limitations,/reach135\/216/);assert.match(item.limitations,/disclosed421–674 excluded/);
   for (const name of item.files) assert.ok(fs.existsSync(path.join(root,name)),name);
 });

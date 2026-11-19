@@ -296,6 +296,6 @@ Attached summary-23 SHA `0b44d61b…`; corrected runner89 SHA `e0412778…`, exa
 
 Attached summary-24 SHA `f4351c05…`; exact pins, development7056 frames, final216 cases/648 trials. Calibrator raw/calibrated/projected RMSE0.810772/0.247240/0.248161. Safety648, recovery645, completion648. Candidate angle0.257795 vs uncalibrated0.763503 and zero0.390803; angle wins648/630/648/637/648 all pass; limits0. Contact wins374/648/577/574/568, required584 and≥4 controls: only zero passes. Aggregate contact means cannot replace paired gate. Strong engineering improvement but strict no-go.89C/90 blocked; motions421–638 disclosed. See result/extract/fixture.
 
-## Серия89B2: prepared, not run
+## Серия89B2: completed strict direct-contact no-go
 
-User requested89C, but frozen89C is gate-blocked by failed89B. Prepared admissible contact-aware development instead. Development639–656×8=144 cases fits angle model,13→2 contact predictor and selects lambda from0/.25/.5/1/2/4 by development score. Untouched final657–674×12=216 cases/648 trials. Candidate must beat angle-only contact≥584, beat≥4/6 contact controls, retain angle≤1.05 angle-only and all safety. Go only allows true frozen89C.90 blocked.
+Attached summary-25 SHA `6e3f9c22…`; exact pins, selected lambda1.0, final216 cases/648 trials. Safety648, recovery645, completion648; all angle gates pass. Contact mean candidate/angle-only0.179762/0.204104. Contact wins angle-only525, uncalibrated446, zero648, shuffled648, open589, lesion640; required584. Four controls pass, but mandatory direct angle-only fails. Direct wins by action209/181/135; reach weakest. Aggregate improvement cannot replace paired gate.89C/90 blocked; motions421–674 disclosed. See result/extract/fixture.
