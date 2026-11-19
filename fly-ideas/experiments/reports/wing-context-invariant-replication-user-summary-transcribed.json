@@ -1,0 +1,214 @@
+{
+  "schema": "wing-context-replication-result-v1",
+  "created_utc": "2026-11-09T13:54:15.529976+00:00",
+  "status": "completed",
+  "protocol": {
+    "schema": "wing-context-replication-v1",
+    "created_utc": "2026-11-09T13:54:13.655406+00:00",
+    "script_sha256": "7e88c46704b889c2b0cd8903730f0f3a5fa0ef89835928bfa2c9094c0d8bb6bc",
+    "series63_script_sha256": "a14ce9046f82bd704984990eb7bfc7eea9b7cd5e837240379b1cf1d8e501b3e1",
+    "source_series63": "E:\\ass\\fly\\fly-ideas\\workspace\\runs\\ideas\\i-observational\\wing-context-invariant\\wing_context_invariant_20261109_114635_6887456e",
+    "source_series63_protocol_sha256": "ca0af09850345fb36e820740eadf606caea26f825458a4ddddf38b47cb2f578f",
+    "control_model_sha256": "f2ef4321e3438ac719e2148da3dc6821fb95abc43d537095728c05be214716ad",
+    "context_invariant_model_sha256": "4e3309e3bbafbdff85d6bf18113a9cc7eb2ce836c16b09e0e2f58b5ab855a793",
+    "holdouts": [
+      {
+        "index": 1,
+        "copy": "input/holdout_001.json",
+        "source_sha256": "9bcf1f4a05448b71a0c85a12d641f44f0d5c959d832985db7067fbca4bc1f163",
+        "motion_sha256": "90b29ef78833b0a84c9241b30a179af2e374c8e5b7a42abf13936c68a2b4a5b8",
+        "original_basename": "wing-trajectory11.json"
+      },
+      {
+        "index": 2,
+        "copy": "input/holdout_002.json",
+        "source_sha256": "f15c483dc5bb125f886cf34edbdbcbeea579f4b216b56b21a85c9c3b928d98d3",
+        "motion_sha256": "7b38ade07720d23b99f73c3ace7c16feb0983b9ce8346eb058b2a19e57e0921a",
+        "original_basename": "wing-trajectory12.json"
+      },
+      {
+        "index": 3,
+        "copy": "input/holdout_003.json",
+        "source_sha256": "c39fb2ab7ea7c8cbf5a10167d5b5d7a96870266b35b94c9144675f505482f2da",
+        "motion_sha256": "7b088a0712dbe5852ac27588d8a9fa0f3d29722ded5bbd6f5a0cd6a3ea272f8a",
+        "original_basename": "wing-trajectory13.json"
+      },
+      {
+        "index": 4,
+        "copy": "input/holdout_004.json",
+        "source_sha256": "29df6e96a0817e7fc635f0833c6f05f5e645d6e2da7136dd3fb2c444bb138a81",
+        "motion_sha256": "06bcb616a991cf2f31e3e02f53cd74f828fc5b4e093dd496d6ec72f28d07a091",
+        "original_basename": "wing-trajectory14.json"
+      },
+      {
+        "index": 5,
+        "copy": "input/holdout_005.json",
+        "source_sha256": "e4dfd8b78d7543e35f60cad190e76e0706483b150f3fb448997cd049d6a2468a",
+        "motion_sha256": "3fbf12ef88f7b9458caa27727d1b20021f807df934059b31142716304137f987",
+        "original_basename": "wing-trajectory15.json"
+      }
+    ],
+    "primary_metric": "mean across five holdouts of (context-invariant right_x RMSE - control right_x RMSE)",
+    "improvement_direction": "negative",
+    "secondary_metrics": [
+      "pooled right_x RMSE and SSE",
+      "mean paired MAE difference",
+      "total opposite-sign frames",
+      "pooled mean error"
+    ],
+    "target_axis": "right_x",
+    "models_frozen": true
+  },
+  "aggregate": {
+    "holdouts": 5,
+    "frames": 245,
+    "primary_mean_paired_rmse_difference_rad": 0.00927617258003438,
+    "holdouts_rmse_better": 3,
+    "holdouts_rmse_worse": 2,
+    "mean_paired_mae_difference_rad": 0.028225218890405385,
+    "control_pooled": {
+      "frames": 245,
+      "sse_rad2": 47.46988587090047,
+      "rmse_rad": 0.4401756878880943,
+      "mae_rad": 0.30587890042793114,
+      "mean_error_rad": -0.13950370819671196,
+      "opposite_sign_frames": 52
+    },
+    "context_invariant_pooled": {
+      "frames": 245,
+      "sse_rad2": 48.393426178296174,
+      "rmse_rad": 0.44443693420196473,
+      "mae_rad": 0.33410411931833645,
+      "mean_error_rad": -0.06676993247998696,
+      "opposite_sign_frames": 75
+    },
+    "pooled_rmse_change_percent": 0.9680785266254377
+  },
+  "holdouts": [
+    {
+      "holdout_index": 1,
+      "frames": 49,
+      "source_sha256": "9bcf1f4a05448b71a0c85a12d641f44f0d5c959d832985db7067fbca4bc1f163",
+      "motion_sha256": "90b29ef78833b0a84c9241b30a179af2e374c8e5b7a42abf13936c68a2b4a5b8",
+      "control": {
+        "frames": 49,
+        "sse_rad2": 4.776998766010196,
+        "rmse_rad": 0.31223351955692064,
+        "mae_rad": 0.21542785239102966,
+        "mean_error_rad": -0.039405289052539275,
+        "opposite_sign_frames": 5
+      },
+      "context_invariant": {
+        "frames": 49,
+        "sse_rad2": 5.89901744428212,
+        "rmse_rad": 0.34696989942615825,
+        "mae_rad": 0.2552628516676005,
+        "mean_error_rad": 0.01038745658941078,
+        "opposite_sign_frames": 9
+      },
+      "paired_rmse_difference_rad": 0.03473637986923761,
+      "paired_mae_difference_rad": 0.03983499927657083
+    },
+    {
+      "holdout_index": 2,
+      "frames": 49,
+      "source_sha256": "f15c483dc5bb125f886cf34edbdbcbeea579f4b216b56b21a85c9c3b928d98d3",
+      "motion_sha256": "7b38ade07720d23b99f73c3ace7c16feb0983b9ce8346eb058b2a19e57e0921a",
+      "control": {
+        "frames": 49,
+        "sse_rad2": 10.137207848763154,
+        "rmse_rad": 0.4548426022613769,
+        "mae_rad": 0.31347147249229185,
+        "mean_error_rad": -0.09827845280137014,
+        "opposite_sign_frames": 9
+      },
+      "context_invariant": {
+        "frames": 49,
+        "sse_rad2": 9.729021367932127,
+        "rmse_rad": 0.4455911315190314,
+        "mae_rad": 0.33517107279280856,
+        "mean_error_rad": -0.02197406149776443,
+        "opposite_sign_frames": 13
+      },
+      "paired_rmse_difference_rad": -0.009251470742345502,
+      "paired_mae_difference_rad": 0.021699600300516708
+    },
+    {
+      "holdout_index": 3,
+      "frames": 49,
+      "source_sha256": "c39fb2ab7ea7c8cbf5a10167d5b5d7a96870266b35b94c9144675f505482f2da",
+      "motion_sha256": "7b088a0712dbe5852ac27588d8a9fa0f3d29722ded5bbd6f5a0cd6a3ea272f8a",
+      "control": {
+        "frames": 49,
+        "sse_rad2": 6.389003398225683,
+        "rmse_rad": 0.36109254278312836,
+        "mae_rad": 0.2570008164058361,
+        "mean_error_rad": -0.06245727308160131,
+        "opposite_sign_frames": 7
+      },
+      "context_invariant": {
+        "frames": 49,
+        "sse_rad2": 9.311664773733785,
+        "rmse_rad": 0.4359288645801731,
+        "mae_rad": 0.32732637672209763,
+        "mean_error_rad": -0.027096519947213016,
+        "opposite_sign_frames": 13
+      },
+      "paired_rmse_difference_rad": 0.07483632179704475,
+      "paired_mae_difference_rad": 0.07032556031626153
+    },
+    {
+      "holdout_index": 4,
+      "frames": 49,
+      "source_sha256": "29df6e96a0817e7fc635f0833c6f05f5e645d6e2da7136dd3fb2c444bb138a81",
+      "motion_sha256": "06bcb616a991cf2f31e3e02f53cd74f828fc5b4e093dd496d6ec72f28d07a091",
+      "control": {
+        "frames": 49,
+        "sse_rad2": 14.759650763357975,
+        "rmse_rad": 0.5488327272653387,
+        "mae_rad": 0.40542785521979524,
+        "mean_error_rad": -0.2709391590568376,
+        "opposite_sign_frames": 16
+      },
+      "context_invariant": {
+        "frames": 49,
+        "sse_rad2": 12.80279216218577,
+        "rmse_rad": 0.5111569941785682,
+        "mae_rad": 0.4057303781957579,
+        "mean_error_rad": -0.17596961489091806,
+        "opposite_sign_frames": 19
+      },
+      "paired_rmse_difference_rad": -0.037675733086770524,
+      "paired_mae_difference_rad": 0.0003025229759626713
+    },
+    {
+      "holdout_index": 5,
+      "frames": 49,
+      "source_sha256": "e4dfd8b78d7543e35f60cad190e76e0706483b150f3fb448997cd049d6a2468a",
+      "motion_sha256": "3fbf12ef88f7b9458caa27727d1b20021f807df934059b31142716304137f987",
+      "control": {
+        "frames": 49,
+        "sse_rad2": 11.407025094543462,
+        "rmse_rad": 0.4824898242459492,
+        "mae_rad": 0.3380665056307026,
+        "mean_error_rad": -0.2264383669912115,
+        "opposite_sign_frames": 15
+      },
+      "context_invariant": {
+        "frames": 49,
+        "sse_rad2": 10.650930430162367,
+        "rmse_rad": 0.4662251893089548,
+        "mae_rad": 0.3470299172134178,
+        "mean_error_rad": -0.11919692265345005,
+        "opposite_sign_frames": 21
+      },
+      "paired_rmse_difference_rad": -0.016264634936994427,
+      "paired_mae_difference_rad": 0.008963411582715186
+    }
+  ],
+  "limitations": [
+    "Пять движений созданы пользователем и закреплены до прогнозов, но не являются слепым биологическим экспериментом.",
+    "Модели заморожены; серия 64 проверяет переносимость результата, а не выбирает новый метод.",
+    "Пять движений не являются биологическими повторами или доказательством зеркальных нейронов."
+  ]
+}

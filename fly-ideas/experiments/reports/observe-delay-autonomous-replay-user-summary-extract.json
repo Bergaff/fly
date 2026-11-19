@@ -1,0 +1,109 @@
+{
+  "transcription": {
+    "source": "summary.json pasted by user; original file bytes not received",
+    "schema": "observe-delay-autonomous-replay-result-v1",
+    "created_utc": "2026-11-10T18:11:50.907448+00:00",
+    "status": "completed"
+  },
+  "protocol": {
+    "training_episodes": 60094,
+    "holdouts": 5,
+    "delay_s": 0.5,
+    "observer_units": 24,
+    "observer_temporal_basis": 10,
+    "internal_state_coefficients": 72,
+    "output_temporal_basis": 12,
+    "ridge": 1.0,
+    "projection_seed": 6601,
+    "workers": 2,
+    "runner59_sha256": "5c700f4c72f3614c245ab34f2b7bf7f8469e3114cb46568556157a2b99e5ddcf",
+    "script_sha256": "108056b3f86583a300defebd01e2c0b03205bc29534a75106d9c99b283d0a1f4",
+    "source_database_sha256": "e57c47736052d2707de81e8a4476b8089344cb6c4d4fb3ac04d3e204fb7fed52",
+    "source_protocol_sha256": "a1709c7c853ccaf1f5edcef33e240a0068f2fa17e3031c6297650a7cff889e4c",
+    "model_sha256": "c14bcf72893940ce3e45040d7a1caa7692b0953f8c194c7c75c90f2cbbcc6678"
+  },
+  "aggregate": {
+    "primary_mean_normal_minus_zero_rmse_rad": 0.022359172956532346,
+    "normal_better_than_zero": 1,
+    "mean_normal_rmse_rad": 0.3866169500926599,
+    "mean_zero_rmse_rad": 0.36425777713612756,
+    "mean_control_rmse_rad": {
+      "reversed": 0.39753931338087656,
+      "shuffled": 0.39137431525799643,
+      "static": 0.3857044829727376,
+      "closed": 0.42490273637696097
+    }
+  },
+  "holdouts": [
+    {
+      "index": 1,
+      "basename": "wing-trajectory21.json",
+      "source_sha256": "e62e40eb5352304f16fbb3817546e2373207033f9dbbda371087ce7f8668e2c9",
+      "motion_sha256": "3628ada0eee2a0e82edc18c779a1a330a13f237388e07395861bc50af655230f",
+      "normal_rmse_rad": 0.3683497322521165,
+      "zero_rmse_rad": 0.33283366115815205,
+      "normal_minus_zero_rmse_rad": 0.03551607109396443,
+      "controls_rmse_rad": {"reversed": 0.3766527989173368, "shuffled": 0.3611301392825325, "static": 0.3518245737540141, "closed": 0.39053584331226315},
+      "normal_axis_rmse_rad": {"left_x": 0.42869514399501285, "left_y": 0.3595248490613485, "left_z": 0.44093722667386614, "right_x": 0.30433652676963546, "right_y": 0.3292803645864546, "right_z": 0.32493013099512846},
+      "zero_axis_rmse_rad": {"left_x": 0.34843902238975866, "left_y": 0.39518993082595555, "left_z": 0.37156589672597423, "right_x": 0.19389749952877322, "right_y": 0.30306357033998377, "right_z": 0.3458029187976539},
+      "normal_opposite_sign_values": 148,
+      "internal_state_sha256": "20bf2fb010fe79e2c04d168e670142a5aa50c9dc307adc9d22e7721e261b332a"
+    },
+    {
+      "index": 2,
+      "basename": "wing-trajectory22.json",
+      "source_sha256": "ac93c051cfaccbda4eab147d34f4e0fd7a0068271be0f9a2ba009afd21166d52",
+      "motion_sha256": "622d448a2b97846ad01f04f3d3a6f0966f3b30698d78c90e543e68c744431b1f",
+      "normal_rmse_rad": 0.40184571164649013,
+      "zero_rmse_rad": 0.40577246098348574,
+      "normal_minus_zero_rmse_rad": -0.003926749336995605,
+      "controls_rmse_rad": {"reversed": 0.3999560183018325, "shuffled": 0.40063619823962904, "static": 0.3999417257588475, "closed": 0.4355448207109139},
+      "normal_axis_rmse_rad": {"left_x": 0.43163717877603647, "left_y": 0.3244407175684075, "left_z": 0.4802887604698036, "right_x": 0.3801851762332549, "right_y": 0.2584872749974301, "right_z": 0.4850501927607872},
+      "zero_axis_rmse_rad": {"left_x": 0.45945086091955667, "left_y": 0.3371169849653708, "left_z": 0.44315030371402825, "right_x": 0.3833889712792823, "right_y": 0.29876344092770074, "right_z": 0.4801415382867027},
+      "normal_opposite_sign_values": 125,
+      "internal_state_sha256": "2cade1f875a9254a7c1c0bdfdba6eae8c521c25944ce0431cb2515de87e880d1"
+    },
+    {
+      "index": 3,
+      "basename": "wing-trajectory23.json",
+      "source_sha256": "59b094f97d7713c8a125f7bd9561afbb2542c507b0dfe522c335eb0c581a607e",
+      "motion_sha256": "32677a11dbe62d7f50af63847e7699d3b9022854f0b968689bbcded04dc687c8",
+      "normal_rmse_rad": 0.35696635029692436,
+      "zero_rmse_rad": 0.33311528749710484,
+      "normal_minus_zero_rmse_rad": 0.023851062799819522,
+      "controls_rmse_rad": {"reversed": 0.3711895383834665, "shuffled": 0.3707970034331864, "static": 0.3742414747591857, "closed": 0.4358539756274235},
+      "normal_axis_rmse_rad": {"left_x": 0.5187730950260905, "left_y": 0.2017014383097575, "left_z": 0.3825094085494553, "right_x": 0.41132875657769785, "right_y": 0.2956948672775973, "right_z": 0.2275974713737828},
+      "zero_axis_rmse_rad": {"left_x": 0.43783740784056824, "left_y": 0.27216341053849674, "left_z": 0.4087830229719109, "right_x": 0.2939335071675816, "right_y": 0.27493164272676734, "right_z": 0.2663313277983857},
+      "normal_opposite_sign_values": 129,
+      "internal_state_sha256": "bd5c061a1f9d225c33d3e40e7900c031674f4271d27a98ee382210e7e179c75e"
+    },
+    {
+      "index": 4,
+      "basename": "wing-trajectory24.json",
+      "source_sha256": "07d16719ff4f4ab2bb594845c95119d883ead380e6ce29e972656d64cff39107",
+      "motion_sha256": "58ae5c22fe76a2152813fdaf467555b9446e57fe6794abc78f75b9c31a59b948",
+      "normal_rmse_rad": 0.39455051650706385,
+      "zero_rmse_rad": 0.3844512468919104,
+      "normal_minus_zero_rmse_rad": 0.01009926961515345,
+      "controls_rmse_rad": {"reversed": 0.43412099632093243, "shuffled": 0.4354281312116702, "static": 0.3979088354754006, "closed": 0.4623666747785242},
+      "normal_axis_rmse_rad": {"left_x": 0.3981091170813708, "left_y": 0.25345328731227335, "left_z": 0.3470802335721675, "right_x": 0.410017126813704, "right_y": 0.2848241352606091, "right_z": 0.5844550467394476},
+      "zero_axis_rmse_rad": {"left_x": 0.2931440095354368, "left_y": 0.38916215149409183, "left_z": 0.38174151525571304, "right_x": 0.31467369728804134, "right_y": 0.3195422996744844, "right_z": 0.550075063443648},
+      "normal_opposite_sign_values": 137,
+      "internal_state_sha256": "947084532208250fc55cd13b770a7df14ddd4f4408fdfca99ee639f6954c39cc"
+    },
+    {
+      "index": 5,
+      "basename": "wing-trajectory25.json",
+      "source_sha256": "032ea8441ad8522adc87e2564f88a3bf7117325e8dd4f8447096319b068fd8ab",
+      "motion_sha256": "873a1946cab7f7f627a944a30dded8cd5f4566e31c21c6ec98a8b1ad948c53b6",
+      "normal_rmse_rad": 0.41137243976070476,
+      "zero_rmse_rad": 0.3651162291499848,
+      "normal_minus_zero_rmse_rad": 0.04625621061071994,
+      "controls_rmse_rad": {"reversed": 0.40577721498081437, "shuffled": 0.38888010412296414, "static": 0.40460580511623995, "closed": 0.40021236745567995},
+      "normal_axis_rmse_rad": {"left_x": 0.4384006933928871, "left_y": 0.37773973162232105, "left_z": 0.49241715352099413, "right_x": 0.40641000039231234, "right_y": 0.35428373317668194, "right_z": 0.3838235626695895},
+      "zero_axis_rmse_rad": {"left_x": 0.34139135651643976, "left_y": 0.3830919167895901, "left_z": 0.3264213120495813, "right_x": 0.3318113469535026, "right_y": 0.41303792674956846, "right_z": 0.3863958046585374},
+      "normal_opposite_sign_values": 149,
+      "internal_state_sha256": "5bf098a4eb02eb104de0b21753ff0f939160b3303b5f26d5db136bf550b4034c"
+    }
+  ]
+}

@@ -1,0 +1,578 @@
+{
+  "schema": "series-81-user-result-extract-v1",
+  "source": "attached original summary-3.json",
+  "source_file_sha256": "ef7e8b70532c6a6a7d87d44ffd7e0c7efd590e848bb36be01349b320238e3f08",
+  "status": "completed",
+  "protocol": {
+    "schema": "multiscale-gated-view-prototype-v1",
+    "created_utc": "2026-11-15T14:36:04.321686+00:00",
+    "script_sha256": "de0168506e7c6c15f664bf31f98749aebd4d5a9d9e863aceafceee158fb06a74",
+    "runner78_sha256": "886a2683073b0d8322cf195c88d6904424c8578a52c566420fe4da5684216caa",
+    "mode": "prototype",
+    "training_episodes": 320,
+    "training_motion_seed": 8001,
+    "training_view_seed": 8003,
+    "training_views": "50% balanced even-parity core corners; 50% continuous uniform interior",
+    "evaluation_motion_seed": 8002,
+    "evaluation_motions": 6,
+    "evaluation_views": "16 held-out odd-parity core corners",
+    "representation": {
+      "raw_features": 576,
+      "gated_canonical_features": 576,
+      "border_valid_flags": 2,
+      "total_features": 1154,
+      "raw_always_preserved": true
+    },
+    "canonicalization": {
+      "uses_metadata": false,
+      "sequence_union_foreground_threshold": 105,
+      "padding_px": 2,
+      "resize": [
+        48,
+        32
+      ],
+      "interpolation": "bilinear",
+      "gate": "canonical eye features zeroed when union foreground crop touches any image border"
+    },
+    "same_stream_raw_vs_multiscale": true,
+    "go_rule": "each outer axis multiscale pooled below raw and zero with >=60% case wins; middle multiscale below zero and no more than 10% worse raw; combined multiscale below raw/zero; FOV30 and FOV70 combined each no worse raw; >=12/16 held corners improve every outer axis",
+    "scientific_result": false
+  },
+  "go_for_long_training": false,
+  "axes": {
+    "left_proximal": {
+      "raw": 0.43052676685953617,
+      "multiscale": 0.4277803807093972,
+      "zero": 0.44722104751371383,
+      "wins_vs_raw": 60,
+      "cases": 96,
+      "passed": true
+    },
+    "left_middle": {
+      "raw": 0.3724800253421792,
+      "multiscale": 0.3613968988505795,
+      "zero": 0.513068308959383,
+      "wins_vs_raw": 66,
+      "cases": 96,
+      "passed": true
+    },
+    "left_distal": {
+      "raw": 0.4813103815461719,
+      "multiscale": 0.4821344518350173,
+      "zero": 0.48395599443106074,
+      "wins_vs_raw": 45,
+      "cases": 96,
+      "passed": false
+    },
+    "right_proximal": {
+      "raw": 0.44870046310438927,
+      "multiscale": 0.44672011355661195,
+      "zero": 0.4634124906548577,
+      "wins_vs_raw": 62,
+      "cases": 96,
+      "passed": true
+    },
+    "right_middle": {
+      "raw": 0.37182913680860075,
+      "multiscale": 0.3597843952046418,
+      "zero": 0.5068928918259556,
+      "wins_vs_raw": 65,
+      "cases": 96,
+      "passed": true
+    },
+    "right_distal": {
+      "raw": 0.461014156408654,
+      "multiscale": 0.46265120345675603,
+      "zero": 0.4618045129983536,
+      "wins_vs_raw": 40,
+      "cases": 96,
+      "passed": false
+    }
+  },
+  "combined": {
+    "raw": 0.429704824002218,
+    "multiscale": 0.42604913824849916,
+    "zero": 0.48000244930759234
+  },
+  "fov_safeguards": {
+    "30": {
+      "raw": 0.40145387288272927,
+      "multiscale": 0.4009774079135043,
+      "passed": true
+    },
+    "70": {
+      "raw": 0.45620966615034775,
+      "multiscale": 0.4497253103256972,
+      "passed": true
+    }
+  },
+  "feature_view_distance_diagnostic": {
+    "raw": 0.13440110071564657,
+    "canonical": 0.12668801237564944
+  },
+  "held_corners_outer_improved": 4,
+  "held_corners_total": 16,
+  "derived": {
+    "combined_improvement_percent": 0.8507434754095198,
+    "valid_eye_groups": {
+      "0": {
+        "cases": 48,
+        "raw_rmse": 0.40145387288272927,
+        "multiscale_rmse": 0.4009774079135042,
+        "wins": 25
+      },
+      "1": {
+        "cases": 6,
+        "raw_rmse": 0.4485407758155998,
+        "multiscale_rmse": 0.4487697712644563,
+        "wins": 4
+      },
+      "2": {
+        "cases": 42,
+        "raw_rmse": 0.45729472339944643,
+        "multiscale_rmse": 0.44986165022142477,
+        "wins": 31
+      }
+    }
+  },
+  "cells": [
+    {
+      "cell_id": 1,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": true,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.46028552744343426,
+      "multiscale_rmse": 0.45620813764752915,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 2,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": false,
+        "left_distal": false,
+        "right_proximal": false,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.43068861389097535,
+      "multiscale_rmse": 0.43266818931304213,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 3,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": true,
+        "right_proximal": true,
+        "right_distal": true
+      },
+      "all_outer_improved": true,
+      "raw_rmse": 0.38609688450305873,
+      "multiscale_rmse": 0.38540913346960715,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 4,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": false,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.38155381881507733,
+      "multiscale_rmse": 0.3815906969753597,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 5,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": true,
+        "right_proximal": true,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.3695363053481551,
+      "multiscale_rmse": 0.36972845020612793,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 6,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": false,
+        "left_distal": false,
+        "right_proximal": false,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.3894806214682741,
+      "multiscale_rmse": 0.3905672506007931,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 7,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": false,
+        "left_distal": true,
+        "right_proximal": false,
+        "right_distal": true
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.3700605982831512,
+      "multiscale_rmse": 0.3698144812576095,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 8,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": true,
+        "right_distal": true
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.41486750266130934,
+      "multiscale_rmse": 0.41325429398319874,
+      "mean_valid_canonical_eyes": 0.0
+    },
+    {
+      "cell_id": 9,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": false,
+        "left_distal": false,
+        "right_proximal": false,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.4661194866134814,
+      "multiscale_rmse": 0.47732849667337546,
+      "mean_valid_canonical_eyes": 2.0
+    },
+    {
+      "cell_id": 10,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": true,
+        "right_proximal": true,
+        "right_distal": true
+      },
+      "all_outer_improved": true,
+      "raw_rmse": 0.45084998928326087,
+      "multiscale_rmse": 0.4393771558634263,
+      "mean_valid_canonical_eyes": 2.0
+    },
+    {
+      "cell_id": 11,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": true,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.44552298514462085,
+      "multiscale_rmse": 0.4302702355629363,
+      "mean_valid_canonical_eyes": 2.0
+    },
+    {
+      "cell_id": 12,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": true,
+        "right_proximal": true,
+        "right_distal": true
+      },
+      "all_outer_improved": true,
+      "raw_rmse": 0.461309168151673,
+      "multiscale_rmse": 0.45256452607526315,
+      "mean_valid_canonical_eyes": 2.0
+    },
+    {
+      "cell_id": 13,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": true,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.4485407758155998,
+      "multiscale_rmse": 0.4487697712644563,
+      "mean_valid_canonical_eyes": 1.0
+    },
+    {
+      "cell_id": 14,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": true,
+        "right_proximal": true,
+        "right_distal": true
+      },
+      "all_outer_improved": true,
+      "raw_rmse": 0.4710791223824035,
+      "multiscale_rmse": 0.46209995659908293,
+      "mean_valid_canonical_eyes": 2.0
+    },
+    {
+      "cell_id": 15,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": true,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.4491687846559084,
+      "multiscale_rmse": 0.44140431442250144,
+      "mean_valid_canonical_eyes": 2.0
+    },
+    {
+      "cell_id": 16,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "outer_improved": {
+        "left_proximal": true,
+        "left_distal": false,
+        "right_proximal": true,
+        "right_distal": false
+      },
+      "all_outer_improved": false,
+      "raw_rmse": 0.4564330664385502,
+      "multiscale_rmse": 0.44431125013409356,
+      "mean_valid_canonical_eyes": 2.0
+    }
+  ],
+  "limitations": [
+    "Short supervised representation ablation, not a scientific long-run result.",
+    "Raw features are always preserved; canonical eye features are gated only by image-derived border validity.",
+    "Raw and multiscale models use the same balanced stream, isolating the added representation.",
+    "No autonomous replay, contacts, actuators, biological brain or mirror-neuron claim."
+  ]
+}

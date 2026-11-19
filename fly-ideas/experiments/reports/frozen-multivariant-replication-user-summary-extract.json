@@ -1,0 +1,1491 @@
+{
+  "source_file": "summary-18.json",
+  "source_file_sha256": "93daa4e4dc360b2b741ee7ff8cac6934d58d293c3aedc82bdc914184e71c468b",
+  "schema": "frozen-multivariant-replication-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "frozen-multivariant-replication-v1",
+    "mode": "full",
+    "script_sha256": "846bf4b56e7d6d221a8a5a35eb02675f16bde570ea7e7b7a8e2d822f4c33e879",
+    "runner84z_sha256": "fa4040d7271f2c98021042054ebe60767ad092de81d610a60815738be9f57a6b",
+    "selected_model_sha256": "cb7610514c423372362f6cd3512b19f39c156213728c5ecaafe17fe10734e4b0",
+    "selected_variant": "ridge_0175",
+    "right_distal_ridge": 0.175,
+    "new_weight": 1.0,
+    "source84v_model_sha256": "44b98c31526f5d43bb8eef26fd91ccec827988061df94e01c8aa0a6a19f3b7af",
+    "source84s_model_sha256": "a53e7016642db2ebd774e13a589aff841103a15fffd00430d77bf7fdbe93311f",
+    "source84r_model_sha256": "1e90771b23de33d78a4794c1fea265601a62fb8778b89f6db2c074167070e02c",
+    "motion_seed": 8436,
+    "holdouts": [
+      {
+        "id": 441,
+        "source_sha256": "8f80fb118de75080d71fcb54f04aaa802adaa7d3ca30c07e26aba44b6e9ee922",
+        "motion_sha256": "a5d3a6a5da0335a70e7128a8ec82281b5a9bff55277e5a8d5a2c6b26973e2c29",
+        "family": "piecewise5"
+      },
+      {
+        "id": 442,
+        "source_sha256": "fe5df61b03494a39a67a075f1d3357b9c4340d5267cb4d6545fc2697b9304751",
+        "motion_sha256": "8771bddd7ea53ddbbd84fb46853de1e5b89b2e7d3fce8bf42cf868b5915923b0",
+        "family": "piecewise5"
+      },
+      {
+        "id": 443,
+        "source_sha256": "cbe887c57b5d210900648495bbdd1405319a941c64f39afd5f1dee6960883946",
+        "motion_sha256": "f0f1d89a9f23fb1dd309a8927792ff6c9af751c56e1c52ff5a58c19727ae564f",
+        "family": "piecewise5"
+      },
+      {
+        "id": 444,
+        "source_sha256": "26a34e9d57ef2c4ab47393d373769bc65f10f254bbb63a8610ab5ef2e37931d9",
+        "motion_sha256": "c843826f18aa372e3498e6adfd1086b3639319111d07db058cde4c44302c871a",
+        "family": "piecewise5"
+      },
+      {
+        "id": 445,
+        "source_sha256": "93e7ccc8feccded4999ebe23b686b70faae777b45aed649a171b02c1c6ecd80b",
+        "motion_sha256": "8b7186e227409139959d6cd50ebfc493725f5edbbb204485141696dd1363c0d5",
+        "family": "piecewise5"
+      },
+      {
+        "id": 446,
+        "source_sha256": "d5bbda3315e0a17029e60d3b12c667176068acbfd04ab9f1c82629e396d10760",
+        "motion_sha256": "0c22872db9d868bf3a144b99cc387ec27b29b3028d194e76b9d80772257d43e2",
+        "family": "piecewise9"
+      },
+      {
+        "id": 447,
+        "source_sha256": "b2832847116213a07e6e2e3b059d92d8326562f2395764833be37bb76570314c",
+        "motion_sha256": "328662c5a40679fbcb652ed0961bf6dea7203937b4d8179e0fd86b1e7413c3bb",
+        "family": "piecewise9"
+      },
+      {
+        "id": 448,
+        "source_sha256": "a54b6cd065338b1e9068dbf0d652f24fe2056998329388d9f8b2bdd1b0686b47",
+        "motion_sha256": "4bc89f29790ca695efd51ce81155857da2d75cf7c51885a5487f47d79571bd5d",
+        "family": "piecewise9"
+      },
+      {
+        "id": 449,
+        "source_sha256": "0d150645f79da5bca9f141964f59d59d89028ccaf0a53867f489c341162bcfa3",
+        "motion_sha256": "3a10f2982bbe1f1e539b731e67f84788b0e304be979f030d6480d6aa3e90bbdf",
+        "family": "piecewise9"
+      },
+      {
+        "id": 450,
+        "source_sha256": "0b1cceea73a1feaaa1303be0341a33bda91a67f99c9a7278c1c002bcbff00031",
+        "motion_sha256": "6e3b7697a6630ea0b14cd54abb5fa0d86353497b1070ce03846381e80ced7c32",
+        "family": "piecewise9"
+      }
+    ],
+    "geometry_corners": 16,
+    "training_allowed": false,
+    "development_selection_allowed": false,
+    "primary_rule": "same strict frozen84V/84S/84R global/lower-X/X/Z/control/corner gates as84Z final"
+  },
+  "primary": {
+    "axes": {
+      "left_proximal": {
+        "candidate": 0.32834658226059327,
+        "source84v": 0.32796669702011355,
+        "source84s": 0.34899589193216085,
+        "source84r": 0.3533147319257948,
+        "zero": 0.468189404681957,
+        "wins_vs_zero": 160,
+        "wins_vs_source84v": 66,
+        "wins_vs_source84s": 136,
+        "wins_vs_source84r": 135,
+        "cases": 160,
+        "passed": true
+      },
+      "left_middle": {
+        "candidate": 0.13111266586556575,
+        "source84v": 0.13106272065725624,
+        "source84s": 0.1427112328437168,
+        "source84r": 0.1399464585623727,
+        "zero": 0.43854753956316944,
+        "wins_vs_zero": 160,
+        "wins_vs_source84v": 81,
+        "wins_vs_source84s": 132,
+        "wins_vs_source84r": 138,
+        "cases": 160,
+        "passed": true
+      },
+      "left_distal": {
+        "candidate": 0.4046691355485806,
+        "source84v": 0.4050137884831496,
+        "source84s": 0.4304860299640878,
+        "source84r": 0.43679479737966587,
+        "zero": 0.45910436970130386,
+        "wins_vs_zero": 142,
+        "wins_vs_source84v": 74,
+        "wins_vs_source84s": 134,
+        "wins_vs_source84r": 140,
+        "cases": 160,
+        "passed": true
+      },
+      "right_proximal": {
+        "candidate": 0.3516047857006296,
+        "source84v": 0.35145438303972715,
+        "source84s": 0.37043398940167077,
+        "source84r": 0.37526016395231054,
+        "zero": 0.48713866701733555,
+        "wins_vs_zero": 159,
+        "wins_vs_source84v": 73,
+        "wins_vs_source84s": 135,
+        "wins_vs_source84r": 130,
+        "cases": 160,
+        "passed": true
+      },
+      "right_middle": {
+        "candidate": 0.15035990143802033,
+        "source84v": 0.15082970769841314,
+        "source84s": 0.16453943743130475,
+        "source84r": 0.16317252552646458,
+        "zero": 0.4755724319322779,
+        "wins_vs_zero": 160,
+        "wins_vs_source84v": 110,
+        "wins_vs_source84s": 138,
+        "wins_vs_source84r": 150,
+        "cases": 160,
+        "passed": true
+      },
+      "right_distal": {
+        "candidate": 0.39135410967375994,
+        "source84v": 0.4069386455719816,
+        "source84s": 0.4309506960344743,
+        "source84r": 0.4361054235538445,
+        "zero": 0.46126051832313975,
+        "wins_vs_zero": 141,
+        "wins_vs_source84v": 142,
+        "wins_vs_source84s": 137,
+        "wins_vs_source84r": 142,
+        "cases": 160,
+        "passed": true
+      }
+    },
+    "combined": {
+      "candidate": 0.3130897589469623,
+      "source84v": 0.3163975888298406,
+      "source84s": 0.3360297407339577,
+      "source84r": 0.33981352981381996,
+      "zero": 0.46521259836647544,
+      "shuffled": 0.45338741505003033,
+      "static": 0.5873491510394218,
+      "closed": 0.5220979869840451
+    },
+    "body_x_safeguards": [
+      {
+        "value": 3.82,
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.32897811055886284,
+            "zero": 0.468189404681957,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.1251959965250652,
+            "zero": 0.43854753956316944,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4167324069531819,
+            "zero": 0.45910436970130386,
+            "wins": 69,
+            "cases": 80,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3504964914360552,
+            "zero": 0.48713866701733555,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.1444961247508226,
+            "zero": 0.4755724319322779,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.40607759582429526,
+            "zero": 0.46126051832313975,
+            "wins": 68,
+            "cases": 80,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "value": 4.18,
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.3277138369638147,
+            "zero": 0.468189404681957,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.13677362594757383,
+            "zero": 0.43854753956316944,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.39223503097795653,
+            "zero": 0.45910436970130386,
+            "wins": 73,
+            "cases": 80,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.35270959746820973,
+            "zero": 0.48713866701733555,
+            "wins": 79,
+            "cases": 80,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.15600342897801026,
+            "zero": 0.4755724319322779,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.37605460306535665,
+            "zero": 0.46126051832313975,
+            "wins": 73,
+            "cases": 80,
+            "passed": true
+          }
+        },
+        "passed": true
+      }
+    ],
+    "camera_z_safeguards": [
+      {
+        "value": 0.36,
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.32673407666942667,
+            "zero": 0.468189404681957,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.13637608496609652,
+            "zero": 0.43854753956316944,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.40318228485838303,
+            "zero": 0.45910436970130386,
+            "wins": 70,
+            "cases": 80,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3500146641163285,
+            "zero": 0.48713866701733555,
+            "wins": 79,
+            "cases": 80,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.1565901826858706,
+            "zero": 0.4755724319322779,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.38961312971836953,
+            "zero": 0.46126051832313975,
+            "wins": 69,
+            "cases": 80,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "value": 0.56,
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.32995120746468304,
+            "zero": 0.468189404681957,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.12562892083461916,
+            "zero": 0.43854753956316944,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.40615054315813076,
+            "zero": 0.45910436970130386,
+            "wins": 72,
+            "cases": 80,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3531877483134218,
+            "zero": 0.48713866701733555,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.14386005215940958,
+            "zero": 0.4755724319322779,
+            "wins": 80,
+            "cases": 80,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.3930873789224727,
+            "zero": 0.46126051832313975,
+            "wins": 72,
+            "cases": 80,
+            "passed": true
+          }
+        },
+        "passed": true
+      }
+    ],
+    "corner_results": [
+      {
+        "corner_id": 1,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.36,
+          "body_x": 3.82,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.30857585607786053,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.11967973319246508,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4111818309763061,
+            "zero": 0.45910436970130386,
+            "wins": 8,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3340469765085607,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.15273733737395873,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.4019996684421297,
+            "zero": 0.46126051832313975,
+            "wins": 7,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 2,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.36,
+          "body_x": 3.82,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.34034794433871546,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.13063059571448404,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4149299602872602,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.35618689819703436,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.1316394579055142,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.40294551688135727,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 3,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.36,
+          "body_x": 4.18,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.31272192026304885,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.1382619747835806,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.3859863280216627,
+            "zero": 0.45910436970130386,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3377198292478651,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.17101299839802972,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.36806571505699087,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 4,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.36,
+          "body_x": 4.18,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.32465608219585695,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.14529382597715076,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.40349928527048573,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3495695247347514,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.15654335123886176,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.3879072245405683,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 5,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.56,
+          "body_x": 3.82,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.3105042519517507,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.11040532947706828,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4183466759484445,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3378592452611223,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.1470359811809332,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.4110641277977552,
+            "zero": 0.46126051832313975,
+            "wins": 8,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 6,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.56,
+          "body_x": 3.82,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.347075054081291,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.1225304319973036,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4257481579253165,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.36667346091063413,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.12923821855318218,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.41785466871634086,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 7,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.56,
+          "body_x": 4.18,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.3101974018021113,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.12711429216123266,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.3891686767692687,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3347406815639552,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.15288365178887806,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.36903180751710557,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 8,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.14,
+          "camera_z": 0.56,
+          "body_x": 4.18,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.32438500651774865,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.1391553991524098,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.39636441108402537,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.34717105647472235,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.14592057458098584,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.38352046960389374,
+            "zero": 0.46126051832313975,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 9,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.36,
+          "body_x": 3.82,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.31727354901061966,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.13651031896284702,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4079159859831254,
+            "zero": 0.45910436970130386,
+            "wins": 7,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3426200422838414,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.16225125220143347,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.3948059558637294,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 10,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.36,
+          "body_x": 3.82,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.3406574069557427,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.14344394401851898,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.41515263292081056,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.35733007422272833,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.15701633498687786,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.40223794476352714,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 11,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.36,
+          "body_x": 4.18,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.32585933864884614,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.1289860237388847,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.3858278245962133,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.35226598700686357,
+            "zero": 0.48713866701733555,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.16035044292810896,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.3665304736431565,
+            "zero": 0.46126051832313975,
+            "wins": 8,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 12,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.36,
+          "body_x": 4.18,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.34189855098606187,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.14602946693962413,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.3997535233268659,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3690629962472342,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.15831333526884908,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.39046411260941927,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 13,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.56,
+          "body_x": 3.82,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.3172487900600387,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.11700961495475679,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4143938859517445,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.34198524586686213,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.14566146164772487,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.4023482594634187,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 14,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.56,
+          "body_x": 3.82,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.34716889749724233,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.11789479844471494,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.4258461386007362,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.3656505912156098,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.12592236830151393,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.41484432914609953,
+            "zero": 0.46126051832313975,
+            "wins": 8,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 15,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.56,
+          "body_x": 4.18,
+          "body_y": -0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.3333741639829718,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.12852949781037237,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.38697770836435774,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.35748483359597266,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.1522967392514138,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.36584088722827746,
+            "zero": 0.46126051832313975,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      {
+        "corner_id": 16,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.42,
+          "camera_z": 0.56,
+          "body_x": 4.18,
+          "body_y": 0.32
+        },
+        "axes": {
+          "left_proximal": {
+            "candidate": 0.34685584740626196,
+            "zero": 0.468189404681957,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_middle": {
+            "candidate": 0.13937513685624703,
+            "zero": 0.43854753956316944,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "left_distal": {
+            "candidate": 0.3898906203137486,
+            "zero": 0.45910436970130386,
+            "wins": 9,
+            "cases": 10,
+            "passed": true
+          },
+          "right_proximal": {
+            "candidate": 0.37189467874558635,
+            "zero": 0.48713866701733555,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_middle": {
+            "candidate": 0.14936329487812494,
+            "zero": 0.4755724319322779,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          },
+          "right_distal": {
+            "candidate": 0.37612941757394946,
+            "zero": 0.46126051832313975,
+            "wins": 10,
+            "cases": 10,
+            "passed": true
+          }
+        },
+        "passed": true
+      }
+    ],
+    "corners_passed": 16,
+    "corners_required": 12,
+    "lower_x_right_distal_comparator": {
+      "candidate": 0.40607759582429526,
+      "source84v": 0.41898226203682903,
+      "source84s": 0.43490912422443057,
+      "source84r": 0.44428238623555155,
+      "zero": 0.46126051832313975,
+      "wins_vs_zero": 68,
+      "wins_vs_source84v": 73,
+      "wins_vs_source84s": 64,
+      "wins_vs_source84r": 67,
+      "cases": 80,
+      "required_vs_zero": 60,
+      "required_vs_each_source": 48,
+      "passed": true
+    },
+    "passed": true
+  },
+  "audit": {
+    "accepted_total": 16384,
+    "audited_count": 128,
+    "is_exhaustive": false,
+    "sample_ids": [
+      0,
+      1,
+      2,
+      133,
+      264,
+      395,
+      526,
+      657,
+      788,
+      919,
+      1050,
+      1181,
+      1312,
+      1443,
+      1574,
+      1705,
+      1836,
+      1967,
+      2098,
+      2229,
+      2360,
+      2491,
+      2622,
+      2754,
+      2885,
+      3016,
+      3147,
+      3278,
+      3409,
+      3540,
+      3671,
+      3802,
+      3933,
+      4064,
+      4195,
+      4326,
+      4457,
+      4588,
+      4719,
+      4850,
+      4981,
+      5112,
+      5243,
+      5374,
+      5506,
+      5637,
+      5768,
+      5899,
+      6030,
+      6161,
+      6292,
+      6423,
+      6554,
+      6685,
+      6816,
+      6947,
+      7078,
+      7209,
+      7340,
+      7471,
+      7602,
+      7733,
+      7864,
+      7995,
+      8126,
+      8258,
+      8389,
+      8520,
+      8651,
+      8782,
+      8913,
+      9044,
+      9175,
+      9306,
+      9437,
+      9568,
+      9699,
+      9830,
+      9961,
+      10092,
+      10223,
+      10354,
+      10485,
+      10616,
+      10747,
+      10878,
+      11010,
+      11141,
+      11272,
+      11403,
+      11534,
+      11665,
+      11796,
+      11927,
+      12058,
+      12189,
+      12320,
+      12451,
+      12582,
+      12713,
+      12844,
+      12975,
+      13106,
+      13237,
+      13368,
+      13499,
+      13630,
+      13762,
+      13893,
+      14024,
+      14155,
+      14286,
+      14417,
+      14548,
+      14679,
+      14810,
+      14941,
+      15072,
+      15203,
+      15334,
+      15465,
+      15596,
+      15727,
+      15858,
+      15989,
+      16120,
+      16251,
+      16383
+    ]
+  },
+  "derived": {
+    "test_records": 160,
+    "distinct_test_ids": [
+      441,
+      442,
+      443,
+      444,
+      445,
+      446,
+      447,
+      448,
+      449,
+      450
+    ],
+    "distinct_corner_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "state_unchanged_cases": 160,
+    "state_sha_match_cases": 160,
+    "candidate_case_wins": {
+      "zero": 160,
+      "source84v": 136,
+      "source84s": 151,
+      "source84r": 157,
+      "shuffled": 160,
+      "static": 160,
+      "closed": 159
+    },
+    "upper_x_right_distal": {
+      "candidate": 0.3760546030653567,
+      "source84v": 0.39452754861786216,
+      "source84s": 0.4269555696926022,
+      "source84r": 0.4277721849150555,
+      "zero": 0.4612605183231394
+    },
+    "upper_x_right_distal_wins": {
+      "vs_zero": 73,
+      "vs_source84v": 69,
+      "vs_source84s": 73,
+      "vs_source84r": 75
+    },
+    "corner_axis_min_wins": {
+      "left_proximal": 10,
+      "left_middle": 10,
+      "left_distal": 7,
+      "right_proximal": 9,
+      "right_middle": 10,
+      "right_distal": 7
+    },
+    "diagnostics": {
+      "minimum_unique_rgb_frames": 51,
+      "minimum_changed_rgb_values": 29953,
+      "minimum_candidate_feature_max_std": 0.01708764210343361,
+      "maximum_candidate_clipped_fraction": 0.034013605442176874
+    },
+    "overlap_totals": {
+      "under_0_001_deg": 0,
+      "under_1_deg": 0,
+      "under_5_deg": 94
+    }
+  },
+  "limitations": [
+    "Read-only evaluation; selected model84Z and frozen84V/84S/84R unchanged.",
+    "No training or variant selection in replication.",
+    "New motions use same synthetic family/grid.",
+    "No natural vision, actuators, closed loop, biological brain or mirror-neuron evidence."
+  ]
+}

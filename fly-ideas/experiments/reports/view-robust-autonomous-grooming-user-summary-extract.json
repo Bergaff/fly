@@ -1,0 +1,54 @@
+{
+  "schema": "series-78-user-result-extract-v1",
+  "source": "user-pasted ИТОГ.txt and full summary.json; original local result files not supplied",
+  "status": "completed",
+  "protocol_mode": "long",
+  "active_training_seconds": 28801.312999999995,
+  "candidates": 44216,
+  "accepted_candidates": 44216,
+  "training_frames": 2166584,
+  "new_model_sha256": "145a07ac8e6f5294f230b57e6c5bee92509d6e95a6d4ab4a684d3adb42f3a90b",
+  "axes": {
+    "left_proximal": {"normal": 0.44107722853975556, "zero": 0.49169947101256095, "wins": 8, "passed": true},
+    "left_middle": {"normal": 0.3647198573638189, "zero": 0.47199250038170576, "wins": 8, "passed": true},
+    "left_distal": {"normal": 0.431939185192561, "zero": 0.44827848298174056, "wins": 9, "passed": true},
+    "right_proximal": {"normal": 0.4602957490130793, "zero": 0.5069784327815692, "wins": 9, "passed": true},
+    "right_middle": {"normal": 0.36016409756596546, "zero": 0.46444427899116425, "wins": 8, "passed": true},
+    "right_distal": {"normal": 0.432179236663133, "zero": 0.4494218844242457, "wins": 9, "passed": true}
+  },
+  "combined_pooled_rmse": {
+    "normal": 0.4168353795633547,
+    "matched": 0.36576717063835973,
+    "zero": 0.47261939202486813,
+    "shuffled": 0.4564542158529882,
+    "static": 0.528253314643014,
+    "closed": 1.0242482028056814
+  },
+  "combined_wins_vs_zero": 9,
+  "better_than_controls": 3,
+  "state_coefficients": 72,
+  "delay_s": 0.5,
+  "state_unchanged_count": 10,
+  "contact_summary": {
+    "mean_normal_f1": 0.9149947966117506,
+    "mean_zero_f1": 0.9062059589434437,
+    "normal_better": 4,
+    "equal": 6,
+    "normal_worse": 0
+  },
+  "audit": {
+    "accepted_total": 44216,
+    "audited_count": 128,
+    "is_exhaustive": false,
+    "holdout_frames": 490,
+    "overlap_under_0_001_deg": 0,
+    "overlap_under_1_deg": 0,
+    "overlap_under_5_deg": 107
+  },
+  "notable_tests": {
+    "normal_worse_than_zero": [146],
+    "static_better_than_normal": [141]
+  },
+  "primary_passed": true,
+  "interpretation": "View augmentation converts the previous catastrophic geometric failure into a preregistered six-axis transfer success, with a remaining view penalty and weak contact gain."
+}
