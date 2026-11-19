@@ -706,11 +706,11 @@ test('серия89B4: strict mean-vs-hard no-go сохранён',()=>{
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89B5: preregistered predicted-hard development сохранена',()=>{
+test('серия89B5: strict foreleg/control-count no-go сохранён',()=>{
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-predicted-hard-contact-89b5');
-  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);assert.match(item.status,/89C\/90 blocked/);
-  assert.match(item.source,/development747–764/);assert.match(item.source,/final765–782/);
-  assert.match(item.results,/argmax predicted hard expert/);assert.match(item.results,/without truth action/);assert.match(item.results,/total\/per-action90%/);assert.match(item.results,/7\/9 controls/);
-  assert.match(item.limitations,/oracle has label leakage/);assert.match(item.limitations,/only frozen89C/);
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/strict foreleg\/control-count no-go/);assert.match(item.status,/89C\/90 blocked/);
+  assert.match(item.source,/SHAc14bbb13/);assert.match(item.source,/development747–764/);assert.match(item.source,/final765–782/);
+  assert.match(item.results,/Identity216\/216/);assert.match(item.results,/0.121827<soft0.126011/);assert.match(item.results,/foreleg188 fails195/);assert.match(item.results,/Only6\/9 controls/);assert.match(item.results,/oracle ties0/);
+  assert.match(item.limitations,/cannot remove oracle/);assert.match(item.limitations,/disclosed421–782 excluded/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
