@@ -331,3 +331,7 @@ Attached summary-32 SHA `c2608558…`; exact89E/89D/84Z pins, ridge0.01/boost4 a
 ## Series90: completed, mapping gate closed
 
 Bounded audit with cutoff 2026-09-18 pinned frozen89E and FlyVis `92b3845…`, Shiu `91bdd1e…`, FlyGym `3c8ce5e…`. Required gates5/9: official components and feasible controls exist, but reviewed FlyVis→FlyWire mapping, fixed transduction, preregistered validated descending/motor readout and end-to-end chain are absent. No name matching, hand gains or post-hoc adapter was invented. This is the final roadmap82–90 result: functional synthetic mirror-like surrogate supported, biological mirror neurons not established. Any continuation requires a new roadmap and independent mapping/readout or biological recordings/interventions. See series90 plan/source audit/result/runner/test.
+
+## Public GitHub Pages showcase
+
+Добавлен отдельный public build через `.github/workflows/pages.yml`. Он визуально показывает verified89E и concluding90, а также позволяет посетителю составить6×0,6с sequence из foreleg rubbing/head grooming/reach-withdraw/rest и увидеть observation→0,5с delay→browser repeat второй мухой. Это deterministic explanatory surrogate, не exact89E Python inference: committed extract не содержит полного browser inference bundle/trajectories, а Pages статический. Значения>100% маркируются как out-of-domain. Никакие движения посетителя не отправляются на сервер. Включение Pages через GitHub UI описано в `GITHUB-PAGES.md`.
