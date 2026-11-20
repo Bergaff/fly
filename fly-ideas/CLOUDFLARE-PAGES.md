@@ -15,7 +15,6 @@ Public build отделён от desktop app. Cloudflare получает тол
 
 - `wrangler.toml` задаёт Pages output `dist`;
 - `public/_headers` добавляет CSP и защитные HTTP-заголовки;
-- `public/_redirects` возвращает SPA entry для прямых ссылок;
 - `npm run build:pages` включает только public showcase mode.
 
 ## Развёртывание через интерфейс Cloudflare
