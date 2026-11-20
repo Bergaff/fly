@@ -259,3 +259,15 @@ Frozen89C завершена strict no-go. Exact frozen pins подтвержд�
 Frozen89E завершена full preregistered frozen go на motions873–890/views781–792. Exact89E/89D/84Z pins, ridge0,01/boost4 и запрет fit/selection подтверждены. Identity216/216; safety/recovery/completion648; angle pass; contact soft598/angle636/common633; action angle/common215/201,213/216,208/216; broad7/8. Mean0,124517≤standard0,124796 и soft0,130136; candidate=oracle648/648. Все gates независимо воспроизведены. Малый эффект vs standard ~0,224%;89C no-go остаётся историческим.
 
 Series90 завершена как заключительный reviewed biological mapping audit: **mapping gate closed**,5/9 required gates. Official FlyVis, Shiu lesions, FlyGym API и controls доступны, но отсутствуют externally reviewed FlyVis→FlyWire IDs, fixed reviewed activity→rate rule, preregistered validated DN/motor readout и end-to-end chain для действий89E. Official sources на cutoff 2026-09-18 содержат компоненты раздельно, но не reviewed end-to-end bridge/readout. Roadmap82–90 завершается functional synthetic mirror-like go, но не доказательством biological mirror neurons.
+
+# Возможный следующий roadmap после закрытой Series90
+
+Это нерешённые цели, не выводы серий82–90. Новый roadmap должен отдельно preregister и проверить:
+
+1. существуют ли у дрозофилы биологические зеркальные нейроны;
+2. можно ли после независимого review считать конкретные FlyWire IDs зеркальными нейронами;
+3. воспроизводят ли interventions у живой мухи причинные эффекты synthetic lesions;
+4. существует ли естественная цепь visual types → FlyWire/Shiu pathways → motor neurons → muscles;
+5. переносятся ли результаты six-joint surrogate на реальное тело, мышцы и контактные силы.
+
+Для этих утверждений нужны reviewed type-to-ID mappings, fixed sensory transduction, preregistered DN/VNC/motor readout, biological recordings/interventions и body validation. Текущие synthetic results нельзя заранее считать подтверждением этих пунктов.

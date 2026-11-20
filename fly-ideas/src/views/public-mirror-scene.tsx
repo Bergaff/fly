@@ -9,9 +9,11 @@ export type MirrorPose = {
   headPitch: number;
   reach: number;
   bodyShift: number;
+  wingLeft: number;
+  wingRight: number;
 };
 
-const ZERO_POSE: MirrorPose = { forelegLeft: 0, forelegRight: 0, headYaw: 0, headPitch: 0, reach: 0, bodyShift: 0 };
+const ZERO_POSE: MirrorPose = { forelegLeft: 0, forelegRight: 0, headYaw: 0, headPitch: 0, reach: 0, bodyShift: 0, wingLeft: 0, wingRight: 0 };
 
 function cylinder(a: THREE.Vector3, b: THREE.Vector3, material: THREE.Material, radius = .024) {
   const delta = b.clone().sub(a);
@@ -40,6 +42,7 @@ function makeArticulatedFly() {
   ellipsoid(head, [-.05, -.2, .05], [.18, .13, .17], eye);
 
   const forelegs: THREE.Group[] = [];
+  const wings: THREE.Group[] = [];
   for (const side of [-1, 1]) {
     const fore = new THREE.Group(); fore.position.set(-.48, side * .22, -.06); root.add(fore); forelegs.push(fore);
     fore.add(cylinder(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-.18, side * .27, -.22), limb));
@@ -50,10 +53,10 @@ function makeArticulatedFly() {
       root.add(cylinder(new THREE.Vector3(x, side * .22, -.08), new THREE.Vector3(x + .1, side * .52, -.35), limb));
       root.add(cylinder(new THREE.Vector3(x + .1, side * .52, -.35), new THREE.Vector3(x + (j - 1.5) * .25, side * .8, -.58), limb, .02));
     }
-    const wing = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .48), wingMat);
-    wing.position.set(.02, side * .52, .28); wing.rotation.set(.08, 0, side * .18); root.add(wing);
+    const wing = new THREE.Group(); wing.position.set(.02, side * .31, .28); wing.userData.side = side; root.add(wing); wings.push(wing);
+    const surface = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .48), wingMat); surface.position.y = side * .25; wing.add(surface);
   }
-  return { root, head, forelegs };
+  return { root, head, forelegs, wings };
 }
 
 function applyPose(fly: ReturnType<typeof makeArticulatedFly>, pose: MirrorPose) {
@@ -62,6 +65,7 @@ function applyPose(fly: ReturnType<typeof makeArticulatedFly>, pose: MirrorPose)
   fly.head.rotation.y = pose.headPitch * .5;
   fly.forelegs[0].rotation.set(-pose.reach * .45, pose.forelegLeft * .8, pose.forelegLeft * .55);
   fly.forelegs[1].rotation.set(-pose.reach * .45, -pose.forelegRight * .8, -pose.forelegRight * .55);
+  fly.wings.forEach((wing, index) => { const side = Number(wing.userData.side); const stroke = index === 0 ? pose.wingLeft : pose.wingRight; wing.rotation.set(.08 + Math.abs(stroke) * .22, stroke * .85, side * (.18 + stroke * .42), "XYZ"); });
 }
 
 export function PublicMirrorScene({ teacher = ZERO_POSE, observer = ZERO_POSE, teacherVisible = true, phase }: { teacher?: MirrorPose; observer?: MirrorPose; teacherVisible?: boolean; phase: string }) {

@@ -4,23 +4,26 @@ import { LegalDialog, type LegalKind } from "@/components/legal-dialog";
 
 const actions = {
   rest: { label: "Пауза", short: "пауза" },
+  wing_display: { label: "Взмахи крыльями", short: "крылья" },
   foreleg_rubbing: { label: "Потирание передних лап", short: "лапы" },
   head_directed_grooming: { label: "Движение лап к голове", short: "голова" },
   reach_withdraw: { label: "Вытянуть и убрать лапы", short: "reach" },
 } as const;
 type Action = keyof typeof actions;
+const activeActions: Action[] = ["wing_display", "foreleg_rubbing", "head_directed_grooming", "reach_withdraw"];
 type Slot = { action: Action; amplitude: number };
 const initialSlots: Slot[] = [
-  { action: "foreleg_rubbing", amplitude: .82 }, { action: "foreleg_rubbing", amplitude: 1 },
+  { action: "wing_display", amplitude: .86 }, { action: "foreleg_rubbing", amplitude: 1 },
   { action: "head_directed_grooming", amplitude: .78 }, { action: "rest", amplitude: 0 },
-  { action: "reach_withdraw", amplitude: .88 }, { action: "reach_withdraw", amplitude: .68 },
+  { action: "reach_withdraw", amplitude: .88 }, { action: "wing_display", amplitude: .68 },
 ];
-const ZERO: MirrorPose = { forelegLeft: 0, forelegRight: 0, headYaw: 0, headPitch: 0, reach: 0, bodyShift: 0 };
+const ZERO: MirrorPose = { forelegLeft: 0, forelegRight: 0, headYaw: 0, headPitch: 0, reach: 0, bodyShift: 0, wingLeft: 0, wingRight: 0 };
 const button = "border bg-background px-3 py-2 text-[12px] hover:bg-secondary disabled:opacity-40";
 const field = "border bg-background px-2 py-2 text-[12px]";
 
 function actionPose(action: Action, amplitude: number, phase: number): MirrorPose {
   const wave = Math.sin(phase * Math.PI * 2), pulse = Math.sin(Math.min(1, phase) * Math.PI);
+  if (action === "wing_display") return { ...ZERO, wingLeft: wave * amplitude, wingRight: -wave * amplitude, bodyShift: .035 * Math.sin(phase * Math.PI * 4) * amplitude };
   if (action === "foreleg_rubbing") return { ...ZERO, forelegLeft: wave * amplitude, forelegRight: -wave * amplitude, headPitch: .08 * amplitude };
   if (action === "head_directed_grooming") return { ...ZERO, forelegLeft: (.55 + .3 * wave) * amplitude, forelegRight: (.55 - .3 * wave) * amplitude, headPitch: (.32 + .12 * wave) * amplitude, headYaw: .08 * wave };
   if (action === "reach_withdraw") return { ...ZERO, forelegLeft: .35 * pulse * amplitude, forelegRight: .35 * pulse * amplitude, reach: pulse * amplitude, bodyShift: .12 * pulse * amplitude };
@@ -29,7 +32,7 @@ function actionPose(action: Action, amplitude: number, phase: number): MirrorPos
 function predictedPose(pose: MirrorPose, action: Action, amplitude: number): MirrorPose {
   const gain = action === "foreleg_rubbing" ? .94 : action === "head_directed_grooming" ? .965 : .955;
   const nonlinear = amplitude > 1 ? Math.max(.78, 1 - (amplitude - 1) * .28) : 1;
-  return { forelegLeft: pose.forelegLeft * gain * nonlinear, forelegRight: pose.forelegRight * gain * nonlinear, headYaw: pose.headYaw * .96, headPitch: pose.headPitch * .95, reach: pose.reach * .94 * nonlinear, bodyShift: pose.bodyShift * .93 };
+  return { forelegLeft: pose.forelegLeft * gain * nonlinear, forelegRight: pose.forelegRight * gain * nonlinear, headYaw: pose.headYaw * .96, headPitch: pose.headPitch * .95, reach: pose.reach * .94 * nonlinear, bodyShift: pose.bodyShift * .93, wingLeft: pose.wingLeft * .95 * nonlinear, wingRight: pose.wingRight * .95 * nonlinear };
 }
 
 function Trace({ slots }: { slots: Slot[] }) {
@@ -65,13 +68,13 @@ export function PublicResearchShowcase() {
   const inDomain = slots.filter(s => s.action !== "rest" && s.amplitude <= 1).length; const active = slots.filter(s => s.action !== "rest").length;
   const estimated = useMemo(() => active ? Math.max(.78, Math.min(.98, .965 - slots.reduce((sum, s) => sum + Math.max(0, s.amplitude - 1) * .08, 0) / active)) : 1, [slots, active]);
   const setSlot = (index: number, patch: Partial<Slot>) => setSlots(current => current.map((value, i) => i === index ? { ...value, ...patch } : value));
-  const randomize = () => { const keys = Object.keys(actions) as Action[]; setSlots(slots.map((_, i) => ({ action: keys[1 + ((i * 7 + 2) % 3)], amplitude: .55 + ((i * 19 + 11) % 45) / 100 }))); setElapsed(0); setPlaying(false); };
+  const randomize = () => { setSlots(slots.map((_, i) => ({ action: activeActions[(i * 7 + 2) % activeActions.length], amplitude: .55 + ((i * 19 + 11) % 45) / 100 }))); setElapsed(0); setPlaying(false); };
   const restart = () => { setElapsed(0); setPlaying(true); };
   return <div className="h-full overflow-y-auto bg-background text-foreground">
     <header className="sticky top-0 z-20 border-b bg-background">
       <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-3 px-4 py-3 md:px-8">
         <div><div className="font-mono text-[10px] uppercase tracking-[.16em] text-muted-foreground">Fly / research record / series82–90</div><div className="mt-1 text-[15px] font-semibold">Функциональный цифровой аналог наблюдения и повтора</div></div>
-        <nav className="flex flex-wrap gap-1 text-[11px]" aria-label="Разделы страницы"><a className={button} href="#demo">Демонстратор</a><a className={button} href="#results">Результаты</a><a className={button} href="#limits">Ограничения</a><a className={button} href="#files">Данные</a></nav>
+        <nav className="flex flex-wrap gap-1 text-[11px]" aria-label="Разделы страницы"><a className={button} href="#demo">Демонстратор</a><a className={button} href="#results">Результаты</a><a className={button} href="#limits">Ограничения</a><a className={button} href="#next">Следующие шаги</a><a className={button} href="#files">Данные</a></nav>
       </div>
     </header>
     <main className="mx-auto max-w-[1500px] px-4 pb-16 md:px-8">
@@ -81,11 +84,11 @@ export function PublicResearchShowcase() {
       </section>
 
       <section id="demo" className="scroll-mt-20 py-8">
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b pb-3"><div><div className="font-mono text-[10px] uppercase tracking-[.15em] text-muted-foreground">Интерактивный браузерный surrogate</div><h2 className="mt-1 text-2xl font-semibold">Задайте последовательность первой мухе</h2></div><p className="max-w-xl text-[11px] leading-5 text-muted-foreground">Работает полностью в браузере. Это наглядная deterministic реконструкция трёх исследованных action families, не запуск Python-модели89E и не новый научный результат.</p></div>
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b pb-3"><div><div className="font-mono text-[10px] uppercase tracking-[.15em] text-muted-foreground">Интерактивный браузерный surrogate</div><h2 className="mt-1 text-2xl font-semibold">Задайте последовательность первой мухе</h2></div><p className="max-w-xl text-[11px] leading-5 text-muted-foreground">Работает полностью в браузере. Это наглядная deterministic реконструкция крыльев из ранних серий и трёх action families86–89E, не запуск Python-модели89E и не новый научный результат.</p></div>
         <div className="mt-5 grid gap-6 xl:grid-cols-[390px_minmax(0,1fr)]">
           <div>
             <div className="flex items-center justify-between border-b pb-2"><strong className="text-[13px]">Таймлайн показа</strong><button className={button} onClick={randomize}>Другой пример</button></div>
-            <p className="py-2 text-[11px] leading-5 text-muted-foreground">Каждый блок длится0,6 с. Выберите одно из трёх действий, знакомых frozen policy, и амплитуду. Значения выше100% помечаются как выход за проверенную область.</p>
+            <p className="py-2 text-[11px] leading-5 text-muted-foreground">Каждый блок длится0,6 с. Выберите взмахи крыльями либо одно из трёх действий frozen policy89E и задайте амплитуду. Значения выше100% помечаются как выход за проверенную область.</p>
             <div className="space-y-1">{slots.map((item, index) => <div key={index} className={`grid grid-cols-[28px_minmax(0,1fr)_90px] items-center gap-2 border-b py-2 ${index === slotIndex && playing ? "bg-secondary" : ""}`}><span className="font-mono text-[10px]">{index + 1}</span><select aria-label={`Действие ${index + 1}`} className={field} value={item.action} onChange={e => setSlot(index, { action: e.target.value as Action, amplitude: e.target.value === "rest" ? 0 : Math.max(.4, item.amplitude) })}>{Object.entries(actions).map(([id, value]) => <option key={id} value={id}>{value.label}</option>)}</select><label className="grid grid-cols-[1fr_34px] items-center gap-1 text-[10px]"><input aria-label={`Амплитуда ${index + 1}`} type="range" min="0" max="1.25" step=".05" disabled={item.action === "rest"} value={item.amplitude} onChange={e => setSlot(index, { amplitude: Number(e.target.value) })} className="accent-foreground"/><span className="font-mono">{Math.round(item.amplitude * 100)}%</span></label></div>)}</div>
             <Trace slots={slots} />
             <div className="mt-3 flex flex-wrap items-center gap-2"><button className={button} onClick={() => setPlaying(value => !value)}>{playing ? "Пауза" : elapsed >= total ? "Сначала" : "Продолжить"}</button><button className={button} onClick={restart}>Запустить показ и повтор</button><label className="ml-auto text-[11px]">скорость <select className={field} value={speed} onChange={e => setSpeed(Number(e.target.value))}><option value=".5">0,5×</option><option value="1">1×</option><option value="1.5">1,5×</option></select></label></div>
@@ -101,6 +104,8 @@ export function PublicResearchShowcase() {
       </section>
 
       <section id="limits" className="scroll-mt-20 border-t py-8"><div className="grid gap-6 md:grid-cols-2"><div><div className="font-mono text-[10px] uppercase tracking-[.15em] text-muted-foreground">Допустимый вывод</div><h2 className="mt-2 text-xl font-semibold">Функциональный synthetic mirror-like механизм</h2><p className="mt-3 text-[12px] leading-6 text-muted-foreground">Наблюдение связано с внутренним состоянием, задержкой, автономным воспроизведением, causal digital lesions и actuator surrogate. Итоговая policy прошла frozen replication.</p></div><div className="border-l pl-6"><div className="font-mono text-[10px] uppercase tracking-[.15em] text-muted-foreground">Недопустимый вывод</div><h2 className="mt-2 text-xl font-semibold">Не доказательство биологических зеркальных нейронов</h2><p className="mt-3 text-[12px] leading-6 text-muted-foreground">Нет reviewed end-to-end neural mapping, natural vision, muscle dynamics, collision forces и interventions у живых мух. Browser demo также не изменяет этот статус.</p></div></div></section>
+
+      <section id="next" className="scroll-mt-20 border-t py-8"><div className="grid gap-7 lg:grid-cols-[.72fr_1.28fr]"><div><div className="font-mono text-[10px] uppercase tracking-[.15em] text-muted-foreground">Следующий roadmap</div><h2 className="mt-2 text-2xl font-semibold">Какие утверждения ещё предстоит проверить</h2><p className="mt-3 text-[12px] leading-6 text-muted-foreground">Это цели будущих исследований, а не выводы текущих серий. Для них нужны reviewed mappings, новый preregistration и biological recordings/interventions.</p></div><ul className="border-t text-[12px] text-muted-foreground"><li className="border-b py-3">Обнаружены ли у дрозофилы биологические зеркальные нейроны.</li><li className="border-b py-3">Можно ли после независимой проверки считать конкретные FlyWire IDs зеркальными нейронами.</li><li className="border-b py-3">Воспроизводят ли interventions у живого животного причинные эффекты, найденные synthetic lesions.</li><li className="border-b py-3">Существует ли проверенная естественная цепь FlyVis-like vision → FlyWire/Shiu pathway → моторные нейроны → мышцы.</li><li className="border-b py-3">Переносятся ли результаты six-joint surrogate на реальное тело, мышцы и контактные силы.</li></ul></div></section>
 
       <section id="files" className="scroll-mt-20 border-t py-8"><div className="flex flex-wrap justify-between gap-5"><div><div className="font-mono text-[10px] uppercase tracking-[.15em] text-muted-foreground">Воспроизводимость</div><h2 className="mt-2 text-xl font-semibold">Отчёты и проверяемые артефакты находятся в репозитории</h2><p className="mt-3 max-w-3xl text-[12px] leading-6 text-muted-foreground">Для89E сохранены trial-level extract, independent verifier и report. Для90 сохранены source audit, machine-readable decision и gate runner. На этой странице нет сервера: заданные движения остаются в браузере и никуда не отправляются.</p></div><a className={button} href="https://github.com/Bergaff/fly" target="_blank" rel="noreferrer">Открыть репозиторий</a></div></section>
     </main>
