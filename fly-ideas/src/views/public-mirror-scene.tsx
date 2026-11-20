@@ -70,7 +70,7 @@ function applyPose(fly: ReturnType<typeof makeArticulatedFly>, pose: MirrorPose)
 
 export function PublicMirrorScene({ teacher = ZERO_POSE, observer = ZERO_POSE, teacherVisible = true, phase }: { teacher?: MirrorPose; observer?: MirrorPose; teacherVisible?: boolean; phase: string }) {
   const host = useRef<HTMLDivElement>(null);
-  const sceneState = useRef<{ teacher: ReturnType<typeof makeArticulatedFly>; observer: ReturnType<typeof makeArticulatedFly>; draw: () => void } | null>(null);
+  const sceneState = useRef<{ teacher: ReturnType<typeof makeArticulatedFly>; observer: ReturnType<typeof makeArticulatedFly>; draw: () => void; resetView: () => void } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
     if (!host.current) return;
@@ -88,8 +88,9 @@ export function PublicMirrorScene({ teacher = ZERO_POSE, observer = ZERO_POSE, t
     const a = makeArticulatedFly(), b = makeArticulatedFly(); a.root.userData.baseX = 2.1; b.root.userData.baseX = -2.1; a.root.position.x = 2.1; b.root.position.x = -2.1; b.root.rotation.z = Math.PI; world.add(a.root, b.root);
     const ground = new THREE.GridHelper(8, 16, 0x555147, 0x393731); ground.rotation.x = Math.PI / 2; ground.position.z = -.68; world.add(ground);
     const draw = () => renderer.render(scene, camera);
+    const resetView = () => { camera.position.set(4.4, 6.5, 10.5); camera.up.set(0, 1, 0); controls.target.set(0, 0, 0); controls.update(); draw(); };
     const resize = () => { const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); draw(); };
-    const observerSize = new ResizeObserver(resize); observerSize.observe(el); controls.addEventListener("change", draw); sceneState.current = { teacher: a, observer: b, draw }; resize();
+    const observerSize = new ResizeObserver(resize); observerSize.observe(el); controls.addEventListener("change", draw); sceneState.current = { teacher: a, observer: b, draw, resetView }; resize();
     return () => { sceneState.current = null; observerSize.disconnect(); controls.removeEventListener("change", draw); controls.dispose(); scene.traverse(object => { if (object instanceof THREE.Mesh || object instanceof THREE.Line) { object.geometry.dispose(); const materials = Array.isArray(object.material) ? object.material : [object.material]; materials.forEach(m => m.dispose()); } }); renderer.dispose(); renderer.domElement.remove(); };
   }, []);
   useEffect(() => {
@@ -98,6 +99,7 @@ export function PublicMirrorScene({ teacher = ZERO_POSE, observer = ZERO_POSE, t
   }, [teacher, observer, teacherVisible]);
   return <div className="relative h-[360px] w-full overflow-hidden border md:h-[520px]" ref={host} aria-label="Интерактивная схема двух мух">
     <div className="pointer-events-none absolute left-3 top-3 z-10 border bg-background/90 px-2 py-1 font-mono text-[10px] uppercase tracking-[.12em]">{phase}</div>
+    <button type="button" className="absolute right-3 top-3 z-10 border bg-background/90 px-2 py-1 text-[10px] hover:bg-secondary" onClick={() => sceneState.current?.resetView()}>Исходный вид</button>
     {error && <p className="p-4 text-sm">{error}</p>}
   </div>;
 }
