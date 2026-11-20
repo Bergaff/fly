@@ -724,11 +724,11 @@ test('серия89B6: independently verified development go сохранён',()
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89C: frozen replication подготовлена',()=>{
+test('серия89C: strict frozen no-go сохранён',()=>{
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-robust-replication-89c');
-  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered frozen/);assert.match(item.status,/90 blocked/);
-  assert.match(item.source,/Authorized by independently verified89B6/);assert.match(item.source,/model b8beb562/);assert.match(item.source,/motions819–836/);assert.match(item.source,/views721–732/);
-  assert.match(item.results,/No fit\/selection\/threshold change/);assert.match(item.results,/no truth action/);assert.match(item.results,/exact decision89B6/);
-  assert.match(item.limitations,/exact result89B6 plus production84Z/);assert.match(item.limitations,/only full89C go may authorize90/);
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/strict frozen no-go/);assert.match(item.status,/90 blocked/);
+  assert.match(item.source,/SHA63c4aaf8/);assert.match(item.source,/boost4/);assert.match(item.source,/motions819–836/);assert.match(item.source,/views721–732/);
+  assert.match(item.results,/Identity212\/216/);assert.match(item.results,/Foreleg\/common194 fails195/);assert.match(item.results,/broad6\/8/);assert.match(item.results,/soft582/);assert.match(item.results,/1.095e-8/);assert.match(item.results,/oracle foreleg\/common200/);
+  assert.match(item.limitations,/Cannot round194\/582/);assert.match(item.limitations,/frozen89C failed/);assert.match(item.limitations,/disclosed421–836/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
