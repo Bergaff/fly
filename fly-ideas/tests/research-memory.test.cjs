@@ -732,3 +732,12 @@ test('серия89C: strict frozen no-go сохранён',()=>{
   assert.match(item.limitations,/Cannot round194\/582/);assert.match(item.limitations,/frozen89C failed/);assert.match(item.limitations,/disclosed421–836/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89D: routing-margin development подготовлена',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-routing-margin-contact-89d');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);assert.match(item.status,/89E\/90 blocked/);
+  assert.match(item.source,/frozen89C no-go/);assert.match(item.source,/development837–854/);assert.match(item.source,/final855–872/);
+  assert.match(item.results,/minimum per-action accuracy/);assert.match(item.results,/mean\/min true margin/);assert.match(item.results,/common wins≥90%/);assert.match(item.results,/7\/8 broad/);
+  assert.match(item.limitations,/not89C rerun/);assert.match(item.limitations,/separate frozen89E/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});

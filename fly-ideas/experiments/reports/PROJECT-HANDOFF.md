@@ -319,3 +319,7 @@ Attached summary-29 SHA `f1c36207…`; exact pins, development783–800 and unto
 ## Frozen89C: completed strict no-go
 
 Attached summary-30 SHA `63c4aaf8…`; exact frozen summary/model/runner/source pins, boost4 and no-training state confirmed. Motions819–836×views721–732=216 cases/648 trials. Identity212/216 (foreleg70, head70, reach72), safety/recovery/completion648 and angle pass. Total angle631/common620 pass, but foreleg/common194 fails195; broad6/8 because soft582 and uncal557 fail. Candidate mean0.1297995926 is worse than standard0.1297995817 by1.095e-8, also strict fail. Four routes went to reach; oracle foreleg/common200 indicates routing explains direct miss, but cannot replace candidate. No rounding/tolerance/control removal.89B6 development go remains historical;89C no-go;90 blocked. See result/extract/fixture.
+
+## Серия89D: prepared, not run
+
+New development, not an89C rerun. Development837–854×8; untouched final855–872×12. Identity ridge candidates0.001…100 selected grouped-CV lexicographically by minimum action accuracy, total, mean/min true margin. Foreleg boost requires development common wins≥90%, then minimizes held-out contact/angle mean to address strict mean-vs-standard failure. Exact direct/broad/mean gates remain. Full go only allows separate frozen89E;90 blocked.
