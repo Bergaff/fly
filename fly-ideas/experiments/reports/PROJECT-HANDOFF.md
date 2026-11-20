@@ -322,4 +322,8 @@ Attached summary-30 SHA `63c4aaf8…`; exact frozen summary/model/runner/source 
 
 ## Серия89D: completed full development go
 
-Attached summary-31 SHA `fcde095e…`; exact pins, development837–854 and untouched final855–872×12. Grouped-CV selected ridge0.01 with144/144 and min margin0.021934; boost4 had common44/48 and best contact mean among eligible (boost8 common43 ineligible). Final identity216/216; safety648, recovery645, completion648; angle pass. Contact soft587, angle630, common639; action angle/common foreleg213/209, head213/214, reach204/216; broad7/8. Mean candidate0.122980≤standard0.123237 and soft0.128826; candidate=oracle648/648. All gates independently reproduced.89C no-go remains historical. Go authorizes separate frozen89E only;90 blocked.
+Attached summary-31 SHA `fcde095e…`; exact pins, development837–854 and untouched final855–872×12. Grouped-CV selected ridge0.01 with144/144 and min margin0.021934; boost4 had common44/48 and best contact mean among eligible (boost8 common43 ineligible). Final identity216/216; safety648, recovery645, completion648; angle pass. Contact soft587, angle630, common639; action angle/common foreleg213/209, head213/214, reach204/216; broad7/8. Mean candidate0.122980≤standard0.123237 and soft0.128826; candidate=oracle648/648. All gates independently reproduced.89C no-go remains historical.
+
+## Frozen89E: prepared, not run
+
+Requires exact local result89D: summary fcde095e…, model82fbfe15…, complete manifest, ridge0.01/boost4; plus production84Z. No fit/selection/threshold change. New motions873–890, views781–792,216 cases/648 trials. Loads frozen policy and calls exact decision89D. Candidate no true action; oracle diagnostic. Near miss no-go;90 blocked until full89E go.

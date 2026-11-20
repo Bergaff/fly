@@ -741,3 +741,12 @@ test('серия89D: independently verified development go сохранён',()=
   assert.match(item.limitations,/~0.209%/);assert.match(item.limitations,/89C frozen no-go remains/);assert.match(item.limitations,/separate frozen89E only/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия89E: frozen routing-margin replication подготовлена',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-frozen-routing-margin-replication-89e');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered frozen/);assert.match(item.status,/90 blocked/);
+  assert.match(item.source,/independently verified89D go/);assert.match(item.source,/model82fbfe15/);assert.match(item.source,/ridge0.01/);assert.match(item.source,/motions873–890/);assert.match(item.source,/views781–792/);
+  assert.match(item.results,/No fit\/selection\/threshold changes/);assert.match(item.results,/no truth action/);assert.match(item.results,/exact decision89D/);
+  assert.match(item.limitations,/exact local result89D plus production84Z/);assert.match(item.limitations,/only full89E go may authorize90/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});
