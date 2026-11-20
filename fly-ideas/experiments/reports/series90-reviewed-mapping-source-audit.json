@@ -1,0 +1,63 @@
+{
+  "schema": "series90-reviewed-mapping-source-audit-v1",
+  "audited_utc": "2026-09-18T00:00:00Z",
+  "cutoff_utc": "2026-09-18T23:59:59Z",
+  "question": "Does a reviewed, machine-readable FlyVis-to-FlyWire-to-descending/motor-to-FlyGym chain exist for the frozen89E actions?",
+  "sources": [
+    {
+      "repository": "TuragaLab/flyvis",
+      "url": "https://github.com/TuragaLab/flyvis",
+      "commit": "92b3845cc426dd309a1a0e1b3890156c42e14021",
+      "commit_utc": "2026-08-06T04:09:38Z",
+      "role": "official pretrained connectome-constrained optic-lobe visual model",
+      "finding": "Provides typed visual activity and custom-stimulus APIs, but the audited repository contains no FlyWire root-ID mapping and no reviewed chain onward to the frozen89E actions.",
+      "gate_support": ["official_flyvis_activity"],
+      "gate_blockers": ["reviewed_flyvis_to_flywire_mapping"]
+    },
+    {
+      "repository": "philshiu/Drosophila_brain_model",
+      "url": "https://github.com/philshiu/Drosophila_brain_model",
+      "commit": "91bdd1e7dcf193f3e7ca5a8933497fcef63b7960",
+      "commit_utc": "2024-09-14T13:47:44Z",
+      "role": "whole-brain FlyWire LIF model with FlyWire-ID stimulation and silencing",
+      "finding": "Provides FlyWire-ID input, activity and lesion mechanisms, but no reviewed FlyVis-to-root-ID mapping or preregistered root-ID-to-six-command motor readout for foreleg rubbing, head grooming and reach-withdraw.",
+      "gate_support": ["shiu_flywire_simulation_and_lesions"],
+      "gate_blockers": ["reviewed_flyvis_to_flywire_mapping", "preregistered_descending_motor_readout"]
+    },
+    {
+      "repository": "NeLy-EPFL/flygym",
+      "url": "https://github.com/NeLy-EPFL/flygym",
+      "commit": "3c8ce5e6cc90dd1ef0b63db53c5e8724c6bedb09",
+      "commit_utc": "2026-08-24T11:57:33Z",
+      "role": "official NeuroMechFly/FlyGym embodied simulation API",
+      "finding": "Provides an embodied framework and a generic descending/ascending brain-to-VNC interface, but the audited repository contains no Shiu/FlyWire-specific reviewed descending-neuron readout for the frozen89E actions.",
+      "gate_support": ["official_flygym_body_api"],
+      "gate_blockers": ["preregistered_descending_motor_readout"]
+    }
+  ],
+  "existing_local_protocols": [
+    {
+      "path": "experiments/templates/70_embodied_connectome_pipeline.py",
+      "sha256": "601d85a7ddf31b9e71fa3e30151e9accf0620e82783acadadc03c138de9c71bb",
+      "finding": "Contract fixture only; scientific_result=false and visual mapping/readout gates are intentionally false."
+    },
+    {
+      "path": "experiments/templates/71_visual_population_causal_study.py",
+      "sha256": "485d6a17c0de0daff95b1a63d375e480af1009be96bd473f4a7896bd3948e570",
+      "finding": "Creates FlyVis activity and mapping candidates, but exact-name candidates remain UNREVIEWED; no Shiu or body conclusion is allowed before independent mapping and readout review."
+    }
+  ],
+  "required_gates": [
+    "functional89e_frozen_go",
+    "official_flyvis_activity",
+    "reviewed_flyvis_to_flywire_mapping",
+    "fixed_activity_to_rate_rule",
+    "shiu_flywire_simulation_and_lesions",
+    "preregistered_descending_motor_readout",
+    "mapping_permutation_and_lesion_controls",
+    "official_flygym_body_api",
+    "validated_end_to_end_action_chain"
+  ],
+  "audit_conclusion": "mapping_gate_closed",
+  "reason": "As of the audit cutoff, no audited official source supplies both a reviewed FlyVis-type-to-FlyWire-ID mapping and a preregistered, validated descending/motor readout for the three frozen89E actions. Filling either gap by name matching or post-hoc gains would manufacture the desired behavior."
+}

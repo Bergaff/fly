@@ -750,3 +750,12 @@ test('серия89E: frozen routing-margin replication go',()=>{
   assert.match(item.limitations,/~0.224%/);assert.match(item.limitations,/89C no-go remains/);assert.match(item.limitations,/separate preregistered series90/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
+
+test('серия90: concluding reviewed mapping gate closed',()=>{
+  const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-reviewed-biological-mapping-gate-90');
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/mapping gate closed5\/9/);assert.match(item.status,/roadmap82–90 concluded/);
+  assert.match(item.source,/Cutoff2026-09-18/);assert.match(item.source,/FlyVis92b3845/);assert.match(item.source,/Shiu91bdd1e/);assert.match(item.source,/FlyGym3c8ce5e/);assert.match(item.source,/Source audit SHAceb7ab4a/);
+  assert.match(item.results,/Reviewed FlyVis→FlyWire mapping/);assert.match(item.results,/5\/9/);assert.match(item.results,/biological mirror neurons are not established/);
+  assert.match(item.limitations,/components separately/);assert.match(item.limitations,/hand gains/);assert.match(item.limitations,/new roadmap/);
+  for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
+});
