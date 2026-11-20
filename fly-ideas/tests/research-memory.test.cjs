@@ -733,11 +733,11 @@ test('серия89C: strict frozen no-go сохранён',()=>{
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
 
-test('серия89D: routing-margin development подготовлена',()=>{
+test('серия89D: independently verified development go сохранён',()=>{
   const item=memory.RESEARCH_MEMORY.find(e=>e.id==='session-routing-margin-contact-89d');
-  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/prepared preregistered/);assert.match(item.status,/89E\/90 blocked/);
-  assert.match(item.source,/frozen89C no-go/);assert.match(item.source,/development837–854/);assert.match(item.source,/final855–872/);
-  assert.match(item.results,/minimum per-action accuracy/);assert.match(item.results,/mean\/min true margin/);assert.match(item.results,/common wins≥90%/);assert.match(item.results,/7\/8 broad/);
-  assert.match(item.limitations,/not89C rerun/);assert.match(item.limitations,/separate frozen89E/);
+  assert.ok(item&&item.ideaId==='i-observational');assert.match(item.status,/development go/);assert.match(item.status,/89E authorized/);assert.match(item.status,/90 blocked/);
+  assert.match(item.source,/SHAfcde095e/);assert.match(item.source,/development837–854/);assert.match(item.source,/final855–872/);
+  assert.match(item.results,/ridge0.01:144\/144/);assert.match(item.results,/margin0.021934/);assert.match(item.results,/boost4 common44\/48/);assert.match(item.results,/identity216\/216/i);assert.match(item.results,/foreleg213\/209/);assert.match(item.results,/broad7\/8/);assert.match(item.results,/0.122980≤standard0.123237/);assert.match(item.results,/candidate=oracle648\/648/);
+  assert.match(item.limitations,/~0.209%/);assert.match(item.limitations,/89C frozen no-go remains/);assert.match(item.limitations,/separate frozen89E only/);
   for(const name of item.files)assert.ok(fs.existsSync(path.join(root,name)),name);
 });
