@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-17-v84x-prepared";
+export const MEMORY_VERSION = "v630-session-2026-11-17-connectome-advantage-stage1";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -434,6 +434,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Первая муха управляемо машет крыльями; вторая получает изображения. Сохраняются вход, геометрия, времена и ID спайков 32 условных нейронов. Контроли: неподвижные крылья, серый вход и перемешанный порядок кадров.",
     limitations: "Кинематические эллипсоиды и условные камеры; не FlyGym/FlyBody и не мозг FlyWire. Нейроны не доказанные зеркальные, движение не повторяется и обучение не моделируется. Шаблон 16 не является двухагентной сценой и может переходить к синтетике.",
     files: ["experiments/SETUP-TWO-FLIES.bat", "experiments/RUN-TWO-FLIES.bat", "experiments/templates/38_two_flies_observation.py", "workspace/runs/ideas/i-observational/two-flies"] },
+  { id: "session-connectome-advantage-stage1-prepared", ideaId: "i-connectome-advantage", title: "Этап1: artificial96-unit benchmark", status: "код, BAT, preregistration и bounded fixture подготовлены; полный пользовательский запуск не получен", source: "Новый отдельный roadmap после закрытия biological mapping gate90. Три synthetic действия; structured96, parameter-matched shuffled96 и unit-matched dense96;12 seeds в полном режиме.",
+    results: "Код создаёт одинаковые training/test данные для трёх моделей, фиксирует unseen view mixing, time shift, noise, partial occlusion и lesion10/96. Primary заранее требует accuracy structured минимум shuffled+0,02, trajectory RMSE не более0,98 shuffled и paired accuracy wins минимум на2/3 seeds. GUI предлагает workers2/4/6/Максимум, результаты и ошибки сохраняются в копируемые файлы.",
+    limitations: "Это проверка инфраструктуры и искусственных software units, не реальные нейроны, не FlyWire mapping и не доказательство преимущества мозга мухи. Structured mask является инженерным prior. Dense96 имеет столько же units, но больше параметров; основной честный контроль первого этапа — shuffled96 с тем же числом активных весов. Полный запуск выполняет пользователь.",
+    files: ["experiments/RUN-CONNECTOME-ADVANTAGE-STAGE-1.bat", "experiments/templates/91_connectome_advantage_stage1.py", "experiments/reports/connectome-advantage-roadmap.md", "tests/connectome-advantage-stage1.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
