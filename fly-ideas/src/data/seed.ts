@@ -522,7 +522,7 @@ export const SEED_IDEAS: Idea[] = [
     tags: ["connectome advantage", "benchmark", "96 units", "few-shot", "lesions", "fair comparison"],
     status: "active",
     scores: { effort: 7, impact: 10, novelty: 8, speed: 6, risk: 8 },
-    notes: "Код этапа1 подготовлен. Запуск двойным щелчком: experiments/RUN-CONNECTOME-ADVANTAGE-STAGE-1.bat. Результат этапа1 не является сравнением реальных нейронов.",
+    notes: "Этап1 completed, primary no-go: structured accuracy margin+0,004398<0,02, RMSE на6,71% хуже parameter-matched shuffled, paired wins6/12<8/12. Не открывает FlyWire mapping. Полный анализ сохранён в experiments/reports/connectome-advantage-stage1-user-result.md.",
     dependsOn: ["i-cross-species-mirror-algorithm"],
     links: [{ label: "Код этапа 1", url: "experiments/templates/91_connectome_advantage_stage1.py" }, { label: "Roadmap", url: "experiments/reports/connectome-advantage-roadmap.md" }],
     checklist: makeChecklist(3),
