@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v631-session-2026-11-23-complex-result-no-go";
+export const MEMORY_VERSION = "v632-session-2026-11-23-stage92-paired-diagnostic";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -458,6 +458,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Stage92 BAT перенаправляет stdout/stderr Python в ПОСЛЕДНИЙ-ХОД-КОМПЛЕКСНЫЙ.log. Клавиатура и состояние интерактивной консоли больше не находятся на пути progress writes. Для всех следующих долгих runners: GUI/checkpoint показывает состояние, журнал пишется в файл, вычислительный parent не пишет прогресс в консоль.",
     limitations: "Уже завершённый пользовательский результат не затронут. Для будущего runner нужно отдельно bounded-проверять GUI, file logging, checkpoint/resume и отсутствие console writes.",
     files: ["experiments/RUN-COMPLEX-CONNECTOME-ADVANTAGE-4H.bat", "experiments/reports/complex-connectome-advantage-4h-plan.md"] },
+  { id: "session-stage92-paired-diagnostic-prepared", ideaId: "i-connectome-advantage", title: "Stage92: paired-диагностика причин no-go", status: "подготовлен read-only однокликовый анализ; ожидается пользовательский ДИАГНОСТИКА.txt", source: "После выбора пользователя чинить научный no-go запрещено сразу менять архитектуру или пороги. Нужна локализация расхождения: средние few-shot harsh эффекты прошли, replicate-level dual stability нет.",
+    results: "Stage93 diagnostic читает завершённую study.sqlite3 с PRAGMA query_only, проверяет47262 replicates и ожидаемое число metrics, затем для14 budget×scenario групп считает accuracy/RMSE wins/ties/losses, dual/accuracy-only/RMSE-only/neither, распределения paired deltas, корреляцию deltas и Wilson95. SQLite hash не меняется в bounded test. GUI запускается через pythonw, вывод только в файл.",
+    limitations: "Это анализ раскрытых development данных, не новая проверка и не frozen evidence. До получения группового отчёта нельзя выбирать изменение модели. Диагностика не меняет Stage92 no-go и старый gate.",
+    files: ["experiments/DIAGNOSE-STAGE92-PAIRED-STABILITY.bat", "experiments/templates/93_stage92_paired_diagnostic.py", "tests/stage92-paired-diagnostic.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
