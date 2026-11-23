@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v634-session-2026-11-23-stage94-frozen-pass";
+export const MEMORY_VERSION = "v635-session-2026-11-23-stage95-strong-controls-prepared";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -470,6 +470,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Все frozen gates пройдены: few-shot harsh accuracy margin0,030003255≥0,03; RMSE ratio0,945660819≤0,97; harsh dual2620/4096=63,9648%, Wilson95 lower0,624821≥0,60; overall17228/28672=60,0865%, Wilson lower0,595183≥0,55. frozen_pass=true. Structured/shuffled few-shot harsh accuracy0,254787/0,224784, RMSE0,311496/0,329395.",
     limitations: "Accuracy margin прошёл всего на0,000003255, то есть на3 net correct predictions сверх минимальных27648 из921600; формальный pass нельзя отменить, но он пограничный. Это преимущество инженерной structured96 маски, не коннектома:96 units не нейроны, маска не FlyWire, synthetic task не биология. Series90 mapping gate остаётся закрыт.",
     files: ["experiments/reports/stage94-frozen-paired-loss-user-result.json", "experiments/reports/stage94-frozen-paired-loss-user-result.md", "experiments/reports/stage94-frozen-paired-loss-protocol.md"] },
+  { id: "session-stage95-strong-controls-prepared", ideaId: "i-connectome-advantage", title: "Stage95: четырёхчасовой strong-controls development", status: "runner, GUI BAT, protocol и bounded fixture подготовлены; пользовательский запуск ожидается", source: "Пользователь выбрал рекомендованный следующий шаг: сильные controls, бюджет около4 часов. Цель — проверить пограничный Stage94 pass против архитектур сильнее одного shuffled mask до любых biological claims.",
+    results: "Сравниваются structured96, shuffled96, temporal96, learned_sparse96, exact-parameter-matched rnn54 и diagnostic dense96. Первые пять имеют4437 финальных trainable parameters; dense9045. Learned sparse получает dense warmup20% и затем pruning, то есть намеренно advantaged training compute. Calibration до main results фиксирует replicate count. Candidate должен сохранить Stage94 gate против shuffled и иметь positive harsh mean Pareto плюс Wilson95 dual lower≥0,50 harsh/overall против каждого temporal/learned/RNN.",
+    limitations: "Development seeds95000000-series раскрываются и требуют нового frozen runner при pass. RNN совпадает по lesion fraction, не exact unit indices из-за54 units. Даже pass — synthetic engineered result, не коннектом или FlyWire evidence.",
+    files: ["experiments/RUN-STAGE95-STRONG-CONTROLS-4H.bat", "experiments/templates/95_strong_controls_development.py", "experiments/reports/stage95-strong-controls-4h-protocol.md", "tests/stage95-strong-controls.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
