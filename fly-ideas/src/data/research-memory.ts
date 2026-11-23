@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v630-session-2026-11-17-complex-connectome-advantage-prepared";
+export const MEMORY_VERSION = "v630-session-2026-11-23-complex-checkpoint-recovery";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -442,10 +442,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Structured/shuffled/dense accuracy 0,991898/0,987500/0,993056; trajectory RMSE 0,084110/0,078817/0,083832. Structured margin над shuffled только +0,004398 при требовании +0,02; structured RMSE на6,71% хуже shuffled; paired wins6/12 при требовании8/12. Primary false. После lesion10/96 accuracy structured/shuffled уменьшилась одинаково примерно на0,185 процентного пункта; RMSE выросла на28,10%/22,85%. Преимущество structured96 не обнаружено.",
     limitations: "Accuracy всех моделей близка к потолку. Нельзя ослаблять gates или открывать FlyWire mapping. Это artificial96, не реальные нейроны или коннектом. Допустим только новый preregistered development benchmark с устранением ceiling и последующая отдельная frozen replication;12 seeds раскрыты.",
     files: ["experiments/reports/connectome-advantage-stage1-user-result.json", "experiments/reports/connectome-advantage-stage1-user-result.md", "experiments/templates/91_connectome_advantage_stage1.py"] },
-  { id: "session-complex-connectome-advantage-prepared", ideaId: "i-connectome-advantage", title: "Комплексный четырёхчасовой development benchmark", status: "код, BAT, protocol и bounded fixture подготовлены; полный пользовательский запуск ожидается", source: "Новый Stage92 после сохранённого Stage91 no-go. Stage91 runner закреплён SHA dde8ea3d…. Калибровка до основных результатов переводит выбранные workers в fixed replicate count примерно на4 часа.",
+  { id: "session-complex-connectome-advantage-prepared", ideaId: "i-connectome-advantage", title: "Комплексный четырёхчасовой development benchmark", status: "код, BAT, protocol и bounded fixture подготовлены; пользовательский запуск начат", source: "Новый Stage92 после сохранённого Stage91 no-go. Stage91 runner закреплён SHA dde8ea3d…. Калибровка до основных результатов переводит выбранные workers в fixed replicate count примерно на4 часа.",
     results: "Девять ordered classes из трёх действий; few-shot5 и budget30; clean, high-view, occlusion, lesion10, lesion25, state-noise и combined-harsh. Structured96 сравнивается с parameter-matched shuffled96 и диагностической dense96. Development gate: harsh few-shot accuracy margin≥0,03, RMSE ratio≤0,97, harsh strict dual wins≥60%, all-condition dual wins≥55%. SQLite и INCOMPLETE обновляются после каждого replicate; повторный BAT продолжает расчёт.",
-    limitations: "Development выбор кандидата не является frozen replication.96 units не нейроны, state corruption не биологическая память. Даже go не открывает FlyWire mapping. Полный запуск выполняет пользователь; агент проверил только bounded fixture.",
+    limitations: "Development выбор кандидата не является frozen replication.96 units не нейроны, state corruption не биологическая память. Даже go не открывает FlyWire mapping. Полный результат ещё не получен.",
     files: ["experiments/RUN-COMPLEX-CONNECTOME-ADVANTAGE-4H.bat", "experiments/templates/92_complex_connectome_advantage.py", "experiments/reports/complex-connectome-advantage-4h-plan.md", "tests/complex-connectome-advantage-4h.test.cjs"] },
+  { id: "session-complex-connectome-advantage-checkpoint-recovery", ideaId: "i-connectome-advantage", title: "Stage92: восстановление после WinError5 checkpoint", status: "исправлено; расчёт можно продолжить из той же папки", source: "Пользовательский traceback 2026-11-23T14:01:03: os.replace INCOMPLETE.json.tmp→INCOMPLETE.json получил WinError5. Папка complex_20261123_093838_f2166979.",
+    results: "commit_result записывает replicate в SQLite и выполняет db.commit до обновления INCOMPLETE.json, поэтому все подтверждённые до ошибки replicates сохранены. Resume определяет done непосредственно из таблицы replicates и повторяет только отсутствующие IDs. Writer теперь использует уникальные temp, bounded retry, direct-write/fallback checkpoint и не останавливает расчёт при блокировке JSON; completed marker создаётся до удаления checkpoint.",
+    limitations: "Точное число сохранённых replicates неизвестно без чтения пользовательской SQLite. Завершившиеся параллельные jobs после точки исключения могли не попасть в DB и будут безопасно рассчитаны повторно. Нужно обновить код и повторно запустить тот же BAT.",
+    files: ["workspace/runs/ideas/i-connectome-advantage/stage-2-complex-development/complex_20261123_093838_f2166979/study.sqlite3", "experiments/templates/92_complex_connectome_advantage.py", "experiments/RUN-COMPLEX-CONNECTOME-ADVANTAGE-4H.bat"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

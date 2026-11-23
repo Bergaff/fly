@@ -22,7 +22,32 @@ def serial(x):
  if isinstance(x,np.generic):return x.item()
  raise TypeError(type(x).__name__)
 def save(path,value):
- path=Path(path);temp=path.with_suffix(path.suffix+'.tmp');temp.write_text(json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False,default=serial)+'\n',encoding='utf-8');os.replace(temp,path)
+ path=Path(path);data=json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False,default=serial)+'\n';last=None
+ for attempt in range(8):
+  temp=path.parent/f'.{path.name}.{os.getpid()}.{time.time_ns()}.tmp'
+  try:
+   temp.write_text(data,encoding='utf-8');os.replace(temp,path);return
+  except PermissionError as exc:
+   last=exc
+   try:temp.unlink(missing_ok=True)
+   except OSError:pass
+   time.sleep(min(.1*(attempt+1),1.0))
+ raise last if last else OSError('Не удалось сохранить '+str(path))
+def save_checkpoint(path,value):
+ try:save(path,value);return True
+ except PermissionError as exc:
+  data=json.dumps(value,ensure_ascii=False,indent=2)+'\n';fallback=Path(path).with_name('INCOMPLETE-FALLBACK.json')
+  try:Path(path).write_text(data,encoding='utf-8');return True
+  except OSError:pass
+  try:fallback.write_text(data,encoding='utf-8')
+  except OSError:pass
+  print('ПРЕДУПРЕЖДЕНИЕ: Windows временно заблокировал checkpoint JSON. SQLite уже сохранена; расчёт продолжается. '+str(exc),flush=True);return False
+def remove_checkpoint(folder):
+ for name in ('INCOMPLETE.json','INCOMPLETE-FALLBACK.json'):
+  path=Path(folder)/name
+  for attempt in range(10):
+   try:path.unlink(missing_ok=True);break
+   except PermissionError:time.sleep(min(.1*(attempt+1),.5))
 def stage91():
  if sha(STAGE91)!=STAGE91_SHA:raise ValueError('Закреплённый Stage91 runner изменился.')
  spec=importlib.util.spec_from_file_location('connectome_stage91',STAGE91);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
@@ -106,13 +131,13 @@ def worker_choice(value):
 
 def latest_incomplete():
  if not ROOT.exists():return None
- found=sorted((p for p in ROOT.glob('complex_*') if (p/'INCOMPLETE.json').exists()),key=lambda p:p.stat().st_mtime,reverse=True)
+ found=sorted((p for p in ROOT.glob('complex_*') if not (p/'complete.json').exists() and (p/'protocol.json').exists() and (p/'study.sqlite3').exists() and ((p/'INCOMPLETE.json').exists() or (p/'INCOMPLETE-FALLBACK.json').exists())),key=lambda p:p.stat().st_mtime,reverse=True)
  return found[0] if found else None
 
 def prepare(workers,fixture):
  label,count=worker_choice(workers);ROOT.mkdir(parents=True,exist_ok=True);guard=console_guard();folder=ROOT/('fixture' if fixture else 'complex_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:8]);folder.mkdir(exist_ok=fixture);db=sqlite3.connect(folder/'study.sqlite3');schema(db)
  print('Калибровка одного полного replicate...' if not fixture else'Bounded fixture...',flush=True);cal=replicate((-1,fixture));cpu=max(cal['cpu_seconds'],.05);target=2 if fixture else max(count*4,math.ceil(TARGET_WALL_SECONDS*count/cpu));target=min(target,2 if fixture else 50000)
- protocol={'schema':'complex-connectome-advantage-v1','mode':'fixture' if fixture else'four_hour_development','biological_result':False,'stage91_sha256':STAGE91_SHA,'script_sha256':sha(__file__),'target_wall_seconds':0 if fixture else TARGET_WALL_SECONDS,'calibration_cpu_seconds':cpu,'fixed_replicates':target,'workers':count,'worker_choice':label,'models':list(MODELS),'budgets_per_ordered_action_class':list(BUDGETS),'ordered_action_classes':9,'scenarios':[list(x) for x in SCENARIOS],'delay_s':.5,'delay_interpretation':'software latent state held without new sensory input; state_noise scenarios test corruption, not biological memory','development_gate':'budget5 combined_harsh: accuracy margin>=0.03, RMSE ratio<=0.97; harsh dual wins>=60%; all-condition dual wins>=55%','console_guard':guard,'limitations':['Development benchmark after disclosed Stage91 no-go; any selected candidate requires independent frozen replication.','96 units and masks are engineered, not biological neurons or FlyWire IDs.','Dense96 is unit-matched but not parameter-matched; shuffled96 is the primary parameter-matched control.','Calibration fixes replicate count before main results but runtime is approximate.']};save(folder/'protocol.json',protocol);save(folder/'INCOMPLETE.json',{'completed':0,'fixed_replicates':target,'worker_cpu_seconds':0});db.close();return folder
+ protocol={'schema':'complex-connectome-advantage-v1','mode':'fixture' if fixture else'four_hour_development','biological_result':False,'stage91_sha256':STAGE91_SHA,'script_sha256':sha(__file__),'target_wall_seconds':0 if fixture else TARGET_WALL_SECONDS,'calibration_cpu_seconds':cpu,'fixed_replicates':target,'workers':count,'worker_choice':label,'models':list(MODELS),'budgets_per_ordered_action_class':list(BUDGETS),'ordered_action_classes':9,'scenarios':[list(x) for x in SCENARIOS],'delay_s':.5,'delay_interpretation':'software latent state held without new sensory input; state_noise scenarios test corruption, not biological memory','development_gate':'budget5 combined_harsh: accuracy margin>=0.03, RMSE ratio<=0.97; harsh dual wins>=60%; all-condition dual wins>=55%','console_guard':guard,'limitations':['Development benchmark after disclosed Stage91 no-go; any selected candidate requires independent frozen replication.','96 units and masks are engineered, not biological neurons or FlyWire IDs.','Dense96 is unit-matched but not parameter-matched; shuffled96 is the primary parameter-matched control.','Calibration fixes replicate count before main results but runtime is approximate.']};save(folder/'protocol.json',protocol);save_checkpoint(folder/'INCOMPLETE.json',{'completed':0,'fixed_replicates':target,'worker_cpu_seconds':0});db.close();return folder
 
 def execute(folder):
  protocol=json.loads((folder/'protocol.json').read_text(encoding='utf-8'));target=protocol['fixed_replicates'];workers=protocol['workers'];fixture=protocol['mode']=='fixture';db=sqlite3.connect(folder/'study.sqlite3');schema(db);done={row[0] for row in db.execute('SELECT id FROM replicates')};remaining=[i for i in range(target) if i not in done];print(f'Комплексный анализ: готово {len(done)}/{target}, workers={workers}.',flush=True)
@@ -121,9 +146,9 @@ def execute(folder):
   for offset in range(0,len(remaining),chunk_size):
    futures={pool.submit(replicate,(ident,fixture)):ident for ident in remaining[offset:offset+chunk_size]}
    for future in concurrent.futures.as_completed(futures):
-    result=future.result();commit_result(db,result);done.add(result['replicate']);cpu=db.execute('SELECT COALESCE(SUM(cpu_seconds),0) FROM replicates').fetchone()[0];save(folder/'INCOMPLETE.json',{'completed':len(done),'fixed_replicates':target,'worker_cpu_seconds':cpu});
+    result=future.result();commit_result(db,result);done.add(result['replicate']);cpu=db.execute('SELECT COALESCE(SUM(cpu_seconds),0) FROM replicates').fetchone()[0];save_checkpoint(folder/'INCOMPLETE.json',{'completed':len(done),'fixed_replicates':target,'worker_cpu_seconds':cpu});
     if len(done)%max(1,workers)==0 or len(done)==target:print(f'  replicates {len(done)}/{target}; worker CPU {cpu/3600:.2f} ч',flush=True)
- groups,gate=aggregate(db,target);cpu=db.execute('SELECT SUM(cpu_seconds) FROM replicates').fetchone()[0];db.close();summary={'schema':'complex-connectome-advantage-result-v1','status':'fixture_completed' if fixture else'completed','protocol':protocol,'completed_replicates':target,'worker_cpu_seconds':cpu,'aggregate':groups,'development_gate':gate,'interpretation':'candidate_only_requires_frozen_replication' if gate['candidate_for_frozen_replication'] else'no_candidate'};save(folder/'summary.json',summary);lines=['КОМПЛЕКСНЫЙ CONNECTOME ADVANTAGE,4 ЧАСА',f'Replicates: {target}; worker CPU: {cpu/3600:.2f} ч.',f'Кандидат для frozen replication: {gate["candidate_for_frozen_replication"]}.',f'Few-shot harsh accuracy margin: {gate["harsh_fewshot_accuracy_margin"]:.6f}.',f'Few-shot harsh RMSE ratio: {gate["harsh_fewshot_rmse_ratio"]:.6f}.',f'Harsh dual wins: {gate["harsh_dual_wins"]}/{gate["harsh_comparisons"]}.',f'All-condition dual wins: {gate["overall_dual_wins"]}/{gate["overall_comparisons"]}.','Это development artificial96, не реальные нейроны. Даже go требует отдельной frozen replication.'];(folder/'ИТОГ.txt').write_text('\n'.join(lines)+'\n',encoding='utf-8-sig');(folder/'INCOMPLETE.json').unlink();save(folder/'complete.json',{'protocol_sha256':sha(folder/'protocol.json'),'summary_sha256':sha(folder/'summary.json'),'database_sha256':sha(folder/'study.sqlite3')});print('Готово:',folder,flush=True);return folder
+ groups,gate=aggregate(db,target);cpu=db.execute('SELECT SUM(cpu_seconds) FROM replicates').fetchone()[0];db.close();summary={'schema':'complex-connectome-advantage-result-v1','status':'fixture_completed' if fixture else'completed','protocol':protocol,'completed_replicates':target,'worker_cpu_seconds':cpu,'aggregate':groups,'development_gate':gate,'interpretation':'candidate_only_requires_frozen_replication' if gate['candidate_for_frozen_replication'] else'no_candidate'};save(folder/'summary.json',summary);lines=['КОМПЛЕКСНЫЙ CONNECTOME ADVANTAGE,4 ЧАСА',f'Replicates: {target}; worker CPU: {cpu/3600:.2f} ч.',f'Кандидат для frozen replication: {gate["candidate_for_frozen_replication"]}.',f'Few-shot harsh accuracy margin: {gate["harsh_fewshot_accuracy_margin"]:.6f}.',f'Few-shot harsh RMSE ratio: {gate["harsh_fewshot_rmse_ratio"]:.6f}.',f'Harsh dual wins: {gate["harsh_dual_wins"]}/{gate["harsh_comparisons"]}.',f'All-condition dual wins: {gate["overall_dual_wins"]}/{gate["overall_comparisons"]}.','Это development artificial96, не реальные нейроны. Даже go требует отдельной frozen replication.'];(folder/'ИТОГ.txt').write_text('\n'.join(lines)+'\n',encoding='utf-8-sig');save(folder/'complete.json',{'protocol_sha256':sha(folder/'protocol.json'),'summary_sha256':sha(folder/'summary.json'),'database_sha256':sha(folder/'study.sqlite3')});remove_checkpoint(folder);print('Готово:',folder,flush=True);return folder
 
 def choose():
  import tkinter as tk
