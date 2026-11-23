@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v633-session-2026-11-23-stage94-frozen-prepared";
+export const MEMORY_VERSION = "v634-session-2026-11-23-stage94-frozen-pass";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -462,10 +462,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Главный провал — budget30 RMSE, не accuracy: combined-harsh accuracy/RMSE wins83,21%/58,56%, lesion25 67,14%/47,19%. Few-shot5 combined-harsh dual65,31%, budget30 только50,35%. Обнаружен design defect: model-index seed давал моделям разные lesion sets и state-noise draws, нарушая максимально paired control.",
     limitations: "Раскрытая диагностика не меняет Stage92 no-go. SQLite независимо не получена, но JSON содержит полную групповую сводку. Любая коррекция выбрана на disclosed данных и требует новых seeds.",
     files: ["experiments/reports/stage92-paired-diagnostic-user.json", "experiments/reports/stage92-paired-diagnostic-user.md", "experiments/DIAGNOSE-STAGE92-PAIRED-STABILITY.bat"] },
-  { id: "session-stage94-frozen-paired-loss-prepared", ideaId: "i-connectome-advantage", title: "Stage94: frozen paired-loss correction", status: "runner, BAT и protocol подготовлены; пользовательский запуск ожидается", source: "После diagnosis выполнены disclosed bounded pilots. Common RNG плюс trajectory weight2 при64 replicates дали ориентировочно harsh61,72%, overall54,69%; weight4 — harsh64,06%, overall59,15%. Weight4 выбран и заморожен; pilot не является replication.",
-    results: "Stage94 использует2048 новых replicates и seed namespace94000000. Все модели получают одинаковые initialization, minibatch order, lesion indices и state-noise. Trajectory loss weight4. Gate: few-shot harsh margin≥0,03, RMSE ratio≤0,97, а lower Wilson95 harsh≥0,60 и overall≥0,55. GUI показывает progress, pythonw исключает console dependency, SQLite checkpoint/resume после каждого replicate.",
-    limitations: "Это frozen computational replication инженерной artificial96-кандидатуры, не биологическая проверка. Выбор weight4 раскрыт и не может меняться. Даже pass не превращает units в нейроны и не отменяет закрытый Series90 biological mapping gate.",
+  { id: "session-stage94-frozen-paired-loss-prepared", ideaId: "i-connectome-advantage", title: "Stage94: frozen paired-loss correction", status: "runner, BAT и protocol заморожены; полный результат описан отдельно", source: "После diagnosis выполнены disclosed bounded pilots. Common RNG плюс trajectory weight2 при64 replicates дали ориентировочно harsh61,72%, overall54,69%; weight4 — harsh64,06%, overall59,15%. Weight4 выбран и заморожен; pilot не является replication.",
+    results: "Stage94 использует2048 новых replicates и seed namespace94000000. Все модели получают одинаковые initialization, minibatch order, lesion indices и state-noise. Trajectory loss weight4. Gate: few-shot harsh margin≥0,03, RMSE ratio≤0,97, а lower Wilson95 harsh≥0,60 и overall≥0,55.",
+    limitations: "Это frozen computational replication инженерной artificial96-кандидатуры, не биологическая проверка. Выбор weight4 раскрыт и не может меняться.",
     files: ["experiments/RUN-STAGE94-FROZEN-PAIRED-LOSS.bat", "experiments/templates/94_frozen_paired_loss_replication.py", "experiments/reports/stage94-frozen-paired-loss-protocol.md", "tests/stage94-frozen-paired-loss.test.cjs"] },
+  { id: "session-stage94-frozen-paired-loss-user-result", ideaId: "i-connectome-advantage", title: "Stage94: frozen computational replication", status: "completed по присланному summary; frozen computational pass", source: "Пользователь приложил summary-34.json:2048/2048 replicates, workers6,1,32258 worker-hours. Script SHA7d9c7135… и source Stage92 SHA0dbbdcb9… совпадают. Все42 агрегата имеют n=2048. SQLite/protocol/complete отдельно не получены.",
+    results: "Все frozen gates пройдены: few-shot harsh accuracy margin0,030003255≥0,03; RMSE ratio0,945660819≤0,97; harsh dual2620/4096=63,9648%, Wilson95 lower0,624821≥0,60; overall17228/28672=60,0865%, Wilson lower0,595183≥0,55. frozen_pass=true. Structured/shuffled few-shot harsh accuracy0,254787/0,224784, RMSE0,311496/0,329395.",
+    limitations: "Accuracy margin прошёл всего на0,000003255, то есть на3 net correct predictions сверх минимальных27648 из921600; формальный pass нельзя отменить, но он пограничный. Это преимущество инженерной structured96 маски, не коннектома:96 units не нейроны, маска не FlyWire, synthetic task не биология. Series90 mapping gate остаётся закрыт.",
+    files: ["experiments/reports/stage94-frozen-paired-loss-user-result.json", "experiments/reports/stage94-frozen-paired-loss-user-result.md", "experiments/reports/stage94-frozen-paired-loss-protocol.md"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
