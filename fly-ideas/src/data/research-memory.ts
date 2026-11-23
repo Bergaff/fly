@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v632-session-2026-11-23-stage92-paired-diagnostic";
+export const MEMORY_VERSION = "v633-session-2026-11-23-stage94-frozen-prepared";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -458,10 +458,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Stage92 BAT перенаправляет stdout/stderr Python в ПОСЛЕДНИЙ-ХОД-КОМПЛЕКСНЫЙ.log. Клавиатура и состояние интерактивной консоли больше не находятся на пути progress writes. Для всех следующих долгих runners: GUI/checkpoint показывает состояние, журнал пишется в файл, вычислительный parent не пишет прогресс в консоль.",
     limitations: "Уже завершённый пользовательский результат не затронут. Для будущего runner нужно отдельно bounded-проверять GUI, file logging, checkpoint/resume и отсутствие console writes.",
     files: ["experiments/RUN-COMPLEX-CONNECTOME-ADVANTAGE-4H.bat", "experiments/reports/complex-connectome-advantage-4h-plan.md"] },
-  { id: "session-stage92-paired-diagnostic-prepared", ideaId: "i-connectome-advantage", title: "Stage92: paired-диагностика причин no-go", status: "подготовлен read-only однокликовый анализ; ожидается пользовательский ДИАГНОСТИКА.txt", source: "После выбора пользователя чинить научный no-go запрещено сразу менять архитектуру или пороги. Нужна локализация расхождения: средние few-shot harsh эффекты прошли, replicate-level dual stability нет.",
-    results: "Stage93 diagnostic читает завершённую study.sqlite3 с PRAGMA query_only, проверяет47262 replicates и ожидаемое число metrics, затем для14 budget×scenario групп считает accuracy/RMSE wins/ties/losses, dual/accuracy-only/RMSE-only/neither, распределения paired deltas, корреляцию deltas и Wilson95. SQLite hash не меняется в bounded test. GUI запускается через pythonw, вывод только в файл.",
-    limitations: "Это анализ раскрытых development данных, не новая проверка и не frozen evidence. До получения группового отчёта нельзя выбирать изменение модели. Диагностика не меняет Stage92 no-go и старый gate.",
-    files: ["experiments/DIAGNOSE-STAGE92-PAIRED-STABILITY.bat", "experiments/templates/93_stage92_paired_diagnostic.py", "tests/stage92-paired-diagnostic.test.cjs"] },
+  { id: "session-stage92-paired-diagnostic-prepared", ideaId: "i-connectome-advantage", title: "Stage92: paired-диагностика причин no-go", status: "completed по присланным TXT/JSON", source: "Read-only анализ полной study.sqlite3:47262 replicates,1985004 metric rows; model retraining не выполнялся.",
+    results: "Главный провал — budget30 RMSE, не accuracy: combined-harsh accuracy/RMSE wins83,21%/58,56%, lesion25 67,14%/47,19%. Few-shot5 combined-harsh dual65,31%, budget30 только50,35%. Обнаружен design defect: model-index seed давал моделям разные lesion sets и state-noise draws, нарушая максимально paired control.",
+    limitations: "Раскрытая диагностика не меняет Stage92 no-go. SQLite независимо не получена, но JSON содержит полную групповую сводку. Любая коррекция выбрана на disclosed данных и требует новых seeds.",
+    files: ["experiments/reports/stage92-paired-diagnostic-user.json", "experiments/reports/stage92-paired-diagnostic-user.md", "experiments/DIAGNOSE-STAGE92-PAIRED-STABILITY.bat"] },
+  { id: "session-stage94-frozen-paired-loss-prepared", ideaId: "i-connectome-advantage", title: "Stage94: frozen paired-loss correction", status: "runner, BAT и protocol подготовлены; пользовательский запуск ожидается", source: "После diagnosis выполнены disclosed bounded pilots. Common RNG плюс trajectory weight2 при64 replicates дали ориентировочно harsh61,72%, overall54,69%; weight4 — harsh64,06%, overall59,15%. Weight4 выбран и заморожен; pilot не является replication.",
+    results: "Stage94 использует2048 новых replicates и seed namespace94000000. Все модели получают одинаковые initialization, minibatch order, lesion indices и state-noise. Trajectory loss weight4. Gate: few-shot harsh margin≥0,03, RMSE ratio≤0,97, а lower Wilson95 harsh≥0,60 и overall≥0,55. GUI показывает progress, pythonw исключает console dependency, SQLite checkpoint/resume после каждого replicate.",
+    limitations: "Это frozen computational replication инженерной artificial96-кандидатуры, не биологическая проверка. Выбор weight4 раскрыт и не может меняться. Даже pass не превращает units в нейроны и не отменяет закрытый Series90 biological mapping gate.",
+    files: ["experiments/RUN-STAGE94-FROZEN-PAIRED-LOSS.bat", "experiments/templates/94_frozen_paired_loss_replication.py", "experiments/reports/stage94-frozen-paired-loss-protocol.md", "tests/stage94-frozen-paired-loss.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
