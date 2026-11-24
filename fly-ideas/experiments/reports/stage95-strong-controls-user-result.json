@@ -1,0 +1,552 @@
+{
+  "schema": "stage95-strong-controls-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "stage95-strong-controls-development-v1",
+    "mode": "four_hour_development",
+    "biological_result": false,
+    "stage92_sha256": "0dbbdcb91fff86ab059e975ded8c358dae345c1b6429795ead516faabe8c4439",
+    "script_sha256": "43157af631c77ef219bbeabf0ee0e618314ca17b51bfa910c31fe16cc8df3237",
+    "target_wall_seconds": 14400,
+    "calibration_cpu_seconds": 4.390625,
+    "fixed_replicates": 13119,
+    "workers": 4,
+    "worker_choice": "4",
+    "models": [
+      "structured96",
+      "shuffled96",
+      "temporal96",
+      "learned_sparse96",
+      "rnn54",
+      "dense96"
+    ],
+    "primary_controls": [
+      "shuffled96",
+      "temporal96",
+      "learned_sparse96",
+      "rnn54"
+    ],
+    "parameter_counts": {
+      "structured96": 4437,
+      "shuffled96": 4437,
+      "temporal96": 4437,
+      "learned_sparse96_final": 4437,
+      "rnn54": 4437,
+      "dense96": 9045
+    },
+    "trajectory_loss_weight": 4.0,
+    "learned_sparse_disclosure": "dense warmup for20% epochs then magnitude-pruned to2304 input weights; final parameter matched but training compute advantaged",
+    "rnn_lesion_disclosure": "lesion fraction is matched; exact unit indices cannot match96-unit models",
+    "seed_namespace": "95000000-series; development and disclosed after run",
+    "gate": "retain Stage94 vs shuffled; for each temporal/learned-sparse/rnn: positive few-shot harsh accuracy margin, RMSE ratio<1, harsh and overall Wilson95 lower>=0.50",
+    "limitations": [
+      "Development selection only; any candidate needs new frozen seeds.",
+      "Engineered software architectures, not neurons or connectomes.",
+      "Learned sparse has extra dense-warmup compute and is a deliberately strong control."
+    ]
+  },
+  "completed_replicates": 13119,
+  "worker_cpu_seconds": 67439.203125,
+  "aggregate": {
+    "5": {
+      "clean": {
+        "dense96": {
+          "accuracy": 0.5483852935945367,
+          "rmse": 0.18954746417251353,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.548082763760789,
+          "rmse": 0.1639350337710331,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.41674755020284315,
+          "rmse": 0.17854217396217725,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.5144926357869409,
+          "rmse": 0.1853917935007027,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.5291094341540289,
+          "rmse": 0.1805387412587467,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.469028296533437,
+          "rmse": 0.17561632133325417,
+          "n": 13119
+        }
+      },
+      "combined_harsh": {
+        "dense96": {
+          "accuracy": 0.23400513250501087,
+          "rmse": 0.33153338392063814,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.23695606880605163,
+          "rmse": 0.3005304835897141,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.1801968307204967,
+          "rmse": 0.2723483150786073,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.2245818194137361,
+          "rmse": 0.32927378846019223,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.25493694471970485,
+          "rmse": 0.311348820336154,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.21518408415274767,
+          "rmse": 0.3242566929736546,
+          "n": 13119
+        }
+      },
+      "lesion10": {
+        "dense96": {
+          "accuracy": 0.3536602552701283,
+          "rmse": 0.2710389971537609,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.35724809648431205,
+          "rmse": 0.24045043647093714,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.2654436737217484,
+          "rmse": 0.23230315418805889,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.33341226888905695,
+          "rmse": 0.2665379033798806,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.3634238720769637,
+          "rmse": 0.2544198210211069,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.3109776321027276,
+          "rmse": 0.2591644702979028,
+          "n": 13119
+        }
+      },
+      "lesion25": {
+        "dense96": {
+          "accuracy": 0.3100869815619494,
+          "rmse": 0.28426788052027774,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.3133997340583272,
+          "rmse": 0.25452771154441317,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.23219113922978044,
+          "rmse": 0.24518833302992754,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.2923718779378606,
+          "rmse": 0.279900555102102,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.318423829729573,
+          "rmse": 0.26848362294009737,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.27476789389436024,
+          "rmse": 0.27497398008115154,
+          "n": 13119
+        }
+      },
+      "occlusion": {
+        "dense96": {
+          "accuracy": 0.3870242481218862,
+          "rmse": 0.255151362428192,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.3910604636193435,
+          "rmse": 0.22449514784615787,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.2943769426870381,
+          "rmse": 0.21645502579963546,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.36586901101878494,
+          "rmse": 0.2507596794574757,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.39965122680420295,
+          "rmse": 0.23803403878454713,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.34040907589500935,
+          "rmse": 0.24078290522671322,
+          "n": 13119
+        }
+      },
+      "state_noise": {
+        "dense96": {
+          "accuracy": 0.3829907428581036,
+          "rmse": 0.25967097369061765,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.38674695733921904,
+          "rmse": 0.22902248271645292,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.2911106029423095,
+          "rmse": 0.21997907467353164,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.3615514393881535,
+          "rmse": 0.2557302149030586,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.39462543723691146,
+          "rmse": 0.24331669635519865,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.33644112440819507,
+          "rmse": 0.2460205590728577,
+          "n": 13119
+        }
+      },
+      "view_high": {
+        "dense96": {
+          "accuracy": 0.29020453794751894,
+          "rmse": 0.30666777514484844,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.29458173471895377,
+          "rmse": 0.27397831819901514,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.2240651811198271,
+          "rmse": 0.244785347219911,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.2776647949115486,
+          "rmse": 0.303430227401919,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.31855307399785543,
+          "rmse": 0.2843579116007038,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.2636173150053857,
+          "rmse": 0.2929708971762983,
+          "n": 13119
+        }
+      }
+    },
+    "30": {
+      "clean": {
+        "dense96": {
+          "accuracy": 0.9812936284099816,
+          "rmse": 0.04903904698317615,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.9874888838071584,
+          "rmse": 0.04453712418451299,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.9917237933107904,
+          "rmse": 0.06589870845465601,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.9854900864733461,
+          "rmse": 0.04495406292461841,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.9899663761634605,
+          "rmse": 0.04448760517935597,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.9262115167992111,
+          "rmse": 0.04512766084369635,
+          "n": 13119
+        }
+      },
+      "combined_harsh": {
+        "dense96": {
+          "accuracy": 0.40944618068788874,
+          "rmse": 0.13511382566537555,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.4261061564651771,
+          "rmse": 0.13467401804358375,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.4593270151010817,
+          "rmse": 0.1526025515582967,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.4119843145226164,
+          "rmse": 0.13326947121975155,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.48473731907073087,
+          "rmse": 0.12895545648299048,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.3353068916160612,
+          "rmse": 0.13547036778142496,
+          "n": 13119
+        }
+      },
+      "lesion10": {
+        "dense96": {
+          "accuracy": 0.7334009197855534,
+          "rmse": 0.09279086784906566,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.754603416588321,
+          "rmse": 0.0895031209045105,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.8225547340159739,
+          "rmse": 0.11060326477646087,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.7380264417172742,
+          "rmse": 0.08887811295398901,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.7921205037646795,
+          "rmse": 0.08703068626700941,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.5950285844957719,
+          "rmse": 0.09037404059311407,
+          "n": 13119
+        }
+      },
+      "lesion25": {
+        "dense96": {
+          "accuracy": 0.5991572867173154,
+          "rmse": 0.10942365021147896,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.600981104589614,
+          "rmse": 0.10834648515186104,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.7176414191461074,
+          "rmse": 0.1261549993126187,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.5831496303071884,
+          "rmse": 0.10721064652753301,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.6296723158099814,
+          "rmse": 0.10601731845610761,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.46575518120452863,
+          "rmse": 0.10882662285286708,
+          "n": 13119
+        }
+      },
+      "occlusion": {
+        "dense96": {
+          "accuracy": 0.8329645721642078,
+          "rmse": 0.07899934404017447,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.8741267542411059,
+          "rmse": 0.07296188732928802,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.8810622422102076,
+          "rmse": 0.096253758840598,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.8618145014440594,
+          "rmse": 0.07306701819832696,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.9137666319417929,
+          "rmse": 0.07065606761013364,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.7240052171998276,
+          "rmse": 0.0742460026467452,
+          "n": 13119
+        }
+      },
+      "state_noise": {
+        "dense96": {
+          "accuracy": 0.8224531002532337,
+          "rmse": 0.08073518264207878,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.8589282719719583,
+          "rmse": 0.0757603638128298,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.8755860456843868,
+          "rmse": 0.09831865077784355,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.8453528808937059,
+          "rmse": 0.07575338684289128,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.8991063004463462,
+          "rmse": 0.07369938269145651,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.7047969442115413,
+          "rmse": 0.0769220659894374,
+          "n": 13119
+        }
+      },
+      "view_high": {
+        "dense96": {
+          "accuracy": 0.6156451626563672,
+          "rmse": 0.10717955709646618,
+          "n": 13119
+        },
+        "learned_sparse96": {
+          "accuracy": 0.6712991335721761,
+          "rmse": 0.10148238908295959,
+          "n": 13119
+        },
+        "rnn54": {
+          "accuracy": 0.6486896867139295,
+          "rmse": 0.1278349954689792,
+          "n": 13119
+        },
+        "shuffled96": {
+          "accuracy": 0.6535313497810695,
+          "rmse": 0.10121955836752013,
+          "n": 13119
+        },
+        "structured96": {
+          "accuracy": 0.7629006275884845,
+          "rmse": 0.09638394980718672,
+          "n": 13119
+        },
+        "temporal96": {
+          "accuracy": 0.5239776066942781,
+          "rmse": 0.10304712956411533,
+          "n": 13119
+        }
+      }
+    }
+  },
+  "development_gate": {
+    "retains_stage94_vs_shuffled": true,
+    "beats_every_strong_control": false,
+    "development_candidate": false,
+    "comparisons": {
+      "shuffled96": {
+        "fewshot_harsh_accuracy_margin": 0.03035512530596876,
+        "fewshot_harsh_rmse_ratio": 0.9455621165357192,
+        "harsh_dual_wins": 16784,
+        "harsh_comparisons": 26238,
+        "harsh_wilson95_lower": 0.6338537617813536,
+        "overall_dual_wins": 110889,
+        "overall_comparisons": 183666,
+        "overall_wilson95_lower": 0.6015145066350455
+      },
+      "temporal96": {
+        "fewshot_harsh_accuracy_margin": 0.03975286056695718,
+        "fewshot_harsh_rmse_ratio": 0.9601924249608339,
+        "harsh_dual_wins": 18798,
+        "harsh_comparisons": 26238,
+        "harsh_wilson95_lower": 0.7109566866523974,
+        "overall_dual_wins": 117411,
+        "overall_comparisons": 183666,
+        "overall_wilson95_lower": 0.6370645880308973
+      },
+      "learned_sparse96": {
+        "fewshot_harsh_accuracy_margin": 0.017980875913653216,
+        "fewshot_harsh_rmse_ratio": 1.035997468932999,
+        "harsh_dual_wins": 10002,
+        "harsh_comparisons": 26238,
+        "harsh_wilson95_lower": 0.3753439110560918,
+        "overall_dual_wins": 59312,
+        "overall_comparisons": 183666,
+        "overall_wilson95_lower": 0.3207992595509469
+      },
+      "rnn54": {
+        "fewshot_harsh_accuracy_margin": 0.07474011399920816,
+        "fewshot_harsh_rmse_ratio": 1.1432008317961875,
+        "harsh_dual_wins": 8325,
+        "harsh_comparisons": 26238,
+        "harsh_wilson95_lower": 0.31168344396868575,
+        "overall_dual_wins": 60933,
+        "overall_comparisons": 183666,
+        "overall_wilson95_lower": 0.32961002682554175
+      }
+    }
+  },
+  "interpretation": "no_candidate"
+}

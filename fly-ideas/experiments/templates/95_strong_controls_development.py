@@ -122,14 +122,15 @@ def prepare(workers,fixture):
  calibration=replicate((-1,fixture));cpu=max(calibration['cpu_seconds'],.1);target=2 if fixture else min(50000,max(count*4,math.ceil(TARGET_WALL_SECONDS*count/cpu)));protocol={'schema':'stage95-strong-controls-development-v1','mode':'fixture' if fixture else 'four_hour_development','biological_result':False,'stage92_sha256':STAGE92_SHA,'script_sha256':sha(__file__),'target_wall_seconds':0 if fixture else TARGET_WALL_SECONDS,'calibration_cpu_seconds':cpu,'fixed_replicates':target,'workers':count,'worker_choice':label,'models':list(MODELS),'primary_controls':list(PRIMARY_CONTROLS),'parameter_counts':{'structured96':4437,'shuffled96':4437,'temporal96':4437,'learned_sparse96_final':4437,'rnn54':4437,'dense96':9045},'trajectory_loss_weight':TRAJECTORY_WEIGHT,'learned_sparse_disclosure':'dense warmup for20% epochs then magnitude-pruned to2304 input weights; final parameter matched but training compute advantaged','rnn_lesion_disclosure':'lesion fraction is matched; exact unit indices cannot match96-unit models','seed_namespace':'95000000-series; development and disclosed after run','gate':'retain Stage94 vs shuffled; for each temporal/learned-sparse/rnn: positive few-shot harsh accuracy margin, RMSE ratio<1, harsh and overall Wilson95 lower>=0.50','limitations':['Development selection only; any candidate needs new frozen seeds.','Engineered software architectures, not neurons or connectomes.','Learned sparse has extra dense-warmup compute and is a deliberately strong control.']};s.save(folder/'protocol.json',protocol);s.save_checkpoint(folder/'INCOMPLETE.json',{'completed':0,'fixed_replicates':target,'worker_cpu_seconds':0});db.close();return folder
 
 def execute(folder,progress=None):
- s=stage92();folder=Path(folder);protocol=json.loads((folder/'protocol.json').read_text(encoding='utf-8'));target=protocol['fixed_replicates'];workers=protocol['workers'];fixture=protocol['mode']=='fixture';db=sqlite3.connect(folder/'study.sqlite3');schema(db);done={r[0] for r in db.execute('SELECT id FROM replicates')};remaining=[i for i in range(target) if i not in done]
- if progress:progress(len(done),target,0)
+ s=stage92();folder=Path(folder);protocol=json.loads((folder/'protocol.json').read_text(encoding='utf-8'));target=protocol['fixed_replicates'];workers=protocol['workers'];fixture=protocol['mode']=='fixture';db=sqlite3.connect(folder/'study.sqlite3');schema(db);done={r[0] for r in db.execute('SELECT id FROM replicates')};remaining=[i for i in range(target) if i not in done];session_start=time.time();session_initial=len(done)
+ if progress:progress(len(done),target,0,None)
  with concurrent.futures.ProcessPoolExecutor(max_workers=min(workers,max(1,len(remaining))),mp_context=multiprocessing.get_context('spawn')) as pool:
   for offset in range(0,len(remaining),max(1,workers*3)):
    futures=[pool.submit(replicate,(i,fixture)) for i in remaining[offset:offset+max(1,workers*3)]]
    for future in concurrent.futures.as_completed(futures):
     result=future.result();commit(db,result);done.add(result['replicate']);cpu=db.execute('SELECT COALESCE(SUM(cpu_seconds),0) FROM replicates').fetchone()[0];s.save_checkpoint(folder/'INCOMPLETE.json',{'completed':len(done),'fixed_replicates':target,'worker_cpu_seconds':cpu})
-    if progress:progress(len(done),target,cpu)
+    if progress:
+     session_completed=len(done)-session_initial;elapsed=max(time.time()-session_start,.001);eta=(target-len(done))*elapsed/session_completed if session_completed else None;progress(len(done),target,cpu,eta)
  groups,gate=aggregate(db);cpu=db.execute('SELECT SUM(cpu_seconds) FROM replicates').fetchone()[0];db.close();summary={'schema':'stage95-strong-controls-result-v1','status':'fixture_completed' if fixture else'completed','protocol':protocol,'completed_replicates':target,'worker_cpu_seconds':cpu,'aggregate':groups,'development_gate':gate,'interpretation':'candidate_for_new_frozen_replication' if gate['development_candidate'] else'no_candidate'};s.save(folder/'summary.json',summary);lines=['STAGE95: STRONG CONTROLS DEVELOPMENT',f'Replicates: {target}; worker CPU: {cpu/3600:.3f} ч.',f'Retains Stage94 vs shuffled: {gate["retains_stage94_vs_shuffled"]}.',f'Beats every strong control: {gate["beats_every_strong_control"]}.',f'Development candidate: {gate["development_candidate"]}.']
  for name,v in gate['comparisons'].items():lines.append(f'{name}: margin {v["fewshot_harsh_accuracy_margin"]:.6f}; RMSE ratio {v["fewshot_harsh_rmse_ratio"]:.6f}; harsh lower {v["harsh_wilson95_lower"]:.6f}; overall lower {v["overall_wilson95_lower"]:.6f}.')
  lines.append('Development artificial architectures; любой candidate требует новой frozen replication.');(folder/'ИТОГ.txt').write_text('\n'.join(lines)+'\n',encoding='utf-8-sig');s.save(folder/'complete.json',{'protocol_sha256':sha(folder/'protocol.json'),'summary_sha256':sha(folder/'summary.json'),'database_sha256':sha(folder/'study.sqlite3')});s.remove_checkpoint(folder);return folder
@@ -137,16 +138,30 @@ def execute(folder,progress=None):
 def choose():
  import tkinter as tk
  from tkinter import messagebox
- root=tk.Tk();root.title('Stage95: сильные controls, около4 часов');root.geometry('800x450+130+80');root.attributes('-topmost',True);choice=tk.StringVar(value='6');started={'v':False};old=latest_incomplete();tk.Label(root,text='Development benchmark против shuffled96, temporal96,\nlearned-sparse96 и parameter-matched RNN54.\nКалибровка заранее фиксирует число replicates примерно на4 часа.\nЭто artificial architectures; результат не является биологическим.',font=('Arial',11),padx=18,pady=18).pack();tk.Label(root,text='Workers:',font=('Arial',10,'bold')).pack()
- for title,value in [('2','2'),('4','4'),('6','6'),('Максимум','max')]:tk.Radiobutton(root,text=title,variable=choice,value=value).pack()
- tk.Button(root,text='Продолжить Stage95' if old else'Начать Stage95',command=lambda:started.update(v=True),padx=20,pady=9).pack(pady=14)
- while not started['v']:
+ root=tk.Tk();root.title('Stage95: сильные controls, около4 часов');root.geometry('820x540+120+60');root.attributes('-topmost',True);choice=tk.StringVar(value='6');action={'v':None};old=latest_incomplete()
+ tk.Label(root,text='Development benchmark против shuffled96, temporal96,\nlearned-sparse96 и parameter-matched RNN54.\nКалибровка заранее фиксирует число replicates примерно на4 часа.\nЭто artificial architectures; результат не является биологическим.',font=('Arial',11),padx=18,pady=18).pack();tk.Label(root,text='Workers для НОВОГО расчёта:',font=('Arial',10,'bold')).pack()
+ worker_frame=tk.Frame(root);worker_frame.pack(pady=8)
+ for title,value,key in [('2','2','2'),('4','4','4'),('6','6','6'),('Максимум','max','m')]:
+  tk.Radiobutton(worker_frame,text=title,variable=choice,value=value,indicatoron=False,width=11,pady=7).pack(side='left',padx=4);root.bind(key,lambda event,v=value:choice.set(v))
+ tk.Label(root,text='Можно выбрать workers клавишами 2, 4, 6 или M.',font=('Arial',9)).pack()
+ buttons=tk.Frame(root);buttons.pack(pady=18)
+ if old:tk.Button(buttons,text='Продолжить незавершённый расчёт',command=lambda:action.update(v='continue'),padx=18,pady=10).pack(side='left',padx=7)
+ tk.Button(buttons,text='Начать новый расчёт',command=lambda:action.update(v='new'),padx=18,pady=10).pack(side='left',padx=7)
+ while action['v'] is None:
   try:root.update();time.sleep(.03)
   except tk.TclError:return
- folder=old if old else prepare(choice.get(),False)
+ if action['v']=='continue':folder=old
+ else:
+  for widget in root.winfo_children():widget.destroy()
+  tk.Label(root,text='Калибровка нового расчёта...\nОна не входит в научный результат.',font=('Arial',13),padx=30,pady=70).pack();root.update();folder=prepare(choice.get(),False)
  for widget in root.winfo_children():widget.destroy()
- root.protocol('WM_DELETE_WINDOW',lambda:None);label=tk.Label(root,text='Подготовка...',font=('Arial',13),padx=30,pady=50);label.pack();detail=tk.Label(root,text='',font=('Arial',10));detail.pack()
- def progress(done,total,cpu):label.config(text=f'Расчёт: {done}/{total}');detail.config(text=f'Worker CPU: {cpu/3600:.3f} ч.\nSQLite checkpoint сохранён.');root.update()
+ root.protocol('WM_DELETE_WINDOW',lambda:None);label=tk.Label(root,text='Подготовка...',font=('Arial',14,'bold'),padx=30,pady=35);label.pack();percent=tk.Label(root,text='0,00%',font=('Arial',20));percent.pack();detail=tk.Label(root,text='',font=('Arial',10),justify='center');detail.pack(pady=14)
+ def progress(done,total,cpu,eta):
+  value=100*done/total if total else 0;percent.config(text=f'{value:.2f}%'.replace('.',','));label.config(text=f'Расчёт: {done}/{total}')
+  if eta is None:eta_text='Примерное время окончания: оценивается после первого replicate.'
+  else:
+   finish=datetime.fromtimestamp(time.time()+eta).strftime('%Y-%m-%d %H:%M');hours=int(eta//3600);minutes=int((eta%3600)//60);eta_text=f'Осталось примерно: {hours} ч {minutes} мин.\nПримерное окончание: {finish}.'
+  detail.config(text=f'Worker CPU: {cpu/3600:.3f} ч.\n{eta_text}\nSQLite checkpoint сохранён.');root.update()
  try:result=execute(folder,progress)
  except Exception as exc:
   report=failure_report(exc);messagebox.showerror('Stage95 остановлен','Ошибка сохранена:\n'+str(report.resolve()),parent=root);os.startfile(str(report));root.destroy();return
