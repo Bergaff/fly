@@ -667,6 +667,7 @@ print(json.dumps(out))
 
 const EMBODIED_FLYVIS_VERSION = "1.2.0";
 const EMBODIED_FLYGYM_VERSION = "2.1.1";
+const EMBODIED_NUMPY_VERSION = "2.2.6";
 const embodiedPaths = () => ({
   flyvisDir: path.join(WS, ".venv-flyvis"),
   flygymDir: path.join(WS, ".venv-flygym"),
@@ -712,10 +713,10 @@ async function setupEmbodiedEnv(win, target = "all") {
     if (!base) throw new Error("Для совместимой установки FlyGym нужен Python 3.12. Выберите python.exe версии 3.12 выше или установите его и нажмите «проверить снова».");
     const spec = parsePySpec(base.exe || base.cmd); const ep = embodiedPaths(); await fsp.mkdir(ep.flyvisRoot, { recursive: true });
     const environments = target === "flygym"
-      ? [{ label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}`, extras: ["brian2==2.9.0"] }]
+      ? [{ label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}`, extras: [`numpy==${EMBODIED_NUMPY_VERSION}`, "brian2==2.9.0"] }]
       : [
           { label: "FlyVis", dir: ep.flyvisDir, pkg: `flyvis==${EMBODIED_FLYVIS_VERSION}`, extras: [] },
-          { label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}`, extras: ["brian2==2.9.0"] },
+          { label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}`, extras: [`numpy==${EMBODIED_NUMPY_VERSION}`, "brian2==2.9.0"] },
         ];
     const total = target === "flygym" ? 3 : 5;
     for (let i=0;i<environments.length;i++) {
@@ -730,7 +731,11 @@ async function setupEmbodiedEnv(win, target = "all") {
       const dl=await streamed(cli,["download-pretrained"],{FLYVIS_ROOT_DIR:ep.flyvisRoot}); if(!dl.ok)throw new Error("FlyVis установлен, но pretrained-модели не скачались. Повторное нажатие безопасно продолжит установку.");
     }
     const result=await checkEmbodiedEnv();
-    if (target === "flygym" ? !result.flygym.ready : !result.ready) throw new Error("Проверка окружения после установки не пройдена.");
+    if (target === "flygym" ? !result.flygym.ready : !result.ready) {
+      const details = target === "flygym" ? result.flygym.error : [result.flyvis.error,result.flygym.error].filter(Boolean).join("\n");
+      emit(`\n[диагностика импорта]\n${details || "причина не возвращена"}\n`);
+      throw new Error(`Проверка окружения после установки не пройдена: ${details || "причина не возвращена"}`);
+    }
     emit(target === "flygym" ? "\n[готово] FlyGym и официальное физическое тело доступны.\n" : "\n[готово] FlyVis, pretrained-модели и FlyGym доступны. Среда Shiu не изменялась.\n",{done:true,ok:true}); return result;
   } catch(e) { emit(`\n[ошибка] ${e.message || e}\n`,{done:true,ok:false}); throw e; }
   finally { envSetupBusy=false; }
