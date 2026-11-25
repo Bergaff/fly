@@ -133,11 +133,11 @@ def run(source,d_folder,workers='6',output_root=ROOT,fixture=False,progress=lamb
 def gui():
  import tkinter as tk
  from tkinter import filedialog,messagebox
- root=tk.Tk();root.title('Series101: frozen89E → FlyGym');root.geometry('760x400+150+80');root.attributes('-topmost',True);status=tk.StringVar(value='Выберите frozen sources и запустите короткий adapter prototype');pct=tk.DoubleVar(value=0);eta=tk.StringVar(value='');start=[None]
- tk.Label(root,text='Series101: frozen89E → официальное тело FlyGym',font=('Arial',13,'bold'),pady=14).pack();tk.Label(root,text='24 frozen visual cases × 5 физических controls. Обучения нет.\nVisual phase выполняется последовательно, чтобы не дублировать память frozen chain.',justify='center').pack();tk.Label(root,textvariable=status,pady=12).pack();tk.Scale(root,variable=pct,from_=0,to=100,orient='horizontal',length=580,state='disabled').pack();tk.Label(root,textvariable=eta).pack();button=tk.Button(root,text='Выбрать result89D и source84Z, затем запустить',padx=18,pady=8);button.pack(pady=14)
+ root=tk.Tk();root.title('Series101: frozen89E → FlyGym');root.geometry('760x420+150+80');root.attributes('-topmost',True);status=tk.StringVar(value='Выберите frozen sources и запустите короткий adapter prototype');pct=tk.DoubleVar(value=0);overall=tk.StringVar(value='Общий прогресс: 0,0%');eta=tk.StringVar(value='Оставшееся время появится после начала расчёта');start=[None]
+ tk.Label(root,text='Series101: frozen89E → официальное тело FlyGym',font=('Arial',13,'bold'),pady=14).pack();tk.Label(root,text='24 frozen visual cases × 5 физических controls. Обучения нет.\nVisual phase выполняется последовательно, чтобы не дублировать память frozen chain.',justify='center').pack();tk.Label(root,textvariable=status,pady=10).pack();tk.Scale(root,variable=pct,from_=0,to=100,orient='horizontal',length=580,state='disabled').pack();tk.Label(root,textvariable=overall,font=('Arial',10,'bold')).pack(pady=(4,0));tk.Label(root,textvariable=eta).pack();button=tk.Button(root,text='Выбрать result89D и source84Z, затем запустить',padx=18,pady=8);button.pack(pady=12)
  def update(text,fraction,done,total):
   def apply():
-   status.set(text);pct.set(round(fraction*100,1))
+   percent=round(fraction*100,1);status.set(text);pct.set(percent);overall.set(f'Общий прогресс: {percent:.1f}%'.replace('.',','))
    if start[0] and fraction>.02:
     elapsed=time.time()-start[0];remain=elapsed*(1-fraction)/fraction;eta.set(f'Прошло {elapsed/60:.1f} мин · осталось примерно {remain/60:.1f} мин')
   root.after(0,apply)
