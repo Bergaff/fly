@@ -931,4 +931,8 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series110: nuisance front-end repair
 
-`experiments\RUN-NUISANCE-FRONTEND-REPAIR-110.bat` сохраняет exact base+adapter и выбирает среди6 deterministic front ends: raw, sequence/frame percentile, z-score, percentile+temporal smoothing, percentile+spatial smoothing. New selection IDs1378–1395; conditional untouched final1396–1413. Gate сохраняет overall/action/domain validity, specificity и ablation gain. Series109 final не переиспользуется. Runner SHA `1d15c85d…`; genuine pending.
+`experiments\RUN-NUISANCE-FRONTEND-REPAIR-110.bat` genuine selection no-go: percentile frontends восстановили dim/contrast acceptance до3/3; temporal дал kept/rejected/action18/18 и RMSE0,06489, но reach-neutral3/6<4 и gain noise/shift/dropout1/3<2. Ни один frontend не прошёл, final не открыт; JSON SHA `e9320864…`.
+
+### Series111: operational nuisance router
+
+`experiments\RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat` на fresh selection1414–1431 и conditional final1432–1449 выбирает6 deterministic routes между temporal/spatial/frame frontends. Safe rejection теперь prospectively оценивается validity+specificity; ablation RMSE gain остаётся diagnostic, поскольку не требуется намеренно делать fallback вреднее already-poor base shuffle. Overall/action/domain gates сохранены. Runner SHA `f6f3e3ef…`; pending.

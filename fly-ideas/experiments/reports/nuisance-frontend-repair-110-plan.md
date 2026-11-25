@@ -47,4 +47,8 @@ Among passing selection front ends, choose minimum candidate RMSE then name. App
 
 Double-click `experiments\RUN-NUISANCE-FRONTEND-REPAIR-110.bat`, then choose original Series105D run/result, original Series107 run/result, result89D and source84Z.
 
-A pass is non-physical development authorization for a separately frozen physical Series111. It does not rewrite the Series109 no-go and is not hardware-camera, biological, FlyVis/FlyWire, living-fly or mirror-neuron evidence.
+A pass is non-physical development authorization for a separately frozen physical validation. It does not rewrite the Series109 no-go and is not hardware-camera, biological, FlyVis/FlyWire, living-fly or mirror-neuron evidence.
+
+## Genuine outcome
+
+Complete result SHA `e93208643c0c1229fe27d8ffabacd4680bb42153a05bcec89900e1deb97e1fd3` is a selection no-go; final remained untouched. Percentile normalization repaired dim/low-contrast acceptance. `percentile_temporal` achieved kept/rejected/action18/18 and RMSE0,064890 but failed reach-neutral3/6<4 and gain1/3<2 for noise/shift/dropout. No threshold is weakened. Series111 prospectively defines an operational safe-abstention gate on fresh data, retaining validity/specificity while reporting—not incentivizing—fallback RMSE harm.

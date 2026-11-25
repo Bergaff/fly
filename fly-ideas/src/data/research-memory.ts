@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v670-session-2026-09-18-nuisance-repair-plan";
+export const MEMORY_VERSION = "v671-session-2026-09-18-operational-router-plan";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -542,10 +542,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Safe18, tracking0,061683, shuffled rejected17, identity15, open-loop18, adapter gain13. Failed: dim/low-contrast kept0/3 each, total kept12<15, control wins11<12, distinct false, noise/dropout gain1/3. robustness_candidate/scientific false.",
     limitations: "Scale-sensitive adapter rejected valid photometric shifts; Series108 stays same-domain pass. Deterministic digital nuisances, not hardware or biological transfer. Do not weaken gates or reuse final for repair selection.",
     files: ["experiments/RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat", "experiments/templates/109_frozen_nuisance_robustness_ablation.py", "experiments/reports/frozen-nuisance-robustness-ablation-109-plan.md", "experiments/reports/frozen-nuisance-robustness-ablation-109-user-result.json", "experiments/reports/frozen-nuisance-robustness-ablation-109-user-result.md", "tests/frozen-nuisance-robustness-109.test.cjs"] },
-  { id: "session-nuisance-frontend-repair-110", ideaId: "i-observational", title: "Series110: nuisance frontend repair", status: "runner/protocol frozen; genuine run pending", source: "Exact109 no-go; base+adapter frozen. New selection1378–1395 and conditional final1396–1413. Six raw/percentile/zscore/temporal/spatial deterministic front ends; runner SHA1d15c85d….",
-    results: "Selection/final gate keeps candidate/shuffle/action>=15, controls/gain>=12, action>=4/class and domain>=2/3, distinct. Fixture6/6 pass; genuine pending.",
-    limitations: "Supervised non-physical frontend selection on generated nuisance data. Series109 remains no-go. Pass only authorizes a separately frozen physical test; no hardware/biological claim.",
-    files: ["experiments/RUN-NUISANCE-FRONTEND-REPAIR-110.bat", "experiments/templates/110_nuisance_frontend_repair_tournament.py", "experiments/reports/nuisance-frontend-repair-110-plan.md", "tests/nuisance-frontend-repair-110.test.cjs"] },
+  { id: "session-nuisance-frontend-repair-110", ideaId: "i-observational", title: "Series110: nuisance frontend repair", status: "genuine selection no-go; final untouched", source: "Exact109 no-go; base+adapter frozen. Result SHAe9320864… on selection1378–1395; six deterministic frontends.",
+    results: "Percentile normalization repaired dim/contrast. Temporal kept/rejected/action18, RMSE0,06489, but reach-neutral3/6<4 and gain noise/shift/dropout1/3<2. No frontend selected; final0; development/scientific false.",
+    limitations: "Frozen gain rule remains binding. Safe rejection need not intentionally worsen truth RMSE versus base shuffle; any revised operational gate requires fresh preregistration/data.",
+    files: ["experiments/RUN-NUISANCE-FRONTEND-REPAIR-110.bat", "experiments/templates/110_nuisance_frontend_repair_tournament.py", "experiments/reports/nuisance-frontend-repair-110-plan.md", "experiments/reports/nuisance-frontend-repair-110-user-result.json", "experiments/reports/nuisance-frontend-repair-110-user-result.md", "tests/nuisance-frontend-repair-110.test.cjs"] },
+  { id: "session-operational-nuisance-router-111", ideaId: "i-observational", title: "Series111: operational nuisance router", status: "runner/protocol frozen; genuine pending", source: "Fresh selection1414–1431/final1432–1449; exact base+adapter. Six temporal/spatial/frame deterministic routes; runner SHAf6f3e3ef….",
+    results: "Gate requires validity/action>=15,>=4/action,>=2/domain and specificity>=12,>=4/action,>=2/domain, distinct. Adapter gain reported diagnostically, not used to incentivize harmful fallback. Fixture4/4 pass.",
+    limitations: "Prospective supervised non-physical route selection. Series109/110 remain no-go. Digital nuisance only; pass authorizes separate physical test, not hardware/biological claim.",
+    files: ["experiments/RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat", "experiments/templates/111_operational_nuisance_router.py", "experiments/reports/operational-nuisance-router-111-plan.md", "tests/operational-nuisance-router-111.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

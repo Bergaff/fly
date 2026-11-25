@@ -398,4 +398,8 @@ No same-distribution tuning. Complete genuine result SHA `e7cfc5068fb53ae69782d3
 
 ## Series110: nuisance frontend repair prepared
 
-Exact base+adapter retained; Series109 outcomes excluded. Six fixed normalizers compete on new selection IDs1378–1395: raw, sequence/frame percentile, z-score, percentile+temporal or spatial smoothing. Untouched final1396–1413 opens only after selection pass. Frozen gate keeps overall/action/domain validity, specificity and adapter-gain requirements. BAT `RUN-NUISANCE-FRONTEND-REPAIR-110.bat`, runner SHA1d15c85d…, genuine pending. A pass remains supervised non-physical development and only authorizes separate physical validation.
+Exact base+adapter retained; Series109 outcomes excluded. Genuine result SHAe9320864 is a selection no-go: percentile variants repaired dim/contrast; temporal kept/rejected/action18 and RMSE0,06489, but reach-neutral3/6 and gain noise/shift/dropout1/3 failed. No frontend selected; final untouched.
+
+## Series111 operational router prepared
+
+Fresh selection1414–1431/final1432–1449. Six deterministic routes combine temporal/spatial/frame frontends without true action/domain labels. Prospectively frozen operational gate retains acceptance/rejection/identity and specificity overall/by-action/by-domain. Base-shuffle RMSE gain is diagnostic, not gated: safe abstention need not intentionally maximize harmful fallback error. This does not reinterpret109/110. BAT `RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat`, SHA f6f3e3ef…, pending.
