@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v641-session-2026-11-25-flygym-body-pass";
+export const MEMORY_VERSION = "v642-session-2026-11-25-frozen89e-flygym-adapter";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -498,6 +498,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Два официальных NeuroMechFly в одном FlatGroundWorld, по42 actuated DOF. Выполнено720 physics steps и37 samples; finite=true. Front-leg response demonstrator/observer0,124949/0,122106rad; max actuator-force norms9,4642/9,0063; ground contact обеих true; thorax Z1,0199–1,9975мм. Все9 preregistered checks pass, primary=true. Следующий короткий frozen89E→FlyGym adapter prototype разрешён.",
     limitations: "Observer получал задержанную diagnostic motor command напрямую, не RGB или frozen89E state. Это technical body/runtime gate без visual imitation, обучения, FlyVis/connectome mapping, biological neuron или live-fly claim. Покадровую динамику без physics_trace независимо не проверяли; FlyVis torch shm.dll error к этому run не относится.",
     files: ["experiments/RUN-FLYGYM-TWO-BODY-PREFLIGHT.bat", "experiments/templates/100_flygym_two_body_preflight.py", "experiments/reports/flygym-two-body-preflight-plan.md", "experiments/reports/flygym-two-body-preflight-user-result.md", "experiments/reports/flygym-two-body-preflight-user-result.json", "tests/flygym-two-body-preflight.test.cjs"] },
+  { id: "session-frozen89e-flygym-adapter-plan", ideaId: "i-observational", title: "Series101: frozen89E policy в официальном FlyGym body", status: "runner/protocol заморожены; пользовательский run ещё не выполнен", source: "После technical body-go100 подготовлен новый development adapter. Точные go89E/body100 и frozen runner/model identities закреплены; motions891–896 и views801–804 новые. Training/selection запрещены.",
+    results: "Fixed unit-gain mapping шести synthetic channels в шесть front-leg pitch DOF от neutral pose, clip±0,35rad. Official MOTOR actuators: dt0,0005, Kp18, Kd0,18, torque limit25.24 visual cases×candidate/zero/shuffled/shared-lesion/true-open-loop=120 FlyGym rollouts. Go требует all candidate safe/contact, tracking<=0,20rad, wins>=60% zero/shuffled и>=80% open-loop, distinct state targets.",
+    limitations: "Development adapter, не frozen scientific или biological result. Остальные36 actuators держат neutral pose. Demonstrator получает synthetic truth для физического показа; observer candidate только frozen89E policy. Нет FlyVis/FlyWire mapping, мышц, живой мухи или biological mirror-neuron claim.",
+    files: ["experiments/RUN-FROZEN89E-FLYGYM-ADAPTER.bat", "experiments/templates/101_frozen89e_flygym_adapter.py", "experiments/reports/frozen89e-flygym-adapter-plan.md", "tests/frozen89e-flygym-adapter.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
