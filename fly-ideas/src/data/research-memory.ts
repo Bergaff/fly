@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v637-session-2026-11-23-stage96-hybrid-prepared";
+export const MEMORY_VERSION = "v638-session-2026-11-24-stage96-hybrid-no-go";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -482,10 +482,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "GUI имеет отдельные Start new/Continue buttons; workers2/4/6/Max как кнопки и keyboard shortcuts2/4/6/M. Progress показывает done/total, процент с двумя знаками, оценку remaining hours/minutes и local finish timestamp. ETA считается по wall throughput текущей resumed session; до первого нового replicate помечается как оцениваемая.",
     limitations: "ETA приблизительна и меняется при нагрузке/thermal throttling. Continue использует workers, закреплённые в protocol старой папки; выбор workers относится к Start new.",
     files: ["experiments/templates/95_strong_controls_development.py", "experiments/templates/96_hybrid_multihead_development.py", "tests/stage96-hybrid-multihead.test.cjs"] },
-  { id: "session-stage96-hybrid-multihead-prepared", ideaId: "i-connectome-advantage", title: "Stage96: восьмичасовой exact-budget hybrid development", status: "runner, GUI BAT, protocol и bounded fixture подготовлены; пользовательский запуск ожидается", source: "После Stage95 no-go пользователь выбрал рекомендованный multi-head hybrid и бюджет около8 часов. Новая hypothesis разделяет observed tradeoff, не меняя старый gate: structured classifier branch + recurrent trajectory branch в общем exact budget4437.",
-    results: "Hybrid budget: classifier61 units=2083 parameters, trajectory RNN40 с18 fixed zeros=2354, total4437. Controls: hybrid shuffled/temporal/learned с общей trajectory architecture, monolithic learned_sparse96 и rnn54 по4437. Classification gate требует margin≥0,02 vs shuffled и Wilson lower≥0,55 vs все hybrid controls; joint gate требует mean accuracy/RMSE superiority и RMSE/dual Wilson lower≥0,50 vs оба monolithic controls. Calibration до main results фиксирует count около8 часов, max50000, seeds96000000-series.",
-    limitations: "Новая task-specialized architecture выбрана после раскрытого Stage95 и является development. Любой pass требует нового frozen runner/seeds. Это engineered software model, не connectome, neurons или FlyWire evidence.",
+  { id: "session-stage96-hybrid-multihead-prepared", ideaId: "i-connectome-advantage", title: "Stage96: восьмичасовой exact-budget hybrid development", status: "runner/protocol заморожены; полный результат описан отдельно", source: "После Stage95 no-go пользователь выбрал multi-head hybrid и бюджет около8 часов. Новая hypothesis разделяет observed tradeoff: structured classifier + recurrent trajectory в exact budget4437.",
+    results: "Hybrid budget: classifier61=2083 parameters, trajectory RNN40=2354, total4437. Controls: hybrid shuffled/temporal/learned, monolithic learned_sparse96 и rnn54. Classification и joint Wilson gates зафиксированы до результата.",
+    limitations: "Task-specialized architecture выбрана после раскрытого Stage95 и является development.",
     files: ["experiments/RUN-STAGE96-HYBRID-MULTIHEAD-8H.bat", "experiments/templates/96_hybrid_multihead_development.py", "experiments/reports/stage96-hybrid-multihead-8h-protocol.md", "tests/stage96-hybrid-multihead.test.cjs"] },
+  { id: "session-stage96-hybrid-multihead-user-result", ideaId: "i-connectome-advantage", title: "Stage96: полный exact-budget hybrid benchmark", status: "completed по присланному summary; partial engineering success, development no-go", source: "Пользователь приложил summary-36.json:32720/32720 replicates, workers6,59,2210 worker-hours. Script SHA d8000261… и Stage95 SHA58b74a79… совпадают. Все84 агрегата имеют n=32720; каждая модель4437 parameters. SQLite/protocol/complete отдельно не получены.",
+    results: "Classification branch pass=true: margins structured vs hybrid shuffled/temporal/learned +0,041407/+0,056909/+0,020002; harsh Wilson lower0,803066/0,952450/0,611700; overall0,793322/0,975407/0,552758. Joint vs RNN54 полностью проходит. Но learned_sparse blocks: few-shot RMSE ratio0,838246, однако harsh/overall RMSE lower0,497529/0,442467 и dual lower0,456498/0,409179. joint pass=false, candidate=false.",
+    limitations: "Hybrid выигрывает learned-sparse в few-shot harsh mean, но проигрывает trajectory stability при budget30; нельзя исключать budget30 или менять all-condition gate. Не разрешена frozen replication общей hypothesis или mapping. Узкий structured-classifier и RNN54 results остаются development и требуют отдельной заранее сформулированной hypothesis.",
+    files: ["experiments/reports/stage96-hybrid-multihead-user-result.json", "experiments/reports/stage96-hybrid-multihead-user-result.md", "experiments/reports/stage96-hybrid-multihead-8h-protocol.md"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
