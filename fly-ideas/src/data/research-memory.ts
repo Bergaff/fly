@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v656-session-2026-09-18-official-eye-no-go";
+export const MEMORY_VERSION = "v657-session-2026-09-18-official-eye-adaptation";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -514,6 +514,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Candidate safety/contact6/6, tracking0,118936rad, distinct targets и open-loop wins6/6 pass. Action correct2/6 fail; все predicted head_directed_grooming. Wins: neutral4/6 pass, reversed3/6 fail, zero2/6 fail, shuffled3/6 fail, shared lesion3/6 secondary. Primary=false; scientific_result=false. Candidate truth RMSE0,197330 хуже neutral0,196367, reversed0,191784, zero0,165856.",
     limitations: "Unchanged frozen89E не установил transfer на official-eye domain. Thresholds не ослаблять; без rerun selected motions или post-result rescue как confirmation. Это не biological result и не FlyVis/FlyWire mapping, muscles, live fly или mirror-neuron evidence. Series101–103 technical passes остаются engineering-only.",
     files: ["experiments/RUN-FROZEN89E-OFFICIAL-EYE-POLICY.bat", "experiments/templates/104_frozen89e_official_eye_policy.py", "experiments/reports/frozen89e-official-eye-policy-plan.md", "experiments/reports/frozen89e-official-eye-policy-user-result.json", "experiments/reports/frozen89e-official-eye-policy-user-result.md", "tests/frozen89e-official-eye-policy.test.cjs"] },
+  { id: "session-official-eye-diagnostic-adaptation-105ab", ideaId: "i-observational", title: "Series105A+B: official-eye diagnostic и paired adapter", status: "runner/protocol frozen; genuine Windows run pending", source: "Один BAT последовательно запускает две разделённые фазы. 105A сравнивает official-eye и synthetic frozen states/readout на disclosed Series104 motions903–908 без fit/gate. 105B fit использует12 новых train motions1051–1062, held validation1063–1068; exact Series104 no-go остаётся prerequisite и не меняется. Runner SHA b070fff6….",
+    results: "Fixed adapter —72 independent affine coordinates from official frozen coefficients to mean coefficients views801–804; no action labels/truth, cross-feature mixing, selection or post-result tuning. Development gate: validation action>=4/6; RMSE wins>=4/6 против raw/neutral/reversed/zero/shuffled; distinct targets; mean adapted<raw. Fixture7/7 passed; genuine result pending.",
+    limitations: "New trained engineering model, not unchanged frozen89E replication and not rescue of Series104. Validation non-physical. Even pass only authorizes separate preregistered untouched physical Series106. No FlyVis/FlyWire, biological vision, live fly or mirror-neuron claim.",
+    files: ["experiments/RUN-OFFICIAL-EYE-DIAGNOSTIC-ADAPTATION-105AB.bat", "experiments/templates/105ab_official_eye_diagnostic_adaptation.py", "experiments/reports/official-eye-diagnostic-adaptation-105ab-plan.md", "tests/official-eye-diagnostic-adaptation-105ab.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
