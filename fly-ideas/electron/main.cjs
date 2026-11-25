@@ -689,7 +689,7 @@ async function checkEmbodiedEnv() {
     return { python: exe, ready: true, version: r.out.split(/\r?\n/).pop(), error: null };
   };
   const flyvis = await probe(flyvisPy, "import flyvis; print(getattr(flyvis,'__version__','unknown'))");
-  const flygym = await probe(flygymPy, "import flygym; print(getattr(flygym,'__version__','unknown'))");
+  const flygym = await probe(flygymPy, "import flygym; from importlib.metadata import version; print(version('flygym'))");
   const bytes = await folderBytes(p.flyvisRoot); const pretrained = { folder: p.flyvisRoot, ready: bytes > 1024 * 1024, bytes };
   return { flyvis, flygym, pretrained, ready: flyvis.ready && flygym.ready && pretrained.ready };
 }

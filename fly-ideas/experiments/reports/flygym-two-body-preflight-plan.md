@@ -41,6 +41,8 @@ Gate не содержит accuracy, imitation или biological claim.
 4. Дважды щёлкнуть `experiments/RUN-FLYGYM-TWO-BODY-PREFLIGHT.bat`.
 5. В окне нажать «Запустить короткую проверку».
 
+Launcher принимает оба корректных варианта Windows venv: `pythonw.exe` и окружения, где создан только `python.exe`. Версия FlyGym читается через package metadata, потому что FlyGym 2.1.1 не обязан экспортировать `flygym.__version__`.
+
 Результат автоматически открывается и содержит `ИТОГ.txt`, `summary.json`, `physics_trace.csv` и `complete.json`. Ошибка сохраняется в копируемый `ОШИБКА.txt`.
 
 ## Следующий шаг только после go

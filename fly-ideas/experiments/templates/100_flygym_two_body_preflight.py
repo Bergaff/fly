@@ -35,13 +35,14 @@ def fixture_result():
 def real_result(progress):
  import numpy as np
  import flygym,mujoco
+ from importlib.metadata import version as package_version
  from flygym.anatomy import AxisOrder,JointPreset,ActuatedDOFPreset,Skeleton
  from flygym.compose.fly import NeuroMechFly,ActuatorType
  from flygym.compose.pose import KinematicPosePreset
  from flygym.compose.world import FlatGroundWorld
  from flygym.simulation import Simulation
  from flygym.utils.math import Rotation3D
- version=getattr(flygym,"__version__","unknown")
+ version=package_version("flygym")
  if version!=EXPECTED_FLYGYM:raise RuntimeError(f"Нужен FlyGym {EXPECTED_FLYGYM}, найден {version}.")
  progress("Создаются два официальных тела NeuroMechFly…",.08)
  axis=AxisOrder.YAW_PITCH_ROLL;skeleton=Skeleton(axis_order=axis,joint_preset=JointPreset.LEGS_ONLY);pose=KinematicPosePreset.NEUTRAL.get_pose_by_axis_order(axis)
