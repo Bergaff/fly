@@ -48,3 +48,7 @@ Double-click `experiments\RUN-TEMPORAL-CROSSFEATURE-ADAPTER-105C.bat`, then choo
 ## Limitations
 
 This is a newly trained engineering adapter. It is not unchanged frozen89E replication, a rescue of Series104/105B, biological observation-to-action, FlyVis/FlyWire mapping, living-animal evidence or mirror-neuron evidence. Physical Series106 remains blocked unless every frozen105C development criterion passes.
+
+## Genuine Windows result
+
+Run completed, selected ridge100 by train-only CV NRMSE0,146472, and evaluated all9 held cases. Cross-feature improved diagonal9/9 and raw9/9; mean RMSE0,160217 was below diagonal0,189996, raw0,495953 and zero0,169557. Nevertheless action correct4/9<6, neutral wins5/9<6 and zero wins3/9<6; reversed7/9 and shuffled9/9 passed. Eight cases were predicted reach/withdraw and no head-directed case was recognized. `passed=false`, `development_candidate=false`, `scientific_result=false`. Exact JSON SHA `d9f8c8400b4cff10ecc5b20132e06cb2ccb07f3cee3075d461a1c1622abcda39`; files `temporal-crossfeature-adapter-105c-user-result.json/.md`. Physical Series106 remains blocked.

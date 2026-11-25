@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v659-session-2026-09-18-temporal-crossfeature-plan";
+export const MEMORY_VERSION = "v660-session-2026-09-18-temporal-crossfeature-no-go";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -518,10 +518,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "105A: official action2/6, synthetic5/6; mean state cosine -0,149018 и все6 отрицательны; official target RMSE0,501423 против synthetic0,152898. Adapter mean abs feature correlation0,289699. Held adapted RMSE0,200818 против raw0,504072; wins raw6/6, neutral5/6, shuffled6/6, но action2/6, reversed3/6, zero2/6; zero mean0,171385 лучше. Primary=false, development_candidate=false, scientific_result=false.",
     limitations: "Coordinate-wise scale/offset уменьшает raw trajectory error, но не восстанавливает identity/specificity. Exact adapter закрыт без ослабления gate. Series106 physical confirmation не авторизован. Не rescue Series104, не unchanged replication и не FlyVis/FlyWire/biological/live-fly/mirror-neuron evidence.",
     files: ["experiments/RUN-OFFICIAL-EYE-DIAGNOSTIC-ADAPTATION-105AB.bat", "experiments/templates/105ab_official_eye_diagnostic_adaptation.py", "experiments/reports/official-eye-diagnostic-adaptation-105ab-plan.md", "experiments/reports/official-eye-diagnostic-adaptation-105ab-user-result.json", "experiments/reports/official-eye-diagnostic-adaptation-105ab-user-result.md", "tests/official-eye-diagnostic-adaptation-105ab.test.cjs"] },
-  { id: "session-temporal-crossfeature-adapter-105c", ideaId: "i-observational", title: "Series105C: temporal cross-feature official-eye adapter", status: "runner/protocol frozen; genuine Windows run pending", source: "После exact diagonal105B no-go подготовлена новая, не rescue-гипотеза: full standardized72×72 ridge mixes6 axes×12 temporal cosine coefficients. Exact105B result SHA92715b54… prerequisite. Train1069–1098, held validation1099–1107. Runner SHA60c74e44….",
-    results: "30 paired train motions; mean synthetic views801–804 teacher. Fixed ridges0,01–100 выбираются five-fold train-only replicate CV по state NRMSE, без action labels/truth. Gate на9 held: action>=6, wins>=6 против same-data diagonal/raw/neutral/reversed/zero/shuffled, distinct, mean candidate<diagonal/raw. Fixture6/6 passed; genuine pending.",
-    limitations: "New trained engineering adapter, not unchanged replication or recovery of Series104/105B. Validation non-physical. Only full pass can authorize separately frozen untouched physical Series106. No biological/FlyVis/FlyWire/live-fly/mirror-neuron claim.",
-    files: ["experiments/RUN-TEMPORAL-CROSSFEATURE-ADAPTER-105C.bat", "experiments/templates/105c_temporal_crossfeature_adapter.py", "experiments/reports/temporal-crossfeature-adapter-105c-plan.md", "tests/temporal-crossfeature-adapter-105c.test.cjs"] },
+  { id: "session-temporal-crossfeature-adapter-105c", ideaId: "i-observational", title: "Series105C: temporal cross-feature official-eye adapter", status: "completed genuine Windows run; exact cross-feature development no-go", source: "После diagonal105B no-go full standardized72×72 ridge смешал axes×temporal coefficients. Train1069–1098, held1099–1107. Runner SHA60c74e44…, result JSON SHAd9f8c840…, model SHA9224cd9e…. Series104/105B остаются no-go.",
+    results: "Train-only CV выбрала boundary ridge100, NRMSE0,146472. Held cross-feature mean RMSE0,160217; beat diagonal9/9, raw9/9, reversed7/9, shuffled9/9. Но action4/9, neutral5/9 и zero3/9 ниже6;8/9 predicted reach_withdraw, head0/3. Primary=false, development_candidate=false, scientific_result=false.",
+    limitations: "Full linear mixing улучшил reconstruction, но не identity/neutral-zero specificity. Не расширять ridge grid post-result как confirmation и не ослаблять gate. Physical Series106 не авторизован. Не unchanged replication, biological/FlyVis/FlyWire/live-fly/mirror-neuron evidence.",
+    files: ["experiments/RUN-TEMPORAL-CROSSFEATURE-ADAPTER-105C.bat", "experiments/templates/105c_temporal_crossfeature_adapter.py", "experiments/reports/temporal-crossfeature-adapter-105c-plan.md", "experiments/reports/temporal-crossfeature-adapter-105c-user-result.json", "experiments/reports/temporal-crossfeature-adapter-105c-user-result.md", "tests/temporal-crossfeature-adapter-105c.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
