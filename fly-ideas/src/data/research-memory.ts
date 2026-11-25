@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v661-session-2026-09-18-action-aware-tournament";
+export const MEMORY_VERSION = "v662-session-2026-09-18-action-aware-pass";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -522,10 +522,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Train-only CV выбрала boundary ridge100, NRMSE0,146472. Held cross-feature mean RMSE0,160217; beat diagonal9/9, raw9/9, reversed7/9, shuffled9/9. Но action4/9, neutral5/9 и zero3/9 ниже6;8/9 predicted reach_withdraw, head0/3. Primary=false, development_candidate=false, scientific_result=false.",
     limitations: "Full linear mixing улучшил reconstruction, но не identity/neutral-zero specificity. Не расширять ridge grid post-result как confirmation и не ослаблять gate. Physical Series106 не авторизован. Не unchanged replication, biological/FlyVis/FlyWire/live-fly/mirror-neuron evidence.",
     files: ["experiments/RUN-TEMPORAL-CROSSFEATURE-ADAPTER-105C.bat", "experiments/templates/105c_temporal_crossfeature_adapter.py", "experiments/reports/temporal-crossfeature-adapter-105c-plan.md", "experiments/reports/temporal-crossfeature-adapter-105c-user-result.json", "experiments/reports/temporal-crossfeature-adapter-105c-user-result.md", "tests/temporal-crossfeature-adapter-105c.test.cjs"] },
-  { id: "session-action-aware-temporal-tournament-105d", ideaId: "i-observational", title: "Series105D: long action-aware temporal tournament", status: "runner/protocol frozen; genuine Windows run pending", source: "После three official-eye transfer no-gos пользователь разрешил новую supervised line до15ч. Exact105C result SHAd9f8c840… prerequisite. Train1108–1197, selection1198–1215, conditional untouched final1216–1233. Runner SHA8c39bfca….",
-    results: "Four fixed ideas: state multitask ridge, state random-Fourier, temporal edge-pool ridge, temporal classifier+three trajectory experts. Train labels/actual truth explicitly allowed. Selection eligibility action/control wins>=12/18; min candidate RMSE winner. No eligible=>final untouched. Per-capture atomic checkpoints, explicit new/continue GUI. Fixture7/7 pass; genuine pending.",
-    limitations: "Supervised engineering development, not frozen89E transfer or rescue of Series104/105B/105C. Selection/final not used for fit. Even final pass only authorizes separately preregistered physical Series106. No biological/FlyVis/FlyWire/live-fly/mirror-neuron claim.",
-    files: ["experiments/RUN-ACTION-AWARE-TEMPORAL-TOURNAMENT-105D.bat", "experiments/templates/105d_action_aware_temporal_tournament.py", "experiments/reports/action-aware-temporal-tournament-105d-plan.md", "tests/action-aware-temporal-tournament-105d.test.cjs"] },
+  { id: "session-action-aware-temporal-tournament-105d", ideaId: "i-observational", title: "Series105D: long action-aware temporal tournament", status: "completed genuine Windows run; supervised untouched-final development pass", source: "После three transfer no-gos supervised line used90 train,18 selection,18 untouched final.15ч была upper estimate; fixed workload completed faster without shortcut. Runner SHA8c39bfca…, result SHA59f8d54f…, selected temporal_action_experts model SHA1bbb15cd….",
+    results: "All4 models passed selection; min RMSE0,044689 selected temporal experts. Final action18/18; wins neutral15, reversed16, zero18, shuffled17/18; candidate mean RMSE0,038314; distinct. Primary=true, development_candidate=true, scientific_result=false. Foreleg/head/reach action each6/6.",
+    limitations: "Supervised generated labels+actual truth, not frozen89E transfer or rescue of Series104/105B/105C. Non-physical development only. Reach visual specificity weaker (neutral3/6,reversed4/6). Separate frozen physical Series106 authorized; must exact-load original NPZ SHA1bbb15cd…. No biological/FlyVis/FlyWire/live-fly/mirror-neuron claim.",
+    files: ["experiments/RUN-ACTION-AWARE-TEMPORAL-TOURNAMENT-105D.bat", "experiments/templates/105d_action_aware_temporal_tournament.py", "experiments/reports/action-aware-temporal-tournament-105d-plan.md", "experiments/reports/action-aware-temporal-tournament-105d-user-result.json", "experiments/reports/action-aware-temporal-tournament-105d-user-result.md", "tests/action-aware-temporal-tournament-105d.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

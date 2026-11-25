@@ -1,0 +1,3881 @@
+{
+  "schema": "action-aware-temporal-tournament-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "action-aware-temporal-tournament-v1",
+    "created_utc": "2026-11-25T12:03:44.285025+00:00",
+    "script_sha256": "8c39bfca87f3a11f59ac82cca721c58bb142094f7cd26bb1d4d6ae275ab23e45",
+    "runner105c_sha256": "60c74e44bca8c64ecc667e6eb8705f6163565cdd0509230ca8872d50ac4b206f",
+    "series105c_result_sha256": "d9f8c8400b4cff10ecc5b20132e06cb2ccb07f3cee3075d461a1c1622abcda39",
+    "prior_outcomes": "Series104,105B,105C remain no-go",
+    "expected_wall_budget_hours": 15.0,
+    "checkpoint_each_capture": true,
+    "resume_allowed": true,
+    "training_uses_action_labels_and_actual_truth": true,
+    "models": [
+      "state_multitask_ridge",
+      "state_random_fourier",
+      "temporal_pool_ridge",
+      "temporal_action_experts"
+    ],
+    "model_definitions": {
+      "state_multitask_ridge": "official frozen state -> joint truth coefficients + action one-hot, ridge10",
+      "state_random_fourier": "384 deterministic cosine features -> multitask ridge10",
+      "temporal_pool_ridge": "384 hashed edge temporal-pool features -> multitask ridge100",
+      "temporal_action_experts": "temporal action ridge10 + three class-conditional trajectory ridges100"
+    },
+    "motions": [
+      {
+        "role": "train",
+        "id": 1108,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "seed": 105700,
+        "amplitude": 0.6,
+        "speed": 0.68,
+        "motion_sha256": "dc63e60e66d7527ba4bb7b09d4e7337cbbcf299ea2bdfb0b7d67404857b47694"
+      },
+      {
+        "role": "train",
+        "id": 1109,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "seed": 105701,
+        "amplitude": 0.67125,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "b1a1d50d554afee3191b19ffce0e1bf3a9fcb91abe5aa8dfd452a18217af36e1"
+      },
+      {
+        "role": "train",
+        "id": 1110,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "seed": 105702,
+        "amplitude": 0.7424999999999999,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "d01bfe21d9a4a45d58e3191978509533cbce260dbe5e9b9fd3b0328d1ca6867f"
+      },
+      {
+        "role": "train",
+        "id": 1111,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "seed": 105710,
+        "amplitude": 0.76625,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "689f1e4f8ee81971b0a4b8d6a3cf4ba50dffa5e2bced73fc2d81a72fb7ed182c"
+      },
+      {
+        "role": "train",
+        "id": 1112,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "seed": 105711,
+        "amplitude": 0.8374999999999999,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "2049ace8eb7e6997de11edaaa2086f8312257d0e2dd49275d6023609f0ab9251"
+      },
+      {
+        "role": "train",
+        "id": 1113,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "seed": 105712,
+        "amplitude": 0.90875,
+        "speed": 0.68,
+        "motion_sha256": "976ad2d7ee07a6fd9741f396cd6afc134df271ce97a5f2279817afad86a73878"
+      },
+      {
+        "role": "train",
+        "id": 1114,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "seed": 105720,
+        "amplitude": 0.9325,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "bbf490eb9b2c524f207f30f65b93e65b39e085715067aea7ec2ddeed4ca613a3"
+      },
+      {
+        "role": "train",
+        "id": 1115,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "seed": 105721,
+        "amplitude": 0.6,
+        "speed": 1.2088888888888891,
+        "motion_sha256": "6d7724e57202bfdd2903b9c96b0ab5c61fb55ccdd6f3d0c92b68f4f1c69ba7b2"
+      },
+      {
+        "role": "train",
+        "id": 1116,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "seed": 105722,
+        "amplitude": 0.67125,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "e65f302e021d0aeb227b32dc3914ca1c97158c05886383cd21e72b7d297ce9f5"
+      },
+      {
+        "role": "train",
+        "id": 1117,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "seed": 105730,
+        "amplitude": 0.695,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "d4336dad2b59be89f1e91e70475e0aace59dfcf44a09418669154ec0a6131856"
+      },
+      {
+        "role": "train",
+        "id": 1118,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "seed": 105731,
+        "amplitude": 0.76625,
+        "speed": 0.7733333333333334,
+        "motion_sha256": "1572efdde381dc0f870fc321cc3f67a11dcb51aa76cc6df8e391f77e08e132b2"
+      },
+      {
+        "role": "train",
+        "id": 1119,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "seed": 105732,
+        "amplitude": 0.8374999999999999,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "812dd999b85d8e343293420136e140b1863c088496043704c8641d9ac5d2b5a9"
+      },
+      {
+        "role": "train",
+        "id": 1120,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "seed": 105740,
+        "amplitude": 0.86125,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "31a07bc702b31b2941d10a637059187efd75134882c605817fad974db10b3f74"
+      },
+      {
+        "role": "train",
+        "id": 1121,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "seed": 105741,
+        "amplitude": 0.9325,
+        "speed": 0.928888888888889,
+        "motion_sha256": "ba36c3263d8fe9690f7220a5870398482663f422f254a107cfa30c2527ef916d"
+      },
+      {
+        "role": "train",
+        "id": 1122,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "seed": 105742,
+        "amplitude": 0.6,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "26da89a612870b777bc7a7d3dde1f3cad5efdf6e747f2155b585edfe5a9b52b8"
+      },
+      {
+        "role": "train",
+        "id": 1123,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "seed": 105750,
+        "amplitude": 0.62375,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "40d70e4ad06efa690a073773366e138773f03cd4a400dfb3b1b25f8089aadb4f"
+      },
+      {
+        "role": "train",
+        "id": 1124,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "seed": 105751,
+        "amplitude": 0.695,
+        "speed": 1.0844444444444445,
+        "motion_sha256": "e68a8f1831d951110cd5a362c0f9ab293ea92ef2ac3da41397cabace200fd849"
+      },
+      {
+        "role": "train",
+        "id": 1125,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "seed": 105752,
+        "amplitude": 0.76625,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "2e8b4927dff67ca385674603b85e8601dd8a1ddfdb82d2fa9c9efa1e30bf1fb0"
+      },
+      {
+        "role": "train",
+        "id": 1126,
+        "replicate": 7,
+        "action": "foreleg_rubbing",
+        "seed": 105760,
+        "amplitude": 0.79,
+        "speed": 1.0222222222222221,
+        "motion_sha256": "40bc9d48fee0c34862025bf297c6c6929a9e2e99305c51c69683d6779b322215"
+      },
+      {
+        "role": "train",
+        "id": 1127,
+        "replicate": 7,
+        "action": "head_directed_grooming",
+        "seed": 105761,
+        "amplitude": 0.86125,
+        "speed": 1.2400000000000002,
+        "motion_sha256": "bdd38c636046879304f0f6dad0504455f6a9f9ad65a162e74486abd9092a60ac"
+      },
+      {
+        "role": "train",
+        "id": 1128,
+        "replicate": 7,
+        "action": "reach_withdraw",
+        "seed": 105762,
+        "amplitude": 0.9325,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "18510cde6404b5caaa8b3b0f172b9588a3ea0195307dcb58c696886f78317f7e"
+      },
+      {
+        "role": "train",
+        "id": 1129,
+        "replicate": 8,
+        "action": "foreleg_rubbing",
+        "seed": 105770,
+        "amplitude": 0.95625,
+        "speed": 1.1777777777777778,
+        "motion_sha256": "66d97ce665187a64201039768268d274e9d447828818a64097ef21bc9a13c2aa"
+      },
+      {
+        "role": "train",
+        "id": 1130,
+        "replicate": 8,
+        "action": "head_directed_grooming",
+        "seed": 105771,
+        "amplitude": 0.62375,
+        "speed": 0.8044444444444445,
+        "motion_sha256": "d8c9f544b67e026e33dffbbebb67f36b4a23eb963b0391ff67ff9e06d361a96a"
+      },
+      {
+        "role": "train",
+        "id": 1131,
+        "replicate": 8,
+        "action": "reach_withdraw",
+        "seed": 105772,
+        "amplitude": 0.695,
+        "speed": 1.0222222222222221,
+        "motion_sha256": "a29f0aacece9a1f197e0c3be7b42d4cb8dc507b5872638bd4b3e131beffaae59"
+      },
+      {
+        "role": "train",
+        "id": 1132,
+        "replicate": 9,
+        "action": "foreleg_rubbing",
+        "seed": 105780,
+        "amplitude": 0.71875,
+        "speed": 0.7422222222222222,
+        "motion_sha256": "b916a17473f959e553c3813d9e77ce22e09338c8846d3b116ed1fe28cc9e4cf3"
+      },
+      {
+        "role": "train",
+        "id": 1133,
+        "replicate": 9,
+        "action": "head_directed_grooming",
+        "seed": 105781,
+        "amplitude": 0.79,
+        "speed": 0.9600000000000001,
+        "motion_sha256": "c1709dd7802ebb5339f3190cc04bcbc4aeb2cfbab628bd67f5889cdd3d78bde8"
+      },
+      {
+        "role": "train",
+        "id": 1134,
+        "replicate": 9,
+        "action": "reach_withdraw",
+        "seed": 105782,
+        "amplitude": 0.86125,
+        "speed": 1.1777777777777778,
+        "motion_sha256": "658c82d2b8ca3c2a7ca9fc4825ca32257cc794b38bfb1dd462d58f58640b6143"
+      },
+      {
+        "role": "train",
+        "id": 1135,
+        "replicate": 10,
+        "action": "foreleg_rubbing",
+        "seed": 105790,
+        "amplitude": 0.885,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "37040d8237d60d92442284046b6616745c71975834541be32df675a8c75b5b2d"
+      },
+      {
+        "role": "train",
+        "id": 1136,
+        "replicate": 10,
+        "action": "head_directed_grooming",
+        "seed": 105791,
+        "amplitude": 0.95625,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "ea8b49eef16f760a8ddffe2c56c9d8886e56b1a01c895f26fe2d76b2328cdaa9"
+      },
+      {
+        "role": "train",
+        "id": 1137,
+        "replicate": 10,
+        "action": "reach_withdraw",
+        "seed": 105792,
+        "amplitude": 0.62375,
+        "speed": 0.7422222222222222,
+        "motion_sha256": "a1b3efd651d106366f207728397d7f36f4b17f585960eae1e2ad466779a1d288"
+      },
+      {
+        "role": "train",
+        "id": 1138,
+        "replicate": 11,
+        "action": "foreleg_rubbing",
+        "seed": 105800,
+        "amplitude": 0.6475,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "bd8f8e0bb72fc32d53266367c654b5ce2832ebbeb795cc50a74da182d1fa3040"
+      },
+      {
+        "role": "train",
+        "id": 1139,
+        "replicate": 11,
+        "action": "head_directed_grooming",
+        "seed": 105801,
+        "amplitude": 0.71875,
+        "speed": 0.68,
+        "motion_sha256": "ee5e78a1783f98a8506a255675cd11329deff3f16075540e5214fb35a70edbf4"
+      },
+      {
+        "role": "train",
+        "id": 1140,
+        "replicate": 11,
+        "action": "reach_withdraw",
+        "seed": 105802,
+        "amplitude": 0.79,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "53e487ea3a89c58db1ec375a71e51d6b05cd00b22bb426a1bacffa94dc803a54"
+      },
+      {
+        "role": "train",
+        "id": 1141,
+        "replicate": 12,
+        "action": "foreleg_rubbing",
+        "seed": 105810,
+        "amplitude": 0.81375,
+        "speed": 1.2088888888888891,
+        "motion_sha256": "15335532ad5e1e366663cb2d2df877c05e0152a77123fe32311c377d692b1b58"
+      },
+      {
+        "role": "train",
+        "id": 1142,
+        "replicate": 12,
+        "action": "head_directed_grooming",
+        "seed": 105811,
+        "amplitude": 0.885,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "08368f14751881497101e9366a4df8066fc4c1494bdbe19d5a311170c2c799c9"
+      },
+      {
+        "role": "train",
+        "id": 1143,
+        "replicate": 12,
+        "action": "reach_withdraw",
+        "seed": 105812,
+        "amplitude": 0.95625,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "c5341aa022bea2b6f3cef138cda6b1dbbd13ed151a89bde300d042f737fc9648"
+      },
+      {
+        "role": "train",
+        "id": 1144,
+        "replicate": 13,
+        "action": "foreleg_rubbing",
+        "seed": 105820,
+        "amplitude": 0.98,
+        "speed": 0.7733333333333334,
+        "motion_sha256": "e72d0d4a56610b7fd468535a046d0d50f5eff1a6bcec2fa4b031843299737f1d"
+      },
+      {
+        "role": "train",
+        "id": 1145,
+        "replicate": 13,
+        "action": "head_directed_grooming",
+        "seed": 105821,
+        "amplitude": 0.6475,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "6e9b6bed0a2cf5a1480b869ea5c3fb8502dd74c822b4188c83d45c29aad47979"
+      },
+      {
+        "role": "train",
+        "id": 1146,
+        "replicate": 13,
+        "action": "reach_withdraw",
+        "seed": 105822,
+        "amplitude": 0.71875,
+        "speed": 1.2088888888888891,
+        "motion_sha256": "cf156be1d30974335a4abfd883841586cf7bd39d9dad591662d06cfabcf4b34c"
+      },
+      {
+        "role": "train",
+        "id": 1147,
+        "replicate": 14,
+        "action": "foreleg_rubbing",
+        "seed": 105830,
+        "amplitude": 0.7424999999999999,
+        "speed": 0.928888888888889,
+        "motion_sha256": "b0e401f45d7a8975ffd3677a445c545779460f7de0d04778f48875c6a0c0cf39"
+      },
+      {
+        "role": "train",
+        "id": 1148,
+        "replicate": 14,
+        "action": "head_directed_grooming",
+        "seed": 105831,
+        "amplitude": 0.81375,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "79ff214f9d9b1ffe5440dadc8bc537ff6b7bb76ce18ba7243c46af90ee295442"
+      },
+      {
+        "role": "train",
+        "id": 1149,
+        "replicate": 14,
+        "action": "reach_withdraw",
+        "seed": 105832,
+        "amplitude": 0.885,
+        "speed": 0.7733333333333334,
+        "motion_sha256": "a68da006915959f81ad7844ac5a1a1db1ee28de7ca89c2634016d436c964f7b9"
+      },
+      {
+        "role": "train",
+        "id": 1150,
+        "replicate": 15,
+        "action": "foreleg_rubbing",
+        "seed": 105840,
+        "amplitude": 0.90875,
+        "speed": 1.0844444444444445,
+        "motion_sha256": "5a028198e442b5859ca3887a4128eb5650a5d380b71823d5b9f0cab720fb40a4"
+      },
+      {
+        "role": "train",
+        "id": 1151,
+        "replicate": 15,
+        "action": "head_directed_grooming",
+        "seed": 105841,
+        "amplitude": 0.98,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "f457403a77254efd76e14f7c77fd421c9141c5bd231a75f44ee43aeaed1a1c19"
+      },
+      {
+        "role": "train",
+        "id": 1152,
+        "replicate": 15,
+        "action": "reach_withdraw",
+        "seed": 105842,
+        "amplitude": 0.6475,
+        "speed": 0.928888888888889,
+        "motion_sha256": "aaddd5916199746dd7da9408db6ffc3222a7727124651133182666e92519c295"
+      },
+      {
+        "role": "train",
+        "id": 1153,
+        "replicate": 16,
+        "action": "foreleg_rubbing",
+        "seed": 105850,
+        "amplitude": 0.67125,
+        "speed": 1.2400000000000002,
+        "motion_sha256": "2367ead0b2d206653a6baf0931f7e31fad70343760085ad701d08ff8d5e229cd"
+      },
+      {
+        "role": "train",
+        "id": 1154,
+        "replicate": 16,
+        "action": "head_directed_grooming",
+        "seed": 105851,
+        "amplitude": 0.7424999999999999,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "86880bf3b7fb244c5bce90c0c82f6b1d986fd31d5014d6f71a7056f176035b89"
+      },
+      {
+        "role": "train",
+        "id": 1155,
+        "replicate": 16,
+        "action": "reach_withdraw",
+        "seed": 105852,
+        "amplitude": 0.81375,
+        "speed": 1.0844444444444445,
+        "motion_sha256": "a086b0aacebf683aaf08d0b7da146898e0557030d6cc49a9e530ee1af9a91113"
+      },
+      {
+        "role": "train",
+        "id": 1156,
+        "replicate": 17,
+        "action": "foreleg_rubbing",
+        "seed": 105860,
+        "amplitude": 0.8374999999999999,
+        "speed": 0.8044444444444445,
+        "motion_sha256": "e8333215e2bc519e737f2671efefdf15e46c33c0cfb2a5cc028a67e641115cd1"
+      },
+      {
+        "role": "train",
+        "id": 1157,
+        "replicate": 17,
+        "action": "head_directed_grooming",
+        "seed": 105861,
+        "amplitude": 0.90875,
+        "speed": 1.0222222222222221,
+        "motion_sha256": "e6fd615f473327197ea3250f72bd260ba4098fe9dcbff61639581aa0bcf91f65"
+      },
+      {
+        "role": "train",
+        "id": 1158,
+        "replicate": 17,
+        "action": "reach_withdraw",
+        "seed": 105862,
+        "amplitude": 0.98,
+        "speed": 1.2400000000000002,
+        "motion_sha256": "4b682cad75b03d8a368806f799fbfad6e093d253feed98f2548ccc00ba0a97b8"
+      },
+      {
+        "role": "train",
+        "id": 1159,
+        "replicate": 18,
+        "action": "foreleg_rubbing",
+        "seed": 105870,
+        "amplitude": 0.6,
+        "speed": 0.9600000000000001,
+        "motion_sha256": "034e0865bbda1aa90839c5c0453e94daee263503acf7769e83cd2a7736e19d39"
+      },
+      {
+        "role": "train",
+        "id": 1160,
+        "replicate": 18,
+        "action": "head_directed_grooming",
+        "seed": 105871,
+        "amplitude": 0.67125,
+        "speed": 1.1777777777777778,
+        "motion_sha256": "c0f8becfd712754dc4910f5f5da0bc079a55aea4bf0028fea234b7e26cf7d055"
+      },
+      {
+        "role": "train",
+        "id": 1161,
+        "replicate": 18,
+        "action": "reach_withdraw",
+        "seed": 105872,
+        "amplitude": 0.7424999999999999,
+        "speed": 0.8044444444444445,
+        "motion_sha256": "2d9c9e02957ec1f034107b0af48772ac6c8cdc94066b7dfe54be6f06fa7a76fe"
+      },
+      {
+        "role": "train",
+        "id": 1162,
+        "replicate": 19,
+        "action": "foreleg_rubbing",
+        "seed": 105880,
+        "amplitude": 0.76625,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "097c8e78f402dc49d418febf95d1f41d96c6c1b106762c63bfb78b0fdc03d2d0"
+      },
+      {
+        "role": "train",
+        "id": 1163,
+        "replicate": 19,
+        "action": "head_directed_grooming",
+        "seed": 105881,
+        "amplitude": 0.8374999999999999,
+        "speed": 0.7422222222222222,
+        "motion_sha256": "1e66b0d63d0c8ad6c8659d9dd2a42d3d231a827bf65fe37eac203f4839c76143"
+      },
+      {
+        "role": "train",
+        "id": 1164,
+        "replicate": 19,
+        "action": "reach_withdraw",
+        "seed": 105882,
+        "amplitude": 0.90875,
+        "speed": 0.9600000000000001,
+        "motion_sha256": "cc0fdba757fa2882a8a1ab57b8bdf4433383a309f27ed9a6a1f0224880e3af0d"
+      },
+      {
+        "role": "train",
+        "id": 1165,
+        "replicate": 20,
+        "action": "foreleg_rubbing",
+        "seed": 105890,
+        "amplitude": 0.9325,
+        "speed": 0.68,
+        "motion_sha256": "b9412cdeab9a7236e7d0e0cf10d41260ea50142689b164c2d7bfe747d57a8fef"
+      },
+      {
+        "role": "train",
+        "id": 1166,
+        "replicate": 20,
+        "action": "head_directed_grooming",
+        "seed": 105891,
+        "amplitude": 0.6,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "9833b96664b31bb3b5594000fdea97c1fcbb98c45e7b5432969d7d27be8e9688"
+      },
+      {
+        "role": "train",
+        "id": 1167,
+        "replicate": 20,
+        "action": "reach_withdraw",
+        "seed": 105892,
+        "amplitude": 0.67125,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "7b3db65e7cecc555d28950f2fe4599b0d92cadd8887dd68901ca31bec2511337"
+      },
+      {
+        "role": "train",
+        "id": 1168,
+        "replicate": 21,
+        "action": "foreleg_rubbing",
+        "seed": 105900,
+        "amplitude": 0.695,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "e0e9189ec6708f25d90be459acaadee73ae020767c98b946895361e56e9c44d0"
+      },
+      {
+        "role": "train",
+        "id": 1169,
+        "replicate": 21,
+        "action": "head_directed_grooming",
+        "seed": 105901,
+        "amplitude": 0.76625,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "edb6ebc3d5c32944f47ffaa64f95df91364e15709080ea3af882ad04ceebdb62"
+      },
+      {
+        "role": "train",
+        "id": 1170,
+        "replicate": 21,
+        "action": "reach_withdraw",
+        "seed": 105902,
+        "amplitude": 0.8374999999999999,
+        "speed": 0.68,
+        "motion_sha256": "c0d8e87342dd5f9f03607d27c91ee0cb2fce40952b3e6d15935d9d729add242b"
+      },
+      {
+        "role": "train",
+        "id": 1171,
+        "replicate": 22,
+        "action": "foreleg_rubbing",
+        "seed": 105910,
+        "amplitude": 0.86125,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "f7e75c446dde321f6d3dff4ff654e4ed7ee3e2a48194d965375f4aff2052be04"
+      },
+      {
+        "role": "train",
+        "id": 1172,
+        "replicate": 22,
+        "action": "head_directed_grooming",
+        "seed": 105911,
+        "amplitude": 0.9325,
+        "speed": 1.2088888888888891,
+        "motion_sha256": "38ab635ee6f3a41dd4d76f3fef5113725d584a84fc1053b366f698bc7cabf871"
+      },
+      {
+        "role": "train",
+        "id": 1173,
+        "replicate": 22,
+        "action": "reach_withdraw",
+        "seed": 105912,
+        "amplitude": 0.6,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "e6f3d7e076fe5ffee4421c90a28e7155a41c574ddcb8f5e21ccb2b15af6ed838"
+      },
+      {
+        "role": "train",
+        "id": 1174,
+        "replicate": 23,
+        "action": "foreleg_rubbing",
+        "seed": 105920,
+        "amplitude": 0.62375,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "a22e5f00d0b15d3eaffee06217337df97802f7d84c199d5d2b3263bb93a32d3c"
+      },
+      {
+        "role": "train",
+        "id": 1175,
+        "replicate": 23,
+        "action": "head_directed_grooming",
+        "seed": 105921,
+        "amplitude": 0.695,
+        "speed": 0.7733333333333334,
+        "motion_sha256": "326eaac6635cad275a99c87be5538564fac7ef3e51b30f457fbb411157760864"
+      },
+      {
+        "role": "train",
+        "id": 1176,
+        "replicate": 23,
+        "action": "reach_withdraw",
+        "seed": 105922,
+        "amplitude": 0.76625,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "6af3b1cd2526690e7512d724565cff2f0491f578d23dc172bd67592fab5c4aac"
+      },
+      {
+        "role": "train",
+        "id": 1177,
+        "replicate": 24,
+        "action": "foreleg_rubbing",
+        "seed": 105930,
+        "amplitude": 0.79,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "17f449d2c514f5789e988b014589391bb8191207ba53ead4e7a327052cf320d6"
+      },
+      {
+        "role": "train",
+        "id": 1178,
+        "replicate": 24,
+        "action": "head_directed_grooming",
+        "seed": 105931,
+        "amplitude": 0.86125,
+        "speed": 0.928888888888889,
+        "motion_sha256": "ac0fc96b79d7ce292b20f54ff9e07ce95bfcd837438890d9742b2f577082213a"
+      },
+      {
+        "role": "train",
+        "id": 1179,
+        "replicate": 24,
+        "action": "reach_withdraw",
+        "seed": 105932,
+        "amplitude": 0.9325,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "530ca80740ba71dfd87f4b1aef28a718ade27952108325190c78be978f791c77"
+      },
+      {
+        "role": "train",
+        "id": 1180,
+        "replicate": 25,
+        "action": "foreleg_rubbing",
+        "seed": 105940,
+        "amplitude": 0.95625,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "24801101267b7793a5227177203d6593aa3e588f602fef3e63340671051b83bd"
+      },
+      {
+        "role": "train",
+        "id": 1181,
+        "replicate": 25,
+        "action": "head_directed_grooming",
+        "seed": 105941,
+        "amplitude": 0.62375,
+        "speed": 1.0844444444444445,
+        "motion_sha256": "c6d5fe3cf9f4e9d9adf4254928b0b491e6a8725911d14e0e3b29bce646e111cd"
+      },
+      {
+        "role": "train",
+        "id": 1182,
+        "replicate": 25,
+        "action": "reach_withdraw",
+        "seed": 105942,
+        "amplitude": 0.695,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "c79f5d928798d5d99fe9577e54169cae8e303a9ec1107dbeee17db126f2d816e"
+      },
+      {
+        "role": "train",
+        "id": 1183,
+        "replicate": 26,
+        "action": "foreleg_rubbing",
+        "seed": 105950,
+        "amplitude": 0.71875,
+        "speed": 1.0222222222222221,
+        "motion_sha256": "0752e84af64d195944ac99a6ef1613ab2e3ba96bead26b23b4d472935fe0b8e5"
+      },
+      {
+        "role": "train",
+        "id": 1184,
+        "replicate": 26,
+        "action": "head_directed_grooming",
+        "seed": 105951,
+        "amplitude": 0.79,
+        "speed": 1.2400000000000002,
+        "motion_sha256": "ce4db659789989689474adbe56e7a2f17b7ab3c2375de782f899909fe408b93e"
+      },
+      {
+        "role": "train",
+        "id": 1185,
+        "replicate": 26,
+        "action": "reach_withdraw",
+        "seed": 105952,
+        "amplitude": 0.86125,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "da700c9132824f3cb3b3ee008f5afb17353737bd148c0d5b2efadb903c9b8d97"
+      },
+      {
+        "role": "train",
+        "id": 1186,
+        "replicate": 27,
+        "action": "foreleg_rubbing",
+        "seed": 105960,
+        "amplitude": 0.885,
+        "speed": 1.1777777777777778,
+        "motion_sha256": "34ee425af778a833c47effa3af5d661ec2ee92b5b199eafda47393710b62801f"
+      },
+      {
+        "role": "train",
+        "id": 1187,
+        "replicate": 27,
+        "action": "head_directed_grooming",
+        "seed": 105961,
+        "amplitude": 0.95625,
+        "speed": 0.8044444444444445,
+        "motion_sha256": "2b5f40067c9c87a6b4117b7a4f2acd03af651c9a34f8efdfde6bd56c1af7b998"
+      },
+      {
+        "role": "train",
+        "id": 1188,
+        "replicate": 27,
+        "action": "reach_withdraw",
+        "seed": 105962,
+        "amplitude": 0.62375,
+        "speed": 1.0222222222222221,
+        "motion_sha256": "a57f94e27608491d8aafe22a4a731d66b9e26534f3e05a59bb503646689d4661"
+      },
+      {
+        "role": "train",
+        "id": 1189,
+        "replicate": 28,
+        "action": "foreleg_rubbing",
+        "seed": 105970,
+        "amplitude": 0.6475,
+        "speed": 0.7422222222222222,
+        "motion_sha256": "81826742139244ff1700a1625d2535d6f5fbefb21f0d22b9295df094635823db"
+      },
+      {
+        "role": "train",
+        "id": 1190,
+        "replicate": 28,
+        "action": "head_directed_grooming",
+        "seed": 105971,
+        "amplitude": 0.71875,
+        "speed": 0.9600000000000001,
+        "motion_sha256": "4ba5d3d0c31fd372503513b168b75e80d57dda82ae6a4f843d29e4e73f5442c5"
+      },
+      {
+        "role": "train",
+        "id": 1191,
+        "replicate": 28,
+        "action": "reach_withdraw",
+        "seed": 105972,
+        "amplitude": 0.79,
+        "speed": 1.1777777777777778,
+        "motion_sha256": "5e4b21431f6f0157ec9fb5548af909c6677407e9fe09d332f08c8ba50cb1d3f6"
+      },
+      {
+        "role": "train",
+        "id": 1192,
+        "replicate": 29,
+        "action": "foreleg_rubbing",
+        "seed": 105980,
+        "amplitude": 0.81375,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "3a984b3b68dd2b18016b3b4414635b2b12090f9b2139bdd6b7fd8cd38bf20a3d"
+      },
+      {
+        "role": "train",
+        "id": 1193,
+        "replicate": 29,
+        "action": "head_directed_grooming",
+        "seed": 105981,
+        "amplitude": 0.885,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "b8b9dde81c7be123a48dc73fa93a20d3b486e518222612e096a5ff0ce1568aab"
+      },
+      {
+        "role": "train",
+        "id": 1194,
+        "replicate": 29,
+        "action": "reach_withdraw",
+        "seed": 105982,
+        "amplitude": 0.95625,
+        "speed": 0.7422222222222222,
+        "motion_sha256": "e3f29c10de99cfc41ab4e87974609e5a2c80e994e45875fb527fa9508b89df8c"
+      },
+      {
+        "role": "train",
+        "id": 1195,
+        "replicate": 30,
+        "action": "foreleg_rubbing",
+        "seed": 105990,
+        "amplitude": 0.98,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "d018219d26b08ee3e3fb88ff96250afd2faa43de6febef4702685cef174d2d83"
+      },
+      {
+        "role": "train",
+        "id": 1196,
+        "replicate": 30,
+        "action": "head_directed_grooming",
+        "seed": 105991,
+        "amplitude": 0.6475,
+        "speed": 0.68,
+        "motion_sha256": "4dbeb54cbf322843a74d7c9449fb66c166705fd5ace1abbc4f9e482f2e91101b"
+      },
+      {
+        "role": "train",
+        "id": 1197,
+        "replicate": 30,
+        "action": "reach_withdraw",
+        "seed": 105992,
+        "amplitude": 0.71875,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "eb7167f35c3834e8dfb4051a0e7b48696ae920c929ba8a7123b997cce67d527b"
+      },
+      {
+        "role": "selection",
+        "id": 1198,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "seed": 106100,
+        "amplitude": 0.6,
+        "speed": 0.68,
+        "motion_sha256": "7a4854ef517c4bafc2193b7512fa1709aaf2233c7219332a32fd7f3823230450"
+      },
+      {
+        "role": "selection",
+        "id": 1199,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "seed": 106101,
+        "amplitude": 0.67125,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "904392c5671eaa7558832e1a62847e16f295673cbc792449ecde9f751b21e128"
+      },
+      {
+        "role": "selection",
+        "id": 1200,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "seed": 106102,
+        "amplitude": 0.7424999999999999,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "530117ae101ea1480f50ad7f7989b1e7256155c76ae96635d13fcb87a61b99e5"
+      },
+      {
+        "role": "selection",
+        "id": 1201,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "seed": 106110,
+        "amplitude": 0.76625,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "c70c45efd3305832b45683c9940b96238ba71f052ad58e9b47bf909bd9a0c168"
+      },
+      {
+        "role": "selection",
+        "id": 1202,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "seed": 106111,
+        "amplitude": 0.8374999999999999,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "29f1f689e51fc76d55e680dec0b35a34724b7d93d09d562a1ac29e29ade695e5"
+      },
+      {
+        "role": "selection",
+        "id": 1203,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "seed": 106112,
+        "amplitude": 0.90875,
+        "speed": 0.68,
+        "motion_sha256": "e8481922f196f230b6e9ca7cfb5072a285d8b667b0617d48881c4b4a3b14bb5d"
+      },
+      {
+        "role": "selection",
+        "id": 1204,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "seed": 106120,
+        "amplitude": 0.9325,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "c5465d3fbd0644c8f15e2160f2ee30e69f6be8e8ad0d825a968ea480cce6a72c"
+      },
+      {
+        "role": "selection",
+        "id": 1205,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "seed": 106121,
+        "amplitude": 0.6,
+        "speed": 1.2088888888888891,
+        "motion_sha256": "55a8d3d0ca51c2c391162d06fb16d3e09bc19676c69e45672f134dd0576cd0a2"
+      },
+      {
+        "role": "selection",
+        "id": 1206,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "seed": 106122,
+        "amplitude": 0.67125,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "fa787fc36f22253979359ca053558320057a894aee1a0ad74292e24bb6a2c20a"
+      },
+      {
+        "role": "selection",
+        "id": 1207,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "seed": 106130,
+        "amplitude": 0.695,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "ab90f0492032df6556611481704bd869c1e1fa637bb121beeb53755ef1af92bf"
+      },
+      {
+        "role": "selection",
+        "id": 1208,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "seed": 106131,
+        "amplitude": 0.76625,
+        "speed": 0.7733333333333334,
+        "motion_sha256": "e917b2abe7f317512f0847ef3df61d591fc9c09d2bf12fddce965a6374372fbc"
+      },
+      {
+        "role": "selection",
+        "id": 1209,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "seed": 106132,
+        "amplitude": 0.8374999999999999,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "95f3d88168bc520d24e031d25eaca93c42eec4f991dfd3b369a0f7dcdafa9143"
+      },
+      {
+        "role": "selection",
+        "id": 1210,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "seed": 106140,
+        "amplitude": 0.86125,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "4a275e3909ede88987a53b3e81411361a70cbbf63433fe1c66bce733a4912f5d"
+      },
+      {
+        "role": "selection",
+        "id": 1211,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "seed": 106141,
+        "amplitude": 0.9325,
+        "speed": 0.928888888888889,
+        "motion_sha256": "1cd8929b27ae8acc0cb2f424553024a81f767da4da11b3f9e4a029671b77accf"
+      },
+      {
+        "role": "selection",
+        "id": 1212,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "seed": 106142,
+        "amplitude": 0.6,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "47122e8c8aa6de0634c2dff0b12aa0e251949c41b6ebe5508ea49cb26924f1eb"
+      },
+      {
+        "role": "selection",
+        "id": 1213,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "seed": 106150,
+        "amplitude": 0.62375,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "3a403598edbb6dda136a8114768c87791ed0d99cc062c27e6e1eb5d85dcfcae9"
+      },
+      {
+        "role": "selection",
+        "id": 1214,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "seed": 106151,
+        "amplitude": 0.695,
+        "speed": 1.0844444444444445,
+        "motion_sha256": "05b65125ee1388f4f6d2cbde6078774bd80db50ea410a05efac5250b8b1764c9"
+      },
+      {
+        "role": "selection",
+        "id": 1215,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "seed": 106152,
+        "amplitude": 0.76625,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "1b2bf550b76ad0f9eaa16625c3ea7b4d3193a17302a9cffba93660ff6c435849"
+      },
+      {
+        "role": "final",
+        "id": 1216,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "seed": 106300,
+        "amplitude": 0.6,
+        "speed": 0.68,
+        "motion_sha256": "c088d7ede94a827624eb09ad7e6c195084ea7d474a5d47c2be7b78da82d696e3"
+      },
+      {
+        "role": "final",
+        "id": 1217,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "seed": 106301,
+        "amplitude": 0.67125,
+        "speed": 0.8977777777777778,
+        "motion_sha256": "6d68795c53ee7437ec99a5c7acd92d1ae5c686bfd3e63828edde5c437f02541d"
+      },
+      {
+        "role": "final",
+        "id": 1218,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "seed": 106302,
+        "amplitude": 0.7424999999999999,
+        "speed": 1.1155555555555556,
+        "motion_sha256": "5328887018f2a17e71821e5984eccff5a8ef5d6047cd50765f0191ba701f4239"
+      },
+      {
+        "role": "final",
+        "id": 1219,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "seed": 106310,
+        "amplitude": 0.76625,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "bb88a525e334f42ed2041ef96b9d37cd82c7c8d4585f69ab927074fa63d7eb45"
+      },
+      {
+        "role": "final",
+        "id": 1220,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "seed": 106311,
+        "amplitude": 0.8374999999999999,
+        "speed": 1.0533333333333335,
+        "motion_sha256": "4ef35b8fa65953c963c1fd9c447d659b8bbce4223f63934d4b4912213c6c249d"
+      },
+      {
+        "role": "final",
+        "id": 1221,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "seed": 106312,
+        "amplitude": 0.90875,
+        "speed": 0.68,
+        "motion_sha256": "81b5ac0ba08817a1b0d14e7d917c32774ddd3b0bebef6c8cc10f2425f55b35b1"
+      },
+      {
+        "role": "final",
+        "id": 1222,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "seed": 106320,
+        "amplitude": 0.9325,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "41df082e9eca2522251993ea17e0ad037c190c23817f9bb13ddd266f44bf4f5a"
+      },
+      {
+        "role": "final",
+        "id": 1223,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "seed": 106321,
+        "amplitude": 0.6,
+        "speed": 1.2088888888888891,
+        "motion_sha256": "442c3a157a4e27cfae9212513b98947ae572e76a4d0e8ff2a97af0a2b012e088"
+      },
+      {
+        "role": "final",
+        "id": 1224,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "seed": 106322,
+        "amplitude": 0.67125,
+        "speed": 0.8355555555555556,
+        "motion_sha256": "2c78bdc96c739af648d106afa1cb902862752cd8a0f0b8f44500f8af25178493"
+      },
+      {
+        "role": "final",
+        "id": 1225,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "seed": 106330,
+        "amplitude": 0.695,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "51acf1519ec3714931b1e4c2867156be103d1c489a51dce6380355c2bb2f8dff"
+      },
+      {
+        "role": "final",
+        "id": 1226,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "seed": 106331,
+        "amplitude": 0.76625,
+        "speed": 0.7733333333333334,
+        "motion_sha256": "2c5d63d972e49b9c31a9dd2df0f2783003347b11a429ba38da0cafde300525ed"
+      },
+      {
+        "role": "final",
+        "id": 1227,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "seed": 106332,
+        "amplitude": 0.8374999999999999,
+        "speed": 0.9911111111111112,
+        "motion_sha256": "e676c72ccaf47fda634c513c8df51467c31dda74dfd497ed7e79b033a13406c1"
+      },
+      {
+        "role": "final",
+        "id": 1228,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "seed": 106340,
+        "amplitude": 0.86125,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "30dec4c4fe21b8ebb5a5f2c7143d07245f5c3e8fd53be3301ce0391e211c2f22"
+      },
+      {
+        "role": "final",
+        "id": 1229,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "seed": 106341,
+        "amplitude": 0.9325,
+        "speed": 0.928888888888889,
+        "motion_sha256": "6a307b61db7c2fdcce6508a9762b983e1edbb5d304a478ca7ae314875c48d982"
+      },
+      {
+        "role": "final",
+        "id": 1230,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "seed": 106342,
+        "amplitude": 0.6,
+        "speed": 1.1466666666666667,
+        "motion_sha256": "a343432dc97f3c9c3878c85866af2e01ba73da5e42ee984e6ce767f0d45bd739"
+      },
+      {
+        "role": "final",
+        "id": 1231,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "seed": 106350,
+        "amplitude": 0.62375,
+        "speed": 0.8666666666666667,
+        "motion_sha256": "02db7c6e3ce93abfd10186b2c98eb81b9329b86736a99fee604d294860a7b46a"
+      },
+      {
+        "role": "final",
+        "id": 1232,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "seed": 106351,
+        "amplitude": 0.695,
+        "speed": 1.0844444444444445,
+        "motion_sha256": "f13a78f514c8d9dac6ec13dc2146939320e3a9fda0d6dd84b083d9c4f7808686"
+      },
+      {
+        "role": "final",
+        "id": 1233,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "seed": 106352,
+        "amplitude": 0.76625,
+        "speed": 0.7111111111111111,
+        "motion_sha256": "9a8b02fcb8629cf0b345bb0d026db21c9f9948ea24a9b1342e1a66f4bb99aa61"
+      }
+    ],
+    "selection_rule": "model must pass action/control >=12/18 on selection; among eligible minimum candidate RMSE then name; if none final remains untouched",
+    "final_rule": "selected model action correct and candidate wins vs neutral/reversed/zero/shuffled >=12/18; distinct targets",
+    "selection_and_final_not_used_for_fit": true,
+    "post_result_tuning": false
+  },
+  "series105c_primary": {
+    "validation_cases": 9,
+    "required_action_correct": 6,
+    "required_control_wins": 6,
+    "action_correct": 4,
+    "crossfeature_truth_wins": {
+      "diagonal": 9,
+      "raw_frozen": 9,
+      "neutral_visual": 5,
+      "reversed_visual": 7,
+      "zero_state": 3,
+      "shuffled_state": 9
+    },
+    "mean_truth_rmse_rad": {
+      "crossfeature": 0.16021748970505745,
+      "diagonal": 0.18999600155453059,
+      "raw_frozen": 0.4959534114119827,
+      "neutral_visual": 0.17420602676545277,
+      "reversed_visual": 0.17946604750367787,
+      "zero_state": 0.16955653620151873,
+      "shuffled_state": 0.4479582144384987
+    },
+    "targets_distinct": true,
+    "passed": false,
+    "development_candidate": false,
+    "scientific_result": false
+  },
+  "selection": {
+    "state_multitask_ridge": {
+      "metrics": {
+        "cases": 18,
+        "required": 12,
+        "action_correct": 17,
+        "truth_wins": {
+          "neutral_visual": 16,
+          "reversed_visual": 18,
+          "zero_input": 18,
+          "shuffled_visual": 16
+        },
+        "mean_truth_rmse_rad": {
+          "candidate": 0.08332553496897983,
+          "neutral_visual": 0.1627335772900986,
+          "reversed_visual": 0.19237233854048522,
+          "zero_input": 0.38411019755114445,
+          "shuffled_visual": 0.17290806049921226
+        },
+        "targets_distinct": true,
+        "passed": true
+      },
+      "rows": [
+        {
+          "id": 1198,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.05114737388799646,
+              "target_sha256": "7c1a46c13521351acc27c8cd73e0e88319a8ec2e2abb6075721848200e649d7c"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.22423207063440112,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.194230648190296,
+              "target_sha256": "e1a27e755f7a20cf4e513af20cd7f826f66ee50c1e2ef0a305cc07e71a194d6b"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.29863489820317696,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1989610331613025,
+              "target_sha256": "efba2fb5bcbc372ef9307e82f731ef8da76f8a57e182e9dc0b4f9e3bdd565aa5"
+            }
+          }
+        },
+        {
+          "id": 1199,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.1015172353046271,
+              "target_sha256": "2f35c308dc1a32342cd007dd1be6bb5dc011afae08399c3445e4969095aec83c"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2020696410648014,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.2597766717923544,
+              "target_sha256": "d2afe3c3d2f8f73ce58800a63c67dcfef9d38a87d3081711786c52618df27d7d"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.3934372762373086,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.20560373141929084,
+              "target_sha256": "f2b2255534d45a18e163c9a284af4ebb17ce15b6afdad8f624b5485b7351299f"
+            }
+          }
+        },
+        {
+          "id": 1200,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.0550374673800948,
+              "target_sha256": "d32fd033c2855a0c8ea290790eee6de25dccffa53ea6fbcc6ce11406edcd60b1"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.06406527423758865,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.19295222585005764,
+              "target_sha256": "ba81543bb945ec780cda401252677260dd466c67b2ad589b81cf4e2e3670aaca"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.4063274403264294,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.103378682487598,
+              "target_sha256": "5db81657028cf5af1c51c2021cee5779b17860c7b82e6d19e9185ef7de54ced4"
+            }
+          }
+        },
+        {
+          "id": 1201,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.13013460296677534,
+              "target_sha256": "a12432ea2a4cbdac6831b6f4d240c0379e4ed9616c02fec421f117ea15990f18"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.21118752631289775,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16970436945326534,
+              "target_sha256": "d85d7769579688ac329dc875a1e5889201ef31a429f2e73165be357d03413314"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.3526693822946499,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.13651064162241466,
+              "target_sha256": "b62f2d759e3e1f660c60e7b72fb6c3160fbcd23228d2d55b3fb771e64e62aa55"
+            }
+          }
+        },
+        {
+          "id": 1202,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.22294769967170458,
+              "target_sha256": "6b97690b696ab42c34f99fad8c2bfe771c9596dcc0a8dd6dce1e86a4550f2884"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18924440002346923,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.30670677047823186,
+              "target_sha256": "e4b15f5ab8f65ec064f16d6c1dd8f30040dcc947729929bf70605bfad973568f"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.4071100285102715,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.13753997071157742,
+              "target_sha256": "009312c99199a50d1a711b01f3addd2a8399761a572fdff1ff3511803f08ba0d"
+            }
+          }
+        },
+        {
+          "id": 1203,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.082520692488846,
+              "target_sha256": "da2b6c54400d8e2089cbb07cca4ed7d2b978cf13f5bf0c9a6c9a2efd1c5a728e"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.06313032652794909,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.19069268077217916,
+              "target_sha256": "6133a047ccf2fb5c8df58e3556b7dd9b4e16ec621e36b81f3d80895385f3f323"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.37040932051681047,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.15353322302782305,
+              "target_sha256": "ed4efe7a093bc730dc59fc3d65d1e343df8e81cb1d2293637a9033c072052620"
+            }
+          }
+        },
+        {
+          "id": 1204,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.11882115323867182,
+              "target_sha256": "74a8bdef238dae2edb1b051e62689bb5bd19db1ea52c7c9955af4826a227a560"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2360409087053126,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.14373722057936075,
+              "target_sha256": "f31e1c112eb9c452f4c9ff45beb450f393a2f89aabf8500a3e2f39c996819762"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.46203975299486494,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.07638480724621768,
+              "target_sha256": "93d27fc89f19d0aa19dcaa0261c04916b31e2c3b94ceb74b92007f2d0d9d794b"
+            }
+          }
+        },
+        {
+          "id": 1205,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.06408906019453216,
+              "target_sha256": "5b7404f013a0fdc653e51a2765d042469cb38f72fd2a1edfd4c162b7d237886f"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18064925038817928,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.25351536366759403,
+              "target_sha256": "363403318d2c96f2181219ab2bd81cb9f922e75aaa4ef17dea4d5e6eb58be688"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.4018730265661188,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1782235778323586,
+              "target_sha256": "cec30b10d8c9207eefc80b63a0815466e2e49de59168d2d264dd1336b85fbae6"
+            }
+          }
+        },
+        {
+          "id": 1206,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04593374067324936,
+              "target_sha256": "fe38db9da38959cabfe8046bde153f7c49afc68c7b4f8fd33df70f811f2ddf2e"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.061097861619738396,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.06776317296813579,
+              "target_sha256": "734fd606f75bf40a3fe4abf69a401255a5209efa17c060cb18d9866a2eec453c"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.3829336501173031,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.12423885980086997,
+              "target_sha256": "3c02c946e94b6eccfb68b8fec1f8c8e8f292b2ebcc03fa8563f45ced474dfef5"
+            }
+          }
+        },
+        {
+          "id": 1207,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.050556099691017466,
+              "target_sha256": "0679a9969e6e4e42e0c06c0e5190127df04e90b2dbdfc209b44f8076dd14a4d8"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2362964178207691,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16557733316572704,
+              "target_sha256": "8b94253f4e0722839e3f77fdc86cb15d3b2a956e5e7d7b313dc117b5706a0254"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.4415724256614824,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.09560652915673723,
+              "target_sha256": "4a2ef165954851ca396cc794ae5afda6ba89523dc6b342262530f56d89a7504c"
+            }
+          }
+        },
+        {
+          "id": 1208,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.0978486343509925,
+              "target_sha256": "cfd20d2bc138407c36acfe36f05418c3ad8d00a49ebbb3fe387e0df78b4651a2"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.20564568528722996,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.23718061175349434,
+              "target_sha256": "9523f4d77dcc07af773cc7e9c504b8b306fc6028dc98754580149a9dec74bfe0"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.39634863652607144,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1584702181797942,
+              "target_sha256": "ca5063fff55563cccb5703b6ca81f199caf0519d5f621e8b3852ba43b5dec49b"
+            }
+          }
+        },
+        {
+          "id": 1209,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.020929023273422477,
+              "target_sha256": "f33bd736007c510fc3ad101ed47bdd2b394950ab8dbda9a68f10ba5bb760fa97"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.05088917571777679,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.10182782667580602,
+              "target_sha256": "48550ce27fd4d0dc8383d922706787e52e8dc9c7f20949a1e7f81b3aab4bcfe8"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.3874426556003547,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.16320731012914233,
+              "target_sha256": "bc522bf8989428b83f24a79d99eea96f1d5a88e38682485f12f5b03925ba134b"
+            }
+          }
+        },
+        {
+          "id": 1210,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.09027410434251233,
+              "target_sha256": "83b5fea35a712ac3f55df71309b60d92f62887483e56ae28b4cc803c7f779230"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.25096056610419815,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.21783220732500955,
+              "target_sha256": "351e1b9f08404e41815dcc70de1f15f75f336f007b8e8f200797b8485220311c"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.30776429146642215,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.27703873231735776,
+              "target_sha256": "e134963560bdd6b434bf309ab173d2c0ca4c9aefe7855970f8a82a61c6075b4c"
+            }
+          }
+        },
+        {
+          "id": 1211,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.08232253864381835,
+              "target_sha256": "8cb5ba7caf9b149ab16bf75e0f2edb26466f6a2f8b000fdb25a72d601090365b"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.1984277942056444,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.23893004523505026,
+              "target_sha256": "2f303ca2ff361f2b5b4a54256159338caa37cc37a24718460ba7fba6955c7352"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.4039328888084277,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.21522216800202976,
+              "target_sha256": "a20908e2ecf94aafa36378ad304d2dd9880e10f99342e47d198b2b3b02d7d1ab"
+            }
+          }
+        },
+        {
+          "id": 1212,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04431699668724857,
+              "target_sha256": "75bdb48693d01d82c03fb9c5f1c920d53c93684fde4610c05cf951d6a0813728"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.059989410167972525,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.18586139526354184,
+              "target_sha256": "735e621783d6514070503cac06133cf25a135f19acd676ff5c0f681203f0d6f5"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.39924219417660944,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1887878656107242,
+              "target_sha256": "e8f18d98f6de12ebe9cade909d04793a7566cb38c11a0b2cb371e0acc68c7a77"
+            }
+          }
+        },
+        {
+          "id": 1213,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.05187968342637021,
+              "target_sha256": "caf1cc5d37a70c41d0bb980126979bde2b59c4a73f51bd755cecf1a5536fdb37"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2224137005697032,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.20703095836949198,
+              "target_sha256": "eef2f2a1909c5b3bc81527c43db6e69ea5356ea94f45d5c73d4bae578519f18a"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2970651250703668,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.324070272424907,
+              "target_sha256": "7cdcf4dc6325e13f0849bc59929273207970fe1c2f3e452cd8b655da939f8e6b"
+            }
+          }
+        },
+        {
+          "id": 1214,
+          "action": "head_directed_grooming",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.16171236587638585,
+              "target_sha256": "77b9409a45d8c5fd74a4509dcf7b82ae66b3c7008af4ea1e08f7bae509663f88"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.20651128205853989,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.19597833981804474,
+              "target_sha256": "ff220617348d09c99e5c4ba24917e47c7b7459f72a01cb75565fd88ba7f67326"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.4311511283626108,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.22067236194190637,
+              "target_sha256": "f87c52739987af5969ffc6316b1e895a21e2c78aac67d290864ed209efd22c92"
+            }
+          }
+        },
+        {
+          "id": 1215,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.02787115734337169,
+              "target_sha256": "3ee9d9c6a14c031050812c54851006ee064666e5eaa93ce89e5026f810efa5e9"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.06635309977560323,
+              "target_sha256": "9d17008b44cc618165683940b9b45157e73b40ae513b1d1edf06934db9b98c75"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.13340425237109343,
+              "target_sha256": "4a670d36bcd302e7ac6887a5703476c41fa263faad57be32a2257ff3ef5034f0"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.37402943448132075,
+              "target_sha256": "92723b5c85f861ea9c0474e79861b74c4bc27742bede645a250c94fa39e04cae"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.15489510391376896,
+              "target_sha256": "d901d6fe2a7a4e3dec2ac018ce133c52e05515d2c501f076f549772d3c7a46ee"
+            }
+          }
+        }
+      ]
+    },
+    "state_random_fourier": {
+      "metrics": {
+        "cases": 18,
+        "required": 12,
+        "action_correct": 16,
+        "truth_wins": {
+          "neutral_visual": 15,
+          "reversed_visual": 17,
+          "zero_input": 16,
+          "shuffled_visual": 15
+        },
+        "mean_truth_rmse_rad": {
+          "candidate": 0.0873200608716594,
+          "neutral_visual": 0.1575191952512294,
+          "reversed_visual": 0.1610667967141728,
+          "zero_input": 0.1646081108306887,
+          "shuffled_visual": 0.16837134017390015
+        },
+        "targets_distinct": true,
+        "passed": true
+      },
+      "rows": [
+        {
+          "id": 1198,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.040884584012980174,
+              "target_sha256": "a59ec14e16ac4dcb1dc35ce92f90171c54b82f63e71bcb0b6ca6fc1e156ae68c"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.23711114616428658,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1666812084835447,
+              "target_sha256": "5f6641da7ccf2e55608fbb4996f2cc4f5a1147c58dfd91e05e85ce5eccbadeec"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.24495818543773276,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.2124346236108831,
+              "target_sha256": "9b31016d483e06758caf3e7b608c8c6e83a6c960adf361a2f5b11faf624efca5"
+            }
+          }
+        },
+        {
+          "id": 1199,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.09312094042716847,
+              "target_sha256": "13d5e2c0765b406fc7a503ae75ca896f665186f0e832eacb5744b060324c6be4"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.194071999405341,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.17775604183797944,
+              "target_sha256": "3be0d5d61b055666c8b8e27478ac902c69d476d642e7a9a777a979e210c5a8b4"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.096941606966557,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.22178821184005346,
+              "target_sha256": "6dbb44917ab89acdafd119c3fd91d308bf46747e6a039d3cc95d8a6e4aa677b7"
+            }
+          }
+        },
+        {
+          "id": 1200,
+          "action": "reach_withdraw",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.11413401568619974,
+              "target_sha256": "7c51b7db84175489d5b35d1135fae1a7f9042c28ce5fe253a9f2c9f2383464f9"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.04321271578814975,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16089292280776757,
+              "target_sha256": "75e8175fa1aa7d96de75cd4be7dd326ada0f30622ce4a0b2dacbc612256873be"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.14569321015945602,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1028571335395571,
+              "target_sha256": "791da409031d7f2cc77f507f50699de82be2665d7cb7b523e781212b7c8aeb20"
+            }
+          }
+        },
+        {
+          "id": 1201,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.1417213564152923,
+              "target_sha256": "efd079e82650d81c1e8fc06117406c6dd6a61746796fe3a9a77b77f52a291e88"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.1903619397546378,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.18955916465441955,
+              "target_sha256": "8057ebb5ff3b5f291b937d8cf7c8c1d25f8d371b95116676bc7879ec731785d4"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.21134751499973625,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.15690462403073116,
+              "target_sha256": "93db9d1662f060758b5e6b6936a3830e02752ae08f60d150be4103d00413e2f9"
+            }
+          }
+        },
+        {
+          "id": 1202,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.17043295772508407,
+              "target_sha256": "ea0e590f521d767ddcc924e1230893f16b6a0959dc0fbdce2b2dd54a19d68b8b"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.20482415654889224,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.11252497753128984,
+              "target_sha256": "f38bc7d4efc3ff44cb9caf6156fbb44e033f269e9fcbeaa2565605e6e281a6c6"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.10362096035449292,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.12127279445872297,
+              "target_sha256": "d575372d4d094745905ba03c6c3aa01f64357ef5fb0ff0f96db4bc2507e5262e"
+            }
+          }
+        },
+        {
+          "id": 1203,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.07416368811712303,
+              "target_sha256": "46e801e3c049271351563933151b9bd1bfe6a5dc02dbb87cf02a3901ec4de2e8"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.07085986668965251,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.15004471857424792,
+              "target_sha256": "f3d5de065a0c08a8fb190f4ec5f6e956c13a951fed40cc532d69d74d962ca3a2"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.16112485248720007,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.12455113150655282,
+              "target_sha256": "f12000a0e36b59386e5c973a65b3e808c4dfadfd9f79debbf5ab94a95ba9187a"
+            }
+          }
+        },
+        {
+          "id": 1204,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.09113856096116431,
+              "target_sha256": "46a0ec119120f8489432cacb449dc9014abb9cdc00e350fa9462016e3efcaa26"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18201935517658624,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.12500362731936987,
+              "target_sha256": "3c901fab9f47e3866a10dece396a0701d87675b395aee7b919e4046f277a66ed"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.21701281066526745,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.08430938512899551,
+              "target_sha256": "5404a61e1b428c575ac7e6b1eba481022822441ddee3e71b50434112d0800ac3"
+            }
+          }
+        },
+        {
+          "id": 1205,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.06388621241995142,
+              "target_sha256": "1b38c5b77d7f6f9ba450bc49fe0c7b1924ccd84ff8a9311f0327bc3717512265"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.1867505546828363,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.23818231887473262,
+              "target_sha256": "c6bcb28bc64e097d726fdaeb5cb8d62bbf467e47192cc90d427db0470e4ba3b9"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.08605045867129568,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.18744018207902508,
+              "target_sha256": "da51bfefd535f9997086da8d34a933a8ba7cd5d12e43c32bff5e6be10fbd3008"
+            }
+          }
+        },
+        {
+          "id": 1206,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04278604409163015,
+              "target_sha256": "0325cd25ae72e4cd73a7753a1f080170b7f301116b5cd27d3b6e77b81dc71906"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.05951959275499471,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.06837982267090666,
+              "target_sha256": "0609260cf31918ba6442aa984c21f5833ee4363acb8718cdc96e9132fffd1185"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1507782931759599,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.14100783712279621,
+              "target_sha256": "226bb6601a069dce2f61aa194c81626cc81066011a654f65e6c5098cdb7fe21a"
+            }
+          }
+        },
+        {
+          "id": 1207,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.027182389643503998,
+              "target_sha256": "7170d32272601e011c9732331144e5491e6bccf2811ff7165fc27c4a1b54f6f1"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.19200836769498203,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16486416755288588,
+              "target_sha256": "9a8a6e97669b474822af9cb718578ea5ea7a32e86e901af636b9510f64d4395d"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.20782546090218595,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.11728840071508925,
+              "target_sha256": "a935b3912515c8f1dea527309aa23d8da8d97ed812922ba691fe1b9d2f49d336"
+            }
+          }
+        },
+        {
+          "id": 1208,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.13791197034715977,
+              "target_sha256": "fb5671bab5c4cbcee1bc548912995330ba46def1e99b116d7e97b5a4f205b214"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.20321337178089902,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.19542320980516908,
+              "target_sha256": "eedcc149175c94efd71ffe288618cd86fd86846deedbf8de48a421f5724a5d80"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.10725724883112568,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.18770172824397074,
+              "target_sha256": "fd76dde23892a98dbd98492a01f0467ff7b0748367d45c0df5c765c524cc91b5"
+            }
+          }
+        },
+        {
+          "id": 1209,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.03144204527538746,
+              "target_sha256": "35f1e4be381bc7642a6649f26b7b406253d4e922d3398fb8253d0cf86116e7f5"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.05923212775622558,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.10416417849618607,
+              "target_sha256": "666104fef5912bb370816a0881c709349fe78d98b525117caab70fe172ea4c10"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1520512840415695,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1504217789856126,
+              "target_sha256": "bc7ce0ebcb6a8fe26d195d12cf65dc99916028066b86b484450335e34b8cabfd"
+            }
+          }
+        },
+        {
+          "id": 1210,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.11442187986260445,
+              "target_sha256": "23beea1e3f6f74c1f734c0aaff86fdffb36b3673cc073b61a3dcb4c2d6c65d94"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.26856258608904526,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.19064613878353445,
+              "target_sha256": "096c7edb3a302391247687ef766367873fca0e6cb9cdc1569b2bc5e8821377a6"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2691904695801698,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.2943865570903018,
+              "target_sha256": "7fc9d8ee4052eb5f29465a580afaa6028859d6a546dc60ca5936b87f76672e3c"
+            }
+          }
+        },
+        {
+          "id": 1211,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.09376716771404353,
+              "target_sha256": "556085364449c5c5c4f935434b2c44dde901628f91049f517f10695dae838f0d"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2088459758720381,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.24730748460391222,
+              "target_sha256": "1dd765fc1ca82b097a92d5ae5e2b7790b3ebf16f434fca4d3307ad8f54612045"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.10618433290991892,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.2049751862264746,
+              "target_sha256": "3e0c79a5cf23186c08708a00317ff4a5e1fd4fddbf81a982e39d422f4c5dcc25"
+            }
+          }
+        },
+        {
+          "id": 1212,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.06931110957064446,
+              "target_sha256": "34897fe3544e2d55a76bd73e335446ec4764f1449af7f36aeb96fd15d1f2bd8c"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.05064192617833058,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16043950771312457,
+              "target_sha256": "0aae77df45433956a53a41bfc08b117c252320079a564615f0af67a5ae94c853"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1415331658953392,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.14760612746201937,
+              "target_sha256": "cea3a502a09fd7d899e7fe44c513d5ed7939a63e69a9aebfc67467e825267a4d"
+            }
+          }
+        },
+        {
+          "id": 1213,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.054223322658843304,
+              "target_sha256": "84edcba15ae5b4c7ef979686d65664ed5e236d7828d865d84bede4f28f805dd6"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.24368744285693805,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.17063414126608337,
+              "target_sha256": "0b92df0d126637788fadfc02725ba395747e68069d92dc72d730f39f8a0a9d5b"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.24558029243579743,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.2493962172144768,
+              "target_sha256": "6b347905dfd5ba2f4b7a641f32bf77c57f7ea48c5989d6634a55680691f3e0d0"
+            }
+          }
+        },
+        {
+          "id": 1214,
+          "action": "head_directed_grooming",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.15325494906160408,
+              "target_sha256": "5ef19648b7d550616f4d5f07285e541c2a58dc0b8f4bbcebd80bd480a5dce467"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.1737611103013331,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1553591020648597,
+              "target_sha256": "d073f8cf443b77c9a9f42b8389a399568b2e445a63e64666d4123cbc5ec1b5b6"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1592611747770039,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.18417169363453195,
+              "target_sha256": "9c3752b0dfb72da8586c2896f0f230d63c6d290a9ad09af4e33555992221601a"
+            }
+          }
+        },
+        {
+          "id": 1215,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.05797790169948454,
+              "target_sha256": "ca592d44f56518dda47fbdd77467c3dc2da780619ee075a7834118bdfec03702"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.06666127902696,
+              "target_sha256": "2bd6e3446e52e06c42c1239337c06fe110c6b7bccbea82751935cadd185f6bbe"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.12133960781509683,
+              "target_sha256": "d8343dbcb872a081c7ec81735bda79ae593ac4cafa60d425f2110e426ab1cc79"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1565346726615881,
+              "target_sha256": "4ace61c3ff457815c79e9fa1be4bb77c165655645be491497e8cb8506ae2d390"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1421705102404082,
+              "target_sha256": "cab69645b68525ca467cd8c2931fb8082503928c29eec37e92dc30343d633306"
+            }
+          }
+        }
+      ]
+    },
+    "temporal_pool_ridge": {
+      "metrics": {
+        "cases": 18,
+        "required": 12,
+        "action_correct": 17,
+        "truth_wins": {
+          "neutral_visual": 18,
+          "reversed_visual": 18,
+          "zero_input": 18,
+          "shuffled_visual": 18
+        },
+        "mean_truth_rmse_rad": {
+          "candidate": 0.04920727759590701,
+          "neutral_visual": 0.14072267819211437,
+          "reversed_visual": 0.12660237745679626,
+          "zero_input": 0.23836056329650346,
+          "shuffled_visual": 0.12254288462693393
+        },
+        "targets_distinct": true,
+        "passed": true
+      },
+      "rows": [
+        {
+          "id": 1198,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.049658265964904864,
+              "target_sha256": "07c1b273d34e98ccc1585f8a43be18c76d983a20023e0141ca440facae823925"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.21709225209336586,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16922098804418498,
+              "target_sha256": "4e823ab43e57f6aa09339b93072643c96d62bd48dc3af929a906ae3ecff996e0"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.26676460431803584,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.17262639014445502,
+              "target_sha256": "75c8eb81fa86d749a30173846a214de074c2610ea244562f3d23226682a6141b"
+            }
+          }
+        },
+        {
+          "id": 1199,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.07016484397699903,
+              "target_sha256": "81babd14e4d098308ef6345466293c7a61db08fa7c1e81c4f97b543594336e3d"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.17443032588012675,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1456300301661202,
+              "target_sha256": "d0dc1d72c0aa1f66bc81b2ee829032661bc76e28dd4048ea319ecfc4f09f8518"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.20551207618127934,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.12185876693830126,
+              "target_sha256": "3a415fdc493dbdc70c997217c8e747b0e5ef334485e8eeb9a643c2cd3a35c356"
+            }
+          }
+        },
+        {
+          "id": 1200,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.021162098681304888,
+              "target_sha256": "4f119d2dde44811b2de762ece8c021fdfc6ae521fc0183883ef3f8818fbaaaca"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.027383126686736675,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.09810016394376883,
+              "target_sha256": "c29d332cc761fcf399627d3dd6d113dd1bbdb1fd14d39e982183085d3d4c9cfd"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.24237652563679704,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.11257683286012257,
+              "target_sha256": "8f90cbd502e321cbab0e294b5e468dfe4b97f6fb09940a48d5e223251718197a"
+            }
+          }
+        },
+        {
+          "id": 1201,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.07440371123127774,
+              "target_sha256": "d05169d06dec212e6be915dbe4cdd0369970eff351eacee2a36e761ee9f745b3"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.17582628904162156,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.11769258904536359,
+              "target_sha256": "1ca1db5ab407521a0fc03e251714b7090b5fd77e4d2e8b08dc96173cf098cbf8"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.19611109525670717,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1092108615313335,
+              "target_sha256": "a35a61302aa54f8cd9e08a8b4792285596bd8bceadb60c1241136c14b82a7ff8"
+            }
+          }
+        },
+        {
+          "id": 1202,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04226383220952561,
+              "target_sha256": "c1f98524abb1bd2eb0b3faa0d9bb7af30c6fcec17e037da65135edd1a6383857"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18378016251227494,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.11933965398042126,
+              "target_sha256": "3ee83a5152ae8576c9176fd35f6779b973725d2241f37c298caae4f9654a6c00"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.26427255813177086,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.0740260431639029,
+              "target_sha256": "52f5ff40307477cd59d27c58062183d38fadc11dd6ebddce43ca405f08e83dfe"
+            }
+          }
+        },
+        {
+          "id": 1203,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.03837992616696119,
+              "target_sha256": "017edb2fff114f8c89f99c8a6263fb0972dfcae6663f6fee06ee79c0be430240"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.05856112762239229,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.09427492638032803,
+              "target_sha256": "8a57368416358da77f80e127e1377b79fd2250cfed02f35910e1654cb1fbaacc"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.24235817770166657,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.10769779198142243,
+              "target_sha256": "c321b3d3cf27a23dcca762aa9aa11cca5c5ed3f7142b1acd81951bc8eba32428"
+            }
+          }
+        },
+        {
+          "id": 1204,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04707656481762443,
+              "target_sha256": "a8eb316dcc026b81b772f696bb5e4a1933294a615c590d15494f48e2f52c4746"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.17851071580928837,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.14301802934947605,
+              "target_sha256": "76c61792ca0c26e65ac3cc95ec2b6c89903c1ff3bcb5f3cae148dcb454c355d9"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2090766378703451,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.10027034818078533,
+              "target_sha256": "fc0e083ee132c1457997cb66cf04b40add71824e88ee413817374fa24ed952d8"
+            }
+          }
+        },
+        {
+          "id": 1205,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04367600977917127,
+              "target_sha256": "b65198bfb807112405650bc12245c7dd2b32b4f412c002a23d0b08d625606517"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.16408054002724135,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.11579930509834142,
+              "target_sha256": "602f1a33a71056e205ecad071991c8e017b858d76344cf8990ea0bdaf447c634"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.23677408447416054,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.09359239842519222,
+              "target_sha256": "812288179d443561a754aaa49d30c01e798dfbb1d48783a2af5b9eebd8ec2cdf"
+            }
+          }
+        },
+        {
+          "id": 1206,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.02385615241711679,
+              "target_sha256": "4e8653a90a3b50bc8d678f7a4b1531829388f177a49adbb09868f583504b6a06"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.04157400711273275,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.09655848129658673,
+              "target_sha256": "df93458de0c47ab28f7e416b5ae357d4d48d1a8489ee69f6d3f291eb64ea0ff2"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.24208959533839938,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.10459436002827383,
+              "target_sha256": "0570bb6015e31b22a1da4563f5d77300e741913d2e8a1906cbd8014e6d3f77b9"
+            }
+          }
+        },
+        {
+          "id": 1207,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.027034670842826247,
+              "target_sha256": "4a9ceffaa395a2ca52cd9e812d12e905647058295b02f8b310d7a8eb15814619"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18093535873396624,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1422200577692079,
+              "target_sha256": "3a69d80bfb4fe26309dc4e319bcfc2550a65c2fd300351bd6c9d3ceaebf52a7c"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.21024505330332705,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.09204812309323879,
+              "target_sha256": "a7182d5deba8472dd87b1bd30ff6e6abd0c139d82f0d87d6325486daf41189db"
+            }
+          }
+        },
+        {
+          "id": 1208,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.08880238135325452,
+              "target_sha256": "9db58f80a6c957872ce6f9ffe45c0600ad25d5e9e1a6366961336fc14a4153d6"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.1850920654440976,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.11919103289796576,
+              "target_sha256": "0064abacd7f9f4437aced8529b0ddab1474f3550f732acc0ff2d08c06bf14cb0"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2284561222244993,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.09572884854781535,
+              "target_sha256": "bc95aa8988cc4c4c178a71c4111c04919e31cf62775e288b2383ccbfff35a2af"
+            }
+          }
+        },
+        {
+          "id": 1209,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.021775657817615656,
+              "target_sha256": "234301655902f8f29f01476daa58fdb122f860f9f4ae1fd34063e337f81b1447"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.042780559742617484,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.08533414872605843,
+              "target_sha256": "67fc2a5eac6a3ecba49da246b4e8f98e951b78cdb59824193ff772b7841013cc"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2510118949544691,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.09076785445433774,
+              "target_sha256": "1a1254e73cee400cc2034554740423f9950101d2f3608c082992375ffc08b10f"
+            }
+          }
+        },
+        {
+          "id": 1210,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.06035474814176328,
+              "target_sha256": "8bfa86b130c56c6be8983f4498b64aaac4a0e00d87e9b60efb283b474df38f0b"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.24822283498334247,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.19427825305264804,
+              "target_sha256": "a8d95d620656dfa7fb24cbde02e38cf45a016f227eb94a55d4585b289ef2f5af"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2998175063352238,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.22038380012281078,
+              "target_sha256": "9faa62f09169e6888646137fedfcfc0168f99916dd5c5b64405a3aadaaff92c7"
+            }
+          }
+        },
+        {
+          "id": 1211,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.06906969579000692,
+              "target_sha256": "e71f5af299a2733982f55aa7aab683b9156f97712d76215c54e8feec7d999f07"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18928343944255635,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.12255126562315208,
+              "target_sha256": "782ca5cd2a1b145bec6097ed7892b319c18296606bebed046baf42f10ef32808"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2578827126046619,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.10432930712037737,
+              "target_sha256": "b8ea535ac19aba37bb34b0c6ea16ff121d37a0779a3aef3f1263ef962492b5f8"
+            }
+          }
+        },
+        {
+          "id": 1212,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.02687808303710426,
+              "target_sha256": "7639eca482a9d20e51e1eb120e26f9ec0c6b7c869d0ae4df0d9f19b5715795b2"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.02698224188595198,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.08497518336520833,
+              "target_sha256": "2a03544da64c4d247d34b8287fa8cb8106d6c6b37f180981ef8c67be5a6e1b63"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.24633576580545552,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.10177311941991544,
+              "target_sha256": "4e7f746e8146baf8abb44085f00b60a9769b739fcf48a7d0b3e04cfde1bab51c"
+            }
+          }
+        },
+        {
+          "id": 1213,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.03699003075695894,
+              "target_sha256": "2ca0cee131799abf201955ecbd6c37dbe2c6144b64a11a9fde6bdfb921e249f1"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.22106518017300605,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16754929209429953,
+              "target_sha256": "26547523c40b48b218eef215fe5311a8b0fb25b63763168d810dc81ac605fecf"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.28231406035453693,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.20258278188106996,
+              "target_sha256": "65bcba43b6df710885a1383dabf5d0155e4cfca860e9db6fd26cfffe497c3c3d"
+            }
+          }
+        },
+        {
+          "id": 1214,
+          "action": "head_directed_grooming",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.1160850795153155,
+              "target_sha256": "4a51472028698c0848e4d24c7818b125d93adb81eeb73a56116d0d3e7461b980"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.16600778286808324,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1601785847418875,
+              "target_sha256": "0a3485effc88d9646cf7751c99fe2c6465d4c665b227a37770cffad89960a91e"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.17128027019017653,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.16872605745323893,
+              "target_sha256": "a31f7b3cbc666976b7aaf7e3fc95920d26ddea30a4d7e5925825dd219ea4e5b5"
+            }
+          }
+        },
+        {
+          "id": 1215,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.028099244226594912,
+              "target_sha256": "86355e46474af5afd2521b9afd5d18c1911cc44615902f285c7b281d3c2f309e"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.051400197398656686,
+              "target_sha256": "5a7ea1f9b7c4ed69c11d5374a13bbfe69c8eb84eba8c5fe368ed75d04ea334d1"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.10293080864731367,
+              "target_sha256": "a7cbf9a71f9144f8438c7f157c667f1acec7a7f38f7314e583afcfae7ce1fee7"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2378113986555497,
+              "target_sha256": "92ab870890bc830d1b6695841c8162bc0b2fded1fec8855eddccbd263a7494da"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.13297823793821736,
+              "target_sha256": "7fa7e0aeaa1518ad057b35b7eeda810b2cdb8ae268129cef530a6881d92b9b93"
+            }
+          }
+        }
+      ]
+    },
+    "temporal_action_experts": {
+      "metrics": {
+        "cases": 18,
+        "required": 12,
+        "action_correct": 17,
+        "truth_wins": {
+          "neutral_visual": 16,
+          "reversed_visual": 16,
+          "zero_input": 18,
+          "shuffled_visual": 15
+        },
+        "mean_truth_rmse_rad": {
+          "candidate": 0.04468868132968065,
+          "neutral_visual": 0.13557359198109692,
+          "reversed_visual": 0.12198169207937545,
+          "zero_input": 0.18762419334499914,
+          "shuffled_visual": 0.12282582720022815
+        },
+        "targets_distinct": true,
+        "passed": true
+      },
+      "rows": [
+        {
+          "id": 1198,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04390823077987934,
+              "target_sha256": "b7f0c055ef6d9585267839a7e7278a51f1160e87298d1a032728d5d2af672762"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.21451936711871536,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.21953775457234956,
+              "target_sha256": "b87155f0fb2ce23f1aaa228c0b9b6a9e723681bd1de0e863fc60438c418f5594"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1876247419236171,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.215628107139961,
+              "target_sha256": "946141bddaec1af583a6aa66f0926966d2b23ea4a9b45a67b06221ff38d720a8"
+            }
+          }
+        },
+        {
+          "id": 1199,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.053496543085607084,
+              "target_sha256": "32fcdc60cac8eb245aebdf9ffb8e76e2e664f2430816d97b0c88a88d327de7b3"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.17308498715827347,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.11456041661906835,
+              "target_sha256": "3881d7ea5335ae963bc8986d67d9c8bc038a21004ffbb8692847bf4e4a7c7d66"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.20679682369087996,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.11413035970102028,
+              "target_sha256": "d4cc3c24fe4e0fa6f9de003ddff5020a23a7221b2ec672e89d03efe0b30ab455"
+            }
+          }
+        },
+        {
+          "id": 1200,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.0059565957726753485,
+              "target_sha256": "58ff06e0b3a71ad99c0d92b91bc188f693a044d284c85061b15c9105f21b688f"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.01548183072213087,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.01170199550877676,
+              "target_sha256": "5c97113ccc57500d9cbabe4d6b65b0cfda428d275cf7bbd99f7aa49da119603f"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.16160175148120645,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.159843270573903,
+              "target_sha256": "7a905ec6ff6ada7a8816ffb3119639db7e10920ead08874df3eb2874c7efcc7d"
+            }
+          }
+        },
+        {
+          "id": 1201,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.08810637780281616,
+              "target_sha256": "ce8ac24d619bba9d58bd6eb696056cb318c9b62d742d2f1963332acb032be4a1"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.17339511697706902,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.2067118336238766,
+              "target_sha256": "d32788411ac913f8337a5888e73c43fdbf56eb745c1fa83cdacda11031e01b7e"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1507395233737777,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.08477339568696325,
+              "target_sha256": "dfdbb91f21649753af0a48625f97a283f4b38ff57d8b9625afe22da050f6dabd"
+            }
+          }
+        },
+        {
+          "id": 1202,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.03818273557822819,
+              "target_sha256": "a98a9a1bdba1ff54990e39a8397d5ebf3801613b705c6e9dfb94451495ee78d1"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.17797274265497715,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.2023410617348509,
+              "target_sha256": "f960cc3155ba94fe311688fef270c4b4ac6be5e73f252e3c51a3bf785224e477"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.22155388749658517,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.05501119464090614,
+              "target_sha256": "769ddc599e55c7520f00bdc05379e06e3e9152898126a48fc5b2e0c97cf95c73"
+            }
+          }
+        },
+        {
+          "id": 1203,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.01908938374020543,
+              "target_sha256": "0530658499abe4469dddcc00fca5e8b3327f227b004e4dfeae5cc259143b967a"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.04425851678035337,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.03907764285428141,
+              "target_sha256": "be652f3db840ded48f7727649e3cdd6fb8b1fb127d3e59c5c9f79e688d99f5c1"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.14951023972147595,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1533410081377291,
+              "target_sha256": "5c7f0286b192fe7ac7610ad51014ed78f3f836b6c67595740ad8f02af62b9832"
+            }
+          }
+        },
+        {
+          "id": 1204,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.038709517025594734,
+              "target_sha256": "5272f472869abb965d5ec7eb9e1a3770aa443b89b3131ea9015798426e26e056"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18831964205402604,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.22435119405487502,
+              "target_sha256": "050a89acec526d44135ec444af654c2fa9384767390a0d2338ca25575e35eead"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.18794003966221046,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.10578244926506405,
+              "target_sha256": "5c5358c1bc6f0ec9d278251619bfde5433b4d93b3ce5e7e58d1c261f58888495"
+            }
+          }
+        },
+        {
+          "id": 1205,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.033505204733117785,
+              "target_sha256": "d9c10e25da8f7cea60dfbe73393c87ea43a2c26752856e795bfd5f113f16aac3"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.1614588534523597,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.05348325385315378,
+              "target_sha256": "407dcf9122c3a4b1f8d526be1e5de9286eee3c78b883fb1d143e4ca704c3344d"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.21378053957663853,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.053391062254960646,
+              "target_sha256": "34447ffe7ac35f0eb90ec8af31fdc4b70ca3a6dd5403c96afcc9eb0d3579a32c"
+            }
+          }
+        },
+        {
+          "id": 1206,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.019951916447644373,
+              "target_sha256": "2cec82d8e9d33a58e449bb716223940092d5cb30ed5418860a2c75c0d5ef9abf"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.02806463841254282,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1410468220942129,
+              "target_sha256": "830c1894f159c949d01fcacfd030ff5765b72c374800f2306be9b48ce576736a"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.151537144783601,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.14824774536482271,
+              "target_sha256": "a460fc31a067493b5ad1cbd4e779d9c66558f8456532329aecceb03f4e3bb382"
+            }
+          }
+        },
+        {
+          "id": 1207,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.01926493169353532,
+              "target_sha256": "5da29d6cb3588a2ca9f66846361cf047ba560e49a3db03baee67e4e847b0896e"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18890747570286143,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.2210674414988106,
+              "target_sha256": "1fb80d84886ef3c3b8c5b7c0cef33aab3d0698dd1fc79c8d33b3993fea45e48c"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.19787349242020738,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.04473268966098227,
+              "target_sha256": "a48faca2e8364682e283bd2a0f7fdf63fd30a4053fa3e96e14ba200653e3781d"
+            }
+          }
+        },
+        {
+          "id": 1208,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.07384891564090042,
+              "target_sha256": "80d1f68c2f2ca4adc93fe75aa9d3474803806876d86b087d75d48c62a56b3127"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18146699783041814,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.09649270208549746,
+              "target_sha256": "466d43b43986c378edac1b948ebca79990037a16ed559c07bf781ce1c7fb0d8e"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.20874895227630877,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.09173789356275937,
+              "target_sha256": "d954f8df353bd0b3a702a6e1a294e1e3f82609ae440ce0765c5bd3966f60e9d2"
+            }
+          }
+        },
+        {
+          "id": 1209,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.019859592871083145,
+              "target_sha256": "4b04fa781a9e9a51c36f7bcf23455391eef9b1b0ec9dcabb6e033487490aafa3"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.022275148168545127,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.023791726852783832,
+              "target_sha256": "d44032f663c0f1af948cbe73aa695b9ba36ae41aaaff6d88cb4094d2be325fec"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1609098524296428,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.02194104178591877,
+              "target_sha256": "46cda9475542a44377b833fb26bf6d9f4c742ef6c5fb8a9cbf6b86267ca7caef"
+            }
+          }
+        },
+        {
+          "id": 1210,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.04394812447384405,
+              "target_sha256": "5702561ca64e352a1fb3c7a1f75d1062e320a92bfa6968db535d7ae0709d095a"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2466983002491061,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.1575985281086724,
+              "target_sha256": "280daaa1f9e5115ed8680a95378bfaa7cd217c9ce51e953254e5d4ae3417eeeb"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.22739311619212665,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.21422530951699742,
+              "target_sha256": "760ef0def95cb268d3449c7f637d8196c537710d0230be0236061ed669b5b34b"
+            }
+          }
+        },
+        {
+          "id": 1211,
+          "action": "head_directed_grooming",
+          "predicted_action": "head_directed_grooming",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.06418127601488839,
+              "target_sha256": "cd91c336bf8807a1d11640144d4fbc128eb35109e88a2d188e059344cff5d2aa"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.18371413578168483,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.04385849607028504,
+              "target_sha256": "3a194627747bdba23c3da73905ca842fafe091673aab7bced9de58034acf6077"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.21935517395810158,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.05967779790383397,
+              "target_sha256": "397310cced3a28ee1baea3385deb475ce920d4bcfbd3e9b1135b92b2b95f6da1"
+            }
+          }
+        },
+        {
+          "id": 1212,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.019867194162981935,
+              "target_sha256": "45cacdd693598156ea314c31e35e4ba0df69a6991b979776a41380f8d3bf8c3a"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.015189919396567074,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.022048996232983595,
+              "target_sha256": "50c29a8358880d670816ea7ead2f5018671857a13246a775f8db7e82736b7987"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.1588118575305475,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1516216117446695,
+              "target_sha256": "bf57161653f5bc11d34524aa8544e32549dc27b87429f94f8d16b97c5c61da44"
+            }
+          }
+        },
+        {
+          "id": 1213,
+          "action": "foreleg_rubbing",
+          "predicted_action": "foreleg_rubbing",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.030494150412389717,
+              "target_sha256": "bea860666956c20b3b0eed0ab524a0b05db95f588c88c3e0b6bd0cf77f429f14"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.2174934899157289,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.2220063463486168,
+              "target_sha256": "ea45cca241d80c4ec0c7e71d95327f7ff36a138355b64705fd8d3447e044bf71"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.2075979639272326,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.21093023165623262,
+              "target_sha256": "24d91e7195a25e4dac3e741efc55fa3cad73ca22b6f511eca2ee23250c80f509"
+            }
+          }
+        },
+        {
+          "id": 1214,
+          "action": "head_directed_grooming",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.1724846921548548,
+              "target_sha256": "313aa57450bbf7a7a263f5c42a83d7a9da10347ed54d043d7912be39985665c0"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.16976084353836468,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.16472228829161528,
+              "target_sha256": "15448cf387c6d97be6cac14cc320a7935ed0fe646e1f66387394873ffc3b60d2"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.21795441564392876,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.1630375614259362,
+              "target_sha256": "a2a3656dba8b13379d0ae58afefee984dff10c6b817546d301e7f5ca8034ab00"
+            }
+          }
+        },
+        {
+          "id": 1215,
+          "action": "reach_withdraw",
+          "predicted_action": "reach_withdraw",
+          "controls": {
+            "candidate": {
+              "truth_rmse_rad": 0.019540881544005406,
+              "target_sha256": "e482677ee56fb49ec95c3c446f31cf37722b81620d5f7331909a1f4fa29766f3"
+            },
+            "neutral_visual": {
+              "truth_rmse_rad": 0.038262649746020436,
+              "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+            },
+            "reversed_visual": {
+              "truth_rmse_rad": 0.03127195702404795,
+              "target_sha256": "4860634c7c89488a5d0261c18be3dedbd589d1cff7caba7df1d95429c0bd777a"
+            },
+            "zero_input": {
+              "truth_rmse_rad": 0.14750596412189573,
+              "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+            },
+            "shuffled_visual": {
+              "truth_rmse_rad": 0.16281215958144643,
+              "target_sha256": "61b64534ccf974b9a1893345ce1bd4ee737929138c8e0c5d8f6b7b3dde26e14d"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "selected_model": "temporal_action_experts",
+  "selected_model_sha256": "1bbb15cd398f2cba944cabf38cb49abf83b878bf28127674ff94caced5fa69e1",
+  "primary": {
+    "cases": 18,
+    "required": 12,
+    "action_correct": 18,
+    "truth_wins": {
+      "neutral_visual": 15,
+      "reversed_visual": 16,
+      "zero_input": 18,
+      "shuffled_visual": 17
+    },
+    "mean_truth_rmse_rad": {
+      "candidate": 0.0383139573376573,
+      "neutral_visual": 0.13742052214782724,
+      "reversed_visual": 0.1626018552324153,
+      "zero_input": 0.1884249357538474,
+      "shuffled_visual": 0.12285378055682175
+    },
+    "targets_distinct": true,
+    "passed": true,
+    "development_candidate": true,
+    "scientific_result": false
+  },
+  "final": [
+    {
+      "id": 1216,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.07701906607485877,
+          "target_sha256": "c165ee56a7c3fdd46600d3048a24b5c236f212a327536aa46336ddd4678e4a77"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.2096960744678498,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.21654713087146946,
+          "target_sha256": "a5b0d0ff87a24b4b43526c63266bc80a11030cadd47d69c9bad02d7b6052278c"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.17897045839933498,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.15539106606928121,
+          "target_sha256": "12abb6d0df520294084ca9d47aa6e65b74ec0fec2d0137687acb86f39332903b"
+        }
+      }
+    },
+    {
+      "id": 1217,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.04970338214337781,
+          "target_sha256": "c1855b7dba23811919fc6b03544868326cf30790e8d9d57fa9230c3d0127c4ff"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.17277512619023144,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.16922060199956682,
+          "target_sha256": "bd6481413dc4eb6f11d98f56587571f46a322486cc5016e8f187caed69c3267f"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.20735479400260484,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.09580626066521208,
+          "target_sha256": "8ad2da0c47a484b1dcd83484d34da3c19a052c2b218f61413a4f52c55dd663d4"
+        }
+      }
+    },
+    {
+      "id": 1218,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.017791154981790524,
+          "target_sha256": "1ca97f713a2f0573d3f96d799c34ac442f486f8da92abbdb8b1332686af9379d"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.008974615733355753,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.02221469946715497,
+          "target_sha256": "08c8d2aa819d3aca05abaf63b2b1d5b4bb8d767f69d4cc1d15628265caf39af0"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.16172092925203727,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.15776604172633296,
+          "target_sha256": "20666f02107b413384080162c5d76fbab78f6415666129cc7d99dc0dfb127eff"
+        }
+      }
+    },
+    {
+      "id": 1219,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.04056117071604821,
+          "target_sha256": "1bf22cc3d85b118b7f2d8328b63afae2fe13f3d8d5557eeed33ee6c603b8d019"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.2231952554977488,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.2305105448351889,
+          "target_sha256": "6e3130988a1e3a82d490ec0499627f16d1812d707274818853e68cc410203000"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.19812352269415306,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.14558651510943427,
+          "target_sha256": "06f6aa7c4dc787230a1b0049c12e46e9fcfa0d2923957686d9368f257279b0c9"
+        }
+      }
+    },
+    {
+      "id": 1220,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.024638847109494193,
+          "target_sha256": "327ee44d1f850f60b31b5a0c35ddd4feb72d29ac9ee67329eb4b31419c61998e"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.1776795031172028,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.2233623650840038,
+          "target_sha256": "8832f0da9baead6a0ce890ff6580fd63ef015e465da076624b3e0b47cd20723b"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.218338868573305,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.07796176241515991,
+          "target_sha256": "78447dc2c3743ca9e09ec46e0f74d762a9378f03fa4132308cc272f7da22305c"
+        }
+      }
+    },
+    {
+      "id": 1221,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.012890405959510643,
+          "target_sha256": "682e332d119f18583228de711569fba7d6eed12b5730f92183bc073132c6564e"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.046689732455385144,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.1595266154798659,
+          "target_sha256": "dc8d0339fb3e7853513eeba8bdfb44dd47b52a798560e53014cd314e52f03772"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.1558012322492943,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.1619425193746613,
+          "target_sha256": "bec31604fc0db8ce4b021eaf6d0f36b8a2d04d11b389cec53a8288fa00761425"
+        }
+      }
+    },
+    {
+      "id": 1222,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.028594072224088277,
+          "target_sha256": "fc769df551dfa68545c2ad1a9431d1ed8bb0c1daa73230d712213ad4b1737e56"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.20786941470165224,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.2285149158634529,
+          "target_sha256": "9652df7af1f4d597ef0f8d511b0e8136e6ec7ac0294d1be2722ae921fda8a423"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.19167736882965863,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.08959579539588171,
+          "target_sha256": "f6a26089eae6719e404d0980073a33773c5ea8a8d9df982ef3aef176fe594b0a"
+        }
+      }
+    },
+    {
+      "id": 1223,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.054298449425060465,
+          "target_sha256": "49a554a534f993c61f89ba68ec330cea3e174b28be7fe4b2a5917e1a973ede4e"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.1634232917382167,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.1663574058958148,
+          "target_sha256": "4b33d68c5bc088e8497cec29506cc300576266672288a80b57f4fcd5dd71a78c"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.2119328226554777,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.05901898823170551,
+          "target_sha256": "c0ebed60de33551738cf377158308ce38eebef6fd76a3fff8b1a9aeea187a117"
+        }
+      }
+    },
+    {
+      "id": 1224,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.01939268533838412,
+          "target_sha256": "146b3849c604327b3dece32294cadb508207376e2825e3775d16c428c4de50ee"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.02491259928763421,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.014682632771566072,
+          "target_sha256": "eaaa42df33035cb841bd5755fcf209dbb5d54bf8c0164b129d5c5b887aeb34ad"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.1488394423005432,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.14692204119886246,
+          "target_sha256": "3bcedfd5f8813bf72345a6947de3bddcf2771c5dac176dca127eb469f2c43448"
+        }
+      }
+    },
+    {
+      "id": 1225,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.024020780427367872,
+          "target_sha256": "2d1e376b7b394f22324ef1cf457661a9011d65fa969e26fdf9ebb290262f3b94"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.1889684481211987,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.21922023770282414,
+          "target_sha256": "a8204fdad60b6dc833e728855d6897828a383ef60eeba17b24abf1502e78bdc0"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.2016983026126891,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.04991832518966091,
+          "target_sha256": "5638e19b884546b76a84e8bc6c2614fe3f6d9723ad137079e6ca18a7e4612e2f"
+        }
+      }
+    },
+    {
+      "id": 1226,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.039872408645495766,
+          "target_sha256": "88a82017d73fe155cb87eea3341fb886d798e7dd9e403a1ff4020780b8abc42a"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.18087293395699977,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.07512507731293525,
+          "target_sha256": "77bf9ad80b91fba87560f1f3367067daae3d3f85d360d1d64d8e62509a7cfb59"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.22108400373491624,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.04618794914732476,
+          "target_sha256": "873b923e9d96fd01f267e88029ee1306ba9d77ed3560402fb7b04a1936ff336b"
+        }
+      }
+    },
+    {
+      "id": 1227,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.025342100411751972,
+          "target_sha256": "63d9a15ccd0ba4f404315ef32515abf5994fffbe4caa729a43d6304904b04b09"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.019085600336077122,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.1467921957938691,
+          "target_sha256": "e6084dbfe405e9075fe59d610c2758c0bba074dbcc05b7a9e6d63db7332738dd"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.15936680770381176,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.1539483635445171,
+          "target_sha256": "3857cf269910dd89ef11bcc2acc33818904aa2bdca251c1785740e41d13d8da4"
+        }
+      }
+    },
+    {
+      "id": 1228,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.04016390964417938,
+          "target_sha256": "96f0506f4547fc3c90e5040f8d486ab62f8b7dbfb10bdfa4022faf79cc3a9eb5"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.22175533609494955,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.22914544747776527,
+          "target_sha256": "b3bae2a82859bc2c74fff7b9b54c0762a5819928455f8f23a4954da4039f7df2"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.17888702265059223,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.16324912691215998,
+          "target_sha256": "fc691429278156e61b844f84f225cc9e0712440016bc03d9e9c89fa84e62d308"
+        }
+      }
+    },
+    {
+      "id": 1229,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.03662126907872477,
+          "target_sha256": "89175a27c713a3b9347b89f2f66653225ba1be6f28497860c3d64b83c31688f6"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.1844437825743377,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.18280843914527167,
+          "target_sha256": "8a3a72e4c9d52f7b7db962aad978c501cdcf8426f0c91d3c98d1979670c79a47"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.2183522778903884,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.12140210141958539,
+          "target_sha256": "c84ed5dc5648f69251d8e7c952bc369b98161480b9d04c76df34f5f9336fbdf8"
+        }
+      }
+    },
+    {
+      "id": 1230,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.02425910983553011,
+          "target_sha256": "cbf49e08a3e06a41c680f18672de8e059cdd97bbec1857fa60b391337cd90e54"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.014109979383043224,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.023118803179520024,
+          "target_sha256": "4734d410222313c328e7f78c0d1263482ede2217f87fa845bc7b94cc5c50dc6c"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.15844060754875605,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.1546034364914655,
+          "target_sha256": "16fae61d086b8b3ddf92661e9ae7959780224dde921f8d03adfee03d41f18721"
+        }
+      }
+    },
+    {
+      "id": 1231,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.07975886495641446,
+          "target_sha256": "d9a2477b69956d6ad84b4a24f3f01b358f8364ca0d8dad6e07ba0df9bf7683a9"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.22059616640546917,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.22266970636379418,
+          "target_sha256": "8353aebc6375545628f7a4067ec81d076ac894e7547117b8d2fddbdcdc45c87e"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.21457879303260094,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.209257798935935,
+          "target_sha256": "cd93e68d47148cc8f17f9e41aa1241d0d4874c8841a7fa38f97caabff61e5588"
+        }
+      }
+    },
+    {
+      "id": 1232,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.07148121221473244,
+          "target_sha256": "c20bbb884db6c7ac7febb710550dd4d6f96c727c1e05a7616ba211aad25585a3"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.16964457609556222,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.24686248108303077,
+          "target_sha256": "2cc80515b002fc911811ec8e0102ebbf2cb0c24b04389e0ffe82fad74d67a587"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.21763585370757274,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.07050548737993682,
+          "target_sha256": "532d21b22d9405d1860e77e855a54e1d81c55d943982c668dae52e33b618d430"
+        }
+      }
+    },
+    {
+      "id": 1233,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "controls": {
+        "candidate": {
+          "truth_rmse_rad": 0.0232423428910217,
+          "target_sha256": "80093dde770bcb4e6d61e22abd5971f0fc0958232ee27ca2bd6c670aa09ff08d"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.038876962503976376,
+          "target_sha256": "3600e83b341a963eeaec5651dbea0561cfff46d931c741819b200eede7527a5d"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.15015409385638134,
+          "target_sha256": "de53fbadcababfc3094803208e37719a099673f0f33cababa09d6ac5c0eb7528"
+        },
+        "zero_input": {
+          "truth_rmse_rad": 0.14884573573151672,
+          "target_sha256": "f08aaf5e0668318e42514baf549b99e6a9f7671829c4ab1b0b7c409dcd3be908"
+        },
+        "shuffled_visual": {
+          "truth_rmse_rad": 0.1523044708156743,
+          "target_sha256": "a3b6cc189a6b08a7d6534caf9299d5d8f8cfad580e708665fec6e3dee1ae386b"
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Supervised engineering development uses generated action labels and actual demonstrator truth.",
+    "Selection split chooses among four declared ideas; final is untouched unless a model passes selection.",
+    "Even a pass only authorizes separately preregistered physical Series106.",
+    "No biological vision, FlyVis/FlyWire, living animal or mirror-neuron claim."
+  ]
+}

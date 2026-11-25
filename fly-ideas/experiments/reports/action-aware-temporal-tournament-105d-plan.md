@@ -68,3 +68,7 @@ Double-click `experiments\RUN-ACTION-AWARE-TEMPORAL-TOURNAMENT-105D.bat`. Choose
 ## Limitations
 
 This line is supervised by generated actions and actual demonstrator trajectories. It cannot rescue or rewrite Series104/105B/105C and cannot establish biological learning, FlyVis/FlyWire/connectome mapping, a living animal or mirror neurons. Physical Series106 stays blocked unless the untouched final gate passes exactly.
+
+## Genuine Windows result
+
+The fixed workload completed faster than the15-hour upper estimate but did not exit early:90 train,18 selection×4 models and18 final cases are present. All four models passed selection; minimum candidate RMSE selected `temporal_action_experts`. Untouched final passed: action18/18, wins neutral15/18, reversed16/18, zero18/18, shuffled17/18, distinct targets; candidate mean RMSE0,038314. `development_candidate=true`, `scientific_result=false`. Exact JSON SHA `59f8d54fbc7c062c068259d455484f643844f33092e655e195acb170cbfb9ad3`; selected model SHA `1bbb15cd398f2cba944cabf38cb49abf83b878bf28127674ff94caced5fa69e1`; files `action-aware-temporal-tournament-105d-user-result.json/.md`. This authorizes separate frozen physical Series106, not a direct physical or biological claim.
