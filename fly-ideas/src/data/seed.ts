@@ -253,7 +253,7 @@ export const SEED_IDEAS: Idea[] = [
  { refId: "r-vogt2016", why: "Анатомический канал зрение → MB, по которому идёт «наблюдение»" },
  { refId: "r-aso2014", why: "Логика DAN → KC → MBON, куда встраиваем учительский сигнал" },
  ],
- notes: "После завершения synthetic roadmap и остановки Stage91–96 пользователь выбрал новую official-body линию. Series100 подготавливает короткий FlyGym2.1.1 preflight с двумя NeuroMechFly, MuJoCo actuators/forces/ground contacts. Это не Stage97 и пока не visual imitation: observer получает задержанную diagnostic motor command. После настоящего Windows go разрешён отдельный frozen89E→FlyGym adapter prototype. Биологический mapping Series90 остаётся закрыт.",
+ notes: "После завершения synthetic roadmap и остановки Stage91–96 пользователь выбрал новую official-body линию. Series100 completed на Windows: FlyGym2.1.1/MuJoCo3.16.0, два NeuroMechFly по42 actuators,720 physics steps, finite, real forces/contact, все9 technical gates pass. Это не Stage97 и не visual imitation: observer получал задержанную direct motor command. Теперь разрешён короткий frozen89E→FlyGym adapter prototype. Биологический mapping Series90 остаётся закрыт.",
  }),
  idea({
  id: "i-interference",

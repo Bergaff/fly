@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v640-session-2026-11-24-flygym-body-preflight";
+export const MEMORY_VERSION = "v641-session-2026-11-25-flygym-body-pass";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -494,10 +494,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Новые Stage97 runner, seeds и расчёт не создаются. Зафиксирован итог линии: Stage94 frozen pass против shuffled; Stage95 no-go против learned-sparse/RNN joint controls; Stage96 подтверждает structured classification и hybrid-vs-RNN54, но не проходит learned-sparse all-budget trajectory/dual gate. Общий candidate отсутствует.",
     limitations: "Нельзя позже представить Stage94 как финальное общее преимущество, скрыв Stage95/96 no-go. Нельзя постфактум сузить hypothesis до few-shot/classification и назвать старые disclosed данные frozen. Возврат к этой теме потребует нового явного решения, новой preregistration и untouched seeds. Biological mapping остаётся закрыт Series90.",
     files: ["experiments/reports/stage94-frozen-paired-loss-user-result.md", "experiments/reports/stage95-strong-controls-user-result.md", "experiments/reports/stage96-hybrid-multihead-user-result.md", "experiments/reports/synthetic-joint-line-closure.md", "experiments/reports/PROJECT-HANDOFF.md"] },
-  { id: "session-flygym-two-body-preflight", ideaId: "i-observational", title: "Series100: два официальных физических тела FlyGym", status: "подготовлен короткий blocking preflight; настоящий Windows runtime ещё не выполнен", source: "После явного выбора пользователя начата новая official-body линия, не Stage97 и не продолжение закрытой synthetic joint optimization. Runner закрепляет flygym2.1.1, два NeuroMechFly в одном FlatGroundWorld и MuJoCo sensors/actuators.",
-    results: "Предпроверка длительностью0,36с проверяет не менее30 приводов на тело, finite physics, front-leg response>=0,015rad, ненулевые actuator forces, ground contact обеих мух и thorax Z0,15–2,5мм. Через интерфейс Fly Ideas теперь можно установить только FlyGym без FlyVis; BAT запускает отдельное GUI и сохраняет summary/trace/error. Первый Windows pre-run выявил, что FlyGym готов, но показывает unknown без metadata lookup, а venv не содержит pythonw.exe; исправлены importlib.metadata version и fallback на python.exe.",
-    limitations: "Observer получает задержанную диагностическую motor command напрямую, а не через RGB или frozen89E state. Это технический body gate без обучения, scientific imitation result, FlyVis/connectome mapping или biological claim. Adapter frozen89E→FlyGym разрешён только после настоящего go.",
-    files: ["experiments/RUN-FLYGYM-TWO-BODY-PREFLIGHT.bat", "experiments/templates/100_flygym_two_body_preflight.py", "experiments/reports/flygym-two-body-preflight-plan.md", "tests/flygym-two-body-preflight.test.cjs"] },
+  { id: "session-flygym-two-body-preflight", ideaId: "i-observational", title: "Series100: два официальных физических тела FlyGym", status: "completed на Windows; технический body gate9/9 пройден", source: "Оригинальный summary-37.json SHA6c0f32bd…: Windows10 build19045, Python3.12.0, FlyGym2.1.1, MuJoCo3.16.0, fixture=false. Script SHA0fa2c86c… совпадает с репозиторием. Physics trace, complete manifest и локальная папка отдельно не получены.",
+    results: "Два официальных NeuroMechFly в одном FlatGroundWorld, по42 actuated DOF. Выполнено720 physics steps и37 samples; finite=true. Front-leg response demonstrator/observer0,124949/0,122106rad; max actuator-force norms9,4642/9,0063; ground contact обеих true; thorax Z1,0199–1,9975мм. Все9 preregistered checks pass, primary=true. Следующий короткий frozen89E→FlyGym adapter prototype разрешён.",
+    limitations: "Observer получал задержанную diagnostic motor command напрямую, не RGB или frozen89E state. Это technical body/runtime gate без visual imitation, обучения, FlyVis/connectome mapping, biological neuron или live-fly claim. Покадровую динамику без physics_trace независимо не проверяли; FlyVis torch shm.dll error к этому run не относится.",
+    files: ["experiments/RUN-FLYGYM-TWO-BODY-PREFLIGHT.bat", "experiments/templates/100_flygym_two_body_preflight.py", "experiments/reports/flygym-two-body-preflight-plan.md", "experiments/reports/flygym-two-body-preflight-user-result.md", "experiments/reports/flygym-two-body-preflight-user-result.json", "tests/flygym-two-body-preflight.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
@@ -514,6 +514,10 @@ export function installResearchMemory(existing?: ResearchMemoryState): ResearchM
     ].includes(entry.status)) {
       const current = RESEARCH_MEMORY.find((item) => item.id === "session-long-user-wing-context-plan");
       return current ? { ...entry, title: current.title, status: current.status, source: current.source, results: current.results, limitations: current.limitations, files: [...current.files] } : entry;
+    }
+    if (entry?.id === "session-flygym-two-body-preflight" && entry.status === "подготовлен короткий blocking preflight; настоящий Windows runtime ещё не выполнен") {
+      const current = RESEARCH_MEMORY.find((item) => item.id === entry.id);
+      return current ? { ...current, files: [...current.files] } : entry;
     }
     if (entry?.id === "session-long-user-wing-user-result") {
       const oldSource = "NPZ, SQLite, имена выбранных JSON и покадровые файлы независимо не получены.";
