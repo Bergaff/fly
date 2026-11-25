@@ -1,0 +1,1994 @@
+{
+  "schema": "frozen89e-flygym-replication-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "frozen89e-flygym-replication-v1",
+    "mode": "full",
+    "script_sha256": "16309bb094236e861fff6eeb1b4d24ce072d6f7ab55c8f88cd6f12e6d94d7a19",
+    "created_utc": "2026-11-25T10:23:47.428488+00:00",
+    "series101_runner_sha256": "00063575a7b8f0c23d5bb319ec3776f1ac04c963a069755e2daf4d25e2613a17",
+    "series101_result_sha256": "9577d951090e4104326652a76ce31b387f82e13910cead1c4e2d477d9c3374ea",
+    "training_allowed": false,
+    "selection_allowed": false,
+    "post_result_tuning_allowed": false,
+    "motions": [
+      {
+        "role": "adapter_frozen_replication",
+        "id": 897,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "seed": 102010,
+        "amplitude": 0.66,
+        "speed": 0.68,
+        "motion_sha256": "7105dbe766a772b0709ed6d9af0f183aac89254dce8c53e368ff17f5d4057f95"
+      },
+      {
+        "role": "adapter_frozen_replication",
+        "id": 898,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "seed": 102011,
+        "amplitude": 0.66,
+        "speed": 1.2,
+        "motion_sha256": "c14f9806024d4d908b2cf449197eb1a476ebbb075719aa6ca39df9b91fd97b49"
+      },
+      {
+        "role": "adapter_frozen_replication",
+        "id": 899,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "seed": 102012,
+        "amplitude": 0.66,
+        "speed": 0.68,
+        "motion_sha256": "21c829db3d1b45e73d821a0b33f53164e4953c17577a1fd0156e6a0d1e940b3e"
+      },
+      {
+        "role": "adapter_frozen_replication",
+        "id": 900,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "seed": 102020,
+        "amplitude": 0.98,
+        "speed": 1.2,
+        "motion_sha256": "b950e4ee367b3895a3196645de2d3051a3edd6d9ae3f7b823fd9c6fd91ed9e6e"
+      },
+      {
+        "role": "adapter_frozen_replication",
+        "id": 901,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "seed": 102021,
+        "amplitude": 0.98,
+        "speed": 0.68,
+        "motion_sha256": "6966e042fca0db7a3bf14ba50c3fa6e933e312dcb2b51600a1b345fdb6765560"
+      },
+      {
+        "role": "adapter_frozen_replication",
+        "id": 902,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "seed": 102022,
+        "amplitude": 0.98,
+        "speed": 1.2,
+        "motion_sha256": "9cbbf30a9dc7f55c6edf917f897655897c6fde66aec7bebb0970bc0b9daae5ef"
+      }
+    ],
+    "views": [
+      {
+        "corner_id": 805,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.18,
+          "camera_z": 0.46,
+          "body_x": 3.9,
+          "body_y": -0.05
+        }
+      },
+      {
+        "corner_id": 806,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.29,
+          "camera_z": 0.58,
+          "body_x": 4.1,
+          "body_y": 0.05
+        }
+      },
+      {
+        "corner_id": 807,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.43,
+          "camera_z": 0.44,
+          "body_x": 4.12,
+          "body_y": -0.02
+        }
+      },
+      {
+        "corner_id": 808,
+        "view": {
+          "fov_deg": 35.0,
+          "camera_side": 0.22,
+          "camera_z": 0.6,
+          "body_x": 3.88,
+          "body_y": 0.04
+        }
+      }
+    ],
+    "workers": 1,
+    "mapped_dof": [
+      "c_thorax-lf_coxa-pitch",
+      "lf_coxa-lf_trochanterfemur-pitch",
+      "lf_trochanterfemur-lf_tibia-pitch",
+      "c_thorax-rf_coxa-pitch",
+      "rf_coxa-rf_trochanterfemur-pitch",
+      "rf_trochanterfemur-rf_tibia-pitch"
+    ],
+    "mapping": "unchanged Series101 unit-gain offsets from official neutral pose, clipped ±0.35rad",
+    "motor": {
+      "type": "MuJoCo MOTOR",
+      "dt_s": 0.0005,
+      "frame_dt_s": 0.04,
+      "kp": 18.0,
+      "kd": 0.18,
+      "torque_limit": 25.0
+    },
+    "controls": [
+      "candidate",
+      "zero_state",
+      "shuffled_state",
+      "shared_lesion",
+      "open_loop"
+    ],
+    "open_loop_definition": "unchanged Series101: same candidate target, feedforward torque from neutral and target velocity; no q/dq feedback",
+    "primary_rule": "unchanged Series101: all candidate safe/contact; mean tracking<=0.20rad; candidate truth RMSE wins vs zero/shuffled>=60%, vs true open-loop>=80%; state target hashes distinct"
+  },
+  "primary": {
+    "cases": 24,
+    "required_state_wins": 15,
+    "required_open_loop_wins": 20,
+    "candidate_safe_cases": 24,
+    "candidate_mean_tracking_rmse_rad": 0.09983855256654033,
+    "candidate_truth_wins": {
+      "zero_state": 23,
+      "shuffled_state": 24,
+      "shared_lesion": 24,
+      "open_loop": 24
+    },
+    "state_controls_distinct": true,
+    "passed": true,
+    "scientific_result": false
+  },
+  "tests": [
+    {
+      "id": 897,
+      "corner_id": 805,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "50a73e259398f3fb98fd77376a063b4a804f9e53621fe2c8c7e6148309d9e07b",
+      "target_hashes": {
+        "candidate": "b8e752598d61573102a4458f99b38f008542d03f98877ae2ff92b4f216c01f01",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "cb9f300125371ca0adc17a1be3dfe888663643dfe02c7912b9da8a8747a93eb2",
+        "shared_lesion": "b9d08d525c5a52eb0b1192c3724fdf893b8946d54ff3731889b6ff65388eba61",
+        "open_loop": "b8e752598d61573102a4458f99b38f008542d03f98877ae2ff92b4f216c01f01"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10968399755671374,
+          "truth_rmse_rad": 0.2218117554150904,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.510204081632653,
+          "max_actuator_force_norm": 12.249126995445058,
+          "minimum_thorax_z_mm": 0.9486448485429243,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 198.27502720959936,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.26725265290838424,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 186.78413566413522,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1257692013402994,
+          "truth_rmse_rad": 0.2921345758306638,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6122448979591835,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9440475546759436,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 208.54305567274253,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1546156487706535,
+          "truth_rmse_rad": 0.32765441316800165,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.4081632653061225,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.2260549129206415,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 221.33045079516168,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.18182502239294257,
+          "truth_rmse_rad": 0.33613340186848656,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.224489795918367,
+          "max_actuator_force_norm": 13.91437141735121,
+          "minimum_thorax_z_mm": 0.8514220774719015,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 159.394607140443,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 897,
+      "corner_id": 806,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "efbbacab1f3482e9a4c059cf874ae224efa69140b1b7a453801ab215b65be560",
+      "target_hashes": {
+        "candidate": "c47022bc3a9022b0bce68c7a953c0b75a5f0731cce277222bdd45b51b7e423a1",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "c923f58ebf9eaff69cb416fe01267e42f060cb53dbc60e286a3e9854fcc40cff",
+        "shared_lesion": "d362f63935506a28800b67e6a51479412d96ea38f6b6d0efe5b6b664dcdced33",
+        "open_loop": "c47022bc3a9022b0bce68c7a953c0b75a5f0731cce277222bdd45b51b7e423a1"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.11647279744150318,
+          "truth_rmse_rad": 0.23864482009278576,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6530612244897958,
+          "max_actuator_force_norm": 14.133563323544445,
+          "minimum_thorax_z_mm": 0.8503333815801924,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 201.68804427044262,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.26725265290838424,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 186.78413566413522,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12908332969161565,
+          "truth_rmse_rad": 0.308319084158428,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6530612244897958,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.8284861136912425,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.64892957794922,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1418827134101167,
+          "truth_rmse_rad": 0.2914299909792504,
+          "contact_frame_fraction": 0.9591836734693877,
+          "mean_contact_legs": 2.857142857142857,
+          "max_actuator_force_norm": 14.1340650484807,
+          "minimum_thorax_z_mm": 0.9365509035482319,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 212.52581661229968,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.20010083311017346,
+          "truth_rmse_rad": 0.3983014394182956,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.653061224489796,
+          "max_actuator_force_norm": 14.279158877005882,
+          "minimum_thorax_z_mm": 0.6837534594794404,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 162.35376551317353,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 897,
+      "corner_id": 807,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "d42ea4b7081074c17c88743b9dbaf4b4a6a4d9469b1a0dd13af1097b15647837",
+      "target_hashes": {
+        "candidate": "32f74d074b158df01ec1793ea5a72da7f9986ed4bdb63debebddcc917b823db4",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "5de6a03926472428cbca7ed61841bba71dd47744cdc820e5c1be9dd684a8f7cf",
+        "shared_lesion": "5a6b5ca315c60454da0c2d3fd8b8eaf9e16b7a3fa381d1543e103d5d879e98dc",
+        "open_loop": "32f74d074b158df01ec1793ea5a72da7f9986ed4bdb63debebddcc917b823db4"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10680618098012656,
+          "truth_rmse_rad": 0.2033539724493777,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.9183673469387754,
+          "max_actuator_force_norm": 11.615758945019444,
+          "minimum_thorax_z_mm": 0.9079100346080121,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 197.2488943614257,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.26725265290838424,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 186.78413566413522,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12822865543377984,
+          "truth_rmse_rad": 0.2934589540893619,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.326530612244898,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9974312209195135,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 208.11677781413727,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1489781358943702,
+          "truth_rmse_rad": 0.3011555104437722,
+          "contact_frame_fraction": 0.9591836734693877,
+          "mean_contact_legs": 2.6122448979591835,
+          "max_actuator_force_norm": 14.16659092913422,
+          "minimum_thorax_z_mm": 1.1102013493699578,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 215.02167923183632,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.18694382494642323,
+          "truth_rmse_rad": 0.30666654631572254,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.061224489795919,
+          "max_actuator_force_norm": 12.626957621509575,
+          "minimum_thorax_z_mm": 0.752242531929028,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 165.81089745198167,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 897,
+      "corner_id": 808,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "36beaa40d28a98749b5a5134218fa42c1636309229c2035de63e6f3e82d130c6",
+      "target_hashes": {
+        "candidate": "8f612154854c4bbd1d2bad49d68c5a860b5c0ebedd3f8d86f2f73c98eb488dd0",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "0795e001f36c361d6144a6cb3a95cf85941bc6bca5a6dc40e91a7640d8a4d308",
+        "shared_lesion": "521cf5f60bbba3d7c475ff1b7bd36fadae65bf81195baf06a0b0a4da59d2a1fa",
+        "open_loop": "8f612154854c4bbd1d2bad49d68c5a860b5c0ebedd3f8d86f2f73c98eb488dd0"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.08624661412663862,
+          "truth_rmse_rad": 0.1935007231741187,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.285714285714286,
+          "max_actuator_force_norm": 8.565925265014526,
+          "minimum_thorax_z_mm": 0.7474928773948565,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 195.5819672503831,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.26725265290838424,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 186.78413566413522,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12872943789204022,
+          "truth_rmse_rad": 0.29676697152493686,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.489795918367347,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.995836360363644,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 208.6604721498421,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14871503638761688,
+          "truth_rmse_rad": 0.29633020076419647,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.7346938775510203,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9068023632335612,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 219.09196059593626,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.17553234943872031,
+          "truth_rmse_rad": 0.2578297077093972,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.469387755102041,
+          "max_actuator_force_norm": 13.374672587314555,
+          "minimum_thorax_z_mm": 0.6476498323248538,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 148.8715149607958,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 898,
+      "corner_id": 805,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "416fc9911a8ddb89b57677258004028cfbbd32dd88dc0238a6e6a0017e206255",
+      "target_hashes": {
+        "candidate": "04915ad2285086bb2d034663dd9e6f56915c85f7528b594be40834d2bc37da04",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "1135449d2af6708f80181e3112468f7a02489e89e6320487cb1782eb2537fc60",
+        "shared_lesion": "95fece2920a119a35646dcfcc90768f4dab31689866eb560c1eb60fb4e69720c",
+        "open_loop": "04915ad2285086bb2d034663dd9e6f56915c85f7528b594be40834d2bc37da04"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10577135727029854,
+          "truth_rmse_rad": 0.17266796134006032,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.979591836734694,
+          "max_actuator_force_norm": 10.403405352782341,
+          "minimum_thorax_z_mm": 0.8452886468353842,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 189.59024095457303,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02707610245033149,
+          "truth_rmse_rad": 0.28283159480877257,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.591836734693878,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9042338947936093,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 183.8738296472314,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12932498658077726,
+          "truth_rmse_rad": 0.3174882902726778,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.5510204081632653,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0225830549155526,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 204.65797497109773,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1518449764928078,
+          "truth_rmse_rad": 0.27820068783038565,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.5714285714285716,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.1751346676721852,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 214.30503046079946,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.21009412578094225,
+          "truth_rmse_rad": 0.2699632759355266,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.795918367346939,
+          "max_actuator_force_norm": 13.034130331805367,
+          "minimum_thorax_z_mm": 0.6689587237064369,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 153.96010484723604,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 898,
+      "corner_id": 806,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "dc8a6fca3f6d1c33ac8b6d88293567b20a9d66b4c502603a423af3b6720e079f",
+      "target_hashes": {
+        "candidate": "34d08c8ffed980e00d88d78da8f4cc1dfe4e4ff5b4ca1a9aae06ba945e631fda",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "3d5eca6652fa540c34e384914c6992865edd85f02e517b9fdfbff8eb653aa2cd",
+        "shared_lesion": "9367afbeb2b09cf385be34c5407a7919d8f58b2570043d498488d7fa992255de",
+        "open_loop": "34d08c8ffed980e00d88d78da8f4cc1dfe4e4ff5b4ca1a9aae06ba945e631fda"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1016582530724688,
+          "truth_rmse_rad": 0.19769299763813158,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.122448979591836,
+          "max_actuator_force_norm": 9.058104332439958,
+          "minimum_thorax_z_mm": 0.7704351384462826,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 191.24418927730258,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02707610245033149,
+          "truth_rmse_rad": 0.28283159480877257,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.591836734693878,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9042338947936093,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 183.8738296472314,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12901683251753956,
+          "truth_rmse_rad": 0.3479883696535837,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.510204081632653,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9445880755176792,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 205.306430046,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1421068387621623,
+          "truth_rmse_rad": 0.24930465557412815,
+          "contact_frame_fraction": 0.8979591836734694,
+          "mean_contact_legs": 3.142857142857143,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.8179990223421558,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 211.48550211307395,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.2067634498306914,
+          "truth_rmse_rad": 0.31752083802033604,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.612244897959184,
+          "max_actuator_force_norm": 14.189226633110966,
+          "minimum_thorax_z_mm": 0.5891053441696528,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 155.12190771168662,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 898,
+      "corner_id": 807,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "3a9e85fa9c6e5eb0ea63cf0537431507ccbbad46ae4a693223fe408cda0dcbf4",
+      "target_hashes": {
+        "candidate": "a6f42f73c4cef31479120e6e267996b799b3bdc7000ae215c80447c063e42f27",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "33a8a5f963afea22a3b046efac43ddebc7a6d46d2a6d9f5d89679b62f9920d48",
+        "shared_lesion": "7fcd9f18c0a4f486266843ee69f0c7765592e7b426e02417900792dc1ee11c94",
+        "open_loop": "a6f42f73c4cef31479120e6e267996b799b3bdc7000ae215c80447c063e42f27"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10668698017323595,
+          "truth_rmse_rad": 0.16464780217827693,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.0,
+          "max_actuator_force_norm": 11.214037201997487,
+          "minimum_thorax_z_mm": 0.845763551624733,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 189.81860067391457,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02707610245033149,
+          "truth_rmse_rad": 0.28283159480877257,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.591836734693878,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9042338947936093,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 183.8738296472314,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12958747756369268,
+          "truth_rmse_rad": 0.34598426493170464,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6530612244897958,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0102699471133971,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 203.94710844487489,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1409915518753229,
+          "truth_rmse_rad": 0.2519094016269356,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.163265306122449,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.841503460225035,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.48585785161703,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.22616782956308734,
+          "truth_rmse_rad": 0.28905127603066433,
+          "contact_frame_fraction": 0.9591836734693877,
+          "mean_contact_legs": 3.979591836734694,
+          "max_actuator_force_norm": 14.15985168884294,
+          "minimum_thorax_z_mm": 0.6772778138044423,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 161.48216921179525,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 898,
+      "corner_id": 808,
+      "action": "head_directed_grooming",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "b1d707e62b5a2e58e023cebee4f7f705ff770af22278dc54a05ae9f2e2d008c5",
+      "target_hashes": {
+        "candidate": "196dcd184a32b94c1bef49c05b1c2279b21fdad6d7864b8058da5d02cc8e642e",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "493bf1c515f00f864f58480f6aa7644616a4e16cbdd2006c55a426c7414588f5",
+        "shared_lesion": "fa8fa2a58bbda4188010c898edce9feecff72f133fb6b1029711dbb9c661fe18",
+        "open_loop": "196dcd184a32b94c1bef49c05b1c2279b21fdad6d7864b8058da5d02cc8e642e"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.09223094811132289,
+          "truth_rmse_rad": 0.24566052528815419,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.693877551020408,
+          "max_actuator_force_norm": 9.427593311816267,
+          "minimum_thorax_z_mm": 0.7187778262300132,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 191.1196163400419,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02707610245033149,
+          "truth_rmse_rad": 0.28283159480877257,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.591836734693878,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9042338947936093,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 183.8738296472314,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12975993657959958,
+          "truth_rmse_rad": 0.3516457716570205,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.5918367346938775,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9785184470949452,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 205.51292492102178,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.13912112663739176,
+          "truth_rmse_rad": 0.24614258471944847,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.3469387755102042,
+          "max_actuator_force_norm": 15.23752289954788,
+          "minimum_thorax_z_mm": 0.821428290817424,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 205.56632758860417,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.20308807463630812,
+          "truth_rmse_rad": 0.38021555883355423,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.73469387755102,
+          "max_actuator_force_norm": 12.998949470278706,
+          "minimum_thorax_z_mm": 0.6515353184621776,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 147.79747840820107,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 899,
+      "corner_id": 805,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "2b0a1e3c737e29ed1b127031bf609dc71f1099fe11600138f277b85f26115248",
+      "target_hashes": {
+        "candidate": "31c3b3a05c18982b56a3c2b0875288a367bf3dca21670224d23457557114ed18",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "ddd694da2c910d71295871d38f471c238b6d4eb2cf304070c59207f3909af20e",
+        "shared_lesion": "91dffd80a2e7f53a73dbd8592418e1f90f9c3eb1612e1b3480aaaffb1543ac25",
+        "open_loop": "31c3b3a05c18982b56a3c2b0875288a367bf3dca21670224d23457557114ed18"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.09328391738223268,
+          "truth_rmse_rad": 0.12016105905274607,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.163265306122449,
+          "max_actuator_force_norm": 9.865910609656186,
+          "minimum_thorax_z_mm": 1.0285797792814897,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 180.09103348292288,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.17640339424382057,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 175.87388605254287,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12238610629056684,
+          "truth_rmse_rad": 0.26162967960926714,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.8979591836734695,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9220185204529014,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 196.02607931506148,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.15703604690910472,
+          "truth_rmse_rad": 0.23520586040092267,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.4081632653061225,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.3730042555750173,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 213.61420474123918,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.16054941925445498,
+          "truth_rmse_rad": 0.23992382078586186,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.142857142857143,
+          "max_actuator_force_norm": 10.645677176395328,
+          "minimum_thorax_z_mm": 0.8702959737532855,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 134.87098818302056,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 899,
+      "corner_id": 806,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "739d079a8470088506851e6c0203086dc77ed23324fd17b57b15ea3e31eeae97",
+      "target_hashes": {
+        "candidate": "4da15c24c1681c2b94a651f0a3db6ba70379b903e60c44a4b9ccf182c459dfcf",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "0e69a263d6ab21f70ba647e2ee50b338ba9d615843f325a047c898ff202c22e8",
+        "shared_lesion": "b720e8e1dfb4e209eca1813da2a86d32418519893b7a5d1fc037b94ec79ea547",
+        "open_loop": "4da15c24c1681c2b94a651f0a3db6ba70379b903e60c44a4b9ccf182c459dfcf"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.07874128206933019,
+          "truth_rmse_rad": 0.1772459351830162,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.448979591836735,
+          "max_actuator_force_norm": 7.749267992318674,
+          "minimum_thorax_z_mm": 0.8475935301649429,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 181.09666190443164,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.17640339424382057,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 175.87388605254287,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1291774738664218,
+          "truth_rmse_rad": 0.2708880570698653,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.5714285714285716,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9933467788700885,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 196.70050376853686,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1545476619906296,
+          "truth_rmse_rad": 0.2270593091381665,
+          "contact_frame_fraction": 0.8979591836734694,
+          "mean_contact_legs": 2.510204081632653,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.321330243772128,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 210.427065596185,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1351044188119033,
+          "truth_rmse_rad": 0.29190230783834015,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.959183673469388,
+          "max_actuator_force_norm": 8.735227431361157,
+          "minimum_thorax_z_mm": 0.6916115831075487,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 110.7380781103743,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 899,
+      "corner_id": 807,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "d1885a0614b1e6efab404d98646e2e55f6612e0da9fc075db10f1960f647c78c",
+      "target_hashes": {
+        "candidate": "adbb6fa022ebdfa6d2fefa0f6a06813fd0536ab337cc5730a3b919e14f2da4d5",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "ce53fa5850217742ca2350884f3abbf62f00804df18b425aeddfc252496f3e80",
+        "shared_lesion": "5982e1fc4d82c9acc7f3941adc6555c48bc908cae39666dff3d647bb002ff73e",
+        "open_loop": "adbb6fa022ebdfa6d2fefa0f6a06813fd0536ab337cc5730a3b919e14f2da4d5"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.08766961607498194,
+          "truth_rmse_rad": 0.08997577156615767,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.163265306122449,
+          "max_actuator_force_norm": 8.980146886640558,
+          "minimum_thorax_z_mm": 0.9882955172622977,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 177.0283663987004,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.17640339424382057,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 175.87388605254287,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12939178856895725,
+          "truth_rmse_rad": 0.2670604165275084,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6530612244897958,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9996300560094291,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 196.58223685402874,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1536444529220462,
+          "truth_rmse_rad": 0.2219197574651244,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.4693877551020407,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.3130655138782834,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 208.02019025961343,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.17639806128886049,
+          "truth_rmse_rad": 0.22621790404699366,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.612244897959184,
+          "max_actuator_force_norm": 9.801031266940447,
+          "minimum_thorax_z_mm": 0.8692320114647077,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 126.39600359453831,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 899,
+      "corner_id": 808,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "dc172ec12c9269b5949b4b603d92af25d2d9b8fd3ab303003f277a3b3fe674be",
+      "target_hashes": {
+        "candidate": "bc8705a17fddbae8467c57cd8cdc08fa9a3d9cc501deac45b6f140f232153a2e",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "6150658d3ac519515a690dca1eb0ac59384f3a9b209dbc9a018cc34df5850c31",
+        "shared_lesion": "c49227a565bf077aaba5d30b41117a8dc85344594ccf82459a73ffc6dda84b36",
+        "open_loop": "bc8705a17fddbae8467c57cd8cdc08fa9a3d9cc501deac45b6f140f232153a2e"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.06597037840129862,
+          "truth_rmse_rad": 0.128493744891201,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.285714285714286,
+          "max_actuator_force_norm": 7.990634455452498,
+          "minimum_thorax_z_mm": 0.7767979789824275,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 177.02244845716444,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.17640339424382057,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 175.87388605254287,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1279715087111472,
+          "truth_rmse_rad": 0.26722800632627297,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.489795918367347,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9942951747761334,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 196.44163836200536,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.15457265510268992,
+          "truth_rmse_rad": 0.2189770762708738,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.5918367346938775,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.2423995542159358,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 208.3816323360765,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.17184127112849926,
+          "truth_rmse_rad": 0.2620348810588386,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.489795918367347,
+          "max_actuator_force_norm": 11.013152255794244,
+          "minimum_thorax_z_mm": 0.6524213573006037,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 111.06867427602897,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 900,
+      "corner_id": 805,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "2281c87be295aaadddad59c1e1509ac54371d89da3a026bce0a59a50d85b686d",
+      "target_hashes": {
+        "candidate": "dad558253ec1f56e7404185b0858798a99dd08ae0ce2a756f890f2b87bf0094d",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "68231dad01e4e67970dafbf070379d162d9023a3d9bb735bb0e4849ea8a11ca9",
+        "shared_lesion": "877ed7fba30b06eac675992b539d05f005ceb96fef1dfda04604e4c277aac821",
+        "open_loop": "dad558253ec1f56e7404185b0858798a99dd08ae0ce2a756f890f2b87bf0094d"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12379028322449416,
+          "truth_rmse_rad": 0.20030383466815352,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.5918367346938775,
+          "max_actuator_force_norm": 12.445100344155403,
+          "minimum_thorax_z_mm": 0.7823624106706208,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.12675136123744,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.30553767176000063,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 191.13554667090327,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.11969483572043949,
+          "truth_rmse_rad": 0.3073438069676637,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.816326530612245,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.8788231990368467,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 211.01052898620287,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14941053437813687,
+          "truth_rmse_rad": 0.33238322775483803,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.7142857142857144,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0366514928343944,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 223.46468222489523,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.20240567547382743,
+          "truth_rmse_rad": 0.2885373293419354,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.979591836734694,
+          "max_actuator_force_norm": 15.365926077798962,
+          "minimum_thorax_z_mm": 0.6737002369743883,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 195.8774473853819,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 900,
+      "corner_id": 806,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "381fbc7d9d45612215a260cab134a260796156438b603088de9e9fc30190332f",
+      "target_hashes": {
+        "candidate": "e79fd97dec16c8e50cf4c003dd052a661b92e062beef1beb56b1dd125cc273ca",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "43c27863428365cd870414cba9700c1d82a12c9ce48bb048ea76d1ee09ca71e5",
+        "shared_lesion": "60c965e841c38b2b123bf4d8ec99f73e8959b86aa3b04ed52bb10108405fe45a",
+        "open_loop": "e79fd97dec16c8e50cf4c003dd052a661b92e062beef1beb56b1dd125cc273ca"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1263477641768731,
+          "truth_rmse_rad": 0.21702804779870505,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6530612244897958,
+          "max_actuator_force_norm": 13.498777749591401,
+          "minimum_thorax_z_mm": 0.7586622315051821,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 210.5361328084201,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.30553767176000063,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 191.13554667090327,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.13170949814594993,
+          "truth_rmse_rad": 0.32700737252041256,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.6122448979591835,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.8701214520477494,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 212.21602164841963,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.13933836067533104,
+          "truth_rmse_rad": 0.3206749010029681,
+          "contact_frame_fraction": 0.9591836734693877,
+          "mean_contact_legs": 3.142857142857143,
+          "max_actuator_force_norm": 14.08925096132535,
+          "minimum_thorax_z_mm": 0.8295208801879626,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 214.81865855785662,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.20975705034004954,
+          "truth_rmse_rad": 0.33956136149140925,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.061224489795919,
+          "max_actuator_force_norm": 14.020512447659016,
+          "minimum_thorax_z_mm": 0.6181360668611774,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 183.545747539325,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 900,
+      "corner_id": 807,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "b2cfc1a335e82c7f080905397ebf4a5ca87d0f71e67121661784378a0fa22015",
+      "target_hashes": {
+        "candidate": "59574dc4504717a1b5d011909520d5b01ad95363dd030e6b101ebcf4471d8611",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "ccc2fe12ec73ae61c2eacfeedda25808fb3bc41524d3f26bc508f8850b54a55a",
+        "shared_lesion": "6ce9596e6bd8ae25121df111b5d7ec2f1c014d684f9d468903691a06e2851b4f",
+        "open_loop": "59574dc4504717a1b5d011909520d5b01ad95363dd030e6b101ebcf4471d8611"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1163504576027598,
+          "truth_rmse_rad": 0.21915845068748951,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.8979591836734695,
+          "max_actuator_force_norm": 11.366070535266587,
+          "minimum_thorax_z_mm": 0.8115864467955914,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.64310348632594,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.30553767176000063,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 191.13554667090327,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.13460084213885978,
+          "truth_rmse_rad": 0.3213394557125938,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.36734693877551,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.022214938224945,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 214.5112194305911,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14112329380774738,
+          "truth_rmse_rad": 0.30959569073073034,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.061224489795918,
+          "max_actuator_force_norm": 14.259110464681221,
+          "minimum_thorax_z_mm": 0.8921514551500546,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 214.0511602063451,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1957099575810828,
+          "truth_rmse_rad": 0.304966825948632,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.020408163265306,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.683409757220719,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 193.77839164451274,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 900,
+      "corner_id": 808,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "state_sha256": "c2870d354ba5aaedb511a8891e137a26bc7b74e842c5524cfbfd396617acc54b",
+      "target_hashes": {
+        "candidate": "20adb26a6401f6f3f4a587226994ea9519bcc176c2e44b6591a4b831d324cf68",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "b857e15088570201350b152e6496694a1c55c8cf9456c5ac1cc9b8e9c95dc5b2",
+        "shared_lesion": "e0624c59773c2269d9d4f920f35b99e4a1b5c33f0ed6f9f53b6512fe511c7894",
+        "open_loop": "20adb26a6401f6f3f4a587226994ea9519bcc176c2e44b6591a4b831d324cf68"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.09477761333332822,
+          "truth_rmse_rad": 0.22024643644148567,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.061224489795919,
+          "max_actuator_force_norm": 9.848898957947796,
+          "minimum_thorax_z_mm": 0.7240908099074176,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 202.62445497682845,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.30553767176000063,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 191.13554667090327,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.132461573222726,
+          "truth_rmse_rad": 0.31533959596840133,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.7755102040816326,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9699980406091453,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 213.38686932644512,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14556214333399162,
+          "truth_rmse_rad": 0.3288979395462215,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.8979591836734695,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.8669810803903218,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 220.85450676388535,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.18588184598904056,
+          "truth_rmse_rad": 0.28108593678836313,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.591836734693878,
+          "max_actuator_force_norm": 14.429112059838424,
+          "minimum_thorax_z_mm": 0.649244762199509,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 170.1613287586623,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 901,
+      "corner_id": 805,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "d0e366f9924d69eacec2032b4c6d40169e834fa580937f1cd2723f44449566dc",
+      "target_hashes": {
+        "candidate": "81efbd7e222dd8ab28f511f127e0f6d4b3780d06e111c4b773217ba802ecb48f",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "7da6daac2c770043b2d798ac6c6c52d92acbef6869b2a5f85a1ead05846c6be1",
+        "shared_lesion": "7c58dae6840c889638d9879e47d475808b64107633c2396f4497c84ab8fe98dd",
+        "open_loop": "81efbd7e222dd8ab28f511f127e0f6d4b3780d06e111c4b773217ba802ecb48f"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10992183228185502,
+          "truth_rmse_rad": 0.19665120009733222,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.3061224489795915,
+          "max_actuator_force_norm": 11.49208080035096,
+          "minimum_thorax_z_mm": 0.7461258945095754,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 194.4555809710226,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.31049883646699405,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 187.8625682922988,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10703918436001318,
+          "truth_rmse_rad": 0.40070292863193957,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.224489795918367,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.558852022640016,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 204.3378441692051,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1324802599874538,
+          "truth_rmse_rad": 0.36611575756290005,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.63265306122449,
+          "max_actuator_force_norm": 14.005853007811979,
+          "minimum_thorax_z_mm": 0.8261423557157103,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 205.4384756679767,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.22805102883546657,
+          "truth_rmse_rad": 0.3053097715329404,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.63265306122449,
+          "max_actuator_force_norm": 15.155393241634863,
+          "minimum_thorax_z_mm": 0.5747232853268703,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 167.13588928157841,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 901,
+      "corner_id": 806,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "95675e58e505beeaf836950f4e1d74dbb3b99ea35856bd42a98c904534875eec",
+      "target_hashes": {
+        "candidate": "3914eb0652149dd749c925faf5cad11f609c28af6bf5ebae71540cd7ead3db44",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "9074d5e914471bd13730a67bd3db8bf447d7444f4f6b7bf8adff6ce2bd6d9560",
+        "shared_lesion": "5f07307de0e465c30a49f322b191c7422fcdd921c70b958f8f1a0cc89afb191e",
+        "open_loop": "3914eb0652149dd749c925faf5cad11f609c28af6bf5ebae71540cd7ead3db44"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.11175221499304086,
+          "truth_rmse_rad": 0.15871338830677661,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.326530612244898,
+          "max_actuator_force_norm": 11.26539391811398,
+          "minimum_thorax_z_mm": 0.7358696374080973,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 195.58511401609329,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.31049883646699405,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 187.8625682922988,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.13204259450049166,
+          "truth_rmse_rad": 0.3652041834533291,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.3877551020408165,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0540222638361454,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 209.87139219579606,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14058080643594742,
+          "truth_rmse_rad": 0.3058958400177761,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 3.0408163265306123,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.8149956988609965,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 209.37054174764623,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.2282708806795252,
+          "truth_rmse_rad": 0.25517960539310525,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.081632653061225,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.506466153567124,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 147.90145489663115,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 901,
+      "corner_id": 807,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "3a3a4398c63650812b02c4be06d48cbc5889a52d09b5bfc835ebd2c656d93861",
+      "target_hashes": {
+        "candidate": "6cb8d009a92914536c92ae330233f5f3ac05082a7b3a49ffae224ede0be36155",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "84e1334b761c8306138b2238aed1fc889eebcf7a28c09e553eefdc33de6db3c0",
+        "shared_lesion": "48bf42a44791f766ee137f61e85e7c2a6e120f59fed9479f73ec59f7f1309ee8",
+        "open_loop": "6cb8d009a92914536c92ae330233f5f3ac05082a7b3a49ffae224ede0be36155"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10846941435939852,
+          "truth_rmse_rad": 0.21366416430362317,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.448979591836735,
+          "max_actuator_force_norm": 10.5012421643297,
+          "minimum_thorax_z_mm": 0.762389387050432,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 194.44891642403243,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.31049883646699405,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 187.8625682922988,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12698149367897563,
+          "truth_rmse_rad": 0.34181292584448963,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.673469387755102,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.9960676465854461,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.61700660607002,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12819230411765978,
+          "truth_rmse_rad": 0.32885547556433337,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.63265306122449,
+          "max_actuator_force_norm": 14.015745565783995,
+          "minimum_thorax_z_mm": 0.8227040042550979,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 203.36933880523702,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.2290033515962444,
+          "truth_rmse_rad": 0.3381788418076606,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.816326530612245,
+          "max_actuator_force_norm": 15.382720756020039,
+          "minimum_thorax_z_mm": 0.6292436789978334,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 155.6776811264942,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 901,
+      "corner_id": 808,
+      "action": "head_directed_grooming",
+      "predicted_action": "head_directed_grooming",
+      "state_sha256": "7856933e32f8120c4a8e067218997c2a43067d316f3ddf9295bf5aad1c7ce56e",
+      "target_hashes": {
+        "candidate": "1e5be8148248e40664042244173399d2cdaf8156ea114b564edbaf18fb339c67",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "e50611b5dc9c30b1ca6ad373df3fbd17aa4458b2bbbbe53cecb20bae4a309a05",
+        "shared_lesion": "7dd6f629d897b7fe02ac71dcd878f6c2c24f7a3c61e7fac4c2dd03d371eff725",
+        "open_loop": "1e5be8148248e40664042244173399d2cdaf8156ea114b564edbaf18fb339c67"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.10806241092215209,
+          "truth_rmse_rad": 0.2165527143896201,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.224489795918367,
+          "max_actuator_force_norm": 10.220521268582575,
+          "minimum_thorax_z_mm": 0.7074701344757776,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 198.01355079239838,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.31049883646699405,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 187.8625682922988,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12588037105621835,
+          "truth_rmse_rad": 0.3738676218806333,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.5918367346938775,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0052682168267124,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.09771753826814,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14255702435633882,
+          "truth_rmse_rad": 0.2954293789693406,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.163265306122449,
+          "max_actuator_force_norm": 15.019534368212836,
+          "minimum_thorax_z_mm": 0.830707188788028,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 206.84446734809896,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.23373678311330406,
+          "truth_rmse_rad": 0.3542837424978431,
+          "contact_frame_fraction": 0.9591836734693877,
+          "mean_contact_legs": 4.63265306122449,
+          "max_actuator_force_norm": 14.579303839270647,
+          "minimum_thorax_z_mm": 0.6120127167666941,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 151.4887429212491,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 902,
+      "corner_id": 805,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "f813f7e97dd3f6821eae6ed6080eef71766518bb8835bb45a61b047f24f9b605",
+      "target_hashes": {
+        "candidate": "8199d3879b4917b6a1e8b268b545c4d298e0d38592258c09cc9e833fd076bbb9",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "7db1dbecc27bd30256de397be0fef9e6eb812b894e12603fdec83f60d8ce0528",
+        "shared_lesion": "c25a6cec37de2909c56e2dafa07a6c5848a5041ec853f93f99e82ac7cc4255d0",
+        "open_loop": "8199d3879b4917b6a1e8b268b545c4d298e0d38592258c09cc9e833fd076bbb9"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.09181566953200714,
+          "truth_rmse_rad": 0.1260651134983652,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.448979591836735,
+          "max_actuator_force_norm": 10.026191607578719,
+          "minimum_thorax_z_mm": 0.8498374802829683,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 184.4390590660401,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.2194060839589654,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 177.8889172726911,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12074514121788024,
+          "truth_rmse_rad": 0.3114004502167733,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.857142857142857,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 0.7106491573013483,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 198.11118623783682,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1549348676498206,
+          "truth_rmse_rad": 0.2204332868174253,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.510204081632653,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.224818123717736,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 207.70379873914186,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1709320224210355,
+          "truth_rmse_rad": 0.2056264628857942,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.326530612244898,
+          "max_actuator_force_norm": 12.095939891788893,
+          "minimum_thorax_z_mm": 0.6660449983771013,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 140.01609222965854,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 902,
+      "corner_id": 806,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "8b5453acfd85600016e6409392ddce3c49eb3d17c7e9d181be064346d7e031a8",
+      "target_hashes": {
+        "candidate": "592df68821a7beaee67871ec8646239f61b2d7d1a53161805350a959358e0fd0",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "918ac256576eafd15b2feccaf98e2dc4abdf8ee087066fcec3f242f3b9c800f8",
+        "shared_lesion": "50980f658ee7520bfa93abcd6aad8f74cd3e8ac487afafa87f7caeb5efa86612",
+        "open_loop": "592df68821a7beaee67871ec8646239f61b2d7d1a53161805350a959358e0fd0"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.0737037181929006,
+          "truth_rmse_rad": 0.2031487054549432,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.3061224489795915,
+          "max_actuator_force_norm": 7.713719720944955,
+          "minimum_thorax_z_mm": 0.7305668140903806,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 181.12258063712815,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.2194060839589654,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 177.8889172726911,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12948895955208126,
+          "truth_rmse_rad": 0.306838716651776,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.63265306122449,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0396834930724976,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 198.5742849154722,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.15422190127348306,
+          "truth_rmse_rad": 0.20327016255762123,
+          "contact_frame_fraction": 0.9183673469387755,
+          "mean_contact_legs": 2.6122448979591835,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.2049200574548666,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 205.38849384011363,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.14507222673538883,
+          "truth_rmse_rad": 0.2990778193112451,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.6938775510204085,
+          "max_actuator_force_norm": 9.397996896937578,
+          "minimum_thorax_z_mm": 0.5848567322219452,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 116.25771508406814,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 902,
+      "corner_id": 807,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "1f62a2c23812b23b5a6e1249f37e3bbadd1f9d56f1b49c0a55b565509894a6bd",
+      "target_hashes": {
+        "candidate": "32844b7eaa999e51b4fc10e9531bfb2ca3feaada2134e784d89143ef7f8ab240",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "220ad888c62a0a159eae3031043c51ac4edb3ad1c61eb88ef277e3121d4bc66e",
+        "shared_lesion": "860fa1c0c2b73d24e7cf2fda44789fc80a33803fd73b29830c866c923234c21e",
+        "open_loop": "32844b7eaa999e51b4fc10e9531bfb2ca3feaada2134e784d89143ef7f8ab240"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.087454424960418,
+          "truth_rmse_rad": 0.10496890075264903,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.9591836734693877,
+          "max_actuator_force_norm": 9.338031996192829,
+          "minimum_thorax_z_mm": 0.9139224373283003,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 180.9541228892092,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.2194060839589654,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 177.8889172726911,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1291672167315318,
+          "truth_rmse_rad": 0.307158321578884,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.2857142857142856,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0229286255796362,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 198.65257918986836,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.15439360737628396,
+          "truth_rmse_rad": 0.20450579070134078,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.63265306122449,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.204322387493627,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 204.2884848405081,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1843366229362479,
+          "truth_rmse_rad": 0.2006811500449925,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 5.040816326530612,
+          "max_actuator_force_norm": 10.087928152183366,
+          "minimum_thorax_z_mm": 0.8016477645501362,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 126.63911884530441,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    },
+    {
+      "id": 902,
+      "corner_id": 808,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "state_sha256": "bcfed6b1607ff7fe42060945044d8f1e0a3c3aaff6f152dce2984cf0c3e489ea",
+      "target_hashes": {
+        "candidate": "dbc513ba01dd8ffffcca5c6d9f6fdc0a1986ebe1a534413336df3104bdb575ba",
+        "zero_state": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e",
+        "shuffled_state": "df0cd68c64a20728b36f3a8fa5f9ad8c8540abdb2ad038513ae196be84ede0ff",
+        "shared_lesion": "18ad40e781e766d820057f5380b0d48bfce2d0ca76af25b3df6aa5785421f9bf",
+        "open_loop": "dbc513ba01dd8ffffcca5c6d9f6fdc0a1986ebe1a534413336df3104bdb575ba"
+      },
+      "controls": {
+        "candidate": {
+          "finite": true,
+          "tracking_rmse_rad": 0.09245713535758877,
+          "truth_rmse_rad": 0.15179136012136044,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.163265306122449,
+          "max_actuator_force_norm": 8.592125529060679,
+          "minimum_thorax_z_mm": 0.75545458987625,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 182.2338790957864,
+          "torque_saturation_fraction": 0.0
+        },
+        "zero_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.02711757759134177,
+          "truth_rmse_rad": 0.2194060839589654,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.551020408163265,
+          "max_actuator_force_norm": 8.836567773146417,
+          "minimum_thorax_z_mm": 0.9069433875013645,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 177.8889172726911,
+          "torque_saturation_fraction": 0.0
+        },
+        "shuffled_state": {
+          "finite": true,
+          "tracking_rmse_rad": 0.12730707720757084,
+          "truth_rmse_rad": 0.3016324329819573,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 3.36734693877551,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.0145253317534608,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 197.8852326019263,
+          "torque_saturation_fraction": 0.0
+        },
+        "shared_lesion": {
+          "finite": true,
+          "tracking_rmse_rad": 0.1549883591509342,
+          "truth_rmse_rad": 0.193893134330356,
+          "contact_frame_fraction": 0.9387755102040817,
+          "mean_contact_legs": 2.6530612244897958,
+          "max_actuator_force_norm": 15.431785379534022,
+          "minimum_thorax_z_mm": 1.207675205287041,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 203.13756873839262,
+          "torque_saturation_fraction": 0.0
+        },
+        "open_loop": {
+          "finite": true,
+          "tracking_rmse_rad": 0.21391664110783773,
+          "truth_rmse_rad": 0.3255282289539667,
+          "contact_frame_fraction": 0.9795918367346939,
+          "mean_contact_legs": 4.591836734693878,
+          "max_actuator_force_norm": 14.048846126989384,
+          "minimum_thorax_z_mm": 0.6674781402092844,
+          "maximum_thorax_z_mm": 1.9975475,
+          "energy_abs_work": 127.82396000056478,
+          "torque_saturation_fraction": 0.0
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Frozen physical-adapter replication, not training, selection, or biological evidence.",
+    "Series101 mapping, motor parameters, controls, thresholds, and gate are unchanged.",
+    "Synthetic truth is used only for scoring and demonstrator command; observer candidate receives frozen89E-derived policy.",
+    "No FlyVis, connectome mapping, living animal, muscles, or claim of biological mirror neurons."
+  ]
+}

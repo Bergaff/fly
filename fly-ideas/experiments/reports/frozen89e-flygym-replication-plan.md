@@ -61,3 +61,7 @@ Shared-lesion wins и action classification сохраняются как second
 ## Допустимый вывод
 
 Pass означает независимую bounded replication технической viability fixed physical adapter. Fail сохраняется как no-replication без изменения порогов. Ни один исход не подтверждает FlyVis, FlyWire/connectome mapping, мышцы, живую муху, biological mirror neurons или статью.
+
+## Полученный Windows результат
+
+Genuine run после compatibility amendment завершён. Frozen primary воспроизведён:24/24 candidate cases safe/contact, mean tracking RMSE0,099839rad, candidate wins23/24 против zero и24/24 против shuffled, shared lesion и true open loop; targets distinct; `primary.passed=true`, `scientific_result=false`. Единственный zero loss имел разницу всего0,000843rad. Action classification23/24 остаётся secondary. Точный JSON и ограниченная интерпретация сохранены как `frozen89e-flygym-replication-user-result.json/.md`; SHA-256 JSON `33795d582e9ac528304018300dc14c67db066d3452e1760df2bb74c9aef9a643`.
