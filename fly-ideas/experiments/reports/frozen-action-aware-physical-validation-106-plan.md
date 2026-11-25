@@ -4,7 +4,7 @@
 
 Series105D passed its untouched supervised non-physical final. Series106 freezes the exact selected `temporal_action_experts` artifact and tests official observer-eye input through the selected model on official FlyGym MOTOR bodies.
 
-- Series106 runner SHA-256: `67d3ad17bcad9eb3fbedb90ed22d5609d5beb4e146670aba82e96b349c4781d4`;
+- Series106 runner SHA-256: `282a7a87ae43b3c6a5b2432c01495c564ee3dc3e1247c0230015917ada5ea5fa`;
 - Series105D runner SHA: `8c39bfca87f3a11f59ac82cca721c58bb142094f7cd26bb1d4d6ae275ab23e45`;
 - genuine Series105D JSON SHA: `59f8d54fbc7c062c068259d455484f643844f33092e655e195acb170cbfb9ad3`;
 - exact selected model SHA: `1bbb15cd398f2cba944cabf38cb49abf83b878bf28127674ff94caced5fa69e1`;
@@ -56,7 +56,7 @@ No threshold may be weakened after outcome.
 
 Double-click `experiments\RUN-FROZEN-ACTION-AWARE-PHYSICAL-VALIDATION-106.bat`. Select, in order:
 
-1. the original Series105D `result` folder containing `selected_action_aware_model.npz`;
+1. either the original Series105D run folder containing the `result` subfolder, or that `result` folder itself; the runner resolves both layouts and requires `selected_action_aware_model.npz`;
 2. the completed result89D folder;
 3. production source84Z.
 

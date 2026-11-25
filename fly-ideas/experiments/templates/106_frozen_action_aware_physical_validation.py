@@ -30,8 +30,10 @@ def authorize():
  s105d=load_module('series106_source105d',RUNNER105D,RUNNER105D_SHA);s105c,s105,s104,s102,s103,result105c,result105,result104=s105d.authorize();return s105d,s105c,s105,s104,s102,s103,x,result105c,result105
 def load_linear(z,prefix):return {k:np.array(z[prefix+k],copy=True) for k in ('xm','xs','ym','ys','w')}
 def load_selected(folder):
- p=Path(folder)/'selected_action_aware_model.npz'
- if file_sha(p)!=MODEL105D_SHA:raise ValueError('Нужен exact selected_action_aware_model.npz SHA1bbb15cd….')
+ folder=Path(folder);candidates=(folder/'selected_action_aware_model.npz',folder/'result'/'selected_action_aware_model.npz');p=next((x for x in candidates if x.is_file()),None)
+ if p is None:raise FileNotFoundError('Не найден selected_action_aware_model.npz. Выберите либо папку запуска Series105D, содержащую подпапку result, либо саму папку result. Проверено: '+', '.join(str(x) for x in candidates))
+ actual=file_sha(p)
+ if actual!=MODEL105D_SHA:raise ValueError(f'Неверный selected_action_aware_model.npz: SHA-256 {actual}; требуется {MODEL105D_SHA}. Нужен оригинальный genuine result Series105D, не fixture и не другая попытка.')
  with np.load(p,allow_pickle=False)as z:
   expected={'model_name','kind','feature'}|{f'classifier_{k}'for k in ('xm','xs','ym','ys','w')}|{f'expert{i}_{k}'for i in range(3)for k in ('xm','xs','ym','ys','w')}
   if set(z.files)!=expected or str(z['model_name'].item())!='temporal_action_experts' or str(z['kind'].item())!='experts' or str(z['feature'].item())!='temp':raise ValueError('Selected Series105D model schema неверна.')
@@ -101,14 +103,14 @@ def gui():
  import tkinter as tk
  from tkinter import filedialog,messagebox
  root=tk.Tk();root.title('Series106: frozen action-aware physical validation');root.geometry('830x480+110+55');root.attributes('-topmost',True);status=tk.StringVar(value='Выберите exact105D model и frozen source folders');pct=tk.DoubleVar(value=0);overall=tk.StringVar(value='Общий прогресс: 0,0%');eta=tk.StringVar(value='Оставшееся время появится после начала');start=[None]
- tk.Label(root,text='Series106: frozen supervised model → official physical body',font=('Arial',13,'bold'),pady=14).pack();tk.Label(root,text='12 новых untouched motions ×6 physical conditions. Training/selection/tuning отсутствуют.\nНужна оригинальная result-папка105D с selected_action_aware_model.npz.',justify='center').pack();tk.Label(root,textvariable=status,pady=10).pack();tk.Scale(root,variable=pct,from_=0,to=100,orient='horizontal',length=630,state='disabled').pack();tk.Label(root,textvariable=overall,font=('Arial',10,'bold')).pack();tk.Label(root,textvariable=eta).pack();button=tk.Button(root,text='Выбрать model105D, result89D и source84Z, затем запустить',padx=18,pady=9);button.pack(pady=14)
+ tk.Label(root,text='Series106: frozen supervised model → official physical body',font=('Arial',13,'bold'),pady=14).pack();tk.Label(root,text='12 новых untouched motions ×6 physical conditions. Training/selection/tuning отсутствуют.\nВыберите папку запуска105D с подпапкой result или саму result-папку.',justify='center').pack();tk.Label(root,textvariable=status,pady=10).pack();tk.Scale(root,variable=pct,from_=0,to=100,orient='horizontal',length=630,state='disabled').pack();tk.Label(root,textvariable=overall,font=('Arial',10,'bold')).pack();tk.Label(root,textvariable=eta).pack();button=tk.Button(root,text='Выбрать model105D, result89D и source84Z, затем запустить',padx=18,pady=9);button.pack(pady=14)
  def update(text,fraction,done,total):
   def apply():
    p=round(fraction*100,1);status.set(text);pct.set(p);overall.set(f'Общий прогресс: {p:.1f}%'.replace('.',','))
    if start[0]and fraction>.02:elapsed=time.time()-start[0];eta.set(f'Прошло {elapsed/60:.1f} мин · осталось примерно {elapsed*(1-fraction)/fraction/60:.1f} мин')
   root.after(0,apply)
  def begin():
-  model=filedialog.askdirectory(title='Выберите оригинальную result-папку Series105D',mustexist=True,initialdir=str(T_ROOT.resolve()if T_ROOT.exists()else Path.cwd()),parent=root)
+  model=filedialog.askdirectory(title='Выберите папку запуска Series105D или её подпапку result',mustexist=True,initialdir=str(T_ROOT.resolve()if T_ROOT.exists()else Path.cwd()),parent=root)
   if not model:return
   d=filedialog.askdirectory(title='Выберите завершённую result-папку Series89D',mustexist=True,initialdir=str(D_ROOT.resolve()if D_ROOT.exists()else Path.cwd()),parent=root)
   if not d:return
