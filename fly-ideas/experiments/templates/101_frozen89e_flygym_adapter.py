@@ -131,6 +131,10 @@ def run(source,d_folder,workers='6',output_root=ROOT,fixture=False,progress=lamb
   with (temp/'physical_trace.csv').open('w',newline='',encoding='utf8') as f:w=csv.DictWriter(f,fieldnames=list(trace[0]));w.writeheader();w.writerows(trace)
  (temp/'ИТОГ.txt').write_text('SERIES101: FROZEN89E → OFFICIAL FLYGYM\n\nPrimary: '+('ВЫПОЛНЕН' if primary['passed'] else'НЕ ВЫПОЛНЕН')+'.\nDevelopment adapter, не биологический результат.\n',encoding='utf-8-sig');save(temp/'complete.json',{'files':manifest(temp)});temp.rename(folder/'result');progress('Готово',1.,1,1);return folder/'result'
 def gui():
+ # Brian2 installs its SIGINT handler while importing, which Python permits only
+ # in the main interpreter thread. Import it before the GUI starts the bounded
+ # adapter work in a background thread; later frozen-chain imports reuse it.
+ import brian2
  import tkinter as tk
  from tkinter import filedialog,messagebox
  root=tk.Tk();root.title('Series101: frozen89E → FlyGym');root.geometry('760x420+150+80');root.attributes('-topmost',True);status=tk.StringVar(value='Выберите frozen sources и запустите короткий adapter prototype');pct=tk.DoubleVar(value=0);overall=tk.StringVar(value='Общий прогресс: 0,0%');eta=tk.StringVar(value='Оставшееся время появится после начала расчёта');start=[None]
