@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v665-session-2026-09-18-grooming-repair-plan";
+export const MEMORY_VERSION = "v666-session-2026-09-18-grooming-repair-pass";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -530,10 +530,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Complete12 cases×6 controls=72 summaries. Safe12/12; tracking0,060518; action12/12; aggregate wins neutral11, reversed11, zero12, shuffled9, open-loop12. Frozen gate failed solely because head-directed grooming beat shuffled visual only1/4 versus required2/4. passed/physical_development_candidate/scientific_result all false.",
     limitations: "Narrow genuine physical no-go. Do not weaken per-class threshold, count near-tie case1241, rerun fixed final until pass, or claim physical confirmation. Supervised generated-label engineering model, not unchanged frozen89E, biological learning, FlyVis/FlyWire, live fly or mirror neurons.",
     files: ["experiments/RUN-FROZEN-ACTION-AWARE-PHYSICAL-VALIDATION-106.bat", "experiments/templates/106_frozen_action_aware_physical_validation.py", "experiments/reports/frozen-action-aware-physical-validation-106-plan.md", "experiments/reports/frozen-action-aware-physical-validation-106-user-result.json", "experiments/reports/frozen-action-aware-physical-validation-106-user-result.md", "tests/frozen-action-aware-physical-validation-106.test.cjs"] },
-  { id: "session-grooming-temporal-order-repair-107", ideaId: "i-observational", title: "Series107: grooming temporal-order repair", status: "runner/protocol frozen; genuine run pending", source: "Series106 exact no-go SHA1eadcbcf…; base temporal_action_experts SHA1bbb15cd remains unchanged. New IDs1246–1341. Train only temporal validity adapter from generated valid/shuffled labels; runner SHA822502bf….",
-    results: "60 train,18 selection, conditional untouched18 final. Eight global/action-specific linear/quadratic temporal-order detector and threshold ideas. Gate: candidate kept18/18, identity and every aggregate control>=12/18, every action×control>=4/6, distinct targets. Fixture6/6 pass; genuine pending.",
-    limitations: "Supervised engineering development using sequence labels and actual truth. Does not change Series106 no-go or reuse its final. Pass only authorizes separately frozen physical108; no biological/FlyVis/FlyWire/live-fly/mirror-neuron evidence.",
-    files: ["experiments/RUN-GROOMING-TEMPORAL-ORDER-REPAIR-107.bat", "experiments/templates/107_grooming_temporal_order_repair.py", "experiments/reports/grooming-temporal-order-repair-107-plan.md", "tests/grooming-temporal-order-repair-107.test.cjs"] },
+  { id: "session-grooming-temporal-order-repair-107", ideaId: "i-observational", title: "Series107: grooming temporal-order repair", status: "genuine supervised development pass", source: "Series106 no-go SHA1eadcbcf…; base temporal_action_experts SHA1bbb15cd unchanged. Complete result SHA6628a5f4…. Selected global_linear_q00 adapter SHA4a8f141a… from new valid/shuffled training labels.",
+    results: "60 train,18 selection,18 untouched final. Final candidate kept/action18/18; wins neutral17, reversed17, zero18, shuffled18; every class gate passed and grooming was6/6 against all controls; RMSE0,045783. development_candidate true, scientific_result false.",
+    limitations: "Supervised non-physical engineering pass; Series106 remains a physical no-go. Series108 requires original exact base and adapter NPZs, new untouched physical motions and no retraining/selection/tuning. No biological/FlyVis/FlyWire/live-fly/mirror-neuron evidence.",
+    files: ["experiments/RUN-GROOMING-TEMPORAL-ORDER-REPAIR-107.bat", "experiments/templates/107_grooming_temporal_order_repair.py", "experiments/reports/grooming-temporal-order-repair-107-plan.md", "experiments/reports/grooming-temporal-order-repair-107-user-result.json", "experiments/reports/grooming-temporal-order-repair-107-user-result.md", "tests/grooming-temporal-order-repair-107.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

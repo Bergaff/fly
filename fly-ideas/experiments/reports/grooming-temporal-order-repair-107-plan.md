@@ -56,3 +56,11 @@ The GUI supports new run and checkpoint continuation, displays percentage/ETA an
 ## Decision boundary
 
 A pass means only that a supervised temporal-order adapter is a development candidate. It authorizes preparation of a separately frozen Series108 with new untouched physical motions and exact base-model plus adapter loading. It is not a Series106 pass and not physical, biological, FlyVis/FlyWire, connectome, living-fly or mirror-neuron evidence. A no-go closes this declared repair tournament without threshold weakening.
+
+## Genuine outcome (recorded after the run)
+
+The complete genuine Windows result is preserved in `grooming-temporal-order-repair-107-user-result.json` (SHA-256 `6628a5f4d6655f926507e7b39591ea14208e8f4d4240dbec22bf5f86b211a5b6`) and interpreted in the adjacent `.md` report.
+
+`global_linear_q00` and `global_quadratic_q00` passed selection with identical candidate RMSE; the declared name tie-break selected `global_linear_q00`. Exact adapter SHA is `4a8f141a4697fc7d3c3c1ad9e9a60eb27a6d93cb5e7403ad4a4b99e413009b57`.
+
+The untouched final passed: candidate kept18/18, action18/18, wins neutral17/18, reversed17/18, zero18/18 and shuffled18/18. Head-directed grooming won6/6 against every control; all per-action requirements passed. `development_candidate=true`, `scientific_result=false`. A separately frozen physical Series108 is now authorized, but requires the original Series105D base NPZ and original Series107 adapter NPZ; neither may be reconstructed from summary JSON alone.
