@@ -66,3 +66,9 @@ Double-click `experiments\RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat`, then choose t
 ## Interpretation
 
 A pass supports frozen engineering robustness to these six declared digital visual nuisances and demonstrates adapter contribution under the preregistered ablation metric. It is not hardware-camera transfer, biological vision, living-fly evidence, real muscles, FlyVis/FlyWire/connectome validation or mirror neurons. `scientific_result` remains false.
+
+## Genuine outcome
+
+Complete result `frozen-nuisance-robustness-ablation-109-user-result.json`, SHA `e7cfc5068fb53ae69782d3d31ce03e16605c044699a3a41590193a5276c99f03`, is a no-go. Safety18/18, tracking0,061683, shuffled rejection17/18, identity15/18, open-loop18/18 and adapter gain13/18 passed aggregate subchecks. But dim and low-contrast candidate acceptance were0/3 each, candidate kept was12/18<15, every aggregate repaired-control win was11/18<12, and targets were not distinct because rejected candidates equalled zero input. Sensor-noise and frame-dropout adapter gain were1/3<2/3. `robustness_candidate=false`, `scientific_result=false`.
+
+The base candidate often outperformed the adapter's zero fallback under dim/contrast, localizing the repair target to scale-sensitive front-end/validity diagnostics. Series110 is separately preregistered on new selection/final IDs; Series109 thresholds and outcomes remain unchanged.

@@ -927,4 +927,8 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series109: new-domain nuisance robustness + adapter ablation
 
-`experiments\RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat` больше не повторяет исходный benchmark. Exact frozen policy проходит6 visual domains: dim, bright, low contrast, sensor noise, horizontal shift и frame dropout, плюс расширенный speed0,56–1,34.18 cases×8 conditions=144 physical rollouts включают repaired/base candidate и repaired/base shuffled ablations. Gate балансируется по action и nuisance domain и требует adapter gain относительно base-only shuffled. No fit/selection/tuning; genuine pending. Runner SHA `691dbd14…`; план `experiments/reports/frozen-nuisance-robustness-ablation-109-plan.md`.
+`experiments\RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat` проверил6 digital visual domains на144 physical rollouts. Genuine **no-go**: safe18, tracking0,061683, shuffled rejected17, identity15 и adapter gain13 прошли aggregate subchecks, но dim/low-contrast candidate kept0/3 each; total kept12/18<15, control wins11/18<12, targets distinct false. Sensor-noise/dropout gain1/3<2/3. Exact JSON SHA `e7cfc506…`; Series108 same-domain pass сохраняется, robustness claim не открыт.
+
+### Series110: nuisance front-end repair
+
+`experiments\RUN-NUISANCE-FRONTEND-REPAIR-110.bat` сохраняет exact base+adapter и выбирает среди6 deterministic front ends: raw, sequence/frame percentile, z-score, percentile+temporal smoothing, percentile+spatial smoothing. New selection IDs1378–1395; conditional untouched final1396–1413. Gate сохраняет overall/action/domain validity, specificity и ablation gain. Series109 final не переиспользуется. Runner SHA `1d15c85d…`; genuine pending.

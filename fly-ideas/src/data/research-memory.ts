@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v669-session-2026-09-18-nuisance-robustness-plan";
+export const MEMORY_VERSION = "v670-session-2026-09-18-nuisance-repair-plan";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -538,10 +538,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Complete108 rollouts: safe18, tracking0,060341, candidate kept18, shuffled rejected18 and6/class, identity18, wins neutral17, reversed14, zero18, shuffled18, open-loop17. Grooming6/6 neutral,5/6 reversed,6/6 zero/shuffled. physical_development_candidate true; scientific false.",
     limitations: "Reach/withdraw reversed3/6 exactly met minimum. Simulated supervised generated-action engineering evidence; Series106 stays no-go. Stop same-benchmark tuning. Next phase must change nuisance/domain conditions with adapter ablation. No biological/FlyVis/FlyWire/live-fly/mirror-neuron claim.",
     files: ["experiments/RUN-FROZEN-GROOMING-REPAIR-PHYSICAL-108.bat", "experiments/templates/108_frozen_grooming_repair_physical_validation.py", "experiments/reports/frozen-grooming-repair-physical-108-plan.md", "experiments/reports/frozen-grooming-repair-physical-108-user-result.json", "experiments/reports/frozen-grooming-repair-physical-108-user-result.md", "tests/frozen-grooming-repair-physical-108.test.cjs"] },
-  { id: "session-frozen-nuisance-robustness-109", ideaId: "i-observational", title: "Series109: frozen nuisance robustness and adapter ablation", status: "runner/protocol frozen; genuine run pending", source: "Exact repaired policy after genuine108 pass. New IDs1360–1377 cross dim/bright/low-contrast/noise/shift/dropout digital domains and wider speeds. Runner SHA691dbd14…; no fit/selection/tuning.",
-    results: "18 cases×8 conditions=144 physical rollouts. Explicit base-candidate and base-shuffled adapter ablations. Frozen gate requires safety/validity/identity/specificity and adapter gain overall, per action and per nuisance domain. Fixture7/7 pass; genuine pending.",
-    limitations: "Deterministic post-capture digital nuisances, not physical camera hardware or biological domain transfer. Exact supervised generated-action policy; scientific_result false regardless of outcome.",
-    files: ["experiments/RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat", "experiments/templates/109_frozen_nuisance_robustness_ablation.py", "experiments/reports/frozen-nuisance-robustness-ablation-109-plan.md", "tests/frozen-nuisance-robustness-109.test.cjs"] },
+  { id: "session-frozen-nuisance-robustness-109", ideaId: "i-observational", title: "Series109: frozen nuisance robustness and adapter ablation", status: "genuine digital-domain robustness no-go", source: "Exact repaired policy after genuine108 pass. Result SHAe7cfc506… on dim/bright/low-contrast/noise/shift/dropout domains; no fit/selection/tuning.",
+    results: "Safe18, tracking0,061683, shuffled rejected17, identity15, open-loop18, adapter gain13. Failed: dim/low-contrast kept0/3 each, total kept12<15, control wins11<12, distinct false, noise/dropout gain1/3. robustness_candidate/scientific false.",
+    limitations: "Scale-sensitive adapter rejected valid photometric shifts; Series108 stays same-domain pass. Deterministic digital nuisances, not hardware or biological transfer. Do not weaken gates or reuse final for repair selection.",
+    files: ["experiments/RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat", "experiments/templates/109_frozen_nuisance_robustness_ablation.py", "experiments/reports/frozen-nuisance-robustness-ablation-109-plan.md", "experiments/reports/frozen-nuisance-robustness-ablation-109-user-result.json", "experiments/reports/frozen-nuisance-robustness-ablation-109-user-result.md", "tests/frozen-nuisance-robustness-109.test.cjs"] },
+  { id: "session-nuisance-frontend-repair-110", ideaId: "i-observational", title: "Series110: nuisance frontend repair", status: "runner/protocol frozen; genuine run pending", source: "Exact109 no-go; base+adapter frozen. New selection1378–1395 and conditional final1396–1413. Six raw/percentile/zscore/temporal/spatial deterministic front ends; runner SHA1d15c85d….",
+    results: "Selection/final gate keeps candidate/shuffle/action>=15, controls/gain>=12, action>=4/class and domain>=2/3, distinct. Fixture6/6 pass; genuine pending.",
+    limitations: "Supervised non-physical frontend selection on generated nuisance data. Series109 remains no-go. Pass only authorizes a separately frozen physical test; no hardware/biological claim.",
+    files: ["experiments/RUN-NUISANCE-FRONTEND-REPAIR-110.bat", "experiments/templates/110_nuisance_frontend_repair_tournament.py", "experiments/reports/nuisance-frontend-repair-110-plan.md", "tests/nuisance-frontend-repair-110.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

@@ -394,4 +394,8 @@ Exact-loaded original base+adapter NPZs; no fit/selection/tuning. Complete genui
 
 ## Series109: frozen nuisance robustness + ablation prepared
 
-No same-distribution tuning. New IDs1360–1377 cross six deterministic post-capture domains (dim/bright/low-contrast/noise/horizontal-shift/frame-dropout) and wider speed range. Eight conditions include repaired/base candidate and repaired/base shuffled controls,144 physical rollouts. Gate requires safety, validity, identity and specificity overall/by-action/by-domain plus adapter gain over base-only shuffled. BAT `RUN-FROZEN-NUISANCE-ROBUSTNESS-109.bat`; runner SHA691dbd14…; genuine pending. Digital nuisance transfer is not hardware camera or biological transfer.
+No same-distribution tuning. Complete genuine result SHA `e7cfc5068fb53ae69782d3d31ce03e16605c044699a3a41590193a5276c99f03` is a robustness no-go. Safe18, tracking0,061683, shuffled rejected17, identity15, open-loop18 and gain13; but dim/low-contrast candidate kept0/3 each, total kept12<15, every aggregate repaired-control win11<12, distinct false; noise/dropout gain1/3<2. Base candidate often beat zero fallback, localizing failure to scale-sensitive frontend/adapter diagnostics.
+
+## Series110: nuisance frontend repair prepared
+
+Exact base+adapter retained; Series109 outcomes excluded. Six fixed normalizers compete on new selection IDs1378–1395: raw, sequence/frame percentile, z-score, percentile+temporal or spatial smoothing. Untouched final1396–1413 opens only after selection pass. Frozen gate keeps overall/action/domain validity, specificity and adapter-gain requirements. BAT `RUN-NUISANCE-FRONTEND-REPAIR-110.bat`, runner SHA1d15c85d…, genuine pending. A pass remains supervised non-physical development and only authorizes separate physical validation.
