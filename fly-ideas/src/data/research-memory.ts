@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v647-session-2026-11-25-flygym-adapter-result";
+export const MEMORY_VERSION = "v648-session-2026-11-25-flygym-adapter-replication";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -502,6 +502,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Fixed mapping6 synthetic channels→6 official front-leg pitch DOF;120 FlyGym MOTOR rollouts. Candidate safe/contact24/24, mean tracking RMSE0,092774rad≤0,20; truth RMSE wins24/24 против zero, shuffled, shared lesion и true open loop; targets distinct; primary=true. Action labels23/24, accuracy не была blocking criterion. True open loop имел те же candidate target hashes, но не использовал q/dq.",
     limitations: "`scientific_result=false`: это bounded viability фиксированного physical adapter, не подтверждение FlyVis/FlyWire mapping или biological result. Остальные36 actuators держат neutral pose; demonstrator получает synthetic truth. Нет мышц, живой мухи или biological mirror-neuron claim. Synthetic optimization остаётся закрыта, Stage97 не открыт.",
     files: ["experiments/RUN-FROZEN89E-FLYGYM-ADAPTER.bat", "experiments/templates/101_frozen89e_flygym_adapter.py", "experiments/reports/frozen89e-flygym-adapter-plan.md", "experiments/reports/frozen89e-flygym-adapter-user-result.json", "experiments/reports/frozen89e-flygym-adapter-user-result.md", "tests/frozen89e-flygym-adapter.test.cjs"] },
+  { id: "session-frozen89e-flygym-replication-plan", ideaId: "i-observational", title: "Series102: frozen-репликация physical adapter", status: "runner/protocol заморожены; genuine Windows run pending", source: "После Series101 physical-adapter pass пользователь выбрал независимую frozen-репликацию до official visual bridge. Exact Series101 runner/result SHA авторизуют запуск. Новые motions897–902 и views805–808 фиксированы до результата; hashes исключают training/disclosed/Series101 overlap.",
+    results: "Без изменения используются frozen89E, mapping6→6 front-leg pitch DOF, clip±0,35rad, FlyGym MOTOR dt0,0005/Kp18/Kd0,18/limit25, candidate/zero/shuffled/shared-lesion/true-open-loop и Series101 primary rule.24 new cases×5=120 rollouts. Training, selection и post-result tuning запрещены. Fixture подготовлена; genuine result ещё не получен.",
+    limitations: "Pass подтвердит только independent bounded physical-adapter replication; fail сохраняется без ослабления thresholds. Не Stage97, не FlyVis/FlyWire mapping, мышцы, живая муха или biological mirror-neuron evidence. Synthetic optimization остаётся закрыта.",
+    files: ["experiments/RUN-FROZEN89E-FLYGYM-REPLICATION.bat", "experiments/templates/102_frozen89e_flygym_replication.py", "experiments/reports/frozen89e-flygym-replication-plan.md", "tests/frozen89e-flygym-replication.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
