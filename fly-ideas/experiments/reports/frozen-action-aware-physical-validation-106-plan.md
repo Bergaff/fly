@@ -65,3 +65,9 @@ GUI shows overall percentage and ETA and automatically opens result or a copyabl
 ## Allowed conclusion
 
 Pass establishes only frozen supervised engineering viability from official-eye temporal features to an official MOTOR body on new generated motions. It does not restore unchanged frozen89E and does not demonstrate biological learning, FlyVis/FlyWire/connectome mapping, muscles, a living fly or mirror neurons. `scientific_result` remains false for every outcome.
+
+## Genuine outcome (recorded after the run)
+
+The complete genuine Windows run is preserved in `frozen-action-aware-physical-validation-106-user-result.json` (SHA-256 `1eadcbcfea31c973f9993da16be7cd0b01998d2f4c6c7aa27c54b4c08da00be9`) and interpreted in the adjacent `.md` report.
+
+The frozen primary gate did not pass. Safety/contact was 12/12, tracking RMSE was 0,060518rad, action identity was 12/12, aggregate wins were neutral11/12, reversed11/12, zero12/12, shuffled9/12 and open-loop12/12. The sole failed gate was class-balanced shuffled-input specificity for head-directed grooming: 1/4 wins versus the required2/4. `physical_development_candidate=false`; `scientific_result=false`. Series106 is closed as a genuine physical no-go; its threshold must not be weakened and its fixed final must not be rerun until it passes.

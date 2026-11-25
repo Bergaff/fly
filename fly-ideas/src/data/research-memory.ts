@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v663-session-2026-09-18-physical-validation-plan";
+export const MEMORY_VERSION = "v664-session-2026-09-18-physical-validation-nogo";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -526,10 +526,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "All4 models passed selection; min RMSE0,044689 selected temporal experts. Final action18/18; wins neutral15, reversed16, zero18, shuffled17/18; candidate mean RMSE0,038314; distinct. Primary=true, development_candidate=true, scientific_result=false. Foreleg/head/reach action each6/6.",
     limitations: "Supervised generated labels+actual truth, not frozen89E transfer or rescue of Series104/105B/105C. Non-physical development only. Reach visual specificity weaker (neutral3/6,reversed4/6). Separate frozen physical Series106 authorized; must exact-load original NPZ SHA1bbb15cd…. No biological/FlyVis/FlyWire/live-fly/mirror-neuron claim.",
     files: ["experiments/RUN-ACTION-AWARE-TEMPORAL-TOURNAMENT-105D.bat", "experiments/templates/105d_action_aware_temporal_tournament.py", "experiments/reports/action-aware-temporal-tournament-105d-plan.md", "experiments/reports/action-aware-temporal-tournament-105d-user-result.json", "experiments/reports/action-aware-temporal-tournament-105d-user-result.md", "tests/action-aware-temporal-tournament-105d.test.cjs"] },
-  { id: "session-frozen-action-aware-physical-validation-106", ideaId: "i-observational", title: "Series106: frozen action-aware physical validation", status: "runner/protocol frozen; genuine Windows run pending", source: "Exact successful105D summary SHA59f8d54f… authorizes loading original temporal_action_experts NPZ SHA1bbb15cd…. No fit/selection/tuning. New untouched motions1234–1245, official eyes→temporal pool→frozen expert→official MOTOR. Runner SHA282a7a87….",
-    results: "12 cases×candidate/neutral/reversed/zero/shuffled/open-loop=72 rollouts. Gate: all safe/contact; tracking<=0,20; action>=9/12 and>=3/4/class; wins>=8/12 and>=2/4/class against each input control; open-loop>=10/12; distinct. Fixture7/7 pass; genuine pending.",
-    limitations: "Requires original105D result folder containing exact model arrays. Engineering physical validation of a supervised generated-label model, not unchanged frozen89E, biological learning, FlyVis/FlyWire, live fly or mirror neurons. scientific_result always false.",
-    files: ["experiments/RUN-FROZEN-ACTION-AWARE-PHYSICAL-VALIDATION-106.bat", "experiments/templates/106_frozen_action_aware_physical_validation.py", "experiments/reports/frozen-action-aware-physical-validation-106-plan.md", "tests/frozen-action-aware-physical-validation-106.test.cjs"] },
+  { id: "session-frozen-action-aware-physical-validation-106", ideaId: "i-observational", title: "Series106: frozen action-aware physical validation", status: "genuine complete; frozen physical no-go", source: "Exact successful105D summary SHA59f8d54f… and temporal_action_experts NPZ SHA1bbb15cd…. No fit/selection/tuning. New untouched motions1234–1245, official eyes→temporal pool→frozen expert→official MOTOR. Runner SHA282a7a87…; result SHA1eadcbcf….",
+    results: "Complete12 cases×6 controls=72 summaries. Safe12/12; tracking0,060518; action12/12; aggregate wins neutral11, reversed11, zero12, shuffled9, open-loop12. Frozen gate failed solely because head-directed grooming beat shuffled visual only1/4 versus required2/4. passed/physical_development_candidate/scientific_result all false.",
+    limitations: "Narrow genuine physical no-go. Do not weaken per-class threshold, count near-tie case1241, rerun fixed final until pass, or claim physical confirmation. Supervised generated-label engineering model, not unchanged frozen89E, biological learning, FlyVis/FlyWire, live fly or mirror neurons.",
+    files: ["experiments/RUN-FROZEN-ACTION-AWARE-PHYSICAL-VALIDATION-106.bat", "experiments/templates/106_frozen_action_aware_physical_validation.py", "experiments/reports/frozen-action-aware-physical-validation-106-plan.md", "experiments/reports/frozen-action-aware-physical-validation-106-user-result.json", "experiments/reports/frozen-action-aware-physical-validation-106-user-result.md", "tests/frozen-action-aware-physical-validation-106.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
