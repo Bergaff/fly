@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v652-session-2026-11-25-flygym-vision-llvmlite-repair";
+export const MEMORY_VERSION = "v653-session-2026-11-25-flygym-vision-result";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -506,10 +506,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "На24 новых cases и120 FlyGym rollouts candidate safe/contact24/24, mean tracking0,099839rad, truth wins23/24 zero и24/24 shuffled/shared-lesion/true-open-loop, targets distinct, primary=true. Единственный zero loss motion899/view806:0,177246 vs0,176403rad. Action classification23/24 secondary. Frozen Series101 gate независимо воспроизведён.",
     limitations: "`scientific_result=false`: подтверждена только independent bounded physical-adapter viability. Это ещё не official FlyGym visual observation между телами, Stage97, FlyVis/FlyWire mapping, мышцы, живая муха или biological mirror-neuron evidence. Synthetic optimization остаётся закрыта.",
     files: ["experiments/RUN-FROZEN89E-FLYGYM-REPLICATION.bat", "experiments/templates/102_frozen89e_flygym_replication.py", "experiments/reports/frozen89e-flygym-replication-plan.md", "experiments/reports/frozen89e-flygym-replication-user-result.json", "experiments/reports/frozen89e-flygym-replication-user-result.md", "tests/frozen89e-flygym-replication.test.cjs"] },
-  { id: "session-flygym-interbody-vision-preflight-plan", ideaId: "i-observational", title: "Series103: official vision между двумя FlyGym bodies", status: "technical preflight подготовлен; genuine Windows run pending", source: "После Series102 frozen physical replication подготовлен отдельный gate перед policy bridge. Exact Series102 result авторизует запуск. Observer использует official add_vision/get_raw_vision; moving demonstrator сравнивается с paired neutral episode. Первый pre-run остановился до frame/outcome из-за отсутствующего/не загружаемого llvmlite.dll в official Retina path; это environment failure.",
-    results: "49 official left/right fisheye RGB frames детерминированно resize до2×64×96 и проходят frozen edge-history shape47×576 без запуска policy. Primary8/8 проверяет shapes, finite/nonconstant signal, paired RGB/edge deltas, demonstrator joint response, real actuator force и observer contact. Installer теперь force-reinstall exact numba0.65.1/llvmlite0.47.0 wheels без cache и проверяет binding+Retina. Fixture прошла; genuine result ещё не получен.",
-    limitations: "Technical image-transport preflight, не evidence, что frozen89E понимает official images. Нет training/selection, FlyVis/FlyWire mapping, живой мухи или biological claim. Только pass разрешает отдельный preregistered official-eye policy bridge.",
-    files: ["experiments/RUN-FLYGYM-INTERBODY-VISION-PREFLIGHT.bat", "experiments/templates/103_flygym_interbody_vision_preflight.py", "experiments/reports/flygym-interbody-vision-preflight-plan.md", "tests/flygym-interbody-vision-preflight.test.cjs"] },
+  { id: "session-flygym-interbody-vision-preflight-plan", ideaId: "i-observational", title: "Series103: official vision между двумя FlyGym bodies", status: "completed на Windows; official image-transport gate8/8 пройден", source: "Original user JSON SHA1a13fe46…: runner33bc95e4…, Series102 prerequisite exact, training/selection false. Observer использует official add_vision/get_raw_vision; paired moving demonstrator vs neutral. Первый pre-run до frame/outcome выявил llvmlite.dll environment failure; exact binary repair предшествовал result.",
+    results: "All8 checks pass: official arrays49×2×64×96×3, edge features47×576, paired RGB delta19,467709 и edge delta0,0142752, demonstrator response0,163094rad, force9,326219, observer contact fraction0,979592. Primary=true, scientific_result=false. Official body→observer eyes→frozen-compatible shape channel технически готов.",
+    limitations: "Не evidence, что frozen89E понимает official images; policy здесь не запускалась. Resize96×64 — engineering adapter. Нет training/selection, FlyVis/FlyWire mapping, живой мухи или biological claim. Pass разрешает отдельный preregistered official-eye policy bridge.",
+    files: ["experiments/RUN-FLYGYM-INTERBODY-VISION-PREFLIGHT.bat", "experiments/templates/103_flygym_interbody_vision_preflight.py", "experiments/reports/flygym-interbody-vision-preflight-plan.md", "experiments/reports/flygym-interbody-vision-preflight-user-result.json", "experiments/reports/flygym-interbody-vision-preflight-user-result.md", "tests/flygym-interbody-vision-preflight.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
@@ -536,6 +536,10 @@ export function installResearchMemory(existing?: ResearchMemoryState): ResearchM
       return current ? { ...current, files: [...current.files] } : entry;
     }
     if (entry?.id === "session-frozen89e-flygym-replication-plan" && entry.status === "runner/protocol заморожены; genuine Windows run pending") {
+      const current = RESEARCH_MEMORY.find((item) => item.id === entry.id);
+      return current ? { ...current, files: [...current.files] } : entry;
+    }
+    if (entry?.id === "session-flygym-interbody-vision-preflight-plan" && entry.status === "technical preflight подготовлен; genuine Windows run pending") {
       const current = RESEARCH_MEMORY.find((item) => item.id === entry.id);
       return current ? { ...current, files: [...current.files] } : entry;
     }

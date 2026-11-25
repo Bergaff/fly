@@ -47,3 +47,7 @@ Frozen edge-history transform применяется без обучения т�
 ## Допустимый следующий шаг
 
 Только при pass разрешается отдельный frozen official-eye policy bridge с заранее фиксированным preprocessing и controls. Pass не означает, что frozen89E понимает official images, и не подтверждает imitation или biological validity.
+
+## Полученный Windows результат
+
+После binary dependency repair genuine run завершён:8/8 checks pass. Получены arrays49×2×64×96×3 и features47×576; paired RGB delta19,467709≫0,05, edge delta0,0142752≫1e-5, demonstrator response0,163094rad, max force9,326219, observer contact fraction0,979592. `primary.passed=true`, `scientific_result=false`. Точный JSON и интерпретация сохранены в `flygym-interbody-vision-preflight-user-result.json/.md`; SHA-256 JSON `1a13fe460bfb7bfc0af70203465ba42b74ba0809d53672bdad0afb209c6184bf`.
