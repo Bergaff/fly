@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v638-session-2026-11-24-stage96-hybrid-no-go";
+export const MEMORY_VERSION = "v639-session-2026-11-24-synthetic-joint-line-stopped";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -488,8 +488,12 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     files: ["experiments/RUN-STAGE96-HYBRID-MULTIHEAD-8H.bat", "experiments/templates/96_hybrid_multihead_development.py", "experiments/reports/stage96-hybrid-multihead-8h-protocol.md", "tests/stage96-hybrid-multihead.test.cjs"] },
   { id: "session-stage96-hybrid-multihead-user-result", ideaId: "i-connectome-advantage", title: "Stage96: полный exact-budget hybrid benchmark", status: "completed по присланному summary; partial engineering success, development no-go", source: "Пользователь приложил summary-36.json:32720/32720 replicates, workers6,59,2210 worker-hours. Script SHA d8000261… и Stage95 SHA58b74a79… совпадают. Все84 агрегата имеют n=32720; каждая модель4437 parameters. SQLite/protocol/complete отдельно не получены.",
     results: "Classification branch pass=true: margins structured vs hybrid shuffled/temporal/learned +0,041407/+0,056909/+0,020002; harsh Wilson lower0,803066/0,952450/0,611700; overall0,793322/0,975407/0,552758. Joint vs RNN54 полностью проходит. Но learned_sparse blocks: few-shot RMSE ratio0,838246, однако harsh/overall RMSE lower0,497529/0,442467 и dual lower0,456498/0,409179. joint pass=false, candidate=false.",
-    limitations: "Hybrid выигрывает learned-sparse в few-shot harsh mean, но проигрывает trajectory stability при budget30; нельзя исключать budget30 или менять all-condition gate. Не разрешена frozen replication общей hypothesis или mapping. Узкий structured-classifier и RNN54 results остаются development и требуют отдельной заранее сформулированной hypothesis.",
+    limitations: "Hybrid выигрывает learned-sparse в few-shot harsh mean, но проигрывает trajectory stability при budget30; нельзя исключать budget30 или менять all-condition gate. Не разрешена frozen replication общей hypothesis или mapping.",
     files: ["experiments/reports/stage96-hybrid-multihead-user-result.json", "experiments/reports/stage96-hybrid-multihead-user-result.md", "experiments/reports/stage96-hybrid-multihead-8h-protocol.md"] },
+  { id: "session-synthetic-joint-line-stopped", ideaId: "i-connectome-advantage", title: "Решение после Stage96: остановить synthetic joint optimization", status: "линия остановлена по явному выбору пользователя", source: "После Stage96 пользователю предложены два честных пути: новая frozen few-shot/classification hypothesis или остановка дальнейшей синтетической оптимизации общей joint hypothesis. Пользователь выбрал «Остановить синтетику». Условный ответ о4-часовом бюджете не применяется, потому что frozen запуск не выбран.",
+    results: "Новые Stage97 runner, seeds и расчёт не создаются. Зафиксирован итог линии: Stage94 frozen pass против shuffled; Stage95 no-go против learned-sparse/RNN joint controls; Stage96 подтверждает structured classification и hybrid-vs-RNN54, но не проходит learned-sparse all-budget trajectory/dual gate. Общий candidate отсутствует.",
+    limitations: "Нельзя позже представить Stage94 как финальное общее преимущество, скрыв Stage95/96 no-go. Нельзя постфактум сузить hypothesis до few-shot/classification и назвать старые disclosed данные frozen. Возврат к этой теме потребует нового явного решения, новой preregistration и untouched seeds. Biological mapping остаётся закрыт Series90.",
+    files: ["experiments/reports/stage94-frozen-paired-loss-user-result.md", "experiments/reports/stage95-strong-controls-user-result.md", "experiments/reports/stage96-hybrid-multihead-user-result.md", "experiments/reports/synthetic-joint-line-closure.md", "experiments/reports/PROJECT-HANDOFF.md"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
