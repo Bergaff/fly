@@ -245,7 +245,7 @@ export const SEED_IDEAS: Idea[] = [
  venues: ["eLife", "Curr Biol", "PLoS Comp Bio", "Cognitive Science (стык)"],
  timeline: "6–9 месяцев (после MB-обучения)",
  tags: ["social learning", "наблюдение", "зеркальные нейроны", "MB", "dopamine", "две мухи"],
- status: "backlog",
+ status: "active",
  scores: { effort: 8, impact: 8, novelty: 9, speed: 3, risk: 7 },
  dependsOn: ["i-mb-learning"],
  citations: [
@@ -253,7 +253,7 @@ export const SEED_IDEAS: Idea[] = [
  { refId: "r-vogt2016", why: "Анатомический канал зрение → MB, по которому идёт «наблюдение»" },
  { refId: "r-aso2014", why: "Логика DAN → KC → MBON, куда встраиваем учительский сигнал" },
  ],
- notes: "Самая смелая идея. Даже отрицательный результат («в коннектоме нет пути от зрения к DAN достаточной силы»): публикуемый: показывает, чего не хватает для социального обучения.",
+ notes: "После завершения synthetic roadmap и остановки Stage91–96 пользователь выбрал новую official-body линию. Series100 подготавливает короткий FlyGym2.1.1 preflight с двумя NeuroMechFly, MuJoCo actuators/forces/ground contacts. Это не Stage97 и пока не visual imitation: observer получает задержанную diagnostic motor command. После настоящего Windows go разрешён отдельный frozen89E→FlyGym adapter prototype. Биологический mapping Series90 остаётся закрыт.",
  }),
  idea({
  id: "i-interference",

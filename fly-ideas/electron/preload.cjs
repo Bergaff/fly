@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld("fly", {
   pickPythonExe: () => ipcRenderer.invoke("fly:pickPythonExe"),
   setupPythonEnv: (mode) => ipcRenderer.invoke("fly:setupPythonEnv", mode),
   checkEmbodiedEnv: () => ipcRenderer.invoke("fly:checkEmbodiedEnv"),
-  setupEmbodiedEnv: () => ipcRenderer.invoke("fly:setupEmbodiedEnv"),
+  setupEmbodiedEnv: (target = "all") => ipcRenderer.invoke("fly:setupEmbodiedEnv", target),
   onEnvSetupOutput: (cb) => {
     const h = (_e, p) => cb(p);
     ipcRenderer.on("fly:envSetupOutput", h);

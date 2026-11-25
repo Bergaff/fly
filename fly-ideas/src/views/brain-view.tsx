@@ -3269,9 +3269,9 @@ function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | nul
     }
   };
 
-  const setupEmbodied = async () => {
+  const setupEmbodied = async (target: "all" | "flygym" = "all") => {
     setSettingUp(true); setSetupError(""); setSetupLog("");
-    try { setEmbodied(await fly!.setupEmbodiedEnv()); }
+    try { setEmbodied(await fly!.setupEmbodiedEnv(target)); }
     catch (e) { setSetupError((e as Error).message); }
     finally { setSettingUp(false); }
   };
@@ -3368,10 +3368,13 @@ function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | nul
             <Row ok={!!embodied?.flygym.ready} label="FlyGym" value={embodied?.flygym.ready ? embodied.flygym.version || "готов" : embodied?.flygym.error || "не установлен"} />
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={() => void setupEmbodied()} disabled={settingUp || !env?.python || !!embodied?.ready}>
-              {settingUp ? "устанавливаю…" : embodied?.ready ? "FlyVis и FlyGym готовы" : "установить всё для зрения и тела"}
+            <Button onClick={() => void setupEmbodied("flygym")} disabled={settingUp || !env?.python || !!embodied?.flygym.ready}>
+              {settingUp ? "устанавливаю…" : embodied?.flygym.ready ? "FlyGym готов" : "установить только FlyGym"}
             </Button>
-            <span className="text-[11px] text-muted-foreground">Создаёт отдельные <code>workspace/.venv-flyvis</code> и <code>workspace/.venv-flygym</code>, скачивает официальные pretrained-модели FlyVis. Нужен Python 3.12.</span>
+            <Button variant="outline" onClick={() => void setupEmbodied("all")} disabled={settingUp || !env?.python || !!embodied?.ready}>
+              {embodied?.ready ? "FlyVis и FlyGym готовы" : "установить всё для зрения и тела"}
+            </Button>
+            <span className="text-[11px] text-muted-foreground">Для физического тела достаточно отдельного <code>workspace/.venv-flygym</code>. Полная установка дополнительно создаёт FlyVis-среду и скачивает pretrained-модели. Нужен Python 3.12.</span>
           </div>
           <p className="text-[11px] text-muted-foreground">Все загрузки выполняются здесь с видимым журналом. Существующая среда Shiu и пользовательские результаты не изменяются. Повторное нажатие после сетевой ошибки безопасно продолжает установку.</p>
         </div>

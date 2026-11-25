@@ -149,7 +149,7 @@ export interface FlyBridge {
   pickPythonExe(): Promise<EnvInfo | null>;
   setupPythonEnv(mode?: "core" | "full"): Promise<EnvInfo>;
   checkEmbodiedEnv(): Promise<EmbodiedEnvInfo>;
-  setupEmbodiedEnv(): Promise<EmbodiedEnvInfo>;
+  setupEmbodiedEnv(target?: "all" | "flygym"): Promise<EmbodiedEnvInfo>;
   onEnvSetupOutput(cb: (p: EnvSetupOutput) => void): () => void;
   openPath(p: string): Promise<string>;
   openExternal(url: string): Promise<void>;

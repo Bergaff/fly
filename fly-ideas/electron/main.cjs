@@ -693,7 +693,8 @@ async function checkEmbodiedEnv() {
   const bytes = await folderBytes(p.flyvisRoot); const pretrained = { folder: p.flyvisRoot, ready: bytes > 1024 * 1024, bytes };
   return { flyvis, flygym, pretrained, ready: flyvis.ready && flygym.ready && pretrained.ready };
 }
-async function setupEmbodiedEnv(win) {
+async function setupEmbodiedEnv(win, target = "all") {
+  if (!new Set(["all", "flygym"]).has(target)) throw new Error("Неизвестный режим установки физического тела.");
   if (envSetupBusy) throw new Error("Другая установка пакетов уже выполняется. Дождитесь завершения.");
   envSetupBusy = true;
   const emit = (text, extra = {}) => win?.webContents.send("fly:envSetupOutput", { text, done: false, scope: "embodied", ...extra });
@@ -708,23 +709,29 @@ async function setupEmbodiedEnv(win) {
   try {
     const candidates = await listPythons();
     const base = candidates.find(x => x.majorMinor?.[0] === 3 && x.majorMinor?.[1] === 12);
-    if (!base) throw new Error("Для совместимой установки FlyVis и FlyGym нужен Python 3.12. Выберите python.exe версии 3.12 выше или установите его и нажмите «проверить снова».");
+    if (!base) throw new Error("Для совместимой установки FlyGym нужен Python 3.12. Выберите python.exe версии 3.12 выше или установите его и нажмите «проверить снова».");
     const spec = parsePySpec(base.exe || base.cmd); const ep = embodiedPaths(); await fsp.mkdir(ep.flyvisRoot, { recursive: true });
-    const environments = [
-      { label: "FlyVis", dir: ep.flyvisDir, pkg: `flyvis==${EMBODIED_FLYVIS_VERSION}` },
-      { label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}` },
-    ];
+    const environments = target === "flygym"
+      ? [{ label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}` }]
+      : [
+          { label: "FlyVis", dir: ep.flyvisDir, pkg: `flyvis==${EMBODIED_FLYVIS_VERSION}` },
+          { label: "FlyGym", dir: ep.flygymDir, pkg: `flygym==${EMBODIED_FLYGYM_VERSION}` },
+        ];
+    const total = target === "flygym" ? 3 : 5;
     for (let i=0;i<environments.length;i++) {
-      const e=environments[i], exe=venvPythonExe(e.dir); emit(`[${i+1}/5] ${e.label}: окружение ${e.dir}\n`);
+      const e=environments[i], exe=venvPythonExe(e.dir); emit(`[${i+1}/${total}] ${e.label}: окружение ${e.dir}\n`);
       if (!fs.existsSync(exe)) { await fsp.mkdir(path.dirname(e.dir), { recursive: true }); const made=await streamed(spec.cmd,[...spec.prefix,"-m","venv",e.dir]); if(!made.ok||!fs.existsSync(exe))throw new Error(`Не удалось создать окружение ${e.label}.`); }
-      emit(`[${i+3}/5] Устанавливаю ${e.pkg} из PyPI...\n`); const inst=await streamed(exe,["-m","pip","install","--prefer-binary",e.pkg]); if(!inst.ok)throw new Error(`Не удалось установить ${e.pkg}.`);
+      emit(`[${i+2}/${total}] Устанавливаю ${e.pkg} из PyPI...\n`); const inst=await streamed(exe,["-m","pip","install","--prefer-binary",e.pkg]); if(!inst.ok)throw new Error(`Не удалось установить ${e.pkg}.`);
     }
-    emit(`[5/5] Скачиваю официальные pretrained-модели FlyVis в ${ep.flyvisRoot}...\n`);
-    const cli = process.platform === "win32" ? path.join(ep.flyvisDir,"Scripts","flyvis.exe") : path.join(ep.flyvisDir,"bin","flyvis");
-    if (!fs.existsSync(cli)) throw new Error("После установки не найден CLI flyvis.");
-    const dl=await streamed(cli,["download-pretrained"],{FLYVIS_ROOT_DIR:ep.flyvisRoot}); if(!dl.ok)throw new Error("FlyVis установлен, но pretrained-модели не скачались. Повторное нажатие безопасно продолжит установку.");
-    const result=await checkEmbodiedEnv(); if(!result.ready)throw new Error("Проверка окружений после установки не пройдена.");
-    emit("\n[готово] FlyVis, pretrained-модели и FlyGym доступны. Среда Shiu не изменялась.\n",{done:true,ok:true}); return result;
+    if (target === "all") {
+      emit(`[5/5] Скачиваю официальные pretrained-модели FlyVis в ${ep.flyvisRoot}...\n`);
+      const cli = process.platform === "win32" ? path.join(ep.flyvisDir,"Scripts","flyvis.exe") : path.join(ep.flyvisDir,"bin","flyvis");
+      if (!fs.existsSync(cli)) throw new Error("После установки не найден CLI flyvis.");
+      const dl=await streamed(cli,["download-pretrained"],{FLYVIS_ROOT_DIR:ep.flyvisRoot}); if(!dl.ok)throw new Error("FlyVis установлен, но pretrained-модели не скачались. Повторное нажатие безопасно продолжит установку.");
+    }
+    const result=await checkEmbodiedEnv();
+    if (target === "flygym" ? !result.flygym.ready : !result.ready) throw new Error("Проверка окружения после установки не пройдена.");
+    emit(target === "flygym" ? "\n[готово] FlyGym и официальное физическое тело доступны.\n" : "\n[готово] FlyVis, pretrained-модели и FlyGym доступны. Среда Shiu не изменялась.\n",{done:true,ok:true}); return result;
   } catch(e) { emit(`\n[ошибка] ${e.message || e}\n`,{done:true,ok:false}); throw e; }
   finally { envSetupBusy=false; }
 }
@@ -1674,7 +1681,7 @@ function registerIpc(getWin) {
   });
   handle("fly:setupPythonEnv", async (_e, mode) => { assertNotSyncing(); environmentInFlight++; try { return await setupPythonEnv(getWin(), mode || "core"); } finally { environmentInFlight--; } });
   handle("fly:checkEmbodiedEnv", () => checkEmbodiedEnv());
-  handle("fly:setupEmbodiedEnv", async () => { assertNotSyncing(); environmentInFlight++; try { return await setupEmbodiedEnv(getWin()); } finally { environmentInFlight--; } });
+  handle("fly:setupEmbodiedEnv", async (_event, target = "all") => { assertNotSyncing(); environmentInFlight++; try { return await setupEmbodiedEnv(getWin(), target); } finally { environmentInFlight--; } });
   handle("fly:openPath", (_e, p) => shell.openPath(p));
   handle("fly:openExternal", (_e, url) => shell.openExternal(url));
 
