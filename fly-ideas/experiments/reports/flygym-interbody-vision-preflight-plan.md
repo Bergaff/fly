@@ -42,6 +42,8 @@ Frozen edge-history transform применяется без обучения т�
 
 После обновления дважды щёлкнуть `experiments/RUN-FLYGYM-INTERBODY-VISION-PREFLIGHT.bat` и нажать одну кнопку. Папки89D/84Z не нужны. GUI показывает общий процент и ETA. Summary, three PNG previews, complete manifest и ошибки сохраняются в copyable файлы и открываются автоматически.
 
+Первый genuine pre-run остановился при первом `get_raw_vision` до получения frame/outcome: установленный `llvmlite` не содержал или не мог загрузить `llvmlite.dll`, необходимый official Retina/Numba path. Это environment failure, не vision no-go. FlyGym-only installer теперь force-reinstall без cache точной совместимой binary-пары `numba==0.65.1` + `llvmlite==0.47.0` из wheels и проверяет `llvmlite.binding` и `Retina()`; BAT выполняет тот же dependency preflight.
+
 ## Допустимый следующий шаг
 
 Только при pass разрешается отдельный frozen official-eye policy bridge с заранее фиксированным preprocessing и controls. Pass не означает, что frozen89E понимает official images, и не подтверждает imitation или biological validity.

@@ -668,6 +668,8 @@ print(json.dumps(out))
 const EMBODIED_FLYVIS_VERSION = "1.2.0";
 const EMBODIED_FLYGYM_VERSION = "2.1.1";
 const EMBODIED_NUMPY_VERSION = "2.2.6";
+const EMBODIED_NUMBA_VERSION = "0.65.1";
+const EMBODIED_LLVMLITE_VERSION = "0.47.0";
 const embodiedPaths = () => ({
   flyvisDir: path.join(WS, ".venv-flyvis"),
   flygymDir: path.join(WS, ".venv-flygym"),
@@ -690,7 +692,7 @@ async function checkEmbodiedEnv() {
     return { python: exe, ready: true, version: r.out.split(/\r?\n/).pop(), error: null };
   };
   const flyvis = await probe(flyvisPy, "import flyvis; print(getattr(flyvis,'__version__','unknown'))");
-  const flygym = await probe(flygymPy, "import brian2, flygym; from importlib.metadata import version; print(version('flygym'))");
+  const flygym = await probe(flygymPy, "import brian2, flygym, numba, llvmlite.binding; from flygym.vision.retina import Retina; from importlib.metadata import version; Retina(); print(version('flygym'))");
   const bytes = await folderBytes(p.flyvisRoot); const pretrained = { folder: p.flyvisRoot, ready: bytes > 1024 * 1024, bytes };
   return { flyvis, flygym, pretrained, ready: flyvis.ready && flygym.ready && pretrained.ready };
 }
@@ -723,6 +725,12 @@ async function setupEmbodiedEnv(win, target = "all") {
       const e=environments[i], exe=venvPythonExe(e.dir); emit(`[${i+1}/${total}] ${e.label}: окружение ${e.dir}\n`);
       if (!fs.existsSync(exe)) { await fsp.mkdir(path.dirname(e.dir), { recursive: true }); const made=await streamed(spec.cmd,[...spec.prefix,"-m","venv",e.dir]); if(!made.ok||!fs.existsSync(exe))throw new Error(`Не удалось создать окружение ${e.label}.`); }
       const packages=[e.pkg,...e.extras]; emit(`[${i+2}/${total}] Устанавливаю ${packages.join(", ")} из PyPI...\n`); const inst=await streamed(exe,["-m","pip","install","--prefer-binary",...packages]); if(!inst.ok)throw new Error(`Не удалось установить ${packages.join(", ")}.`);
+      if (e.label === "FlyGym") {
+        const compiled=[`numba==${EMBODIED_NUMBA_VERSION}`,`llvmlite==${EMBODIED_LLVMLITE_VERSION}`];
+        emit(`[repair] Восстанавливаю binary vision dependencies: ${compiled.join(", ")}...\n`);
+        const repair=await streamed(exe,["-m","pip","install","--only-binary=:all:","--force-reinstall","--no-cache-dir","--no-deps",...compiled]);
+        if(!repair.ok)throw new Error(`Не удалось восстановить ${compiled.join(", ")}.`);
+      }
     }
     if (target === "all") {
       emit(`[5/5] Скачиваю официальные pretrained-модели FlyVis в ${ep.flyvisRoot}...\n`);

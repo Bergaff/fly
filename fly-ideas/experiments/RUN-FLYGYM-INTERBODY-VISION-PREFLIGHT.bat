@@ -15,9 +15,9 @@ if not exist "%SCRIPT%" (
   start "" "%CD%\experiments\ОШИБКА-FLYGYM-VISION-PREFLIGHT.txt"
   exit /b 3
 )
-"%PY%" -c "import flygym, PIL" >nul 2>&1
+"%PY%" -c "import flygym, PIL, numba, llvmlite.binding; from flygym.vision.retina import Retina; Retina()" >nul 2>&1
 if errorlevel 1 (
-  >"experiments\ОШИБКА-FLYGYM-VISION-PREFLIGHT.txt" echo Среда не прошла проверку FlyGym/Pillow. Повторно нажмите установить только FlyGym в интерфейсе.
+  >"experiments\ОШИБКА-FLYGYM-VISION-PREFLIGHT.txt" echo Среда не прошла проверку FlyGym vision/Numba/llvmlite. Повторно нажмите установить только FlyGym в интерфейсе: установщик заново восстановит binary dependencies.
   start "" "%CD%\experiments\ОШИБКА-FLYGYM-VISION-PREFLIGHT.txt"
   start "" "%CD%\START.bat"
   exit /b 4

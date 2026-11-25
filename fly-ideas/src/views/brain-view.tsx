@@ -3374,7 +3374,7 @@ function EnvPanel({ missingPackage, onResolved }: { missingPackage: string | nul
             <Button variant="outline" onClick={() => void setupEmbodied("all")} disabled={settingUp || !env?.python || !!embodied?.ready}>
               {embodied?.ready ? "FlyVis и FlyGym готовы" : "установить всё для зрения и тела"}
             </Button>
-            <span className="text-[11px] text-muted-foreground">Кнопка «установить только FlyGym» поддерживает отдельное <code>workspace/.venv-flygym</code> и ставит совместимые фиксированные версии NumPy и Brian2, необходимые frozen visual chain. Полная установка дополнительно создаёт FlyVis-среду и скачивает pretrained-модели. Нужен Python 3.12.</span>
+            <span className="text-[11px] text-muted-foreground">Кнопка «установить только FlyGym» поддерживает отдельное <code>workspace/.venv-flygym</code> и ставит совместимые фиксированные версии NumPy/Brian2 и заново восстанавливает binary-пару Numba/llvmlite, необходимую official eye renderer. Полная установка дополнительно создаёт FlyVis-среду и скачивает pretrained-модели. Нужен Python 3.12.</span>
           </div>
           <p className="text-[11px] text-muted-foreground">Все загрузки выполняются здесь с видимым журналом. Существующая среда Shiu и пользовательские результаты не изменяются. Повторное нажатие после сетевой ошибки безопасно продолжает установку.</p>
         </div>
