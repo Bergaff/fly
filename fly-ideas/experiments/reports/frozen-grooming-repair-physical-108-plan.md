@@ -62,3 +62,11 @@ The GUI displays percentage/ETA and automatically opens the result or a copyable
 ## Interpretation boundary
 
 A pass establishes class-balanced engineering physical viability for this frozen supervised generated-action policy on new simulated bodies. It still does not establish biological learning, a living fly, real muscles, FlyVis/FlyWire/connectome mapping or mirror neurons. `scientific_result` remains false. A fail closes this frozen repaired-policy physical attempt without rerunning its final until pass.
+
+## Genuine outcome (recorded after the run)
+
+The complete genuine Windows result is preserved in `frozen-grooming-repair-physical-108-user-result.json` (SHA-256 `9253e4bcb60ee9ea3d5fa990561e4807ee31eaf51b457fd198735b4d90ec0e64`) and interpreted in the adjacent `.md` report.
+
+Every frozen gate passed: safe18/18, tracking0,060341rad, candidate kept18/18, shuffled rejected18/18 and6/6/class, identity18/18 and6/6/class, wins neutral17/18, reversed14/18, zero18/18, shuffled18/18 and open-loop17/18. Grooming wins were6/6 neutral,5/6 reversed,6/6 zero and6/6 shuffled. Reach/withdraw reversed was3/6, exactly the required class minimum and therefore a documented limitation.
+
+`physical_development_candidate=true`; `scientific_result=false`. The repaired frozen supervised policy now supports a class-balanced engineering physical-viability claim. Further work should move to a separately preregistered robustness/transfer phase with changed nuisance/domain conditions and an adapter-ablation control, rather than tune or repeat this benchmark.
