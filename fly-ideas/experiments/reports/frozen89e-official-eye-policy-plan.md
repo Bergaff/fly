@@ -64,3 +64,7 @@ Shared-lesion wins логируются, но не добавляются в pri
 ## Допустимый вывод
 
 Pass означает только bounded engineering viability frozen policy на official-eye domain. Fail означает domain-transfer no-go при неизменённом adapter; thresholds не ослабляются. Ни один исход не подтверждает FlyVis/FlyWire/connectome mapping, biological vision, мышцы, живую муху или mirror neurons.
+
+## Полученный Windows результат
+
+Genuine run completed и дал preregistered no-go: candidate safe/contact6/6 и tracking0,118936rad прошли, open-loop wins6/6 и distinct targets прошли, но action correct2/6<4, reversed wins3/6<4, zero wins2/6<4, shuffled wins3/6<4. Neutral visual ровно4/6. Все cases классифицированы как head-directed grooming. `primary.passed=false`, `scientific_result=false`. Точный JSON и интерпретация: `frozen89e-official-eye-policy-user-result.json/.md`; SHA-256 JSON `91109c557111c4278567d383a5f99ed281f05ea5bcbd5fa5e326752afdf6ba04`. Thresholds не изменять; post-result tuning запрещён.
