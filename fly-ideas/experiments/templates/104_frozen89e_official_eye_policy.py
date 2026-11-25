@@ -91,7 +91,7 @@ def run(source,d_folder,output_root=ROOT,fixture=False,progress=lambda *x:None):
  else:
   s101,models,items,desc,guards=prepare(s102,source,d_folder);bridge=s103.Bridge();rows=[];trace=[]
   try:
-   neutral_images,_=capture(s103,bridge,np.zeros((49,6)),progress,.03,.07,'Official neutral-visual control');neutral_coeff,neutral_targets,_=infer(models,neutral_images)
+   neutral_frames=len(np.asarray(items[0]['angles_deg']));neutral_images,_=capture(s103,bridge,np.zeros((neutral_frames,6)),progress,.03,.07,'Official neutral-visual control');neutral_coeff,neutral_targets,_=infer(models,neutral_images)
    cases=[]
    for ci,item in enumerate(items):
     commands=np.asarray(item['angles_deg'],float)*np.pi/180;images,actual=capture(s103,bridge,commands,progress,.10+.30*ci/len(items),.30/len(items),f'Official-eye capture {ci+1}/{len(items)}');coeff,targets,probs=infer(models,images);rev_coeff,rev_targets,_=infer(models,images[::-1].copy());cases.append({'item':item,'truth':actual[2:],'coeff':coeff,'targets':{'candidate':targets['candidate'],'neutral_visual':neutral_targets['candidate'],'reversed_visual':rev_targets['candidate'],'zero_state':targets['zero_state'],'shuffled_state':targets['shuffled_state'],'shared_lesion':targets['shared_lesion'],'open_loop':targets['candidate']},'probs':probs,'neutral_coeff':neutral_coeff,'reversed_coeff':rev_coeff})

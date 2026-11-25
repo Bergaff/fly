@@ -8,7 +8,7 @@ Training, model selection и post-result tuning запрещены. Это не 
 
 ## Exact prerequisites
 
-- Series104 runner SHA `945adc83d44afb327dfc210d4b2e1972a918150075288d8cfcace91f164a7430`;
+- Series104 runner SHA after pre-run length compatibility fix `ace8d99fa0ad71454fa7b4122868547c880817f9b45b9e654fb02245aad298a1`;
 - Series102 runner SHA `16309bb094236e861fff6eeb1b4d24ce072d6f7ab55c8f88cd6f12e6d94d7a19`;
 - Series103 runner SHA `33bc95e41032d1f6bc823d626c6ea8c2f80a7135e5c3b8254c656b8400823d11`;
 - genuine Series103 result SHA `1a13fe460bfb7bfc0af70203465ba42b74ba0809d53672bdad0afb209c6184bf`, primary pass, scientific_result false;
@@ -58,6 +58,8 @@ Shared-lesion wins логируются, но не добавляются в pri
 ## Windows запуск
 
 После обновления дважды щёлкнуть `experiments/RUN-FROZEN89E-OFFICIAL-EYE-POLICY.bat`, выбрать те же завершённые result89D и production84Z. GUI показывает общий процент/ETA, error/result открываются автоматически. Visual capture последовательна; Brian2 импортируется в main thread.
+
+Первый genuine pre-run остановился во время первого case до сохранения metrics/result: новые motions содержат51 raw frames и дают49 policy frames после history offset, а neutral-visual control был ошибочно создан из49 raw frames и дал47 policy frames. Это вызвало shape mismatch47×6 vs49×6. Никаких summary/outcome не было просмотрено. Compatibility fix выводит neutral raw-frame count из exact frozen motion (`len(items[0].angles_deg)`), поэтому candidate, neutral, reversed и truth имеют одинаковые49 policy frames. Motions, images, model, targets, controls, thresholds и primary rule не меняются.
 
 ## Допустимый вывод
 
