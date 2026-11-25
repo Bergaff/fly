@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v666-session-2026-09-18-grooming-repair-pass";
+export const MEMORY_VERSION = "v667-session-2026-09-18-repaired-physical-plan";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -534,6 +534,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "60 train,18 selection,18 untouched final. Final candidate kept/action18/18; wins neutral17, reversed17, zero18, shuffled18; every class gate passed and grooming was6/6 against all controls; RMSE0,045783. development_candidate true, scientific_result false.",
     limitations: "Supervised non-physical engineering pass; Series106 remains a physical no-go. Series108 requires original exact base and adapter NPZs, new untouched physical motions and no retraining/selection/tuning. No biological/FlyVis/FlyWire/live-fly/mirror-neuron evidence.",
     files: ["experiments/RUN-GROOMING-TEMPORAL-ORDER-REPAIR-107.bat", "experiments/templates/107_grooming_temporal_order_repair.py", "experiments/reports/grooming-temporal-order-repair-107-plan.md", "experiments/reports/grooming-temporal-order-repair-107-user-result.json", "experiments/reports/grooming-temporal-order-repair-107-user-result.md", "tests/grooming-temporal-order-repair-107.test.cjs"] },
+  { id: "session-frozen-grooming-repair-physical-108", ideaId: "i-observational", title: "Series108: frozen repaired-policy physical validation", status: "runner/protocol frozen; genuine run pending", source: "Exact Series105D base SHA1bbb15cd plus Series107 global_linear_q00 adapter SHA4a8f141a; no training/selection/tuning. New physical IDs1342–1359. Runner SHA7fd7efb4….",
+    results: "18 cases×6 conditions=108 physical rollouts. Gate: all safe/contact/tracking; candidate accepted18; shuffled rejected>=15 and>=4/class; identity>=15 and>=5/class; each input-control wins>=12 and>=3/class; open-loop>=15; distinct. Fixture7/7 pass; genuine pending.",
+    limitations: "Decisive engineering physical bridge but still simulated supervised generated-action evidence. Series106 stays no-go. No biological learning, FlyVis/FlyWire/connectome, real muscles, live fly or mirror neurons; scientific_result false.",
+    files: ["experiments/RUN-FROZEN-GROOMING-REPAIR-PHYSICAL-108.bat", "experiments/templates/108_frozen_grooming_repair_physical_validation.py", "experiments/reports/frozen-grooming-repair-physical-108-plan.md", "tests/frozen-grooming-repair-physical-108.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
