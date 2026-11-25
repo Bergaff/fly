@@ -41,7 +41,7 @@ def motion_specs(m86,fixture=False):
    out.append({'role':'adapter_frozen_replication','id':ident,'replicate':rep+1,'action':action,'seed':seed,'amplitude':amp,'speed':speed,'angles_deg':m86.motif(action,seed,amp,speed)});ident+=1
  return out[:3] if fixture else out
 def views(fixture=False):
- values=[{'corner_id':805,'view':{'fov_deg':33.,'camera_side':.18,'camera_z':.46,'body_x':3.90,'body_y':-.05}},{'corner_id':806,'view':{'fov_deg':37.,'camera_side':.29,'camera_z':.58,'body_x':4.10,'body_y':.05}},{'corner_id':807,'view':{'fov_deg':33.,'camera_side':.43,'camera_z':.44,'body_x':4.12,'body_y':-.02}},{'corner_id':808,'view':{'fov_deg':37.,'camera_side':.22,'camera_z':.60,'body_x':3.88,'body_y':.04}}]
+ values=[{'corner_id':805,'view':{'fov_deg':35.,'camera_side':.18,'camera_z':.46,'body_x':3.90,'body_y':-.05}},{'corner_id':806,'view':{'fov_deg':35.,'camera_side':.29,'camera_z':.58,'body_x':4.10,'body_y':.05}},{'corner_id':807,'view':{'fov_deg':35.,'camera_side':.43,'camera_z':.44,'body_x':4.12,'body_y':-.02}},{'corner_id':808,'view':{'fov_deg':35.,'camera_side':.22,'camera_z':.60,'body_x':3.88,'body_y':.04}}]
  return values[:1] if fixture else values
 
 def frozen_visual(s101,source_folder,d_folder,fixture,progress):

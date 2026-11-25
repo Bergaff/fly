@@ -8,7 +8,7 @@ Series101 прошёл bounded physical-adapter gate. Следующий эта�
 
 ## Точные prerequisites
 
-- runner Series102 SHA-256: `612700b5a898d0c3bfa025a4f906de651476a5e08ffecad67d132d1a883c7848`;
+- runner Series102 SHA-256 после pre-run compatibility fix: `16309bb094236e861fff6eeb1b4d24ce072d6f7ab55c8f88cd6f12e6d94d7a19`;
 - runner Series101 SHA-256: `00063575a7b8f0c23d5bb319ec3776f1ac04c963a069755e2daf4d25e2613a17`;
 - genuine Series101 JSON SHA-256: `9577d951090e4104326652a76ce31b387f82e13910cead1c4e2d477d9c3374ea`;
 - Series101 result обязан иметь `completed`, `primary.passed=true`, `scientific_result=false`;
@@ -24,7 +24,9 @@ Series101 прошёл bounded physical-adapter gate. Следующий эта�
 - amplitudes0,66 и0,98;
 - speeds0,68 и1,20.
 
-Четыре новых views805–808 используют заранее записанные FOV33/37°, camera side/z и body x/y. Каждый motion hash проверяется против training/disclosed cases, Series89E и всех Series101 motions. Итого24 новых visual cases.
+Четыре новых views805–808 используют frozen-renderer-compatible fixed FOV35° и заранее записанные новые camera side/z и body x/y. Каждый motion hash проверяется против training/disclosed cases, Series89E и всех Series101 motions. Итого24 новых visual cases.
+
+Первый genuine pre-run остановился на первом visual case до получения model/physical outcome: frozen renderer отклонил исходно записанные FOV33/37° как несовместимые с его обязательным `Fixed-FOV35` contract. Поскольку никаких case results не было просмотрено, compatibility amendment ограничен заменой FOV на35°; corner IDs, camera coordinates, motions, models, mapping, controls, thresholds и primary rule не изменены.
 
 ## Неизменяемый physical adapter
 
