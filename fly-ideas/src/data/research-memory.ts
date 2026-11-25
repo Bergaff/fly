@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v642-session-2026-11-25-frozen89e-flygym-adapter";
+export const MEMORY_VERSION = "v643-session-2026-11-25-flygym-adapter-safe-serial";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -499,8 +499,8 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     limitations: "Observer получал задержанную diagnostic motor command напрямую, не RGB или frozen89E state. Это technical body/runtime gate без visual imitation, обучения, FlyVis/connectome mapping, biological neuron или live-fly claim. Покадровую динамику без physics_trace независимо не проверяли; FlyVis torch shm.dll error к этому run не относится.",
     files: ["experiments/RUN-FLYGYM-TWO-BODY-PREFLIGHT.bat", "experiments/templates/100_flygym_two_body_preflight.py", "experiments/reports/flygym-two-body-preflight-plan.md", "experiments/reports/flygym-two-body-preflight-user-result.md", "experiments/reports/flygym-two-body-preflight-user-result.json", "tests/flygym-two-body-preflight.test.cjs"] },
   { id: "session-frozen89e-flygym-adapter-plan", ideaId: "i-observational", title: "Series101: frozen89E policy в официальном FlyGym body", status: "runner/protocol заморожены; пользовательский run ещё не выполнен", source: "После technical body-go100 подготовлен новый development adapter. Точные go89E/body100 и frozen runner/model identities закреплены; motions891–896 и views801–804 новые. Training/selection запрещены.",
-    results: "Fixed unit-gain mapping шести synthetic channels в шесть front-leg pitch DOF от neutral pose, clip±0,35rad. Official MOTOR actuators: dt0,0005, Kp18, Kd0,18, torque limit25.24 visual cases×candidate/zero/shuffled/shared-lesion/true-open-loop=120 FlyGym rollouts. Go требует all candidate safe/contact, tracking<=0,20rad, wins>=60% zero/shuffled и>=80% open-loop, distinct state targets.",
-    limitations: "Development adapter, не frozen scientific или biological result. Остальные36 actuators держат neutral pose. Demonstrator получает synthetic truth для физического показа; observer candidate только frozen89E policy. Нет FlyVis/FlyWire mapping, мышц, живой мухи или biological mirror-neuron claim.",
+    results: "Fixed unit-gain mapping шести synthetic channels в шесть front-leg pitch DOF от neutral pose, clip±0,35rad. Official MOTOR actuators: dt0,0005, Kp18, Kd0,18, torque limit25.24 visual cases×candidate/zero/shuffled/shared-lesion/true-open-loop=120 FlyGym rollouts. Первый Windows pre-run с6 spawn workers упал BrokenProcessPool до case result; bounded visual phase переведена в последовательный GUI-process режим без изменения gate. Ошибка теперь автоматически открывается.",
+    limitations: "Development adapter, не frozen scientific или biological result. Остальные36 actuators держат neutral pose. Demonstrator получает synthetic truth для физического показа; observer candidate только frozen89E policy. Последовательный режим может быть медленнее, но не умножает память import-chain и сохраняет traceback. Нет FlyVis/FlyWire mapping, мышц, живой мухи или biological mirror-neuron claim.",
     files: ["experiments/RUN-FROZEN89E-FLYGYM-ADAPTER.bat", "experiments/templates/101_frozen89e_flygym_adapter.py", "experiments/reports/frozen89e-flygym-adapter-plan.md", "tests/frozen89e-flygym-adapter.test.cjs"] },
 ];
 
@@ -520,6 +520,10 @@ export function installResearchMemory(existing?: ResearchMemoryState): ResearchM
       return current ? { ...entry, title: current.title, status: current.status, source: current.source, results: current.results, limitations: current.limitations, files: [...current.files] } : entry;
     }
     if (entry?.id === "session-flygym-two-body-preflight" && entry.status === "подготовлен короткий blocking preflight; настоящий Windows runtime ещё не выполнен") {
+      const current = RESEARCH_MEMORY.find((item) => item.id === entry.id);
+      return current ? { ...current, files: [...current.files] } : entry;
+    }
+    if (entry?.id === "session-frozen89e-flygym-adapter-plan" && entry.status === "runner/protocol заморожены; пользовательский run ещё не выполнен") {
       const current = RESEARCH_MEMORY.find((item) => item.id === entry.id);
       return current ? { ...current, files: [...current.files] } : entry;
     }

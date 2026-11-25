@@ -62,4 +62,6 @@ Shared lesion остаётся обязательным control и логиру�
 
 ## Windows запуск
 
-После обновления дважды щёлкнуть `experiments/RUN-FROZEN89E-FLYGYM-ADAPTER.bat`. В GUI выбрать workers2/4/6/Maximum, затем завершённую result-папку89D и production-папку84Z. Окно показывает процент и примерное оставшееся время. Результаты и ошибки сохраняются в файлы; интерактивная консоль не используется.
+После обновления дважды щёлкнуть `experiments/RUN-FROZEN89E-FLYGYM-ADAPTER.bat`, затем выбрать завершённую result-папку89D и production-папку84Z. Окно показывает процент и примерное оставшееся время. Результаты и ошибки сохраняются в файлы; интерактивная консоль не используется.
+
+Первый Windows pre-run с6 spawn workers завершился `BrokenProcessPool` до получения case result: один worker был аварийно завершён без Python traceback. Поскольку bounded visual phase содержит только24 cases, execution зафиксирован в безопасном последовательном режиме в GUI process. Это не меняет motions, views, frozen models, mapping, controls или gate, но не умножает память длинной import-chain и сохраняет настоящий traceback. При ошибке `ПОСЛЕДНЯЯ-ОШИБКА-101.txt` теперь автоматически открывается в Windows.

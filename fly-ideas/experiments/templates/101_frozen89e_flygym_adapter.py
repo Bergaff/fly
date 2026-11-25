@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Series101: frozen89E state/policy adapter to two official FlyGym bodies."""
 from __future__ import annotations
-import argparse,concurrent.futures,csv,hashlib,importlib.util,json,math,multiprocessing,os,sqlite3,sys,threading,time,traceback,uuid
+import argparse,csv,hashlib,importlib.util,json,math,os,sqlite3,sys,threading,time,traceback,uuid
 from datetime import datetime,timezone
 from pathlib import Path
 import numpy as np
@@ -46,7 +46,7 @@ def views(fixture=False):
  return values[:1] if fixture else values
 
 def frozen_visual(source_folder,d_folder,workers,fixture,progress):
- s89=load89e();s89.authorize_d();md=s89.load_d();mc=md.load_c();m6=mc.load_b6();m5=m6.load_b5();m4=m5.load_b4();m3=m4.load_b3();m2=m3.load_b2();m=m2.load_b();m88=m.load88();m87=m88.load87();m86=m87.load86();s85=m86.load85();workers,count=s85.worker_choice(workers)
+ s89=load89e();s89.authorize_d();md=s89.load_d();mc=md.load_c();m6=mc.load_b6();m5=m6.load_b5();m4=m5.load_b4();m3=m4.load_b3();m2=m3.load_b2();m=m2.load_b();m88=m.load88();m87=m88.load87();m86=m87.load86();count=1
  frozen_path,d_summary,angle,identity,common,experts,selections,standard,standard_selections,temp=s89.load_frozen(d_folder,fixture);frozen_before=manifest(frozen_path);m86,s85,a,z,b,proto,stim,saved,state,summary,paths,tracked,before,bundle,s84v=m87.source(source_folder,fixture)
  with sqlite3.connect(Path(source_folder,'study.sqlite3').resolve().as_uri()+'?mode=ro',uri=True) as db:training={x[0] for x in db.execute("SELECT motion_sha256 FROM candidates WHERE status='accepted'")}
  seen={x['motion_sha256'] for x in saved['labels']}|training|m86.disclosed_hashes()|m87.published86_hashes()|m88.authorize87()|m.authorize89()|m2.authorize_b()|m3.authorize_b2()|s89.authorize_d()
@@ -56,9 +56,13 @@ def frozen_visual(source_folder,d_folder,workers,fixture,progress):
   h=stim.motion_hash(np.asarray(x['angles_deg'],float))
   if h in seen:raise ValueError('Series101 motion совпал с disclosed/training motion.')
   seen.add(h);item={**x,'motion_sha256':h};items.append(item);desc.append({k:v for k,v in item.items() if k!='angles_deg'})
- vv=views(fixture);tasks=[(x,v) for x in items for v in vv];progress('Frozen visual inference',.04,0,len(tasks));visual=[]
- with concurrent.futures.ProcessPoolExecutor(max_workers=count,mp_context=multiprocessing.get_context('spawn'),initializer=worker_init,initargs=(bundle,s84v)) as pool:
-  for n,row in enumerate(pool.map(worker_visual,tasks),1):visual.append(row);progress('Frozen visual inference',.04+.16*n/len(tasks),n,len(tasks))
+ vv=views(fixture);tasks=[(x,v) for x in items for v in vv];progress('Frozen visual inference: безопасный последовательный режим',.04,0,len(tasks));visual=[]
+ # Windows spawn workers can be terminated by the OS before Python can serialize an
+ # exception (observed as BrokenProcessPool). This bounded phase has only 24 cases,
+ # so run it in the GUI process: failures retain their real traceback and memory is
+ # not multiplied by 2/4/6 copies of the long frozen runner chain.
+ worker_init(bundle,s84v)
+ for n,task in enumerate(tasks,1):visual.append(worker_visual(task));progress('Frozen visual inference: безопасный последовательный режим',.04+.16*n/len(tasks),n,len(tasks))
  cases=[]
  for row in visual:
   targets,probs=md.controls_for(m3,m2,m,b,row['_coeff'],row['_target'],angle,identity,temp,common,float(d_summary['model']['common_selected']['lambda']),experts,selections,standard,standard_selections)
@@ -129,10 +133,8 @@ def run(source,d_folder,workers='6',output_root=ROOT,fixture=False,progress=lamb
 def gui():
  import tkinter as tk
  from tkinter import filedialog,messagebox
- root=tk.Tk();root.title('Series101: frozen89E → FlyGym');root.geometry('760x430+150+80');root.attributes('-topmost',True);workers=tk.StringVar(value='6');status=tk.StringVar(value='Выберите frozen sources и запустите короткий adapter prototype');pct=tk.DoubleVar(value=0);eta=tk.StringVar(value='');start=[None]
- tk.Label(root,text='Series101: frozen89E → официальное тело FlyGym',font=('Arial',13,'bold'),pady=14).pack();tk.Label(root,text='24 frozen visual cases × 5 физических controls. Обучения нет.\nФиксированный mapping управляет шестью pitch DOF передних лап.',justify='center').pack();tk.Label(root,text='Workers для frozen visual phase:').pack(pady=(12,2));row=tk.Frame(root);row.pack()
- for text,value in [('2','2'),('4','4'),('6','6'),('Максимум','max')]:tk.Radiobutton(row,text=text,variable=workers,value=value).pack(side='left',padx=8)
- tk.Label(root,textvariable=status,pady=12).pack();tk.Scale(root,variable=pct,from_=0,to=100,orient='horizontal',length=580,state='disabled').pack();tk.Label(root,textvariable=eta).pack();button=tk.Button(root,text='Выбрать result89D и source84Z, затем запустить',padx=18,pady=8);button.pack(pady=14)
+ root=tk.Tk();root.title('Series101: frozen89E → FlyGym');root.geometry('760x400+150+80');root.attributes('-topmost',True);status=tk.StringVar(value='Выберите frozen sources и запустите короткий adapter prototype');pct=tk.DoubleVar(value=0);eta=tk.StringVar(value='');start=[None]
+ tk.Label(root,text='Series101: frozen89E → официальное тело FlyGym',font=('Arial',13,'bold'),pady=14).pack();tk.Label(root,text='24 frozen visual cases × 5 физических controls. Обучения нет.\nVisual phase выполняется последовательно, чтобы не дублировать память frozen chain.',justify='center').pack();tk.Label(root,textvariable=status,pady=12).pack();tk.Scale(root,variable=pct,from_=0,to=100,orient='horizontal',length=580,state='disabled').pack();tk.Label(root,textvariable=eta).pack();button=tk.Button(root,text='Выбрать result89D и source84Z, затем запустить',padx=18,pady=8);button.pack(pady=14)
  def update(text,fraction,done,total):
   def apply():
    status.set(text);pct.set(round(fraction*100,1))
@@ -147,16 +149,19 @@ def gui():
   button.config(state='disabled');start[0]=time.time()
   def work():
    try:
-    result=run(source,d,workers.get(),progress=update)
+    result=run(source,d,'1',progress=update)
     def ok():
      if os.name=='nt':os.startfile(str(result))
      messagebox.showinfo('Series101','Расчёт завершён. Папка результата открыта.',parent=root);button.config(state='normal')
     root.after(0,ok)
    except Exception as exc:
     error=ROOT/'ПОСЛЕДНЯЯ-ОШИБКА-101.txt';error.parent.mkdir(parents=True,exist_ok=True);error.write_text(type(exc).__name__+': '+str(exc)+'\n\n'+traceback.format_exc(),encoding='utf-8-sig')
-    root.after(0,lambda:(messagebox.showerror('Series101',f'{exc}\n\nОтчёт: {error.resolve()}',parent=root),button.config(state='normal')))
+    if os.name=='nt':
+     try:os.startfile(str(error.resolve()))
+     except OSError:pass
+    root.after(0,lambda:(messagebox.showerror('Series101',f'{exc}\n\nОтчёт автоматически открыт: {error.resolve()}',parent=root),button.config(state='normal')))
   threading.Thread(target=work,daemon=True).start()
- button.config(command=begin);root.bind('2',lambda e:workers.set('2'));root.bind('4',lambda e:workers.set('4'));root.bind('6',lambda e:workers.set('6'));root.bind('m',lambda e:workers.set('max'));root.bind('M',lambda e:workers.set('max'));root.mainloop()
+ button.config(command=begin);root.mainloop()
 def main():
  p=argparse.ArgumentParser();p.add_argument('--gui',action='store_true');p.add_argument('--source84z');p.add_argument('--result89d');p.add_argument('--workers',default='6');p.add_argument('--output-root',default=str(ROOT));p.add_argument('--fixture',action='store_true');a=p.parse_args()
  if a.gui:gui()

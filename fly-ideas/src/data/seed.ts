@@ -253,7 +253,7 @@ export const SEED_IDEAS: Idea[] = [
  { refId: "r-vogt2016", why: "Анатомический канал зрение → MB, по которому идёт «наблюдение»" },
  { refId: "r-aso2014", why: "Логика DAN → KC → MBON, куда встраиваем учительский сигнал" },
  ],
- notes: "После завершения synthetic roadmap и остановки Stage91–96 пользователь выбрал новую official-body линию. Series100 completed на Windows: FlyGym2.1.1/MuJoCo3.16.0, два NeuroMechFly по42 actuators,720 physics steps, finite, real forces/contact, все9 technical gates pass. Это не Stage97 и не visual imitation: observer получал задержанную direct motor command. Series101 frozen89E→FlyGym adapter подготовлен:6 новых motions×4 views×5 controls, fixed mapping в6 front-leg pitch DOF, official MOTOR с proprioceptive closed loop и true open-loop comparator; training запрещён, пользовательский run pending. Биологический mapping Series90 остаётся закрыт.",
+ notes: "После завершения synthetic roadmap и остановки Stage91–96 пользователь выбрал новую official-body линию. Series100 completed на Windows: FlyGym2.1.1/MuJoCo3.16.0, два NeuroMechFly по42 actuators,720 physics steps, finite, real forces/contact, все9 technical gates pass. Это не Stage97 и не visual imitation: observer получал задержанную direct motor command. Series101 frozen89E→FlyGym adapter подготовлен:6 новых motions×4 views×5 controls, fixed mapping в6 front-leg pitch DOF, official MOTOR с proprioceptive closed loop и true open-loop comparator; training запрещён. Первый6-worker Windows pre-run упал BrokenProcessPool до результата, поэтому bounded visual phase переведена в safe sequential GUI-process mode с auto-open error report; rerun pending. Биологический mapping Series90 остаётся закрыт.",
  }),
  idea({
  id: "i-interference",
