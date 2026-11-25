@@ -67,3 +67,7 @@ Exact prerequisites:
 ## Ограничения
 
 Ни один исход не восстанавливает Series104 и не подтверждает biological observation-to-action, FlyVis/FlyWire/connectome mapping, мышцы, живую муху или mirror neurons. Series105B использует synthetic domain как engineering teacher reference. Любая physical проверка требует новых untouched outcomes и отдельного frozen protocol.
+
+## Genuine Windows result
+
+Run completed без runtime failure, но exact development gate не выполнен. 105A: official action2/6 против synthetic reference5/6; mean state cosine -0,149018, и все6 cosines отрицательны; mean official target truth RMSE0,501423 против synthetic0,152898. 105B adapter mean absolute feature correlation0,289699. На held validation adapted RMSE0,200818 улучшил raw0,504072 и выиграл6/6, но action correct2/6, reversed wins3/6 и zero-state wins2/6 провалили gate; zero mean0,171385 лучше adapted. `passed=false`, `development_candidate=false`, `scientific_result=false`. Exact JSON SHA `92715b54fde5fb259ce3947e35edf4f8ba178f659c5de01096546ca739af6a14`; files `official-eye-diagnostic-adaptation-105ab-user-result.json/.md`. Series106 не авторизован.

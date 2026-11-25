@@ -1,0 +1,1143 @@
+{
+  "schema": "official-eye-diagnostic-adaptation-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "official-eye-diagnostic-adaptation-v1",
+    "mode": "full",
+    "created_utc": "2026-11-25T11:27:57.011467+00:00",
+    "script_sha256": "b070fff687dfcfd263c6868b59954283486dd84b5a4e07156816f333a13dae67",
+    "runner104_sha256": "ace8d99fa0ad71454fa7b4122868547c880817f9b45b9e654fb02245aad298a1",
+    "series104_result_sha256": "91109c557111c4278567d383a5f99ed281f05ea5bcbd5fa5e326752afdf6ba04",
+    "series104_outcome": "completed preregistered no-go; never overwritten or reinterpreted",
+    "phase105a": {
+      "role": "post-result diagnostic on disclosed Series104 motions903-908",
+      "fit_allowed": false,
+      "primary_gate": null,
+      "motions": [
+        {
+          "role": "official_eye_policy",
+          "id": 903,
+          "replicate": 1,
+          "action": "foreleg_rubbing",
+          "seed": 104010,
+          "amplitude": 0.75,
+          "speed": 0.84,
+          "motion_sha256": "866cef776e4c938f98474243304195182e07401d5e0530582137fbd8b4cab1a6"
+        },
+        {
+          "role": "official_eye_policy",
+          "id": 904,
+          "replicate": 1,
+          "action": "head_directed_grooming",
+          "seed": 104011,
+          "amplitude": 0.75,
+          "speed": 1.08,
+          "motion_sha256": "f1214d0783b6c9a43706f56853415c42a2550f96992399187805c8a9acf6d729"
+        },
+        {
+          "role": "official_eye_policy",
+          "id": 905,
+          "replicate": 1,
+          "action": "reach_withdraw",
+          "seed": 104012,
+          "amplitude": 0.75,
+          "speed": 0.84,
+          "motion_sha256": "36b1f88f07aca390b94d252cb382c4f09f0abb2138144d6f0c9f052ae1f21dfc"
+        },
+        {
+          "role": "official_eye_policy",
+          "id": 906,
+          "replicate": 2,
+          "action": "foreleg_rubbing",
+          "seed": 104020,
+          "amplitude": 0.88,
+          "speed": 1.08,
+          "motion_sha256": "998d61cee3740db44b69c91968878a2736f14bf433ed8e69b6b9060370c73851"
+        },
+        {
+          "role": "official_eye_policy",
+          "id": 907,
+          "replicate": 2,
+          "action": "head_directed_grooming",
+          "seed": 104021,
+          "amplitude": 0.88,
+          "speed": 0.84,
+          "motion_sha256": "cfa00c406311ab44010cae7c08944b84790ddedcf196c8407fc94473b2a72e5a"
+        },
+        {
+          "role": "official_eye_policy",
+          "id": 908,
+          "replicate": 2,
+          "action": "reach_withdraw",
+          "seed": 104022,
+          "amplitude": 0.88,
+          "speed": 1.08,
+          "motion_sha256": "d3209b01920e240dee8e3cb976b52bf4baef9628465f9e768dfc1d7f63e402cd"
+        }
+      ]
+    },
+    "phase105b": {
+      "training_allowed": true,
+      "adapter": "paired diagonal affine official frozen state to mean of four synthetic-view frozen states",
+      "fit_uses_action_labels_or_truth": false,
+      "fixed_scale_clip": [
+        -3,
+        3
+      ],
+      "train_cases": 12,
+      "validation_cases": 6,
+      "motions": [
+        {
+          "role": "adapter_train",
+          "id": 1051,
+          "replicate": 1,
+          "action": "foreleg_rubbing",
+          "seed": 105100,
+          "amplitude": 0.68,
+          "speed": 0.76,
+          "motion_sha256": "45bb2c2b1464f4e2620d865b6248492922d7aff2926c6412dc472d5ed9d14459"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1052,
+          "replicate": 1,
+          "action": "head_directed_grooming",
+          "seed": 105101,
+          "amplitude": 0.68,
+          "speed": 0.92,
+          "motion_sha256": "4f4099b79abd1692bd964d72d76edade431f263851b3610e91e4aa412c407273"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1053,
+          "replicate": 1,
+          "action": "reach_withdraw",
+          "seed": 105102,
+          "amplitude": 0.68,
+          "speed": 1.08,
+          "motion_sha256": "d225914afaf1bdee290136f6d97b60e4896b5784e2f30fd53c63b036fcfab470"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1054,
+          "replicate": 2,
+          "action": "foreleg_rubbing",
+          "seed": 105110,
+          "amplitude": 0.78,
+          "speed": 0.92,
+          "motion_sha256": "d10ba1d808fdaa60ba0266e3b87be10ed91fba157317fd36b1a7433380872577"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1055,
+          "replicate": 2,
+          "action": "head_directed_grooming",
+          "seed": 105111,
+          "amplitude": 0.78,
+          "speed": 1.08,
+          "motion_sha256": "12100d3ebccf3a6d84f5dd98d8b1552c705071b5be4aec3178b71ab3efa86fa4"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1056,
+          "replicate": 2,
+          "action": "reach_withdraw",
+          "seed": 105112,
+          "amplitude": 0.78,
+          "speed": 1.16,
+          "motion_sha256": "ddfc8d349614d63d7ff53d1e3832e4b9df79ffe5531f31945ded1ef8986a569f"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1057,
+          "replicate": 3,
+          "action": "foreleg_rubbing",
+          "seed": 105120,
+          "amplitude": 0.88,
+          "speed": 1.08,
+          "motion_sha256": "ffc93028b19f43d1c70b1c842cbb7adb7e39b4a9f1f4720fa30604834ccf5e34"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1058,
+          "replicate": 3,
+          "action": "head_directed_grooming",
+          "seed": 105121,
+          "amplitude": 0.88,
+          "speed": 1.16,
+          "motion_sha256": "ea51f7daf116f097df0b8d63366a7537b5aafe4782ce666d47f8f4a12bbdd8bc"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1059,
+          "replicate": 3,
+          "action": "reach_withdraw",
+          "seed": 105122,
+          "amplitude": 0.88,
+          "speed": 0.76,
+          "motion_sha256": "91ac33446cb3f3eba7563ad89cded8e410b998a33813c0fefde3faa9560781d3"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1060,
+          "replicate": 4,
+          "action": "foreleg_rubbing",
+          "seed": 105130,
+          "amplitude": 0.96,
+          "speed": 1.16,
+          "motion_sha256": "7ff834896d7785456ca967efc4bb0859e26f740956e481fc626dc0188ae3256c"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1061,
+          "replicate": 4,
+          "action": "head_directed_grooming",
+          "seed": 105131,
+          "amplitude": 0.96,
+          "speed": 0.76,
+          "motion_sha256": "69cbb1e141acde46d862b1af1fe64a065bf28fe7eeb22486b02b8240824bbfb2"
+        },
+        {
+          "role": "adapter_train",
+          "id": 1062,
+          "replicate": 4,
+          "action": "reach_withdraw",
+          "seed": 105132,
+          "amplitude": 0.96,
+          "speed": 0.92,
+          "motion_sha256": "3bc5ce7cbd064fb278ecb2e2e6852cee4d276f450f05fd1300cfebb0e0547545"
+        },
+        {
+          "role": "adapter_validation",
+          "id": 1063,
+          "replicate": 1,
+          "action": "foreleg_rubbing",
+          "seed": 105200,
+          "amplitude": 0.73,
+          "speed": 0.84,
+          "motion_sha256": "b1a245122931baf303585d397ad49d740be708fd90d5b87dd9ec9349196684c2"
+        },
+        {
+          "role": "adapter_validation",
+          "id": 1064,
+          "replicate": 1,
+          "action": "head_directed_grooming",
+          "seed": 105201,
+          "amplitude": 0.73,
+          "speed": 1.12,
+          "motion_sha256": "59236059da374cbf45e60d69dea7a5231895e3f3cbb8ec406e464c6b096cedab"
+        },
+        {
+          "role": "adapter_validation",
+          "id": 1065,
+          "replicate": 1,
+          "action": "reach_withdraw",
+          "seed": 105202,
+          "amplitude": 0.73,
+          "speed": 0.84,
+          "motion_sha256": "34ccc3f8b3a62b43b2f6616bc4e5a37f5e74063a2d7e8ce64957c5c2b455bddd"
+        },
+        {
+          "role": "adapter_validation",
+          "id": 1066,
+          "replicate": 2,
+          "action": "foreleg_rubbing",
+          "seed": 105210,
+          "amplitude": 0.93,
+          "speed": 1.12,
+          "motion_sha256": "7e988e5f8af2fd7398eca08da99a0b4f1ae8e978520f844ffba3e72b711d8d19"
+        },
+        {
+          "role": "adapter_validation",
+          "id": 1067,
+          "replicate": 2,
+          "action": "head_directed_grooming",
+          "seed": 105211,
+          "amplitude": 0.93,
+          "speed": 0.84,
+          "motion_sha256": "9c9af7b6e3c1b1a50d3ed26000c2293da57d166fdfb8c344886c713bfd5f3d10"
+        },
+        {
+          "role": "adapter_validation",
+          "id": 1068,
+          "replicate": 2,
+          "action": "reach_withdraw",
+          "seed": 105212,
+          "amplitude": 0.93,
+          "speed": 1.12,
+          "motion_sha256": "30da391e255aab7057353e3579502964f466d2d6e7de2f6fecd32ec0779c9ec3"
+        }
+      ],
+      "validation_used_for_fit_or_selection": false,
+      "hyperparameter_selection": false,
+      "post_result_tuning": false
+    },
+    "synthetic_reference_views": [
+      801,
+      802,
+      803,
+      804
+    ],
+    "validation_controls": [
+      "adapted",
+      "raw_frozen",
+      "neutral_visual",
+      "reversed_visual",
+      "zero_state",
+      "shuffled_state"
+    ],
+    "development_gate": "validation action correct>=4/6; adapted truth RMSE wins>=4/6 vs raw/neutral/reversed/zero/shuffled; all control targets distinct; mean adapted<mean raw. Success only authorizes separate untouched physical Series106."
+  },
+  "series104_primary": {
+    "cases": 6,
+    "required_control_wins": 4,
+    "required_open_loop_wins": 5,
+    "required_action_correct": 4,
+    "candidate_safe_cases": 6,
+    "candidate_mean_tracking_rmse_rad": 0.11893635802924186,
+    "action_correct": 2,
+    "candidate_truth_wins": {
+      "neutral_visual": 4,
+      "reversed_visual": 3,
+      "zero_state": 2,
+      "shuffled_state": 3,
+      "shared_lesion": 3,
+      "open_loop": 6
+    },
+    "visual_and_state_controls_distinct": true,
+    "passed": false,
+    "scientific_result": false
+  },
+  "diagnostic105a": {
+    "cases": [
+      {
+        "id": 903,
+        "action": "foreleg_rubbing",
+        "official_predicted_action": "head_directed_grooming",
+        "synthetic_predicted_action": "foreleg_rubbing",
+        "official_probabilities": {
+          "foreleg_rubbing": 4.995979364752114e-08,
+          "head_directed_grooming": 0.9957485701641754,
+          "reach_withdraw": 0.00425137987603107
+        },
+        "synthetic_probabilities": {
+          "foreleg_rubbing": 0.797946360260776,
+          "head_directed_grooming": 0.003083714660532687,
+          "reach_withdraw": 0.1989699250786913
+        },
+        "official_rgb_mean": 138.43423840890523,
+        "official_rgb_std": 104.48496985092798,
+        "official_temporal_abs_delta": 3.9754459635416666,
+        "official_edge_mean": 0.026321548968553543,
+        "official_edge_std": 0.03830857202410698,
+        "state_cosine_official_to_synthetic": -0.25252349230622084,
+        "state_nrmse_official_to_synthetic": 1.667629407543759,
+        "official_target_truth_rmse_rad": 0.5669748094345372,
+        "synthetic_target_truth_rmse_rad": 0.14368197177574402,
+        "official_state_sha256": "1925c3c685ea1d819a0d18858900b379048e366631fde83e1e50ecd90185f562",
+        "synthetic_mean_state_sha256": "0d6e6e2baeea9168e9442e9dad5c0a594a435fdf222d1e672586189593a64be3",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "0ee86b92f77cdcf1a65893f2f015835eb7e3d75f17176670eeb9971dcf111cba"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "39016ec2caa0e0c965b860a38aac6eefa941cf951c355611c6309a34521707c8"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "5875585b8cccecfc850816e2291b93d5ee147962ba159f40404c6ecb682ab4a4"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "cf5abc96e4ec0db89d4d7470ff12b80ac97002082838ed6931b148be9d5cf409"
+          }
+        ]
+      },
+      {
+        "id": 904,
+        "action": "head_directed_grooming",
+        "official_predicted_action": "head_directed_grooming",
+        "synthetic_predicted_action": "reach_withdraw",
+        "official_probabilities": {
+          "foreleg_rubbing": 7.722282530781229e-11,
+          "head_directed_grooming": 0.9999998964111497,
+          "reach_withdraw": 1.0351162737966443e-07
+        },
+        "synthetic_probabilities": {
+          "foreleg_rubbing": 0.04959477026154572,
+          "head_directed_grooming": 0.4428800352935873,
+          "reach_withdraw": 0.507525194444867
+        },
+        "official_rgb_mean": 115.68696863511029,
+        "official_rgb_std": 94.22093631873393,
+        "official_temporal_abs_delta": 10.529632161458334,
+        "official_edge_mean": 0.032949816435575485,
+        "official_edge_std": 0.03996042162179947,
+        "state_cosine_official_to_synthetic": -0.015228329097483777,
+        "state_nrmse_official_to_synthetic": 1.619150771024578,
+        "official_target_truth_rmse_rad": 0.42752165043936574,
+        "synthetic_target_truth_rmse_rad": 0.2030403832690333,
+        "official_state_sha256": "63b665241de352fd2f6db378687ec55ff42eae32ce86f3fe4639f0cd60d205e2",
+        "synthetic_mean_state_sha256": "7754f169d12e80e788ce6a8316dcfcec5dec105b65ed9a29579c798f1f9009bb",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "ab9ca3b4dc6f1cccc3fba6e69c724e522946a4398bb682fbbc8ca3e388c6d127"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "07736b6921cc8c8f6d2426287f994738b35a150288e63a9f056c36a8f035b7dc"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "255c7dc83ba316c8ea2b9f5e33eb19283ab4ad60796c144241a0fb963f50268a"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "15c3831e499d7ff5c61b9c9b230d2c494581ea9a24571c56c3d0004e159ae44d"
+          }
+        ]
+      },
+      {
+        "id": 905,
+        "action": "reach_withdraw",
+        "official_predicted_action": "head_directed_grooming",
+        "synthetic_predicted_action": "reach_withdraw",
+        "official_probabilities": {
+          "foreleg_rubbing": 4.411986012117199e-12,
+          "head_directed_grooming": 0.9999999999131886,
+          "reach_withdraw": 8.239941344057826e-11
+        },
+        "synthetic_probabilities": {
+          "foreleg_rubbing": 0.009013895150081634,
+          "head_directed_grooming": 0.0031115792718826017,
+          "reach_withdraw": 0.9878745255780357
+        },
+        "official_rgb_mean": 124.11650454452614,
+        "official_rgb_std": 98.68548816680249,
+        "official_temporal_abs_delta": 11.087244466145833,
+        "official_edge_mean": 0.030700290575623512,
+        "official_edge_std": 0.03978578746318817,
+        "state_cosine_official_to_synthetic": -0.15838362795541147,
+        "state_nrmse_official_to_synthetic": 1.6105256731220394,
+        "official_target_truth_rmse_rad": 0.5098215073970296,
+        "synthetic_target_truth_rmse_rad": 0.07822334592687372,
+        "official_state_sha256": "0d145e6b497c11df3f2078d13b41a9661885348bdea9e3c7723d95bc48dedc3a",
+        "synthetic_mean_state_sha256": "b53f1a68fe1036f4df2de00cf36d356c8965419c301bd427bbd450e2a8285d32",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "74783f4a6e57cc9ca3baaa13c46b145b402f0e33929214bd58a54dc47affe601"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "358059befbb6f7c7a412c1e087cab69dabb74a39df60f9aa1b82fa0c5cb1db5f"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "295b126e8c6494eca6b4590cfa6fd8ee9d74687d292f164bb8a2422acc43a8d2"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "a05810fd19d99c14ce6f7c71cba68e3103113b93bcf26723f183e456e3f945cd"
+          }
+        ]
+      },
+      {
+        "id": 906,
+        "action": "foreleg_rubbing",
+        "official_predicted_action": "head_directed_grooming",
+        "synthetic_predicted_action": "foreleg_rubbing",
+        "official_probabilities": {
+          "foreleg_rubbing": 4.4479268837899097e-10,
+          "head_directed_grooming": 0.6059210376856978,
+          "reach_withdraw": 0.3940789618695094
+        },
+        "synthetic_probabilities": {
+          "foreleg_rubbing": 0.9310279441771946,
+          "head_directed_grooming": 0.004418938273897338,
+          "reach_withdraw": 0.06455311754890813
+        },
+        "official_rgb_mean": 130.50991402420343,
+        "official_rgb_std": 102.18656664007554,
+        "official_temporal_abs_delta": 7.5561572265625,
+        "official_edge_mean": 0.02616589143872261,
+        "official_edge_std": 0.03870781883597374,
+        "state_cosine_official_to_synthetic": -0.2655591614078585,
+        "state_nrmse_official_to_synthetic": 1.6035120716566873,
+        "official_target_truth_rmse_rad": 0.5916252882886549,
+        "synthetic_target_truth_rmse_rad": 0.1578822037637945,
+        "official_state_sha256": "0b9c708b0de233d2dfb9940fcb469283a003578daca590d8ae1bf9c8926896b6",
+        "synthetic_mean_state_sha256": "9d5398b973082e1cdb6df1fefbc877bf169c18609624e070503d487e649bf292",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "a570d99210280958c425db4a67c5ca2dde7cfdbc4c45e66304d21d0309523f56"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "b77e56e0cc95dc62afa9d646f7f8d7d616b46fe4cf972ca6aaa154cc45e473b4"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "7d808bc364e9c616b990691d340c289a782ec16371d4cdb41c5fe4f1f6f34fcc"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "10771425f4ab0f1d52df6e2ee0aa9fe0c1113b13350f371b95445ac6ee398a10"
+          }
+        ]
+      },
+      {
+        "id": 907,
+        "action": "head_directed_grooming",
+        "official_predicted_action": "head_directed_grooming",
+        "synthetic_predicted_action": "head_directed_grooming",
+        "official_probabilities": {
+          "foreleg_rubbing": 3.8981988598268454e-11,
+          "head_directed_grooming": 0.9999999997185662,
+          "reach_withdraw": 2.424517958487585e-10
+        },
+        "synthetic_probabilities": {
+          "foreleg_rubbing": 0.08362151875616806,
+          "head_directed_grooming": 0.7934852765957241,
+          "reach_withdraw": 0.12289320464810785
+        },
+        "official_rgb_mean": 115.1105286841299,
+        "official_rgb_std": 94.406863681267,
+        "official_temporal_abs_delta": 14.791080729166667,
+        "official_edge_mean": 0.03367836773395538,
+        "official_edge_std": 0.04009068012237549,
+        "state_cosine_official_to_synthetic": -0.04655684246941364,
+        "state_nrmse_official_to_synthetic": 1.5974474548074293,
+        "official_target_truth_rmse_rad": 0.41061831558486456,
+        "synthetic_target_truth_rmse_rad": 0.245935621984133,
+        "official_state_sha256": "114194863a53dc9fd15cf5cea751f3684144b9ef0a43fa5c31450fd1290b4459",
+        "synthetic_mean_state_sha256": "8318ea46f97430d50bd588c46b407a3e120b46b4c239af781436e1b6a0164e6f",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "2745dadd2913e2bb0f0ee51c37b34bf8e0592fa0b5cf2853b964648b2f214bde"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "70f245c747c6bc87cc4226f457cac15d6ea25f34d9b48a5f7e28a159eb59e13b"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "dd51a2b159041b3d4f62ac42c242815e4dff1f090b20ad3fb0898c5c1ba10fd6"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "e66c7f665eb49755e467e71b2d1bb81d856561b90915e8ce1adf7a20490e0b8e"
+          }
+        ]
+      },
+      {
+        "id": 908,
+        "action": "reach_withdraw",
+        "official_predicted_action": "head_directed_grooming",
+        "synthetic_predicted_action": "reach_withdraw",
+        "official_probabilities": {
+          "foreleg_rubbing": 5.0824231445193515e-11,
+          "head_directed_grooming": 0.9999998221787697,
+          "reach_withdraw": 1.7777040603423625e-07
+        },
+        "synthetic_probabilities": {
+          "foreleg_rubbing": 0.008265395985122513,
+          "head_directed_grooming": 0.0024730860667093214,
+          "reach_withdraw": 0.9892615179481681
+        },
+        "official_rgb_mean": 130.22917145373773,
+        "official_rgb_std": 101.08447704319006,
+        "official_temporal_abs_delta": 8.672371419270833,
+        "official_edge_mean": 0.027796495705842972,
+        "official_edge_std": 0.03877577558159828,
+        "state_cosine_official_to_synthetic": -0.15585681998798492,
+        "state_nrmse_official_to_synthetic": 1.6410736189565154,
+        "official_target_truth_rmse_rad": 0.5019773103048347,
+        "synthetic_target_truth_rmse_rad": 0.08862171131929852,
+        "official_state_sha256": "0572f7655fe971936aec41004b22935d17db191b2a6bf31015764fd382887c97",
+        "synthetic_mean_state_sha256": "3501556a316266933bce10b97576ddeba3f19b9aabf9ce0a631d683e4401be6e",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "44be50ae8a1c8ab90fda294e1177248067e2184dea64b7f85635d819cb3ebe0b"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "ea856d813cc811bbda36e96efbd0e6fcbc3b09389c75197f2035e3f4c47fe58b"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "7c3c6a69f56f8880e79476cf5a5daf7656887f8a60e4e2a057e322a45047749e"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "8ace39f1c758f06d114df88b86223eca0f0e22cf99203bb9dddf724ff16227ce"
+          }
+        ]
+      }
+    ],
+    "interpretation_only": true,
+    "can_change_series104": false
+  },
+  "adapter105b": {
+    "model_sha256": "ed021faa3fd3b84ad49183c68313177196c9462af399b83f5ad1f803a0e303ec",
+    "training_pairs": [
+      {
+        "id": 1051,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "454516223510c823661d4768d57f1f9a54bd3aea16eab6e09a7c473df040ae4f",
+        "synthetic_state_sha256": "20e68eb187a31582d19614e56b41bef7fca4448eb3af5d232c74920cba040ec4",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "080c25d5417b35e98ab915054d6e188ef02105793b9e571a4b07e545eaca0f31"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "982306f7a49bfbf701f9380d61d9c6e1e05a9c4c7a2456628fdaa0e11f695d20"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "1f04597fb6290408993e2bb37e3f710df8ccd331d78e2a6ffa5c20b9681b1a6f"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "10ac67f6de2931e937c69b69fb60b57318c708f34dbaac44cac3e94e09ffd4ec"
+          }
+        ]
+      },
+      {
+        "id": 1052,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "8b4620ae0401514c0a37d8b18271b63f38f843b0cc9dbceadbdc9c428c0d9f98",
+        "synthetic_state_sha256": "415f9e6449eff67fa6c5fc2374c6690bbb8393b7a8a558e761f31bdc9cc0f419",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "2462597ac1ac6381968f03c168a0c395bf65d3774f363ac1fba34cc95b1cc30c"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "63d1d6059641067fe1cbb63e6acdb0fbd9ed00495a9238bbb7a5602fbcfd165c"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "e5c15ed8040a457f0354ad697eca3e93dbf10f72536fd767e85d4f2c20555259"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "5845c1facbfe2a17c3cc11a12ad477e088735eb23cc78a6eea2f5a573412770f"
+          }
+        ]
+      },
+      {
+        "id": 1053,
+        "action": "reach_withdraw",
+        "official_state_sha256": "b7199d11e3d98427b77ad10044a71099322203cecc1583ecd5e24917cf186909",
+        "synthetic_state_sha256": "4cca96169c725db581803cfe92f72ccd9d98435a151830af7cab54dc75fd6549",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "9625a47095d009982b806db6789bd6b62a144e5db3698617d175e10008a52d7c"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "6b4488470b855e7558296ce6d29da8cbbcb64fd442c9e7563a88602470236dfb"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "9de610277111de1c175b8188af1b4758f7c3201911727808e91c208977472fb9"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "e994995d9f207daaf220a2d86e33c864e772a471f1597705435191fb437e7475"
+          }
+        ]
+      },
+      {
+        "id": 1054,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "3917e8f0c22f9bfa3ac0d1494e5b3ace104425021bae8900a394f7e943d9cdfe",
+        "synthetic_state_sha256": "2b18d69e659398a84f980e51b8d2d46bc5a0ccbd4bfdaf8ac62784d2a52383c2",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "61c399d014f64d6e059fd57422fe32bb4ec3e8c83662adeeeabe2032968a8314"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "7b4e0bdc0432eae682db34c1914efed3d731e443f4dd1c463743e4a00d66b334"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "d58cb1a19d3a5b2b24a116535dd96a69316e8892fc4b32741ed16f7410a3b474"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "18fcd873ce95a8864dd69b26f13f2cc751cf93ebcace263c0971da54a1a75646"
+          }
+        ]
+      },
+      {
+        "id": 1055,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "71fbe227720d5dbbad401d752144bb9e910ee17907e4ecc8294b046f64c3704a",
+        "synthetic_state_sha256": "bcd7cd33e49e889f4b265093ef7b3f766cab845a79846e1859c53d59e1f5b2e5",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "776ba6b13219abaaac5c4ca6703e84350ff70ccd982e2cc1f4be6fdc3999243f"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "a67b7087e3aa320b97dba985ce35c2c9b29c9926b3a6f363c1c7b1049486dd98"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "93e1fa35e7ffe7e2497d90b619e61dcd4471a8b4a94f8926350dbe881628b014"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "c9b02cef3fcab61ba734d169ca2ba3e37f0002272e7fbf47953cea47692622c7"
+          }
+        ]
+      },
+      {
+        "id": 1056,
+        "action": "reach_withdraw",
+        "official_state_sha256": "6982b7490e74e384e54a5117051419e436b79a48f8976d2525a85b62110e1ceb",
+        "synthetic_state_sha256": "40a03a0f9e4f844b6d7e6854775669b0707f592505910168fb370c894a1bf272",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "448e749dbcf63fec717a3667a6d199712cbdd33bbad9c5be0915c0bf38bdcd1e"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "b9a3c15d0b329d1381833f1aeb0d1e7d96a67e8172809d89d8da1a5f8cd96dbf"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "42c92e068b6bca3b9e78a9a5cd4f34e0fc58e81da7d617eb2fdaa8b69e6ed8bf"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "8a5f85ff9a0de2e25ac7bd32ea0c377f14ce286c53fc988eaceb3c57dacc231d"
+          }
+        ]
+      },
+      {
+        "id": 1057,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "05a76ecc0704838f95f1146722ae1b405f2a35a138a81524dc4dc01a78b81314",
+        "synthetic_state_sha256": "7c456f950440c40a12d0dd9686db7cebae90fad0465a237601cc74c8007bbefe",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "eda6fa0a731722b2d027e95e66b8ca265c337ec0c368d1e2b66f315b5b6d1c15"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "cafacc023a171b45976203e1e2000d2fb464596f0cef663ea87138b0c7eb736a"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "368c45ca76aa2197dce0703d980302e770d593e867bbd2b02259413ff8a8df22"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "dc9f8cfff84dbbec7c56ee8e8b48d8dc8c51c2c1d4800b7e5a3a2b17d459abca"
+          }
+        ]
+      },
+      {
+        "id": 1058,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "c49a6a2910c693694ed3d0ba46612327d1a6bda4f0754497fc6c4ac62333e27d",
+        "synthetic_state_sha256": "7aa6647572530f976b0084505dcc50ee3c2684d4c21857c9bd5715127198bbb5",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "0b054141d6d791f40872fa44b1a7307828b4c1b2190568678093a09fea448c27"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "271c8f7172346b0b2a8207d380abdf31296ab50df4c722bab55c5ff8ec59f8c0"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "212ccd61f70e0bdd0651b8af515a9ccace0c08dc45fbed6c07f523a6706fe4ce"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "c9af3e8e3838792750577212b07c19cf504f739fbfa72504360a2b09ac522d14"
+          }
+        ]
+      },
+      {
+        "id": 1059,
+        "action": "reach_withdraw",
+        "official_state_sha256": "90dbe0fe47bea6d3e24e84581ea3158d7190652498ff17c7ef663ec64b6f6dc7",
+        "synthetic_state_sha256": "a1f93fb6fa6f6e326fbfde1e5ef0adb2e0a4b58f2a78eac6b69174992f527bd2",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "9e962b7a2f413c178a919a46d8072b5dd9d3d24a506ab861089238a167c8e0ec"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "88898986c5e386e9ebe460949887924fecb510a0ea88c283de6c2f1159903fca"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "dbb4e26991bba1bb2b4e45f1aa10baf4e2c8bca520f52cc99c6fb2db4bdc9d50"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "d8fe5601808236d1695c0f7340a97f23514acded3423dc627a117c8c7bdb8712"
+          }
+        ]
+      },
+      {
+        "id": 1060,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "8baa1a6d215423c24253d22c35b27674446e04115b1b8301196b7ceecef39af1",
+        "synthetic_state_sha256": "640c318734a9c8696cda4f17e5c81bf5605d0237745d79fb3e6a1a3c571aac50",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "4264f03d19dc18234aba2d61fcabc62e24d567a084f126f0985869e486455c9c"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "d48a31352b5eba2b575b63046b4d594e5e6d412c3f3f0f05e8b2fedebf9e0200"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "6e0d5c1cc78717819e11b6bfafc29204cf5ce5f8eb90f4a8a86e1124e6e8732c"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "944f3dabc76b5cc06c8a1bdd518ac462c060401aa3985bfe2895ed8abb7c1c4a"
+          }
+        ]
+      },
+      {
+        "id": 1061,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "a446a7e2e9c2717635baf75b3efc498d8b53f2814d479d8410cca3abcfadca8b",
+        "synthetic_state_sha256": "ec3d656cb31fd10154923d58a04f70dbcf6fa8be1c57e427e5910ace64d42a0f",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "0b0552360787f023d1ffad1604ace58e7837f5757dcc7e58739361e7e8464ca5"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "2a10080800b6fd1caee335eeba708c3a8b1fc7c8662f93afaf36a9a6a4e9d348"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "4dcfa46e72019b83db344b494a0eabe0dadbea2c654a4527688c5d04c1c20007"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "cede955c137668b27dcc17fc29ea5fd256f9123dcf2875691cd8b219f5dbb95c"
+          }
+        ]
+      },
+      {
+        "id": 1062,
+        "action": "reach_withdraw",
+        "official_state_sha256": "b50077626e84083afbefe2c18f46a853fd5ff498a45ed9c33463924e136d361e",
+        "synthetic_state_sha256": "e801dda36b4c038fa5a5a58aa324293ba0905a94848811c99864b72e04333560",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "f061cdbf6840405e04fa2734088f8a09e7445c4fabd92572de641a7389c547ca"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "3ab0adbff431bd6f0acec5188e93aa09982f37d8b9bd14d10550fca0336504c8"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "dda1d9c62c0b17cee483ad513f073a613f35182e1583af55e6aa33aad25cd40e"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "1284f65fe763c727a59787b834748672d4eb92bdae5e6a1801a17ac96215307e"
+          }
+        ]
+      }
+    ],
+    "mean_abs_feature_correlation": 0.2896985553405799,
+    "nonzero_scales": 72
+  },
+  "primary": {
+    "validation_cases": 6,
+    "required_action_correct": 4,
+    "required_control_wins": 4,
+    "action_correct": 2,
+    "adapted_truth_wins": {
+      "raw_frozen": 6,
+      "neutral_visual": 5,
+      "reversed_visual": 3,
+      "zero_state": 2,
+      "shuffled_state": 6
+    },
+    "mean_truth_rmse_rad": {
+      "adapted": 0.2008180929168327,
+      "raw_frozen": 0.5040722221102307,
+      "neutral_visual": 0.21160276890054575,
+      "reversed_visual": 0.21144448269918614,
+      "zero_state": 0.17138485123585442,
+      "shuffled_state": 0.4473556204210796
+    },
+    "targets_distinct": true,
+    "passed": false,
+    "development_candidate": false,
+    "scientific_result": false
+  },
+  "validation": [
+    {
+      "id": 1063,
+      "action": "foreleg_rubbing",
+      "predicted_action": "head_directed_grooming",
+      "probabilities": {
+        "foreleg_rubbing": 0.23338655049563978,
+        "head_directed_grooming": 0.510376688314464,
+        "reach_withdraw": 0.25623676118989613
+      },
+      "official_state_sha256": "6107799ba8d9155f02a7139ef1bf8b0131481025468f868f31f567392cb1068d",
+      "adapted_state_sha256": "5c2d319ed33e1ab2e7a2e05ee423033578081d6001c4d9fcd6bc0587f645727c",
+      "controls": {
+        "adapted": {
+          "truth_rmse_rad": 0.2887938655350251,
+          "target_sha256": "d4ca1eb0fce834c77460f5d93e71d36658c8039bc99c429bbcf2bf69a5b18aad"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.5774359599128306,
+          "target_sha256": "8b90646530955eb92accfa9922acc5edc3644ddd06fa703c9de95b0c902c710d"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.23284553904470762,
+          "target_sha256": "191a4e309b4a2bde2351adfd3624c4505bc181c257445a4cfd3640b54ae42d77"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.23533610932624494,
+          "target_sha256": "e0bb74c585ecc1cf76bf41d30bda111843e8ea7a5bcba3aa16c0486dbaceeb0a"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.17465633650918594,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.4141333177571357,
+          "target_sha256": "fed2b5a56caef4cea61ab5f577d780c377e90475300a522097e24cb6638a5b3a"
+        }
+      }
+    },
+    {
+      "id": 1064,
+      "action": "head_directed_grooming",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.07750256894942097,
+        "head_directed_grooming": 0.006649656517137402,
+        "reach_withdraw": 0.9158477745334417
+      },
+      "official_state_sha256": "3ff1b7abed4e5c11d32d77c8ebbc90e1ea0f8f46b10c9f633dda20bf75a5ce82",
+      "adapted_state_sha256": "6971404eff5b8680e4676f98df063599b45ee098c94f179dc908189ae6e66688",
+      "controls": {
+        "adapted": {
+          "truth_rmse_rad": 0.20358563539717117,
+          "target_sha256": "9e8db2e93930999084239a1f6d9166988f8cdbb68a32268b92c35745f8750a13"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.4306840444330121,
+          "target_sha256": "daa5b260c585caefb81f5dc00f60dfd349363ce3ccabf5012081165778fc5b78"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.2290507871277851,
+          "target_sha256": "191a4e309b4a2bde2351adfd3624c4505bc181c257445a4cfd3640b54ae42d77"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.2271661740282964,
+          "target_sha256": "98535a425060aee8b969b552ae985c4c857993fdf6a56a4ada684b2987cf793d"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.1905953826588646,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.47818725370340404,
+          "target_sha256": "c3b2c57cc9f493f2fe3be4e453166850ab402593ef1742b353cb25c1640533c1"
+        }
+      }
+    },
+    {
+      "id": 1065,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.07478821362681841,
+        "head_directed_grooming": 0.0045212137871943545,
+        "reach_withdraw": 0.9206905725859872
+      },
+      "official_state_sha256": "59ac961bfd5ecd1c54c1e4de7829beae15f14e56aa360da83287e2e7c1fc669a",
+      "adapted_state_sha256": "3437c5dc4b38f981756147c2571ba0016cfdeffe5deeeafd002e333817d7ae53",
+      "controls": {
+        "adapted": {
+          "truth_rmse_rad": 0.15144724592757372,
+          "target_sha256": "2d5b7dae4be32c001d4fb850c0d5b5d74e412c4915f4d1e465d1fc3b1cc8e654"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.5192672731939871,
+          "target_sha256": "6fa32b53fa71f58df543c43c791df6af39003c766f4b3018dd8e1ae838c00226"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.15235352029126026,
+          "target_sha256": "191a4e309b4a2bde2351adfd3624c4505bc181c257445a4cfd3640b54ae42d77"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.14502564824226616,
+          "target_sha256": "3d6eaf2da4e11b7a2c9a8fb5d246b96d34cc83b1af39ff398f18c5a2e411c4f0"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.12984847624418,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.4316417399571454,
+          "target_sha256": "76b2ec43a3e85b87939879fefff16d7659a2d3a12d079fa2999dcca852e4590e"
+        }
+      }
+    },
+    {
+      "id": 1066,
+      "action": "foreleg_rubbing",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.060219870287104266,
+        "head_directed_grooming": 0.004017156791679848,
+        "reach_withdraw": 0.9357629729212159
+      },
+      "official_state_sha256": "4f005c008ddeefe4e2411c3a1872f0bb7df1e59b3426bc2dccfa653aca38587b",
+      "adapted_state_sha256": "0e0ee9a19b59983432d73ea6b4f0da0eec7f31322c89a4c104c5f85196c5306b",
+      "controls": {
+        "adapted": {
+          "truth_rmse_rad": 0.23464658894588825,
+          "target_sha256": "030c4b2aa9de06c51b23858a9f9657674ce8d5842f7b125bab3445a3128fa4ad"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.5916711473736257,
+          "target_sha256": "0e1449054271e045aa96e5f6215f29c7b5cec74c6c7111175c317156711ba66f"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.26488407762630234,
+          "target_sha256": "191a4e309b4a2bde2351adfd3624c4505bc181c257445a4cfd3640b54ae42d77"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.22646233098533788,
+          "target_sha256": "0cf78fe90f3fc38461f4da7c7638e35eed76a13439cb1984875391167fa15c27"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.182248247206423,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.4133902548375659,
+          "target_sha256": "8074c47e983df2737e6436e641f0ceb424fa5640891f3abbd098f6ba1ccb9859"
+        }
+      }
+    },
+    {
+      "id": 1067,
+      "action": "head_directed_grooming",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.009150603289581853,
+        "head_directed_grooming": 0.003557056739372906,
+        "reach_withdraw": 0.9872923399710454
+      },
+      "official_state_sha256": "0187c33378287e8fcb6a92fa3e5dd04d2705903abbe980c67438395f57ad1036",
+      "adapted_state_sha256": "1a362a59fb60d5188cb7bcf29083fc5a168d1b83b6183ea2079e59d4df967ad2",
+      "controls": {
+        "adapted": {
+          "truth_rmse_rad": 0.1914813014293198,
+          "target_sha256": "bee74f0de9e37d98c64cff5b301c01621d8922a7f32e04919207154db8aa61ad"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.4101792488892387,
+          "target_sha256": "08cfee36162792ae5566d1e73abd4b58a290b87c4a9005f6df5223317fe77003"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.24128570612843786,
+          "target_sha256": "191a4e309b4a2bde2351adfd3624c4505bc181c257445a4cfd3640b54ae42d77"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.2711222686032788,
+          "target_sha256": "a05e5bc1d55c799bc95c3575665fc9f41f58d4a02e39b9d63217e8f15acfaba5"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.2054716721554006,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.49490244840158887,
+          "target_sha256": "7934eaad8aed52b71b7e32a00283d4f3ae9d2a6fc6cacde0dd3db1d844839a97"
+        }
+      }
+    },
+    {
+      "id": 1068,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.0284820073786471,
+        "head_directed_grooming": 0.0024634804429914934,
+        "reach_withdraw": 0.9690545121783615
+      },
+      "official_state_sha256": "b7d29dee837541d7246fdd22051b6393df6e18baf9b17793994fd4a9fb3cdf34",
+      "adapted_state_sha256": "24346147af0b69631fef1c546960ce9b0a131d769d543678ca3170338a310941",
+      "controls": {
+        "adapted": {
+          "truth_rmse_rad": 0.13495392026601824,
+          "target_sha256": "b53d62125a67f74fb5ae57b9f4df2cd7ab982ec93bec6554bb8b2e8f273df661"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.49519565885869016,
+          "target_sha256": "870a220caba6c452a29e5267e2fbe3eb899cc2050f3554fbedf87ec011a6618e"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.14919698318478114,
+          "target_sha256": "191a4e309b4a2bde2351adfd3624c4505bc181c257445a4cfd3640b54ae42d77"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.16355436500969264,
+          "target_sha256": "e9673260c363287edc782d0bc287868ec733905204a9f7c9a0728439cb34c48a"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.14548899264107235,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.4518787078696379,
+          "target_sha256": "f5a851cd41e66115c728dbeb18ebd8fd6d517580eccb98b76007c377cd38aaf9"
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Series105A is post-result diagnosis and cannot rescue or alter Series104.",
+    "Series105B is a newly trained engineering domain adapter, not unchanged frozen89E replication.",
+    "Validation is non-physical development evidence; any success requires new untouched Series106 physical outcomes.",
+    "No FlyVis/FlyWire/connectome mapping, living animal, biological vision, or mirror-neuron claim."
+  ]
+}
