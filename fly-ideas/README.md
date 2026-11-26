@@ -943,7 +943,7 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series115A–C: завершение трёх направлений в digital-only scope
 
-`experiments\RUN-DIGITAL-THREE-DIRECTION-CLOSURE-115ABC.bat`: A audit65/65 и reviewed root support61/65=93,85% (4 legacy-типа terminal unsupported); B frozen digital action surrogates3/3=100%, при честно сохранённом DN-grounding0/3; C computational rubric6/6=100%. Все доступные пользователю digital deliverables закрыты; biological validation не заявлена и остаётся внешним будущим этапом.
+`experiments\RUN-DIGITAL-THREE-DIRECTION-CLOSURE-115ABC.bat`: genuine Windows run подтвердил A audit65/65 и reviewed root support61/65=93,85% (4 legacy-типа terminal unsupported); B frozen digital action surrogates3/3 при DN-grounding0/3; C computational rubric6/6. Closure относится только к declared audit/method scope: artificial96 channels и browser96×96 matrix остаются0/96 mapped к FlyVis/FlyWire identities и не являются реальными нейронами.
 
 ### Series114: диагностика полноты bridge
 

@@ -20,6 +20,6 @@ Series112 frozen digital action surrogates прошли для3/3 действи
 
 ## Итог
 
-`all_three_digital_directions_closed=true`; digital deliverable completion=100%; biological validation claimed=false. Result SHA-256 `ecde7e75677a89dd591e98045ea9fa0df6e074ced1b4777d04735c088e750578`; runner SHA-256 `dec44f856a4767aa837dfbb4fd912f5320504aa940ccbc3440dd9c8a2c92ddce`.
+`all_three_digital_directions_closed=true`; digital deliverable completion=100%; biological validation claimed=false. This closure is limited to the declared Series115 audit/method scope: the engineered96 channels and browser96×96 correlation matrix remain0/96 mapped to biological identities and are not FlyVis/FlyWire neurons. Result SHA-256 `ecde7e75677a89dd591e98045ea9fa0df6e074ced1b4777d04735c088e750578`; runner SHA-256 `dec44f856a4767aa837dfbb4fd912f5320504aa940ccbc3440dd9c8a2c92ddce`.
 
 Запуск: `experiments\RUN-DIGITAL-THREE-DIRECTION-CLOSURE-115ABC.bat`.

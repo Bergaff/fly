@@ -410,7 +410,7 @@ Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result
 
 ## Series115A–C digital three-direction closure completed
 
-All user-accessible digital deliverables are terminally closed. A audited65/65 and expanded reviewed root support to61/65 (93.85%); Mi11/Mi12/Mi3/Tm28 remain explicitly unsupported rather than guessed. B preserves the frozen3/3 action-surrogate pass while retaining0/3 DN-linked biological labels. C passes6/6 computational gates. `all_three_digital_directions_closed=true`; no biological validation is claimed and external animal/data validation is non-blocking future work.
+Genuine Windows result SHA c98e5a77 reproduced Series115. A audited65/65 and expanded reviewed root support to61/65 (93.85%); Mi11/Mi12/Mi3/Tm28 remain unsupported rather than guessed. B preserves3/3 action surrogates and0/3 DN labels; C passes6/6 computational gates. Scope correction: `all_three_digital_directions_closed` covers only the declared audit/method deliverables. Artificial96 channels and the browser96×96 matrix remain0/96 mapped to FlyVis/FlyWire identities; never describe them as real neurons.
 
 ## Series114 bridge gap diagnosis completed
 
