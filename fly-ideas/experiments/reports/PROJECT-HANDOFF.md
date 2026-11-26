@@ -408,6 +408,10 @@ Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed a
 
 Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false.
 
+## Series114 bridge gap diagnosis completed
+
+113A is a genuine pass:3/3 acceptance criteria, but type coverage is49/65=75.38%, not100%. Exact offline diagnostic classifies16 gaps:4 reviewed types missing roots,6 peripheral photoreceptors,2 split CT1 nomenclature and4 types missing reviewed mapping. It forbids guessed aliases and emits a completion evidence ledger via `RUN-BRIDGE-GAP-DIAGNOSTIC-114.bat`.
+
 ## Series113A–C fly mirror foundation completed
 
 Genuine Windows result SHA482f6bfc reproduced all three exact pre-cutoff source calculations after autocrlf repair. A: reviewed type-level FlyVis→FlyWire bridge passes49/65 types,54 919 disjoint root IDs. B:1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links, but no machine-readable functional action field; validated readout for rubbing/head-grooming/reach remains false. C: Drosophila-first species-neutral method foundation ready, biological mirror candidate/scientific false. Series90 is not rewritten;113 prospectively reopens mapping. Next: preregister literature/recording action ledger and same-neuron observe/execute biological data, never choose DNs from model outcomes.

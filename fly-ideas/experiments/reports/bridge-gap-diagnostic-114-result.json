@@ -1,0 +1,188 @@
+{
+  "schema": "bridge-gap-diagnostic-114-v1",
+  "status": "completed",
+  "created_utc": "2026-11-26T07:08:55.108420+00:00",
+  "input_sha256": "482f6bfcf82c5b354e7b11ed5c6eb3fce1bd9ac4a67c0950d9590df4bdc42666",
+  "answer": {
+    "series113a_passed": true,
+    "acceptance_gate_completion_percent": 100.0,
+    "type_coverage_percent": 75.38461538461539,
+    "mapped_types": 49,
+    "total_types": 65,
+    "unresolved_types": 16,
+    "method_foundation_gates_percent": 100.0,
+    "full_biological_rubric_descriptive_percent": 33.333333333333336,
+    "percent_warning": "Type coverage and gate completion are different denominators. The biological rubric percentage is descriptive only, not probability of success."
+  },
+  "gate_parts": {
+    "minimum_mapped_types": true,
+    "minimum_reviewed_types": true,
+    "disjoint_root_sets": true
+  },
+  "gap_class_counts": {
+    "reviewed_match_missing_roots": 4,
+    "split_nomenclature_gap": 2,
+    "unreviewed_type_gap": 4,
+    "peripheral_photoreceptor_scope_gap": 6
+  },
+  "unresolved": [
+    {
+      "flyvis_type": "Am",
+      "series113_status": "reviewed_type_without_root_set",
+      "diagnostic_class": "reviewed_match_missing_roots",
+      "required_work": "root_source_expansion",
+      "required_evidence": "Find a pinned reviewed source that assigns FlyWire root IDs to this already cross-dataset-reviewed type.",
+      "reviewed_relations": [
+        "1-to-1"
+      ],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "CT1(Lo1)",
+      "series113_status": "unmatched",
+      "diagnostic_class": "split_nomenclature_gap",
+      "required_work": "nomenclature_resolution",
+      "required_evidence": "Resolve the parenthetical CT1 compartment name against reviewed OL/FlyWire nomenclature before any root assignment.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "CT1(M10)",
+      "series113_status": "unmatched",
+      "diagnostic_class": "split_nomenclature_gap",
+      "required_work": "nomenclature_resolution",
+      "required_evidence": "Resolve the parenthetical CT1 compartment name against reviewed OL/FlyWire nomenclature before any root assignment.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "Mi11",
+      "series113_status": "unmatched",
+      "diagnostic_class": "unreviewed_type_gap",
+      "required_work": "reviewed_mapping_expansion",
+      "required_evidence": "Locate reviewed cross-dataset nomenclature evidence and a pinned root-ID source; lexical similarity alone is forbidden.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "Mi12",
+      "series113_status": "unmatched",
+      "diagnostic_class": "unreviewed_type_gap",
+      "required_work": "reviewed_mapping_expansion",
+      "required_evidence": "Locate reviewed cross-dataset nomenclature evidence and a pinned root-ID source; lexical similarity alone is forbidden.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "Mi3",
+      "series113_status": "unmatched",
+      "diagnostic_class": "unreviewed_type_gap",
+      "required_work": "reviewed_mapping_expansion",
+      "required_evidence": "Locate reviewed cross-dataset nomenclature evidence and a pinned root-ID source; lexical similarity alone is forbidden.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "R1",
+      "series113_status": "unmatched",
+      "diagnostic_class": "peripheral_photoreceptor_scope_gap",
+      "required_work": "photoreceptor_coverage_audit",
+      "required_evidence": "Audit whether the official visual-parts table intentionally excludes peripheral photoreceptors; add roots only from a reviewed pinned source.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "R2",
+      "series113_status": "unmatched",
+      "diagnostic_class": "peripheral_photoreceptor_scope_gap",
+      "required_work": "photoreceptor_coverage_audit",
+      "required_evidence": "Audit whether the official visual-parts table intentionally excludes peripheral photoreceptors; add roots only from a reviewed pinned source.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "R3",
+      "series113_status": "unmatched",
+      "diagnostic_class": "peripheral_photoreceptor_scope_gap",
+      "required_work": "photoreceptor_coverage_audit",
+      "required_evidence": "Audit whether the official visual-parts table intentionally excludes peripheral photoreceptors; add roots only from a reviewed pinned source.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "R4",
+      "series113_status": "unmatched",
+      "diagnostic_class": "peripheral_photoreceptor_scope_gap",
+      "required_work": "photoreceptor_coverage_audit",
+      "required_evidence": "Audit whether the official visual-parts table intentionally excludes peripheral photoreceptors; add roots only from a reviewed pinned source.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "R5",
+      "series113_status": "unmatched",
+      "diagnostic_class": "peripheral_photoreceptor_scope_gap",
+      "required_work": "photoreceptor_coverage_audit",
+      "required_evidence": "Audit whether the official visual-parts table intentionally excludes peripheral photoreceptors; add roots only from a reviewed pinned source.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "R6",
+      "series113_status": "unmatched",
+      "diagnostic_class": "peripheral_photoreceptor_scope_gap",
+      "required_work": "photoreceptor_coverage_audit",
+      "required_evidence": "Audit whether the official visual-parts table intentionally excludes peripheral photoreceptors; add roots only from a reviewed pinned source.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "Tm28",
+      "series113_status": "unmatched",
+      "diagnostic_class": "unreviewed_type_gap",
+      "required_work": "reviewed_mapping_expansion",
+      "required_evidence": "Locate reviewed cross-dataset nomenclature evidence and a pinned root-ID source; lexical similarity alone is forbidden.",
+      "reviewed_relations": [],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "Tm30",
+      "series113_status": "reviewed_type_without_root_set",
+      "diagnostic_class": "reviewed_match_missing_roots",
+      "required_work": "root_source_expansion",
+      "required_evidence": "Find a pinned reviewed source that assigns FlyWire root IDs to this already cross-dataset-reviewed type.",
+      "reviewed_relations": [
+        "1-to-1"
+      ],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "TmY13",
+      "series113_status": "reviewed_type_without_root_set",
+      "diagnostic_class": "reviewed_match_missing_roots",
+      "required_work": "root_source_expansion",
+      "required_evidence": "Find a pinned reviewed source that assigns FlyWire root IDs to this already cross-dataset-reviewed type.",
+      "reviewed_relations": [
+        "1-to-1"
+      ],
+      "automatic_completion_allowed": false
+    },
+    {
+      "flyvis_type": "TmY9",
+      "series113_status": "reviewed_type_without_root_set",
+      "diagnostic_class": "reviewed_match_missing_roots",
+      "required_work": "root_source_expansion",
+      "required_evidence": "Find a pinned reviewed source that assigns FlyWire root IDs to this already cross-dataset-reviewed type.",
+      "reviewed_relations": [
+        "1-to-1"
+      ],
+      "automatic_completion_allowed": false
+    }
+  ],
+  "completion_policy": {
+    "can_complete_from_current_exact_sources": false,
+    "reason": "Current exact sources contain no roots for 4 reviewed types and no reviewed match for 12 types. Guessing aliases would violate provenance.",
+    "next_executable_stage": "Acquire and preregister additional reviewed type/root sources, then rerun this audit before extending the bridge."
+  },
+  "scientific_result": false
+}

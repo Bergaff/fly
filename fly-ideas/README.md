@@ -941,6 +941,10 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 `experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`.
 
+### Series114: диагностика полноты bridge
+
+`experiments\RUN-BRIDGE-GAP-DIAGNOSTIC-114.bat` различает100% выполнения acceptance gate113A и75,38% фактического type coverage (49/65). Диагностика16 gaps:4 reviewed без roots,6 peripheral R1–R6,2 split CT1 nomenclature,4 без reviewed mapping. Текущие exact sources не позволяют честно дополнить roots автоматически; создаётся CSV следующей evidence work.
+
 ### Series113A–C: fly mirror foundation
 
 `experiments\RUN-FLY-MIRROR-FOUNDATION-113ABC.bat` выполняет три расчёта одним запуском на exact official commits до cutoff. Genuine Windows result SHA `482f6bfc…` после autocrlf repair:113A reviewed FlyVis→FlyWire bridge49/65 типов и54 919 disjoint roots, pass;113B inventory1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links, но functional three-action labels отсутствуют;113C Drosophila-first method foundation ready, biological mirror candidate/scientific false.
