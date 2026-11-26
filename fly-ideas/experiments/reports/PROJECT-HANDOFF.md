@@ -406,4 +406,8 @@ Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed a
 
 ## Series112 frozen operational-router physical validation prepared
 
-Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false. This closes deterministic digital-nuisance simulated-body engineering validation. Next evidence must be separately preregistered real acquisition/camera hardware; do not inflate this into biological or hardware transfer.
+Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false.
+
+## Series113A–C fly mirror foundation completed
+
+Three exact pre-cutoff source calculations, result SHA7fad3928. A: reviewed type-level FlyVis→FlyWire bridge passes49/65 types,54 919 disjoint root IDs. B:1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links, but no machine-readable functional action field; validated readout for rubbing/head-grooming/reach remains false. C: Drosophila-first species-neutral method foundation ready, biological mirror candidate/scientific false. Series90 is not rewritten;113 prospectively reopens mapping. Next: preregister literature/recording action ledger and same-neuron observe/execute biological data, never choose DNs from model outcomes.

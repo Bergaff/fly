@@ -939,4 +939,8 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series112: frozen operational-router physical validation
 
-`experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`. Digital-nuisance simulated-body milestone закрыт; следующий честный шаг — отдельно preregistered real acquisition/camera hardware, не новые post-result варианты.
+`experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`.
+
+### Series113A–C: fly mirror foundation
+
+`experiments\RUN-FLY-MIRROR-FOUNDATION-113ABC.bat` выполняет три расчёта одним запуском на exact official commits до cutoff. 113A построил reviewed type-level FlyVis→FlyWire bridge:49/65 типов,54 919 disjoint root IDs, pass. 113B нашёл1 303 typed descending neurons/473 types,920 MaleCNS и428 hemibrain links, но официальный table не содержит functional action labels: three-action motor readout пока не validated. 113C фиксирует Drosophila-first species-neutral rubric: method foundation ready, biological mirror candidate false. Result SHA `7fad3928…`; scientific false.
