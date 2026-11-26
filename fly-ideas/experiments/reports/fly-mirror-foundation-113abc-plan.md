@@ -34,3 +34,7 @@ The complete source calculation was run locally before interpretation. Result SH
 113A passes:49/65 FlyVis types map to54,919 disjoint FlyWire root IDs and all49 have reviewed cross-dataset type matches. Four more have reviewed type relations but no direct root set;12 are unmatched under exact names. 113B finds1,303 unique typed descending neurons,473 types,920 MaleCNS supertype links and428 hemibrain links, but no machine-readable action-validation field; therefore the three-action readout remains unvalidated. 113C declares the fly-first method foundation ready, while `biological_mirror_neuron_candidate=false` and `scientific_result=false`.
 
 Run `experiments\RUN-FLY-MIRROR-FOUNDATION-113ABC.bat` to reproduce all three calculations from exact GitHub commits. The next stage must add a preregistered literature/recording evidence ledger for the three actions and biological observe/execute data; it must not hand-pick DNs from model outcomes.
+
+## Genuine Windows reproduction
+
+After the pre-outcome `autocrlf` repair, the complete uploaded result SHA `482f6bfcf82c5b354e7b11ed5c6eb3fce1bd9ac4a67c0950d9590df4bdc42666` reproduced every substantive count and decision: A passed49/65 and54,919 roots; B found1,303 DNs but no validated action field; C marked the method foundation ready and biological/scientific claim false. Exact Git blob verification succeeded on Windows.

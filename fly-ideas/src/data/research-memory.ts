@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v674-session-2026-09-18-fly-mirror-foundation";
+export const MEMORY_VERSION = "v675-session-2026-09-18-fly-mirror-genuine";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -554,10 +554,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Safe/kept/rejected/action18; tracking0,055447; wins18/18 vs neutral/reversed/shuffled/zero and16/18 open-loop; gain diagnostic16; distinct true. Spatial16, temporal fallback2. Physical development true, scientific false.",
     limitations: "Deterministic digital post-capture nuisances and simulated MOTOR body. Does not establish real acquisition/camera hardware, unseen/composite nuisances, living fly, biological learning or connectome evidence. Next evidence must leave this benchmark family.",
     files: ["experiments/RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat", "experiments/templates/112_frozen_operational_router_physical.py", "experiments/reports/frozen-operational-router-physical-112-plan.md", "experiments/reports/frozen-operational-router-physical-112-user-result.json", "experiments/reports/frozen-operational-router-physical-112-user-result.md", "tests/frozen-operational-router-physical-112.test.cjs"] },
-  { id: "session-fly-mirror-foundation-113abc", ideaId: "i-observational", title: "Series113A-C: fly mirror foundation", status: "three exact source calculations completed", source: "Pinned FlyVis, ol_annotations, visual parts list and FlyWire annotations commits available by cutoff2026-09-18; result SHA1761a065….",
+  { id: "session-fly-mirror-foundation-113abc", ideaId: "i-observational", title: "Series113A-C: fly mirror foundation", status: "genuine Windows reproduction completed", source: "Pinned FlyVis, ol_annotations, visual parts list and FlyWire annotations commits by cutoff2026-09-18; uploaded result SHA482f6bfc… with repaired runner810fde63….",
     results: "A pass:49/65 FlyVis types→54 919 disjoint FlyWire roots. B anatomy ready:1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links; validated three-action readout false. C fly-first method foundation ready; biological candidate/scientific false.",
     limitations: "Type sets are not one-to-one functional identities. Official annotation table lacks action-validation fields; anatomy cannot replace stimulation/recording. No same-neuron biological observe/execute data, causal intervention or independent flies yet.",
-    files: ["experiments/RUN-FLY-MIRROR-FOUNDATION-113ABC.bat", "experiments/templates/113abc_fly_mirror_foundation.py", "experiments/reports/fly-mirror-foundation-113abc-plan.md", "experiments/reports/fly-mirror-foundation-113abc-result.json", "experiments/reports/fly-mirror-foundation-113abc-result.md", "experiments/reports/flyvis-flywire-bridge-113a.csv", "tests/fly-mirror-foundation-113abc.test.cjs"] },
+    files: ["experiments/RUN-FLY-MIRROR-FOUNDATION-113ABC.bat", "experiments/templates/113abc_fly_mirror_foundation.py", "experiments/reports/fly-mirror-foundation-113abc-plan.md", "experiments/reports/fly-mirror-foundation-113abc-result.json", "experiments/reports/fly-mirror-foundation-113abc-result.md", "experiments/reports/fly-mirror-foundation-113abc-user-result.json", "experiments/reports/fly-mirror-foundation-113abc-user-result.md", "experiments/reports/flyvis-flywire-bridge-113a.csv", "tests/fly-mirror-foundation-113abc.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

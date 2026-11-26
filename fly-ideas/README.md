@@ -943,4 +943,4 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series113A–C: fly mirror foundation
 
-`experiments\RUN-FLY-MIRROR-FOUNDATION-113ABC.bat` выполняет три расчёта одним запуском на exact official commits до cutoff. 113A построил reviewed type-level FlyVis→FlyWire bridge:49/65 типов,54 919 disjoint root IDs, pass. 113B нашёл1 303 typed descending neurons/473 types,920 MaleCNS и428 hemibrain links, но официальный table не содержит functional action labels: three-action motor readout пока не validated. 113C фиксирует Drosophila-first species-neutral rubric: method foundation ready, biological mirror candidate false. Result SHA `1761a065…`; scientific false.
+`experiments\RUN-FLY-MIRROR-FOUNDATION-113ABC.bat` выполняет три расчёта одним запуском на exact official commits до cutoff. Genuine Windows result SHA `482f6bfc…` после autocrlf repair:113A reviewed FlyVis→FlyWire bridge49/65 типов и54 919 disjoint roots, pass;113B inventory1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links, но functional three-action labels отсутствуют;113C Drosophila-first method foundation ready, biological mirror candidate/scientific false.

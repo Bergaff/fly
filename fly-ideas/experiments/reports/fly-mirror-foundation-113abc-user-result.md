@@ -1,0 +1,7 @@
+# Series113A–C genuine Windows result
+
+The byte-exact uploaded result is `fly-mirror-foundation-113abc-user-result.json`, SHA-256 `482f6bfcf82c5b354e7b11ed5c6eb3fce1bd9ac4a67c0950d9590df4bdc42666`. It used repaired runner SHA `810fde63e265c6703d99205958a16879e5c2d5c5eb057660188a108a8c482ad5`; all exact Git blob checks passed on Windows.
+
+The genuine result reproduces the deterministic source calculation exactly apart from creation time. Calculation A passes:49/65 FlyVis types map to54,919 unique disjoint FlyWire root IDs and all49 have reviewed cross-dataset type matches. Calculation B establishes the anatomical inventory—1,303 unique typed descending neurons across473 types,920 MaleCNS supertype links and428 hemibrain links—but correctly does not validate a three-action functional motor readout because the pinned official table contains no machine-readable action field. Calculation C therefore reports `method_foundation_ready=true`, `biological_mirror_neuron_candidate=false`, and `scientific_result=false`.
+
+This is not a failed mapping effort: the visual mapping and fly-first method foundation passed. It localizes the next scientific dependency to preregistered external functional evidence for the three actions and biological same-neuron observe/execute recordings, matched controls, causal intervention and independent flies. Anatomy-only or model-selected DNs may not be promoted to validated readouts.
