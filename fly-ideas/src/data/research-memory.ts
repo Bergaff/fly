@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v678-session-2026-09-18-series115-genuine-boundary";
+export const MEMORY_VERSION = "v679-session-2026-09-18-real-label-digital-pipeline";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -554,6 +554,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Safe/kept/rejected/action18; tracking0,055447; wins18/18 vs neutral/reversed/shuffled/zero and16/18 open-loop; gain diagnostic16; distinct true. Spatial16, temporal fallback2. Physical development true, scientific false.",
     limitations: "Deterministic digital post-capture nuisances and simulated MOTOR body. Does not establish real acquisition/camera hardware, unseen/composite nuisances, living fly, biological learning or connectome evidence. Next evidence must leave this benchmark family.",
     files: ["experiments/RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat", "experiments/templates/112_frozen_operational_router_physical.py", "experiments/reports/frozen-operational-router-physical-112-plan.md", "experiments/reports/frozen-operational-router-physical-112-user-result.json", "experiments/reports/frozen-operational-router-physical-112-user-result.md", "tests/frozen-operational-router-physical-112.test.cjs"] },
+  { id: "session-biological-digital-pipeline-116abc", ideaId: "i-observational", title: "Series116A-C: real-label digital pipeline", status: "all three digital pipelines implemented", source: "Genuine Series115 plus official FlyWire v783 type connectivity SHA215cf7a6… and pinned annotations; result SHA0ef6b1bd….",
+    results: "A new61×61 real type/root matrix:64 667 roots,2 489 edges,7 335 202 synapses. B reaches8 DN types and classifies held-out actions6/6 vs shuffled/zero2/6. C observe/execute structure margin0.366476 passes, action margin0.002413 fails0.01.",
+    limitations: "Old artificial96 is replaced, not mapped. Action labels remain frozen digital project labels, not biological DN functions. Mirror pipeline is implemented but action specificity is insufficient; descriptive candidates are not biological mirror neurons.",
+    files: ["experiments/RUN-BIOLOGICAL-DIGITAL-PIPELINE-116ABC.bat", "experiments/templates/116abc_biological_digital_pipeline.py", "experiments/reports/biological-digital-pipeline-116abc-result.json", "experiments/reports/biological-digital-pipeline-116abc-result.md", "experiments/reports/biological-digital-pipeline-116a-61x61.csv", "experiments/reports/biological-digital-pipeline-116b-61x8.csv", "tests/biological-digital-pipeline-116abc.test.cjs"] },
   { id: "session-digital-three-direction-closure-115abc", ideaId: "i-observational", title: "Series115A-C: digital three-direction closure", status: "genuine digital audit/method scope closed", source: "Exact Series112/113 inputs and four pinned official commits; genuine Windows result SHA c98e5a77…, runner dec44f85….",
     results: "A audit65/65, reviewed root support61/65=93.85%,4 legacy terminal unsupported. B digital action surrogates3/3 passed, DN-linked biological labels0/3. C computational gates6/6.",
     limitations: "Closure is only the declared Series115 audit/method scope, not animal validation and not96-channel identity mapping. Artificial96 and browser96×96 remain0/96 mapped to FlyVis/FlyWire neurons. CT1/R1-R6 use shared parent/group roots; Mi11/Mi12/Mi3/Tm28 are not guessed.",

@@ -408,6 +408,10 @@ Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed a
 
 Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false.
 
+## Series116A–C real-label digital pipeline implemented
+
+A new61×61 matrix replaces—not relabels—the artificial96 browser map:61 FlyVis types, reviewed root sets,64,667 unique roots,2,489 nonzero type edges and7,335,202 synapses from72,954 official v783 rows. Structural visual→DN paths reach8 DN types; frozen digital readout gets6/6 held-out vs2/6 shuffled and2/6 zero. Observe/execute structure margin is0.366476, but same-vs-other action margin0.002413 fails0.01, so no mirror-neuron claim. All three digital pipelines are implemented; biological function labels remain unclaimed.
+
 ## Series115A–C digital three-direction closure completed
 
 Genuine Windows result SHA c98e5a77 reproduced Series115. A audited65/65 and expanded reviewed root support to61/65 (93.85%); Mi11/Mi12/Mi3/Tm28 remain unsupported rather than guessed. B preserves3/3 action surrogates and0/3 DN labels; C passes6/6 computational gates. Scope correction: `all_three_digital_directions_closed` covers only the declared audit/method deliverables. Artificial96 channels and the browser96×96 matrix remain0/96 mapped to FlyVis/FlyWire identities; never describe them as real neurons.

@@ -941,6 +941,10 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 `experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`.
 
+### Series116A–C: биологически индексированные три цифровых направления
+
+`experiments\RUN-BIOLOGICAL-DIGITAL-PIPELINE-116ABC.bat` строит новую real-label61×61 карту (64 667 roots,2 489 edges,7 335 202 synapses), structural readout61 visual types→8 DN types→3 actions (held-out6/6 против shuffled/zero2/6) и observe/execute analysis. Mirror structure specificity проходит, action specificity margin0,002413 не достигает0,01. Все три pipeline реализованы; старые artificial96 не переименованы, biological function claim=false.
+
 ### Series115A–C: завершение трёх направлений в digital-only scope
 
 `experiments\RUN-DIGITAL-THREE-DIRECTION-CLOSURE-115ABC.bat`: genuine Windows run подтвердил A audit65/65 и reviewed root support61/65=93,85% (4 legacy-типа terminal unsupported); B frozen digital action surrogates3/3 при DN-grounding0/3; C computational rubric6/6. Closure относится только к declared audit/method scope: artificial96 channels и browser96×96 matrix остаются0/96 mapped к FlyVis/FlyWire identities и не являются реальными нейронами.
