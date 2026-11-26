@@ -964,3 +964,7 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 ### Series118: приблизительно4-часовой adaptive расчёт A/B/C
 
 `experiments\RUN-ADAPTIVE-THREE-DIRECTION-118-4H.bat` запускает один checkpointed расчёт всех трёх цифровых направлений. Genuine Windows run SHA `f1a5751b…` занял4ч04м03,625с: development29 742 bundles/713 808 replicates, untouched final7 409/177 816. Frozen final прошёл A stability0,998255/min0,995505; B accuracy0,974546 при shuffled0,672473; C margin0,925103, strongest-control advantage0,414762 и win rate0,986582. Все три declared digital gates прошли. Series117 no-go не переписывается; `biological_claim=false`, `scientific_biological_result=false`.
+
+### Series119: frozen stress-replication трёх направлений
+
+`experiments\RUN-FROZEN-THREE-DIRECTION-STRESS-119-4H.bat` exact-loads genuine Series118 и без adaptive search проверяет frozen config на новых seeds и трёх заранее заданных out-of-family профилях:5–15% edge dropout, edge weight noise,0–2 dropped DN channels и повышенный case noise. Общий и severe-profile gates требуют устойчивости A, преимущества B над independently retrained shuffled structure и C над strongest pairing/structure/identity/label/zero control. Fixture пройдена; полный outcome неизвестен. Это следующий digital stress gate, не биологическое подтверждение.

@@ -431,3 +431,7 @@ Genuine Windows result SHA482f6bfc reproduced all three exact pre-cutoff source 
 ## Series118 four-hour adaptive three-direction run completed
 
 Genuine Windows result SHA `f1a5751b…` completed in14,643.625s with six workers. Development ran1,238 generations,29,742 bundles/713,808 replicates; the untouched frozen final ran7,409 bundles/177,816 replicates. Selected config: alpha.125, beta.5, ridge.01, subset20, derivative0. Final passed A (mean/min.998255/.995505), B (accuracy.974546, shuffled.672473) and C (margin.925103, advantage.414762, win.986582). Controls: pairing-.508228, structure.451291, identity.000222, label.234050, zero≈0. All declared digital gates pass. Series117 remains a valid no-go under its own protocol; this does not establish living-fly action labels or biological mirror neurons. Biological/scientific flags remain false.
+
+## Series119 frozen A/B/C out-of-family stress replication prepared
+
+Series119 exact-loads genuine118 SHA f1a5751b and runner d75169f8 with selected alpha.125/beta.5/ridge.01/subset20/derivative0. No development, mutation, selection or post-result tuning is permitted. New119900000+ seeds cover fixed mild/medium/severe edge-dropout/noise, DN-dropout and case-noise profiles. Overall and severe-profile gates retain pairing, independently retrained structure, identity, label and zero controls. Checkpointed ~4h GUI and fixture are ready; full outcome is pending. This reduces digital winner-noise/generalization uncertainty but cannot fill biological action labels or same-neuron evidence.
