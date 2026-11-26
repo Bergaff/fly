@@ -1,0 +1,66 @@
+flyvis_type,status,root_count,source_types,relation
+Am,reviewed_expanded_root_set,2,Am,exact reviewed type
+C2,reviewed_direct_root_set,1430,C2,Series113 reviewed direct
+C3,reviewed_direct_root_set,1520,C3,Series113 reviewed direct
+CT1(Lo1),reviewed_expanded_root_set,2,CT1,reviewed compartment-to-parent
+CT1(M10),reviewed_expanded_root_set,2,CT1,reviewed compartment-to-parent
+L1,reviewed_direct_root_set,1596,L1,Series113 reviewed direct
+L2,reviewed_direct_root_set,1593,L2,Series113 reviewed direct
+L3,reviewed_direct_root_set,1426,L3,Series113 reviewed direct
+L4,reviewed_direct_root_set,1404,L4,Series113 reviewed direct
+L5,reviewed_direct_root_set,1570,L5,Series113 reviewed direct
+Lawf1,reviewed_direct_root_set,293,Lawf1,Series113 reviewed direct
+Lawf2,reviewed_direct_root_set,346,Lawf2,Series113 reviewed direct
+Mi1,reviewed_direct_root_set,1581,Mi1,Series113 reviewed direct
+Mi10,reviewed_direct_root_set,406,Mi10,Series113 reviewed direct
+Mi11,audited_unsupported_legacy_type,0,,no reviewed modern cross-dataset/root mapping
+Mi12,audited_unsupported_legacy_type,0,,no reviewed modern cross-dataset/root mapping
+Mi13,reviewed_direct_root_set,716,Mi13,Series113 reviewed direct
+Mi14,reviewed_direct_root_set,252,Mi14,Series113 reviewed direct
+Mi15,reviewed_direct_root_set,971,Mi15,Series113 reviewed direct
+Mi2,reviewed_direct_root_set,851,Mi2,Series113 reviewed direct
+Mi3,audited_unsupported_legacy_type,0,,no reviewed modern cross-dataset/root mapping
+Mi4,reviewed_direct_root_set,1532,Mi4,Series113 reviewed direct
+Mi9,reviewed_direct_root_set,1551,Mi9,Series113 reviewed direct
+R1,reviewed_expanded_root_set,8525,R1-6,reviewed grouped type
+R2,reviewed_expanded_root_set,8525,R1-6,reviewed grouped type
+R3,reviewed_expanded_root_set,8525,R1-6,reviewed grouped type
+R4,reviewed_expanded_root_set,8525,R1-6,reviewed grouped type
+R5,reviewed_expanded_root_set,8525,R1-6,reviewed grouped type
+R6,reviewed_expanded_root_set,8525,R1-6,reviewed grouped type
+R7,reviewed_direct_root_set,1333,R7,Series113 reviewed direct
+R8,reviewed_direct_root_set,1339,R8,Series113 reviewed direct
+T1,reviewed_direct_root_set,1389,T1,Series113 reviewed direct
+T2,reviewed_direct_root_set,1466,T2,Series113 reviewed direct
+T2a,reviewed_direct_root_set,1774,T2a,Series113 reviewed direct
+T3,reviewed_direct_root_set,1676,T3,Series113 reviewed direct
+T4a,reviewed_direct_root_set,1457,T4a,Series113 reviewed direct
+T4b,reviewed_direct_root_set,1507,T4b,Series113 reviewed direct
+T4c,reviewed_direct_root_set,1710,T4c,Series113 reviewed direct
+T4d,reviewed_direct_root_set,1569,T4d,Series113 reviewed direct
+T5a,reviewed_direct_root_set,1483,T5a,Series113 reviewed direct
+T5b,reviewed_direct_root_set,1514,T5b,Series113 reviewed direct
+T5c,reviewed_direct_root_set,1536,T5c,Series113 reviewed direct
+T5d,reviewed_direct_root_set,1469,T5d,Series113 reviewed direct
+Tm1,reviewed_direct_root_set,1554,Tm1,Series113 reviewed direct
+Tm16,reviewed_direct_root_set,344,Tm16,Series113 reviewed direct
+Tm2,reviewed_direct_root_set,1549,Tm2,Series113 reviewed direct
+Tm20,reviewed_direct_root_set,1494,Tm20,Series113 reviewed direct
+Tm28,audited_unsupported_legacy_type,0,,no reviewed modern cross-dataset/root mapping
+Tm3,reviewed_direct_root_set,1756,Tm3,Series113 reviewed direct
+Tm30,reviewed_expanded_root_set,107,Tm31,reviewed cross-dataset alias
+Tm4,reviewed_direct_root_set,1489,Tm4,Series113 reviewed direct
+Tm5Y,reviewed_direct_root_set,1,Tm5Y,Series113 reviewed direct
+Tm5a,reviewed_direct_root_set,452,Tm5a,Series113 reviewed direct
+Tm5b,reviewed_direct_root_set,458,Tm5b,Series113 reviewed direct
+Tm5c,reviewed_direct_root_set,622,Tm5c,Series113 reviewed direct
+Tm9,reviewed_direct_root_set,1522,Tm9,Series113 reviewed direct
+TmY10,reviewed_direct_root_set,447,TmY10,Series113 reviewed direct
+TmY13,reviewed_expanded_root_set,377,TmY11,reviewed cross-dataset alias
+TmY14,reviewed_direct_root_set,371,TmY14,Series113 reviewed direct
+TmY15,reviewed_direct_root_set,257,TmY15,Series113 reviewed direct
+TmY18,reviewed_direct_root_set,1,TmY18,Series113 reviewed direct
+TmY3,reviewed_direct_root_set,734,TmY3,Series113 reviewed direct
+TmY4,reviewed_direct_root_set,432,TmY4,Series113 reviewed direct
+TmY5a,reviewed_direct_root_set,1176,TmY5a,Series113 reviewed direct
+TmY9,reviewed_expanded_root_set,735,TmY9q;TmY9q⊥,reviewed split alias

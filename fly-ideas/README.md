@@ -941,6 +941,10 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 `experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`.
 
+### Series115A–C: завершение трёх направлений в digital-only scope
+
+`experiments\RUN-DIGITAL-THREE-DIRECTION-CLOSURE-115ABC.bat`: A audit65/65 и reviewed root support61/65=93,85% (4 legacy-типа terminal unsupported); B frozen digital action surrogates3/3=100%, при честно сохранённом DN-grounding0/3; C computational rubric6/6=100%. Все доступные пользователю digital deliverables закрыты; biological validation не заявлена и остаётся внешним будущим этапом.
+
 ### Series114: диагностика полноты bridge
 
 `experiments\RUN-BRIDGE-GAP-DIAGNOSTIC-114.bat` различает100% выполнения acceptance gate113A и75,38% фактического type coverage (49/65). Диагностика16 gaps:4 reviewed без roots,6 peripheral R1–R6,2 split CT1 nomenclature,4 без reviewed mapping. Текущие exact sources не позволяют честно дополнить roots автоматически; создаётся CSV следующей evidence work.

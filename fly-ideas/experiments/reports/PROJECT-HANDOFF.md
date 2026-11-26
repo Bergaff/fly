@@ -408,6 +408,10 @@ Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed a
 
 Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false.
 
+## Series115A–C digital three-direction closure completed
+
+All user-accessible digital deliverables are terminally closed. A audited65/65 and expanded reviewed root support to61/65 (93.85%); Mi11/Mi12/Mi3/Tm28 remain explicitly unsupported rather than guessed. B preserves the frozen3/3 action-surrogate pass while retaining0/3 DN-linked biological labels. C passes6/6 computational gates. `all_three_digital_directions_closed=true`; no biological validation is claimed and external animal/data validation is non-blocking future work.
+
 ## Series114 bridge gap diagnosis completed
 
 113A is a genuine pass:3/3 acceptance criteria, but type coverage is49/65=75.38%, not100%. Exact offline diagnostic classifies16 gaps:4 reviewed types missing roots,6 peripheral photoreceptors,2 split CT1 nomenclature and4 types missing reviewed mapping. It forbids guessed aliases and emits a completion evidence ledger via `RUN-BRIDGE-GAP-DIAGNOSTIC-114.bat`.
