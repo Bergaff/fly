@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v680-session-2026-09-18-series116-genuine";
+export const MEMORY_VERSION = "v681-session-2026-09-18-frozen-mirror-no-go";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -554,6 +554,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Safe/kept/rejected/action18; tracking0,055447; wins18/18 vs neutral/reversed/shuffled/zero and16/18 open-loop; gain diagnostic16; distinct true. Spatial16, temporal fallback2. Physical development true, scientific false.",
     limitations: "Deterministic digital post-capture nuisances and simulated MOTOR body. Does not establish real acquisition/camera hardware, unseen/composite nuisances, living fly, biological learning or connectome evidence. Next evidence must leave this benchmark family.",
     files: ["experiments/RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat", "experiments/templates/112_frozen_operational_router_physical.py", "experiments/reports/frozen-operational-router-physical-112-plan.md", "experiments/reports/frozen-operational-router-physical-112-user-result.json", "experiments/reports/frozen-operational-router-physical-112-user-result.md", "tests/frozen-operational-router-physical-112.test.cjs"] },
+  { id: "session-frozen-action-specific-mirror-117", ideaId: "i-observational", title: "Series117: frozen action-specific mirror confirmation", status: "frozen computational no-go", source: "Exact genuine Series116 and pinned61×61/61×8 artifacts; first final evaluation with12 frozen candidates,18 development and12 final cases; result SHA98365850….",
+    results: "Real alignment12/12, margin0.663801; rotated pairing0/12. But retrained shuffled structure8/12 margin0.657708 and reversed identity margin0.661038 leave <0.01 margin advantage vs required0.2. Primary false; zero candidates promoted.",
+    limitations: "Supervised digital alignment can recover action geometry without exact connectome identity. Do not weaken gate or retune Series117. Next evidence requires time-resolved official FlyVis observation movies and independent FlyGym execution/proprioceptive traces.",
+    files: ["experiments/RUN-FROZEN-ACTION-SPECIFIC-MIRROR-117.bat", "experiments/templates/117_frozen_action_specific_mirror_confirmation.py", "experiments/reports/frozen-action-specific-mirror-117-result.json", "experiments/reports/frozen-action-specific-mirror-117-result.md", "experiments/reports/frozen-action-specific-mirror-117-similarity.csv", "experiments/reports/frozen-action-specific-mirror-117-candidates.csv", "tests/frozen-action-specific-mirror-117.test.cjs"] },
   { id: "session-biological-digital-pipeline-116abc", ideaId: "i-observational", title: "Series116A-C: real-label digital pipeline", status: "genuine Windows reproduction completed", source: "Official FlyWire v783 connectivity SHA215cf7a6…; uploaded Windows result SHA3bf8603c…, checked result0ef6b1bd…. Twelve floats differ only≤2.22e-16.",
     results: "A new61×61 real type/root matrix:64 667 roots,2 489 edges,7 335 202 synapses. B reaches8 DN types and classifies held-out actions6/6 vs shuffled/zero2/6. C observe/execute structure margin0.366476 passes, action margin0.002413 fails0.01.",
     limitations: "Old artificial96 is replaced, not mapped. Action labels remain frozen digital project labels, not biological DN functions. Mirror pipeline is implemented but action specificity is insufficient; descriptive candidates are not biological mirror neurons.",

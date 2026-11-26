@@ -408,6 +408,10 @@ Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed a
 
 Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false.
 
+## Series117 frozen action-specific confirmation: no-go
+
+Twelve Series116 candidates, ridge0.01,18 development/12 untouched final cases and gates were frozen before first final evaluation. Real alignment decoded12/12, margin0.663801, but retrained shuffled structure retained8/12 and margin0.657708; reversed identity margin0.661038. Required0.2 margin advantage failed. Primary false; promote no mirror candidates. Do not retune117 or weaken controls. A future branch needs time-resolved official FlyVis observation responses and independently generated FlyGym execution/proprioception.
+
 ## Series116A–C real-label digital pipeline implemented
 
 Genuine Windows result SHA3bf8603c reproduced the new61×61 real-label map:64,667 roots,2,489 edges,7,335,202 synapses. Visual→DN paths reach8 types; readout gets6/6 held-out vs2/6 shuffled/zero. Observe/execute structure margin0.366476 passes, action margin0.002413 fails0.01. Twelve Linux/Windows floats differ only5.42e-20–2.22e-16; no count, ranking, gate or decision changes. Artificial96 remains separate and no biological function is claimed.

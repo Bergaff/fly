@@ -941,6 +941,10 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 `experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`.
 
+### Series117: frozen action-specific mirror confirmation
+
+`experiments\RUN-FROZEN-ACTION-SPECIFIC-MIRROR-117.bat`:12 frozen real-type candidates,18 development и12 untouched final cases. Real alignment декодирует12/12 с margin0,663801, но retrained shuffled structure сохраняет margin0,657708, reversed identity0,661038; frozen advantage0,2 не выполнен. Primary NO-GO, candidates не promoted. Нельзя ослаблять gate: следующая evidence должна быть time-resolved FlyVis movies + independent FlyGym execution traces.
+
 ### Series116A–C: биологически индексированные три цифровых направления
 
 `experiments\RUN-BIOLOGICAL-DIGITAL-PIPELINE-116ABC.bat`: genuine Windows run SHA3bf8603c подтвердил новую real-label61×61 карту (64 667 roots,2 489 edges,7 335 202 synapses), readout61→8 DN→3 actions (held-out6/6 против shuffled/zero2/6) и observe/execute analysis. Structure specificity проходит; action margin0,002413<0,01. Linux/Windows float differences≤2,22e-16 не меняют ни одного решения. Старые artificial96 не переименованы; biological claim=false.
