@@ -406,4 +406,4 @@ Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed a
 
 ## Series112 frozen operational-router physical validation prepared
 
-Exact Series111 route, base and adapter; no fit/selection/tuning. Fresh IDs1450–1467 cover six nuisance domains×three actions and seven simulated physical conditions (126 rollouts). Frozen gate adds safety/tracking/open-loop to Series111 validity/action/domain specificity; gain remains diagnostic. BAT `RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat`, runner SHA be3cc743…, genuine pending.
+Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result SHAda0b244c passed all gates on IDs1450–1467/126 rollouts: safe/kept/rejected/action18, tracking0,055447, wins18 against every input control, open-loop16, gain diagnostic16, distinct true. Spatial16/temporal fallback2. `physical_development_candidate=true`, scientific false. This closes deterministic digital-nuisance simulated-body engineering validation. Next evidence must be separately preregistered real acquisition/camera hardware; do not inflate this into biological or hardware transfer.

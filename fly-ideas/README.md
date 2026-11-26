@@ -939,4 +939,4 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series112: frozen operational-router physical validation
 
-`experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` exact-load фиксированных base+adapter и Series111 route на fresh IDs1450–1467. Шесть nuisance domains ×3 actions ×7 simulated physical conditions =126 rollouts; training/selection/tuning запрещены. Gate сохраняет safety, tracking, validity, action/domain specificity, distinct targets и open-loop; gain остаётся diagnostic. Runner SHA `be3cc743…`; genuine pending.
+`experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` genuine frozen pass на126 simulated physical rollouts: safe/kept/rejected/action18/18, tracking0,055447rad, wins18/18 против neutral/reversed/shuffled/zero и16/18 против open-loop; gain diagnostic16/18, distinct true. Spatial использован16 раз, declared temporal fallback2. JSON SHA `da0b244c…`; `physical_development_candidate=true`, `scientific_result=false`. Digital-nuisance simulated-body milestone закрыт; следующий честный шаг — отдельно preregistered real acquisition/camera hardware, не новые post-result варианты.

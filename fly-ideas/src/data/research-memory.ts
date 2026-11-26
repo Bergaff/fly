@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v672-session-2026-11-26-router-physical-plan";
+export const MEMORY_VERSION = "v673-session-2026-11-26-router-physical-pass";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -550,10 +550,10 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Final kept/rejected/action18; truth wins neutral16 and reversed/zero/shuffled18; gain diagnostic16; every action/domain gate and distinct targets passed. development true, scientific false.",
     limitations: "Supervised deterministic digital-nuisance selection only. Series109/110 remain no-go. Authorizes separate frozen simulated-body validation, not hardware/biological claim.",
     files: ["experiments/RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat", "experiments/templates/111_operational_nuisance_router.py", "experiments/reports/operational-nuisance-router-111-plan.md", "experiments/reports/operational-nuisance-router-111-user-result.json", "experiments/reports/operational-nuisance-router-111-user-result.md", "tests/operational-nuisance-router-111.test.cjs"] },
-  { id: "session-frozen-operational-router-physical-112", ideaId: "i-observational", title: "Series112: frozen operational-router physical validation", status: "runner/protocol frozen; genuine pending", source: "Exact111 selected route, base+adapter; fresh IDs1450–1467; six domains×three actions×seven physical conditions. Runner SHAbe3cc743….",
-    results: "Gate adds all-case safety, tracking<=0,20 and open-loop>=15 to Series111 validity/action/domain specificity and distinct targets. Gain remains diagnostic. Fixture6/6 pass.",
-    limitations: "Simulated official MOTOR body with digital post-capture nuisances; no training/selection/tuning. Not camera hardware, living fly, biological learning or connectome evidence.",
-    files: ["experiments/RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat", "experiments/templates/112_frozen_operational_router_physical.py", "experiments/reports/frozen-operational-router-physical-112-plan.md", "tests/frozen-operational-router-physical-112.test.cjs"] },
+  { id: "session-frozen-operational-router-physical-112", ideaId: "i-observational", title: "Series112: frozen operational-router physical validation", status: "genuine frozen simulated-body pass", source: "Exact111 selected route, base+adapter; fresh IDs1450–1467; result SHAda0b244c… on six domains×three actions×seven conditions.",
+    results: "Safe/kept/rejected/action18; tracking0,055447; wins18/18 vs neutral/reversed/shuffled/zero and16/18 open-loop; gain diagnostic16; distinct true. Spatial16, temporal fallback2. Physical development true, scientific false.",
+    limitations: "Deterministic digital post-capture nuisances and simulated MOTOR body. Does not establish real acquisition/camera hardware, unseen/composite nuisances, living fly, biological learning or connectome evidence. Next evidence must leave this benchmark family.",
+    files: ["experiments/RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat", "experiments/templates/112_frozen_operational_router_physical.py", "experiments/reports/frozen-operational-router-physical-112-plan.md", "experiments/reports/frozen-operational-router-physical-112-user-result.json", "experiments/reports/frozen-operational-router-physical-112-user-result.md", "tests/frozen-operational-router-physical-112.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }
