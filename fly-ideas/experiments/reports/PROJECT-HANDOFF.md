@@ -410,7 +410,7 @@ Exact Series111 route, base and adapter; no fit/selection/tuning. Genuine result
 
 ## Series116A–C real-label digital pipeline implemented
 
-A new61×61 matrix replaces—not relabels—the artificial96 browser map:61 FlyVis types, reviewed root sets,64,667 unique roots,2,489 nonzero type edges and7,335,202 synapses from72,954 official v783 rows. Structural visual→DN paths reach8 DN types; frozen digital readout gets6/6 held-out vs2/6 shuffled and2/6 zero. Observe/execute structure margin is0.366476, but same-vs-other action margin0.002413 fails0.01, so no mirror-neuron claim. All three digital pipelines are implemented; biological function labels remain unclaimed.
+Genuine Windows result SHA3bf8603c reproduced the new61×61 real-label map:64,667 roots,2,489 edges,7,335,202 synapses. Visual→DN paths reach8 types; readout gets6/6 held-out vs2/6 shuffled/zero. Observe/execute structure margin0.366476 passes, action margin0.002413 fails0.01. Twelve Linux/Windows floats differ only5.42e-20–2.22e-16; no count, ranking, gate or decision changes. Artificial96 remains separate and no biological function is claimed.
 
 ## Series115A–C digital three-direction closure completed
 

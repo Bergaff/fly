@@ -943,7 +943,7 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series116A–C: биологически индексированные три цифровых направления
 
-`experiments\RUN-BIOLOGICAL-DIGITAL-PIPELINE-116ABC.bat` строит новую real-label61×61 карту (64 667 roots,2 489 edges,7 335 202 synapses), structural readout61 visual types→8 DN types→3 actions (held-out6/6 против shuffled/zero2/6) и observe/execute analysis. Mirror structure specificity проходит, action specificity margin0,002413 не достигает0,01. Все три pipeline реализованы; старые artificial96 не переименованы, biological function claim=false.
+`experiments\RUN-BIOLOGICAL-DIGITAL-PIPELINE-116ABC.bat`: genuine Windows run SHA3bf8603c подтвердил новую real-label61×61 карту (64 667 roots,2 489 edges,7 335 202 synapses), readout61→8 DN→3 actions (held-out6/6 против shuffled/zero2/6) и observe/execute analysis. Structure specificity проходит; action margin0,002413<0,01. Linux/Windows float differences≤2,22e-16 не меняют ни одного решения. Старые artificial96 не переименованы; biological claim=false.
 
 ### Series115A–C: завершение трёх направлений в digital-only scope
 
