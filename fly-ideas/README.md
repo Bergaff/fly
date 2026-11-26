@@ -960,3 +960,7 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 ### Series113A–C: fly mirror foundation
 
 `experiments\RUN-FLY-MIRROR-FOUNDATION-113ABC.bat` выполняет три расчёта одним запуском на exact official commits до cutoff. Genuine Windows result SHA `482f6bfc…` после autocrlf repair:113A reviewed FlyVis→FlyWire bridge49/65 типов и54 919 disjoint roots, pass;113B inventory1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links, но functional three-action labels отсутствуют;113C Drosophila-first method foundation ready, biological mirror candidate/scientific false.
+
+### Series118: приблизительно4-часовой adaptive расчёт A/B/C
+
+`experiments\RUN-ADAPTIVE-THREE-DIRECTION-118-4H.bat` запускает один checkpointed расчёт всех трёх цифровых направлений. Первые80% разрешают development-only пересчёт неудачных вариантов path depth/mix, ridge, type subset и derivative feedback; затем лучший cumulative-development config фиксируется и проверяется на отдельных final seeds без adaptation или повторов ради pass. Сохраняются pairing/label/structure/identity/zero controls, SQLite pause/resume, workers2/4/6/Max, процент/ETA. Fixture пройдена; полный Windows outcome ещё неизвестен. Любой digital pass не является биологическим результатом.

@@ -427,3 +427,7 @@ Genuine Windows result SHA c98e5a77 reproduced Series115. A audited65/65 and exp
 ## Series113A–C fly mirror foundation completed
 
 Genuine Windows result SHA482f6bfc reproduced all three exact pre-cutoff source calculations after autocrlf repair. A: reviewed type-level FlyVis→FlyWire bridge passes49/65 types,54 919 disjoint root IDs. B:1 303 typed DNs/473 types,920 MaleCNS+428 hemibrain links, but no machine-readable functional action field; validated readout for rubbing/head-grooming/reach remains false. C: Drosophila-first species-neutral method foundation ready, biological mirror candidate/scientific false. Series90 is not rewritten;113 prospectively reopens mapping. Next: preregister literature/recording action ledger and same-neuron observe/execute biological data, never choose DNs from model outcomes.
+
+## Series118 four-hour adaptive three-direction run prepared
+
+Exact genuine117 user JSON and pinned116 matrix/path/manifest artifacts feed a single checkpointed A/B/C run. About80% active wall time is adaptive development over path depth/mix, ridge, subset and derivative feedback; then one configuration is frozen for separate `118900000+` final seeds. Final cannot tune/reselect/retry. Pairing, label, retrained-structure, reversed-identity and zero controls remain. GUI has Start new/Continue/Pause, workers2/4/6/Max, progress/ETA/finish. Fixture passed; full Windows outcome is pending and may honestly fail. Biological/scientific claims remain false.
