@@ -28,8 +28,11 @@ def acquire(name,spec,cache,progress,fraction):
  elif git(['remote','get-url','origin'],d)!=spec['url']:raise ValueError(f'{name}: source URL изменён.')
  progress(f'Загружается exact source: {name}',fraction,0,1);git(['fetch','--depth','1','origin',spec['commit']],d);git(['checkout','--detach','--force','FETCH_HEAD'],d)
  if git(['rev-parse','HEAD'],d)!=spec['commit']:raise ValueError(f'{name}: commit mismatch')
- p=d/spec['file']
- if file_sha(p)!=spec['sha']:raise ValueError(f'{name}: file SHA mismatch')
+ # Read the Git blob, not the checked-out file: Windows core.autocrlf may rewrite LF to CRLF.
+ q=subprocess.run(['git','show',spec['commit']+':'+spec['file']],cwd=d,capture_output=True)
+ if q.returncode:raise RuntimeError(f'{name}: git show failed: '+q.stderr.decode('utf8','replace'))
+ exact=cache/'exact_blobs';exact.mkdir(parents=True,exist_ok=True);p=exact/(name+'_'+Path(spec['file']).name);p.write_bytes(q.stdout)
+ if file_sha(p)!=spec['sha']:raise ValueError(f'{name}: Git blob SHA mismatch; expected {spec["sha"]}, got {file_sha(p)}')
  return p
 def norm(x):return(x or'').strip()
 def calculation_a(flyvis_path,match_path,neurons_path):

@@ -4,8 +4,8 @@
   "protocol": {
     "schema": "fly-mirror-foundation-113abc-v1",
     "mode": "full",
-    "created_utc": "2026-11-26T06:51:20.084239+00:00",
-    "script_sha256": "839a5ddffdea966c400a063993f6f7d06d07235508b38f9fab716c4af397f2a3",
+    "created_utc": "2026-11-26T06:56:59.902458+00:00",
+    "script_sha256": "810fde63e265c6703d99205958a16879e5c2d5c5eb057660188a108a8c482ad5",
     "series112_result_sha256": "da0b244c4d1dba53e81ebc95a6a1496b2517d2e3da5969be305a75af5a5c3b01",
     "source_cutoff": "2026-09-18",
     "sources": {

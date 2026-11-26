@@ -1,6 +1,6 @@
 # Series113A–C result interpretation
 
-Exact result SHA: `7fad3928ef65945387b9cc8e1d034f6e0277fa14a2ec5d56e13bb25f5df2e747`.
+Exact result SHA: `1761a0653d6437408d5c5bcde309598223d705e64f2fd997a6922f3500c8d560`.
 
 ## A — FlyVis→FlyWire bridge: pass
 

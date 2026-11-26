@@ -4,7 +4,7 @@ One frozen run performs three calculations rather than another digital nuisance 
 
 ## Exact inputs
 
-Runner SHA `839a5ddffdea966c400a063993f6f7d06d07235508b38f9fab716c4af397f2a3`; exact Series112 result SHA `da0b244c4d1dba53e81ebc95a6a1496b2517d2e3da5969be305a75af5a5c3b01`. Source cutoff remains2026-09-18.
+Runner SHA `810fde63e265c6703d99205958a16879e5c2d5c5eb057660188a108a8c482ad5`; exact Series112 result SHA `da0b244c4d1dba53e81ebc95a6a1496b2517d2e3da5969be305a75af5a5c3b01`. Source cutoff remains2026-09-18.
 
 The runner exact-fetches and checks:
 
@@ -29,7 +29,7 @@ The framework freezes species-neutral fields but is evaluated on fly first. Foun
 
 ## Deterministic result
 
-The complete source calculation was run locally before interpretation. Result SHA `7fad3928ef65945387b9cc8e1d034f6e0277fa14a2ec5d56e13bb25f5df2e747`; bridge CSV SHA `fa210dd048a0d4d93e8f7f6af50a99d670ac9ea9b913f01ada4adfdbdb40b3da`.
+The complete source calculation was run locally before interpretation. Result SHA `1761a0653d6437408d5c5bcde309598223d705e64f2fd997a6922f3500c8d560`; bridge CSV SHA `fa210dd048a0d4d93e8f7f6af50a99d670ac9ea9b913f01ada4adfdbdb40b3da`.
 
 113A passes:49/65 FlyVis types map to54,919 disjoint FlyWire root IDs and all49 have reviewed cross-dataset type matches. Four more have reviewed type relations but no direct root set;12 are unmatched under exact names. 113B finds1,303 unique typed descending neurons,473 types,920 MaleCNS supertype links and428 hemibrain links, but no machine-readable action-validation field; therefore the three-action readout remains unvalidated. 113C declares the fly-first method foundation ready, while `biological_mirror_neuron_candidate=false` and `scientific_result=false`.
 
