@@ -10,7 +10,7 @@ export interface ResearchMemoryEntry {
   files: string[];
 }
 
-export const MEMORY_VERSION = "v671-session-2026-09-18-operational-router-plan";
+export const MEMORY_VERSION = "v672-session-2026-11-26-router-physical-plan";
 const study = "Study_20261102_135659_26e34eaf";
 export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
   { id: "session-v630-top200", ideaId: "i-lesions", title: "Авторская сеть и топ-200", status: "выполнено, по сообщению пользователя",
@@ -546,10 +546,14 @@ export const RESEARCH_MEMORY: ResearchMemoryEntry[] = [
     results: "Percentile normalization repaired dim/contrast. Temporal kept/rejected/action18, RMSE0,06489, but reach-neutral3/6<4 and gain noise/shift/dropout1/3<2. No frontend selected; final0; development/scientific false.",
     limitations: "Frozen gain rule remains binding. Safe rejection need not intentionally worsen truth RMSE versus base shuffle; any revised operational gate requires fresh preregistration/data.",
     files: ["experiments/RUN-NUISANCE-FRONTEND-REPAIR-110.bat", "experiments/templates/110_nuisance_frontend_repair_tournament.py", "experiments/reports/nuisance-frontend-repair-110-plan.md", "experiments/reports/nuisance-frontend-repair-110-user-result.json", "experiments/reports/nuisance-frontend-repair-110-user-result.md", "tests/nuisance-frontend-repair-110.test.cjs"] },
-  { id: "session-operational-nuisance-router-111", ideaId: "i-observational", title: "Series111: operational nuisance router", status: "runner/protocol frozen; genuine pending", source: "Fresh selection1414–1431/final1432–1449; exact base+adapter. Six temporal/spatial/frame deterministic routes; runner SHAf6f3e3ef….",
-    results: "Gate requires validity/action>=15,>=4/action,>=2/domain and specificity>=12,>=4/action,>=2/domain, distinct. Adapter gain reported diagnostically, not used to incentivize harmful fallback. Fixture4/4 pass.",
-    limitations: "Prospective supervised non-physical route selection. Series109/110 remain no-go. Digital nuisance only; pass authorizes separate physical test, not hardware/biological claim.",
-    files: ["experiments/RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat", "experiments/templates/111_operational_nuisance_router.py", "experiments/reports/operational-nuisance-router-111-plan.md", "tests/operational-nuisance-router-111.test.cjs"] },
+  { id: "session-operational-nuisance-router-111", ideaId: "i-observational", title: "Series111: operational nuisance router", status: "genuine untouched-final development pass", source: "Fresh selection1414–1431/final1432–1449; exact base+adapter. Result SHA9ecc0f2b… selected spatial→temporal on rejection.",
+    results: "Final kept/rejected/action18; truth wins neutral16 and reversed/zero/shuffled18; gain diagnostic16; every action/domain gate and distinct targets passed. development true, scientific false.",
+    limitations: "Supervised deterministic digital-nuisance selection only. Series109/110 remain no-go. Authorizes separate frozen simulated-body validation, not hardware/biological claim.",
+    files: ["experiments/RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat", "experiments/templates/111_operational_nuisance_router.py", "experiments/reports/operational-nuisance-router-111-plan.md", "experiments/reports/operational-nuisance-router-111-user-result.json", "experiments/reports/operational-nuisance-router-111-user-result.md", "tests/operational-nuisance-router-111.test.cjs"] },
+  { id: "session-frozen-operational-router-physical-112", ideaId: "i-observational", title: "Series112: frozen operational-router physical validation", status: "runner/protocol frozen; genuine pending", source: "Exact111 selected route, base+adapter; fresh IDs1450–1467; six domains×three actions×seven physical conditions. Runner SHAbe3cc743….",
+    results: "Gate adds all-case safety, tracking<=0,20 and open-loop>=15 to Series111 validity/action/domain specificity and distinct targets. Gain remains diagnostic. Fixture6/6 pass.",
+    limitations: "Simulated official MOTOR body with digital post-capture nuisances; no training/selection/tuning. Not camera hardware, living fly, biological learning or connectome evidence.",
+    files: ["experiments/RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat", "experiments/templates/112_frozen_operational_router_physical.py", "experiments/reports/frozen-operational-router-physical-112-plan.md", "tests/frozen-operational-router-physical-112.test.cjs"] },
 ];
 
 export interface ResearchMemoryState { version: string; entries: ResearchMemoryEntry[] }

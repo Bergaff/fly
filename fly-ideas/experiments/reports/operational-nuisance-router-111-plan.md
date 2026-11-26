@@ -12,3 +12,7 @@ Six declared routes combine percentile-temporal, percentile-spatial and frame-pe
 Frozen selection/final gate: candidate accepted, shuffled rejected and action correct≥15/18; each≥4/6/action and validity≥2/3/domain; candidate wins≥12/18,≥4/6/action and≥2/3/domain against neutral/reversed/zero/shuffled; distinct targets. Adapter RMSE gain remains reported but is not gated because safe rejection is not intended to maximize harmful trajectory error. This rule is frozen before new outcomes and does not reinterpret Series109/110.
 
 Run `experiments\RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat`, selecting Series105D, Series107, result89D and source84Z folders. A pass is supervised non-physical development only and authorizes a separate frozen physical test.
+
+## Genuine outcome
+
+Complete result SHA `9ecc0f2b4568ee2a0f5bcdeca552c28caa3e295b52c98993fdf8a04593146765` passed. Minimum candidate RMSE selected `spatial_then_temporal_on_reject`; untouched final kept/rejected/action18/18 and passed every overall/action/domain specificity gate, with wins16/18 neutral and18/18 reversed/zero/shuffled. Adapter gain diagnostic was16/18. Series112 is separately frozen on fresh physical cases; Series109/110 remain no-gos.

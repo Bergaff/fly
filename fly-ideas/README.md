@@ -935,4 +935,8 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 
 ### Series111: operational nuisance router
 
-`experiments\RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat` на fresh selection1414–1431 и conditional final1432–1449 выбирает6 deterministic routes между temporal/spatial/frame frontends. Safe rejection теперь prospectively оценивается validity+specificity; ablation RMSE gain остаётся diagnostic, поскольку не требуется намеренно делать fallback вреднее already-poor base shuffle. Overall/action/domain gates сохранены. Runner SHA `f6f3e3ef…`; pending.
+`experiments\RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat` genuine pass: выбран `spatial_then_temporal_on_reject`; untouched final дал kept/rejected/action18/18, wins16/18 neutral и18/18 reversed/zero/shuffled, gain diagnostic16/18. JSON SHA `9ecc0f2b…`; это supervised digital development, не biology/hardware.
+
+### Series112: frozen operational-router physical validation
+
+`experiments\RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat` exact-load фиксированных base+adapter и Series111 route на fresh IDs1450–1467. Шесть nuisance domains ×3 actions ×7 simulated physical conditions =126 rollouts; training/selection/tuning запрещены. Gate сохраняет safety, tracking, validity, action/domain specificity, distinct targets и open-loop; gain остаётся diagnostic. Runner SHA `be3cc743…`; genuine pending.

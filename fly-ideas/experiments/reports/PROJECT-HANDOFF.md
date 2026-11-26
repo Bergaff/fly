@@ -402,4 +402,8 @@ Exact base+adapter retained; Series109 outcomes excluded. Genuine result SHAe932
 
 ## Series111 operational router prepared
 
-Fresh selection1414–1431/final1432–1449. Six deterministic routes combine temporal/spatial/frame frontends without true action/domain labels. Prospectively frozen operational gate retains acceptance/rejection/identity and specificity overall/by-action/by-domain. Base-shuffle RMSE gain is diagnostic, not gated: safe abstention need not intentionally maximize harmful fallback error. This does not reinterpret109/110. BAT `RUN-OPERATIONAL-NUISANCE-ROUTER-111.bat`, SHA f6f3e3ef…, pending.
+Fresh selection1414–1431/final1432–1449. Genuine result SHA9ecc0f2b passed and selected `spatial_then_temporal_on_reject`. Final kept/rejected/action18/18; wins neutral16, reversed/zero/shuffled18; adapter gain diagnostic16; balanced gates and distinct targets passed. Series109/110 remain no-gos.
+
+## Series112 frozen operational-router physical validation prepared
+
+Exact Series111 route, base and adapter; no fit/selection/tuning. Fresh IDs1450–1467 cover six nuisance domains×three actions and seven simulated physical conditions (126 rollouts). Frozen gate adds safety/tracking/open-loop to Series111 validity/action/domain specificity; gain remains diagnostic. BAT `RUN-FROZEN-OPERATIONAL-ROUTER-PHYSICAL-112.bat`, runner SHA be3cc743…, genuine pending.
