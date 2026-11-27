@@ -26,7 +26,7 @@ Gate: graph advantage воспроизводится на untouched наборе
 
 ## Series129 — final audit and temporary closure
 
-**Статус: hour-budget runner Series129A–D подготовлен; genuine пользовательский результат ожидается.** Один launcher выполняет immutable audit48 historical official-FlyGym outcomes с10 000 bootstrap resamples, затем примерно60 минут balanced Qwen2.5:7b benchmark по четырём exact task families и трём prompt variants, после чего записывает финальные решения и stop rules. Это не новый physical Graph-controller run и не восстановление Series127/128.
+**Статус: безопасный bounded runner Series129A–D подготовлен; genuine пользовательский результат ожидается.** Первоначальный hour-loop снят после чрезмерной нагрузки на пользовательскую память и охлаждение. Исправленная версия не запускает Ollama server, требует ручного подтверждения, ограничена12 запросами с паузами5 секунд и запрашивает немедленную выгрузку модели. Offline-часть выполняет audit48 historical official-FlyGym outcomes с10 000 bootstrap resamples. Это не новый physical Graph-controller run и не восстановление Series127/128.
 
 Собрать один immutable manifest: все runner/result SHA, platform differences, GO/NO-GO, failed series, exact claims and forbidden claims. Зафиксировать три отдельных финала:
 

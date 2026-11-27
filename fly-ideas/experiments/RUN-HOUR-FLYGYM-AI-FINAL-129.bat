@@ -11,5 +11,5 @@ if not exist "%SCRIPT%" ( >"%ERR%" echo Не найден runner Series129. Об
 if errorlevel 1 ( >"%ERR%" echo Python не прошёл import preflight.& start "" "%ERR%"& exit /b 4 )
 where ollama >nul 2>&1
 if errorlevel 1 ( >"%ERR%" echo Не найдена Ollama. Установите Ollama и qwen2.5:7b.& start "" "%ERR%"& exit /b 5 )
-start "Ollama" /min ollama serve
-if exist "%PYW%" ( start "Series129 hour FlyGym AI final" "%PYW%" "%SCRIPT%" --gui ) else ( start "Series129 hour FlyGym AI final" /b "%PY%" "%SCRIPT%" --gui )
+rem Безопасность: launcher НИКОГДА не запускает ollama serve автоматически.
+if exist "%PYW%" ( start "Series129 light FlyGym AI final" "%PYW%" "%SCRIPT%" --gui ) else ( start "Series129 light FlyGym AI final" /b "%PY%" "%SCRIPT%" --gui )
