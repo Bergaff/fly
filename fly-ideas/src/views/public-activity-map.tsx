@@ -26,17 +26,19 @@ export function PublicActivityMap({ action, amplitude, phase }: { action: Activi
   const canvas = useRef<HTMLCanvasElement>(null);
   const [hover, setHover] = useState<{ source: number; target: number; value: number } | null>(null);
   const actionIndex = prototypeFile.actions.indexOf(action);
+  const pulseStep = Math.floor(phase * 6);
   const activation = useMemo(() => {
     if (actionIndex < 0 || amplitude <= 0) return Array(SIZE).fill(0) as number[];
-    const values = prototypeFile.prototypes[actionIndex], max = Math.max(...values), pulse = .6 + .4 * Math.abs(Math.sin(phase * Math.PI * 2));
+    const values = prototypeFile.prototypes[actionIndex], max = Math.max(...values), pulse = .6 + .4 * Math.abs(Math.sin(pulseStep / 6 * Math.PI * 2));
     return values.map(value => value / Math.max(max, 1e-15) * Math.min(1.25, amplitude) * pulse);
-  }, [actionIndex, amplitude, phase]);
+  }, [actionIndex, amplitude, pulseStep]);
   useEffect(() => {
     const context = canvas.current?.getContext("2d"); if (!context) return;
     context.fillStyle = "rgb(24,23,21)"; context.fillRect(0, 0, CANVAS, CANVAS);
     for (let source = 0; source < SIZE; source += 1) for (let target = 0; target < SIZE; target += 1) {
+      const value = matrix[source][target]; if (value <= 0) continue;
       const edgeActivation = Math.sqrt(activation[source] * activation[target]);
-      context.fillStyle = weightColor(matrix[source][target], edgeActivation);
+      context.fillStyle = weightColor(value, edgeActivation);
       context.fillRect(target * CELL, source * CELL, CELL - 1, CELL - 1);
     }
     if (hover) { context.strokeStyle = "rgb(235,225,201)"; context.lineWidth = 1; context.strokeRect(hover.target * CELL + .5, hover.source * CELL + .5, CELL - 1, CELL - 1); }
