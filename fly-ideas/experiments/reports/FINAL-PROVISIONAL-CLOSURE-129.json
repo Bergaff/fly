@@ -1,0 +1,75 @@
+{
+  "schema": "final-provisional-closure-129-v1",
+  "status": "provisionally_closed",
+  "closed_series": [
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    129
+  ],
+  "skipped_by_gate": [
+    127,
+    128
+  ],
+  "artifacts": {
+    "experiments/reports/final-digital-product-120abc-user-result.json": "0bb6c99c3e8a12a4612c6c44579a7ae3ec9c178e33df5968c16605217d1a37ac",
+    "experiments/reports/local-ollama-narrow-benchmark-121-qwen2.5-7b-user-result-60.json": "0f16b0ac2775df05059b64e7c608784af486592ec78e1e00286d72e026d0a41f",
+    "experiments/reports/graph-core-baseline-benchmark-122-user-result.json": "f867d20f8127b58060d66f123dec5acb74f7844afe4af29fdf617e5c349799f7",
+    "experiments/reports/temporal-closed-loop-graph-benchmark-123-user-result.json": "297a6fb10db6a87f7f401bc88f8f2bb39e9983bde6f42cba185c2f3fb2e48ac4",
+    "experiments/reports/context-memory-graph-gate-124-user-result.json": "01d22b977601893e25fb2eebda2dd9f954a2258bcfa7a5bc24ee6846c08e40b7",
+    "experiments/reports/multihop-structural-specificity-125-user-result.json": "2101304b029fa4228ac53ab83cdf2781fc65efebbdd432b560f46f9aa8a5c94d",
+    "experiments/reports/independent-physical-outcome-development-126-user-result.json": "c57c6f636b5987628ea1983246344ee8bd77bbd4f37231f5d60880c56432aaf5",
+    "experiments/reports/final-low-load-flygym-ai-129-user-itog.txt": "7c6a7362b569fb6bb990db8c9ad3181405957acc50ed315f4a2e3280cb8b49c6",
+    "experiments/templates/129_hour_flygym_ai_final_battery.py": "bd414c765916e957461e95df7b5b1936586b0ec64fc0d9c543118ab22a58c739"
+  },
+  "series129_user_run": {
+    "artifact_kind": "ИТОГ.txt only; detailed summary.json was not supplied",
+    "sha256": "7c6a7362b569fb6bb990db8c9ad3181405957acc50ed315f4a2e3280cb8b49c6",
+    "status": "completed",
+    "elapsed_minutes": 1.6,
+    "ai_cases": 12,
+    "ollama_accuracy": 0.5,
+    "model_unload_requested": true
+  },
+  "final_conclusions": {
+    "fly_graph_vs_ordinary_neural_networks": {
+      "behavioral_performance_advantage_established": false,
+      "compactness_advantage_established": false,
+      "established_advantages": [
+        "interpretable mapping from61 labelled cell types to8 descending channels",
+        "deterministic frozen topology with reproducible lesion and path attribution",
+        "structural nonredundancy relative to its own four-hop operator"
+      ],
+      "ordinary_model_results": [
+        "9-parameter diagonal bilinear model exactly matched the narrow Series122 task",
+        "memoryless ridge slightly beat graph reservoir in Series123 clean RMSE",
+        "matched random reservoir marginally beat graph reservoir in Series124",
+        "constant mean beat graph and graph matched random/rewired controls in Series126"
+      ]
+    },
+    "large_language_model_comparison": {
+      "scope": "narrow exact numeric tasks only",
+      "series121_exact_solver_accuracy": 1.0,
+      "series121_qwen_accuracy": 0.35,
+      "series129_qwen_accuracy": 0.5,
+      "general_intelligence_claim": false
+    },
+    "biological_brain_claim": {
+      "living_fly_advantage_measured": false,
+      "mirror_neurons_established": false,
+      "energy_advantage_measured": false
+    },
+    "cross_animal_transfer": {
+      "algorithm_exists": true,
+      "validated_other_species_count": 0
+    }
+  },
+  "stop_rule": {
+    "series130_same_synthetic_task_authorized": false,
+    "reopen_only_with": "new independent biological recording, target-animal data, or prospectively justified physical target"
+  }
+}

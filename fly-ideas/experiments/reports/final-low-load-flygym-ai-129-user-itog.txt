@@ -1,0 +1,12 @@
+﻿SERIES129A-D — LOW-LOAD FLYGYM + AI BATTERY
+
+Status: completed
+Elapsed: 1.6 min
+AI cases: 12 / max 12
+Ollama accuracy: 0.5000
+Model unload requested: True
+
+Fly engineering: NO-GO external behavioral advantage
+AI comparison: narrow shared tasks only
+Biological mirror neurons: not established
+Series127/128 remain unauthorized.
