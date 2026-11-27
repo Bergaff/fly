@@ -182,13 +182,21 @@ def execute(folder: Path, hours: float, workers: int, fixture: bool, progress):
     target_seconds = 5.0 if fixture else hours * 3600
     total = get_state(db, "total_bundles")
     if total is None:
+        # Measure wall throughput under the same concurrent full-bundle load used by the run.
+        # The original serial calibration overestimated six-worker throughput by3.59x.
+        calibration_count = max(4, workers * 2)
+        calibration_reps = 1 if fixture else REPS_PER_PROFILE
+        calibration_seeds = [119000000 + i for i in range(calibration_count)]
         before = time.perf_counter()
-        stress_bundle(base, 119000000, 1 if fixture else 2)
+        with ThreadPoolExecutor(max_workers=workers) as calibration_pool:
+            list(calibration_pool.map(lambda seed: stress_bundle(base, seed, calibration_reps), calibration_seeds))
         calibration = max(time.perf_counter() - before, 0.001)
-        full_bundle_seconds = calibration * REPS_PER_PROFILE / (1 if fixture else 2)
-        total = max(workers * 2, int(target_seconds * workers / full_bundle_seconds))
+        observed_rate = calibration_count / calibration
+        total = max(workers * 2, int(target_seconds * observed_rate))
         total = min(total, 8 if fixture else 200000)
         put_state(db, "calibration_seconds", calibration)
+        put_state(db, "calibration_concurrent_bundles", calibration_count)
+        put_state(db, "observed_bundles_per_second", observed_rate)
         put_state(db, "total_bundles", total)
     done = db.execute("SELECT COUNT(DISTINCT seed) FROM trials").fetchone()[0]
     started = time.monotonic()

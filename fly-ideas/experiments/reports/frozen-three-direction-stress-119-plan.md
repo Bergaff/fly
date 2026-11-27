@@ -24,6 +24,6 @@ Overall: A mean≥.95 and minimum≥.85; B accuracy≥.85, shuffled≤.75 and di
 
 Severe profile must additionally retain A mean≥.95; B accuracy≥.65 and difference≥.05; C margin≥.20, advantage≥.10 and win rate≥.70. All clauses are required.
 
-The default GUI targets about four active hours using calibration, SQLite checkpoints, Start new/Continue/Pause, workers2/4/6/Max, percentage and ETA. Regardless of outcome, biological and scientific-biological flags remain false.
+The default GUI targets about four active hours using calibration, SQLite checkpoints, Start new/Continue/Pause, workers2/4/6/Max, percentage and ETA. The genuine first run exposed a scheduler-only defect: serial calibration overestimated six-worker NumPy/BLAS throughput and produced14h20m53s instead of4h. Future runs now calibrate concurrent full bundles under the selected worker load; the completed frozen result and gates are unchanged. Regardless of outcome, biological and scientific-biological flags remain false.
 
 Run: `experiments\RUN-FROZEN-THREE-DIRECTION-STRESS-119-4H.bat`.
