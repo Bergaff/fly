@@ -35,7 +35,7 @@ Target — пять ранее измеренных выходов official FlyG
 | matched-random graph | 0.888083 |
 | random-feature MLP | 2.322068 |
 
-**Gate: NO-GO.** Frozen graph практически совпал с raw, rewired и random controls и проиграл простому constant mean. Требуемого5% преимущества нет. Series127 и128 не авторизованы. Это отрицательный инженерный результат; он не отменяет узкую structural self-consistency Series125 и не меняет исторические FlyGym evidence Series100–112 для их собственных frozen adapters.
+**Gate: NO-GO.** Независимый Windows-запуск воспроизвёл решение и все primary metrics (максимальное platform floating-point отличие `8.82e-10`). Frozen graph практически совпал с raw, rewired и random controls и проиграл простому constant mean. Требуемого5% преимущества нет. Series127 и128 не авторизованы. Это отрицательный инженерный результат; он не отменяет узкую structural self-consistency Series125 и не меняет исторические FlyGym evidence Series100–112 для их собственных frozen adapters.
 
 ## Ограничения
 

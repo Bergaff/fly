@@ -8,9 +8,9 @@
 
 ## Series126 — independent behavioral target development
 
-**Статус: локально завершена, NO-GO; независимое Windows-воспроизведение ожидается.** Использована цель, которая **не вычислена из61×61 графа**: пять historical official-FlyGym outcomes из Series106/109/112. На заранее разделённом fit/development и historical audit сравнены Graph Core, matched random graph, rewired graph, raw/metadata linear, random-feature MLP и constant mean.
+**Статус: завершена и независимо воспроизведена, NO-GO.** Использована цель, которая **не вычислена из61×61 графа**: пять historical official-FlyGym outcomes из Series106/109/112. На заранее разделённом fit/development и historical audit сравнены Graph Core, matched random graph, rewired graph, raw/metadata linear, random-feature MLP и constant mean.
 
-Graph normalized RMSE `0.888083` практически совпал с raw/rewired/random controls и хуже constant mean `0.793394`. Заранее заданное улучшение минимум5% против каждого learned control не достигнуто. Поэтому engineering gate — **NO-GO**, Series127/128 не авторизованы. Series112 честно обозначена как ранее просмотренный historical audit, а не новый untouched final. Подробности: `INDEPENDENT-PHYSICAL-OUTCOME-DEVELOPMENT-126.md`.
+Graph normalized RMSE `0.888083` практически совпал с raw/rewired/random controls и хуже constant mean `0.793394`. Заранее заданное улучшение минимум5% против каждого learned control не достигнуто. Пользовательский Windows-запуск воспроизвёл метрики с максимальным platform floating-point отличием `8.82e-10` и тот же gate. Поэтому engineering gate — **NO-GO**, Series127/128 не авторизованы. Series112 честно обозначена как ранее просмотренный historical audit, а не новый untouched final. Подробности: `INDEPENDENT-PHYSICAL-OUTCOME-DEVELOPMENT-126.md`.
 
 ## Series127 — untouched digital replication
 
