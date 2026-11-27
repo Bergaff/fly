@@ -1,0 +1,224 @@
+{
+  "schema": "local-ollama-narrow-benchmark-121-v1",
+  "status": "completed",
+  "benchmark_contract": {
+    "task": "choose the largest weighted61-to-8 DN routing score among four candidates",
+    "shared_cases": true,
+    "case_count": 18,
+    "seed": 121000001,
+    "paths_sha256": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+    "not_general_intelligence_benchmark": true,
+    "project_has_exact_task_specific_solver": true,
+    "ollama_uses_prompted_general_model": true
+  },
+  "project": {
+    "dense_scalar_capacity": 4214,
+    "correct": 18,
+    "accuracy": 1.0,
+    "timed_solver_iterations": 2000,
+    "total_solver_seconds": 0.3322743000007904,
+    "mean_seconds_per_case": 9.229841666688621e-06
+  },
+  "ollama": {
+    "model": {
+      "name": "qwen2.5:7b",
+      "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+      "size_bytes": 4683087332,
+      "parameter_count_if_reported": 7615616512,
+      "family": "qwen2"
+    },
+    "correct": 5,
+    "accuracy": 0.2777777777777778,
+    "total_wall_seconds": 45.54963039999893,
+    "mean_wall_seconds_per_case": 2.5305350222221628,
+    "rows": [
+      {
+        "case": 1,
+        "expected": "Tm3",
+        "answer": "T5b",
+        "correct": false,
+        "wall_seconds": 39.46775230000094,
+        "eval_count": 8,
+        "eval_duration_ns": 131573000,
+        "raw_response": "{\"answer\":\"T5b\"}"
+      },
+      {
+        "case": 2,
+        "expected": "Lawf1",
+        "answer": "Lawf1",
+        "correct": true,
+        "wall_seconds": 0.39019489999918733,
+        "eval_count": 8,
+        "eval_duration_ns": 133071000,
+        "raw_response": "{\"answer\":\"Lawf1\"}"
+      },
+      {
+        "case": 3,
+        "expected": "TmY3",
+        "answer": "Mi10",
+        "correct": false,
+        "wall_seconds": 0.33632050000051095,
+        "eval_count": 8,
+        "eval_duration_ns": 132002000,
+        "raw_response": "{\"answer\":\"Mi10\"}"
+      },
+      {
+        "case": 4,
+        "expected": "R8",
+        "answer": "Tm30",
+        "correct": false,
+        "wall_seconds": 0.3866528999988077,
+        "eval_count": 9,
+        "eval_duration_ns": 151714000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 5,
+        "expected": "Mi9",
+        "answer": "Mi9",
+        "correct": true,
+        "wall_seconds": 0.3597174999995332,
+        "eval_count": 7,
+        "eval_duration_ns": 115628000,
+        "raw_response": "{\"answer\":\"Mi9\"}"
+      },
+      {
+        "case": 6,
+        "expected": "Lawf1",
+        "answer": "Lawf1",
+        "correct": true,
+        "wall_seconds": 0.3488171000008151,
+        "eval_count": 8,
+        "eval_duration_ns": 142944000,
+        "raw_response": "{\"answer\":\"Lawf1\"}"
+      },
+      {
+        "case": 7,
+        "expected": "R5",
+        "answer": "R5",
+        "correct": true,
+        "wall_seconds": 0.35989280000103463,
+        "eval_count": 7,
+        "eval_duration_ns": 117210000,
+        "raw_response": "{\"answer\":\"R5\"}"
+      },
+      {
+        "case": 8,
+        "expected": "L1",
+        "answer": "T4c",
+        "correct": false,
+        "wall_seconds": 0.3500707000002876,
+        "eval_count": 8,
+        "eval_duration_ns": 137094000,
+        "raw_response": "{\"answer\":\"T4c\"}"
+      },
+      {
+        "case": 9,
+        "expected": "Mi13",
+        "answer": "T1",
+        "correct": false,
+        "wall_seconds": 0.36363209999944957,
+        "eval_count": 7,
+        "eval_duration_ns": 113827000,
+        "raw_response": "{\"answer\":\"T1\"}"
+      },
+      {
+        "case": 10,
+        "expected": "Mi10",
+        "answer": "T4b",
+        "correct": false,
+        "wall_seconds": 0.36572720000003756,
+        "eval_count": 8,
+        "eval_duration_ns": 134136000,
+        "raw_response": "{\"answer\":\"T4b\"}"
+      },
+      {
+        "case": 11,
+        "expected": "Tm1",
+        "answer": "T5a",
+        "correct": false,
+        "wall_seconds": 0.3407076999992569,
+        "eval_count": 8,
+        "eval_duration_ns": 134655000,
+        "raw_response": "{\"answer\":\"T5a\"}"
+      },
+      {
+        "case": 12,
+        "expected": "CT1(Lo1)",
+        "answer": "TmY5a",
+        "correct": false,
+        "wall_seconds": 0.40416089999962423,
+        "eval_count": 10,
+        "eval_duration_ns": 169157000,
+        "raw_response": "{\"answer\":\"TmY5a\"}"
+      },
+      {
+        "case": 13,
+        "expected": "L1",
+        "answer": "Tm30",
+        "correct": false,
+        "wall_seconds": 0.3565393999997468,
+        "eval_count": 9,
+        "eval_duration_ns": 152010000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 14,
+        "expected": "T2a",
+        "answer": "Tm16",
+        "correct": false,
+        "wall_seconds": 0.3581039000000601,
+        "eval_count": 9,
+        "eval_duration_ns": 150549000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 15,
+        "expected": "L3",
+        "answer": "R3",
+        "correct": false,
+        "wall_seconds": 0.321700200000123,
+        "eval_count": 7,
+        "eval_duration_ns": 115239000,
+        "raw_response": "{\"answer\":\"R3\"}"
+      },
+      {
+        "case": 16,
+        "expected": "L1",
+        "answer": "L1",
+        "correct": true,
+        "wall_seconds": 0.3200696000003518,
+        "eval_count": 7,
+        "eval_duration_ns": 115517000,
+        "raw_response": "{\"answer\":\"L1\"}"
+      },
+      {
+        "case": 17,
+        "expected": "T1",
+        "answer": "Mi9",
+        "correct": false,
+        "wall_seconds": 0.34850600000027043,
+        "eval_count": 7,
+        "eval_duration_ns": 115267000,
+        "raw_response": "{\"answer\":\"Mi9\"}"
+      },
+      {
+        "case": 18,
+        "expected": "T2",
+        "answer": "T4c",
+        "correct": false,
+        "wall_seconds": 0.3710646999988967,
+        "eval_count": 8,
+        "eval_duration_ns": 134656000,
+        "raw_response": "{\"answer\":\"T4c\"}"
+      }
+    ]
+  },
+  "comparison": {
+    "project_accuracy_minus_ollama": 0.7222222222222222,
+    "speed_ratio_ollama_wall_to_project_exact": 274168.8442343605,
+    "valid_scope": "only this narrow numeric routing benchmark",
+    "general_ai_superiority_claim": false,
+    "biological_claim": false
+  }
+}
