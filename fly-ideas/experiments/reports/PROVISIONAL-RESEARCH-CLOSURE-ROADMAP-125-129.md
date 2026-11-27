@@ -8,19 +8,19 @@
 
 ## Series126 — independent behavioral target development
 
-Использовать цель, которая **не вычислена из61×61 графа**: frozen trajectories, contacts, proprioception и action outcomes из official FlyGym/NeuroMechFly Series100–112 либо новый preregistered пакет, созданный без участия Graph Core. На train/development сравнить Graph Core, matched random graph, memory model, MLP сопоставимого размера и простой controller. Метрики: tracking RMSE, completion, contact error, recovery after delay, latency and memory. Любая настройка разрешена только на development.
+**Статус: локально завершена, NO-GO; независимое Windows-воспроизведение ожидается.** Использована цель, которая **не вычислена из61×61 графа**: пять historical official-FlyGym outcomes из Series106/109/112. На заранее разделённом fit/development и historical audit сравнены Graph Core, matched random graph, rewired graph, raw/metadata linear, random-feature MLP и constant mean.
 
-Gate: graph должен улучшить primary behavioral metric минимум на заранее заданный margin против каждого matched control и не проиграть safety/contact gates. Если gate не пройден — остановка с engineering NO-GO, без Series127/128.
+Graph normalized RMSE `0.888083` практически совпал с raw/rewired/random controls и хуже constant mean `0.793394`. Заранее заданное улучшение минимум5% против каждого learned control не достигнуто. Поэтому engineering gate — **NO-GO**, Series127/128 не авторизованы. Series112 честно обозначена как ранее просмотренный historical audit, а не новый untouched final. Подробности: `INDEPENDENT-PHYSICAL-OUTCOME-DEVELOPMENT-126.md`.
 
 ## Series127 — untouched digital replication
 
-Только если Series126 GO: заморозить architecture, mapping, gains, thresholds and seeds. Проверить новые motions, contexts, delays, viewpoints and perturbations без переобучения. Нужны paired confidence intervals и per-case exports, а не только средние.
+**Статус: не авторизована локальным NO-GO Series126.** По исходному условному протоколу только если Series126 GO: заморозить architecture, mapping, gains, thresholds and seeds. Проверить новые motions, contexts, delays, viewpoints and perturbations без переобучения. Нужны paired confidence intervals и per-case exports, а не только средние.
 
 Gate: graph advantage воспроизводится на untouched наборе и проходит shuffled/rewired/lesion controls. Иначе финальный NO-GO.
 
 ## Series128 — official FlyGym/NeuroMechFly physical replication
 
-Только если Series127 GO: перенести **замороженный** новый controller в official FlyGym/MuJoCo. Сравнить на одном теле и одинаковых disturbances с matched random, MLP, zero/open-loop and lesion controls. Проверить contacts, support, joint limits, torque/energy, recovery and repeatability. Отдельный новый seed/run должен воспроизвести результат.
+**Статус: не авторизована; нового physical run не было.** Только если Series127 GO: перенести **замороженный** новый controller в official FlyGym/MuJoCo. Сравнить на одном теле и одинаковых disturbances с matched random, MLP, zero/open-loop and lesion controls. Проверить contacts, support, joint limits, torque/energy, recovery and repeatability. Отдельный новый seed/run должен воспроизвести результат.
 
 Даже PASS означает только bounded engineering controller evidence, не живые нейроны и не whole-brain model.
 

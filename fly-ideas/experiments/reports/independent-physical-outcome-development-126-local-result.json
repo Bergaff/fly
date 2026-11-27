@@ -1,0 +1,942 @@
+{
+  "schema": "independent-physical-outcome-development-126-v1",
+  "status": "completed",
+  "contract": {
+    "target_source": "historical official FlyGym/NeuroMechFly physical outcomes",
+    "targets_not_generated_by_graph": true,
+    "train_series": 106,
+    "development_series": 109,
+    "development_partition": {
+      "fit_actions": [
+        "foreleg_rubbing",
+        "head_directed_grooming"
+      ],
+      "selection_action": [
+        "reach_withdraw"
+      ]
+    },
+    "historical_audit_series": 112,
+    "historical_audit_is_not_new_untouched_final": true,
+    "target_metrics": [
+      "tracking_rmse_rad",
+      "truth_rmse_rad",
+      "contact_frame_fraction",
+      "max_actuator_force_norm",
+      "energy_abs_work"
+    ],
+    "normalization_scale": [
+      0.010494596463532187,
+      0.046882449128978716,
+      0.05,
+      0.7793520373558412,
+      2.982751582625091
+    ],
+    "normalization_scale_floors": [
+      0.01,
+      0.02,
+      0.05,
+      0.5,
+      2.0
+    ],
+    "source_shas": {
+      "train106": "1eadcbcfea31c973f9993da16be7cd0b01998d2f4c6c7aa27c54b4c08da00be9",
+      "development109": "e7cfc5068fb53ae69782d3d31ce03e16605c044699a3a41590193a5276c99f03",
+      "historical_audit112": "da0b244c4d1dba53e81ebc95a6a1496b2517d2e3da5969be305a75af5a5c3b01"
+    },
+    "graph_input_shas": {
+      "matrix": "03157b503d0271cb0991db524d45220bb8f49ce62e3ba171dc997ed7f3816150",
+      "prototypes": "28edd80b81111d47708f163aaf9b250f7ad330a87d6c9dc5ee70e7895843ca04"
+    },
+    "post_audit_tuning": false,
+    "not_biological_validation": true
+  },
+  "case_counts": {
+    "series106_fit": 12,
+    "series109_fit": 12,
+    "series109_selection": 6,
+    "series112_historical_audit": 18
+  },
+  "development": {
+    "metadata": {
+      "selected_alpha": 0.01,
+      "candidates": [
+        {
+          "alpha": 0.0001,
+          "normalized_rmse": 0.9222347965286001,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01597923861930964,
+            "truth_rmse_rad": 0.03420894749729217,
+            "contact_frame_fraction": 4.081615646282325e-06,
+            "max_actuator_force_norm": 0.686199774140925,
+            "energy_abs_work": 2.361022462165024
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470266977491333,
+            "truth_rmse_rad": 0.027424626697937406,
+            "contact_frame_fraction": 4.081615646282326e-06,
+            "max_actuator_force_norm": 0.5098498979956029,
+            "energy_abs_work": 1.765596322592027
+          }
+        },
+        {
+          "alpha": 0.001,
+          "normalized_rmse": 0.9222190459220294,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01597923549007389,
+            "truth_rmse_rad": 0.03420478044520106,
+            "contact_frame_fraction": 4.081462592124089e-05,
+            "max_actuator_force_norm": 0.6864163075955957,
+            "energy_abs_work": 2.360071478128671
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470206500735668,
+            "truth_rmse_rad": 0.027419964972256145,
+            "contact_frame_fraction": 4.081462592124089e-05,
+            "max_actuator_force_norm": 0.5101472211620349,
+            "energy_abs_work": 1.7655093678054736
+          }
+        },
+        {
+          "alpha": 0.01,
+          "normalized_rmse": 0.9221271252637934,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015979219734525173,
+            "truth_rmse_rad": 0.03416315060752984,
+            "contact_frame_fraction": 0.0004079932681110658,
+            "max_actuator_force_norm": 0.6885841809877381,
+            "energy_abs_work": 2.3515332356672394
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013469606088367813,
+            "truth_rmse_rad": 0.02737338409417052,
+            "contact_frame_fraction": 0.0004079932681110658,
+            "max_actuator_force_norm": 0.5131192829341144,
+            "energy_abs_work": 1.7646406897067664
+          }
+        },
+        {
+          "alpha": 0.1,
+          "normalized_rmse": 0.9276965025331151,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01598059675066741,
+            "truth_rmse_rad": 0.033750891513847595,
+            "contact_frame_fraction": 0.004064696417986254,
+            "max_actuator_force_norm": 0.7105028278159666,
+            "energy_abs_work": 2.3643994805063118
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013464030507171714,
+            "truth_rmse_rad": 0.026911170862478694,
+            "contact_frame_fraction": 0.004064696417986254,
+            "max_actuator_force_norm": 0.5427233552512024,
+            "energy_abs_work": 1.7627924782998576
+          }
+        },
+        {
+          "alpha": 1,
+          "normalized_rmse": 1.438479933242198,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01613018616367449,
+            "truth_rmse_rad": 0.030008283655903776,
+            "contact_frame_fraction": 0.03918367346938769,
+            "max_actuator_force_norm": 0.9434892476587383,
+            "energy_abs_work": 6.9915760843685515
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013445049886050173,
+            "truth_rmse_rad": 0.023321578134888332,
+            "contact_frame_fraction": 0.03918367346938769,
+            "max_actuator_force_norm": 0.8275395069531467,
+            "energy_abs_work": 6.622320886723007
+          }
+        },
+        {
+          "alpha": 10,
+          "normalized_rmse": 8.266312976512811,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.022183279165189845,
+            "truth_rmse_rad": 0.02126465537974887,
+            "contact_frame_fraction": 0.28811524609843925,
+            "max_actuator_force_norm": 2.9012022559810653,
+            "energy_abs_work": 50.78777927159764
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.018879382737547856,
+            "truth_rmse_rad": 0.017299313142120576,
+            "contact_frame_fraction": 0.28811524609843925,
+            "max_actuator_force_norm": 2.869158474909149,
+            "energy_abs_work": 50.7546497465467
+          }
+        }
+      ]
+    },
+    "raw_types": {
+      "selected_alpha": 0.01,
+      "candidates": [
+        {
+          "alpha": 0.0001,
+          "normalized_rmse": 0.9222351915788967,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015979266157688878,
+            "truth_rmse_rad": 0.03420882874407272,
+            "contact_frame_fraction": 4.081615646245318e-06,
+            "max_actuator_force_norm": 0.6862000830342617,
+            "energy_abs_work": 2.3610199205410694
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470292619207527,
+            "truth_rmse_rad": 0.02742451608490123,
+            "contact_frame_fraction": 4.081615646245318e-06,
+            "max_actuator_force_norm": 0.5098503137307051,
+            "energy_abs_work": 1.7655963225921407
+          }
+        },
+        {
+          "alpha": 0.001,
+          "normalized_rmse": 0.9222230311777768,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015979510953605402,
+            "truth_rmse_rad": 0.03420359302364499,
+            "contact_frame_fraction": 4.0814625921203884e-05,
+            "max_actuator_force_norm": 0.6864193967510089,
+            "energy_abs_work": 2.3600465886428053
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470462905399617,
+            "truth_rmse_rad": 0.027418858871323382,
+            "contact_frame_fraction": 4.0814625921203884e-05,
+            "max_actuator_force_norm": 0.5101513776931279,
+            "energy_abs_work": 1.7655093678166291
+          }
+        },
+        {
+          "alpha": 0.01,
+          "normalized_rmse": 0.9221704471933995,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.0159819823314973,
+            "truth_rmse_rad": 0.03415128747058034,
+            "contact_frame_fraction": 0.00040799326811102876,
+            "max_actuator_force_norm": 0.6886150941385243,
+            "energy_abs_work": 2.3513372859341106
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013472168885866586,
+            "truth_rmse_rad": 0.027362326027055184,
+            "contact_frame_fraction": 0.00040799326811102876,
+            "max_actuator_force_norm": 0.5131607663179049,
+            "energy_abs_work": 1.764640690821352
+          }
+        },
+        {
+          "alpha": 0.1,
+          "normalized_rmse": 0.9284680843687985,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01600900664129065,
+            "truth_rmse_rad": 0.033633382826970495,
+            "contact_frame_fraction": 0.004064696417986217,
+            "max_actuator_force_norm": 0.7108135425946704,
+            "energy_abs_work": 2.3677546547826123
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013489534225789343,
+            "truth_rmse_rad": 0.026800883710755452,
+            "contact_frame_fraction": 0.004064696417986217,
+            "max_actuator_force_norm": 0.5431300621390166,
+            "energy_abs_work": 1.7691595832670355
+          }
+        },
+        {
+          "alpha": 1,
+          "normalized_rmse": 1.4632829319814178,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01648071658314661,
+            "truth_rmse_rad": 0.02896115659378162,
+            "contact_frame_fraction": 0.039183673469387524,
+            "max_actuator_force_norm": 0.9463988813274319,
+            "energy_abs_work": 7.164478620099138
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013688284340010482,
+            "truth_rmse_rad": 0.02278443699781844,
+            "contact_frame_fraction": 0.039183673469387524,
+            "max_actuator_force_norm": 0.8308553096889645,
+            "energy_abs_work": 6.804610801346679
+          }
+        },
+        {
+          "alpha": 10,
+          "normalized_rmse": 8.463110090679269,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.02653501975083953,
+            "truth_rmse_rad": 0.02865270298207349,
+            "contact_frame_fraction": 0.28811524609843825,
+            "max_actuator_force_norm": 2.8952552447134035,
+            "energy_abs_work": 52.03594416817272
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.023840425146803294,
+            "truth_rmse_rad": 0.024329618312280723,
+            "contact_frame_fraction": 0.28811524609843825,
+            "max_actuator_force_norm": 2.8631446456406433,
+            "energy_abs_work": 52.00362002082097
+          }
+        }
+      ]
+    },
+    "graph_multihop": {
+      "selected_alpha": 0.01,
+      "candidates": [
+        {
+          "alpha": 0.0001,
+          "normalized_rmse": 0.9222351936574195,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015979266266733783,
+            "truth_rmse_rad": 0.03420882816911283,
+            "contact_frame_fraction": 4.081615646263821e-06,
+            "max_actuator_force_norm": 0.6862000886244162,
+            "energy_abs_work": 2.3610199069629436
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470292720741538,
+            "truth_rmse_rad": 0.027424515549352258,
+            "contact_frame_fraction": 4.081615646263821e-06,
+            "max_actuator_force_norm": 0.509850321254412,
+            "energy_abs_work": 1.7655963225921358
+          }
+        },
+        {
+          "alpha": 0.001,
+          "normalized_rmse": 0.922223052155594,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.0159795120444656,
+            "truth_rmse_rad": 0.03420358727448245,
+            "contact_frame_fraction": 4.081462592122239e-05,
+            "max_actuator_force_norm": 0.6864194526649853,
+            "energy_abs_work": 2.3600464557082006
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470463920725276,
+            "truth_rmse_rad": 0.027418853515803563,
+            "contact_frame_fraction": 4.081462592122239e-05,
+            "max_actuator_force_norm": 0.5101514529265553,
+            "energy_abs_work": 1.765509367816686
+          }
+        },
+        {
+          "alpha": 0.01,
+          "normalized_rmse": 0.922170676204835,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.0159819932811593,
+            "truth_rmse_rad": 0.03415123002266052,
+            "contact_frame_fraction": 0.00040799326811102876,
+            "max_actuator_force_norm": 0.6886156545110963,
+            "energy_abs_work": 2.3513362428445284
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013472179037673783,
+            "truth_rmse_rad": 0.027362272468805706,
+            "contact_frame_fraction": 0.00040799326811102876,
+            "max_actuator_force_norm": 0.5131615182867098,
+            "energy_abs_work": 1.7646406908273065
+          }
+        },
+        {
+          "alpha": 0.1,
+          "normalized_rmse": 0.9284722571464983,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.016009120195445634,
+            "truth_rmse_rad": 0.033632812837066504,
+            "contact_frame_fraction": 0.00406469641798618,
+            "max_actuator_force_norm": 0.7108192605794939,
+            "energy_abs_work": 2.367773051229655
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013489635599359265,
+            "truth_rmse_rad": 0.026800347826123044,
+            "contact_frame_fraction": 0.00406469641798618,
+            "max_actuator_force_norm": 0.5431375454478128,
+            "energy_abs_work": 1.769193730184251
+          }
+        },
+        {
+          "alpha": 1,
+          "normalized_rmse": 1.463423267585015,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01648220850557763,
+            "truth_rmse_rad": 0.028956036612871414,
+            "contact_frame_fraction": 0.039183673469387156,
+            "max_actuator_force_norm": 0.9464615243694277,
+            "energy_abs_work": 7.165438946470902
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013689284038054908,
+            "truth_rmse_rad": 0.022781743716356922,
+            "contact_frame_fraction": 0.03918367346938715,
+            "max_actuator_force_norm": 0.8309266638960818,
+            "energy_abs_work": 6.80562189847961
+          }
+        },
+        {
+          "alpha": 10,
+          "normalized_rmse": 8.464570859336664,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.026558966128829936,
+            "truth_rmse_rad": 0.028712573350393074,
+            "contact_frame_fraction": 0.2881152460984358,
+            "max_actuator_force_norm": 2.8957241522592403,
+            "energy_abs_work": 52.045010140221265
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.023867066825877737,
+            "truth_rmse_rad": 0.02438433432363518,
+            "contact_frame_fraction": 0.28811524609843575,
+            "max_actuator_force_norm": 2.8636188317616793,
+            "energy_abs_work": 52.01269170103726
+          }
+        }
+      ]
+    },
+    "rewired_graph": {
+      "selected_alpha": 0.01,
+      "candidates": [
+        {
+          "alpha": 0.0001,
+          "normalized_rmse": 0.9222351943261965,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01597926634585716,
+            "truth_rmse_rad": 0.03420882792289252,
+            "contact_frame_fraction": 4.0816156462268145e-06,
+            "max_actuator_force_norm": 0.6862000855515303,
+            "energy_abs_work": 2.3610199028476915
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470292794414975,
+            "truth_rmse_rad": 0.027424515320009252,
+            "contact_frame_fraction": 4.0816156462268145e-06,
+            "max_actuator_force_norm": 0.5098503171186596,
+            "energy_abs_work": 1.7655963225921358
+          }
+        },
+        {
+          "alpha": 0.001,
+          "normalized_rmse": 0.9222230589010583,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01597951283599828,
+            "truth_rmse_rad": 0.034203584812447466,
+            "contact_frame_fraction": 4.0814625921185385e-05,
+            "max_actuator_force_norm": 0.6864194219270237,
+            "energy_abs_work": 2.3600464154185112
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.01347046465744948,
+            "truth_rmse_rad": 0.02741885122234281,
+            "contact_frame_fraction": 4.081462592118538e-05,
+            "max_actuator_force_norm": 0.5101514115679843,
+            "energy_abs_work": 1.7655093678167049
+          }
+        },
+        {
+          "alpha": 0.01,
+          "normalized_rmse": 0.9221707494212973,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015982001226351916,
+            "truth_rmse_rad": 0.034151205419210594,
+            "contact_frame_fraction": 0.0004079932681109918,
+            "max_actuator_force_norm": 0.6886153462257281,
+            "energy_abs_work": 2.3513359267137734
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013472186403905018,
+            "truth_rmse_rad": 0.027362249531174096,
+            "contact_frame_fraction": 0.00040799326811099174,
+            "max_actuator_force_norm": 0.5131611045959664,
+            "energy_abs_work": 1.7646406908291208
+          }
+        },
+        {
+          "alpha": 0.1,
+          "normalized_rmse": 0.9284735529042045,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.016009202598911414,
+            "truth_rmse_rad": 0.033632568546118374,
+            "contact_frame_fraction": 0.004064696417986143,
+            "max_actuator_force_norm": 0.7108160915950552,
+            "energy_abs_work": 2.367778627719585
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013489709160894365,
+            "truth_rmse_rad": 0.026800118149542945,
+            "contact_frame_fraction": 0.004064696417986143,
+            "max_actuator_force_norm": 0.5431333981022791,
+            "energy_abs_work": 1.7692040795207096
+          }
+        },
+        {
+          "alpha": 1,
+          "normalized_rmse": 1.4634655521725597,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.01648329196753694,
+            "truth_rmse_rad": 0.028953827157358777,
+            "contact_frame_fraction": 0.03918367346938696,
+            "max_actuator_force_norm": 0.9464242516417737,
+            "energy_abs_work": 7.165730031235455
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013690009865195007,
+            "truth_rmse_rad": 0.02278058124963817,
+            "contact_frame_fraction": 0.03918367346938697,
+            "max_actuator_force_norm": 0.8308842081780857,
+            "energy_abs_work": 6.805928369477779
+          }
+        },
+        {
+          "alpha": 10,
+          "normalized_rmse": 8.465004947943363,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.026576443041391264,
+            "truth_rmse_rad": 0.028739637822325588,
+            "contact_frame_fraction": 0.2881152460984347,
+            "max_actuator_force_norm": 2.895246708107997,
+            "energy_abs_work": 52.04775864549516
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.023886507262167084,
+            "truth_rmse_rad": 0.024409035896175286,
+            "contact_frame_fraction": 0.2881152460984347,
+            "max_actuator_force_norm": 2.8631360129210424,
+            "energy_abs_work": 52.015441936446585
+          }
+        }
+      ]
+    },
+    "matched_random_graph": {
+      "selected_alpha": 0.01,
+      "candidates": [
+        {
+          "alpha": 0.0001,
+          "normalized_rmse": 0.9222351960883106,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015979266461385644,
+            "truth_rmse_rad": 0.03420882740336593,
+            "contact_frame_fraction": 4.081615646263821e-06,
+            "max_actuator_force_norm": 0.6862000877371747,
+            "energy_abs_work": 2.361019891469466
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470292901985972,
+            "truth_rmse_rad": 0.027424514836093854,
+            "contact_frame_fraction": 4.081615646263821e-06,
+            "max_actuator_force_norm": 0.5098503200602867,
+            "energy_abs_work": 1.7655963225921407
+          }
+        },
+        {
+          "alpha": 0.001,
+          "normalized_rmse": 0.9222230766832898,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015979513991720207,
+            "truth_rmse_rad": 0.03420357961756487,
+            "contact_frame_fraction": 4.081462592122239e-05,
+            "max_actuator_force_norm": 0.686419443787135,
+            "energy_abs_work": 2.360046304022062
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013470465733144761,
+            "truth_rmse_rad": 0.02741884638315054,
+            "contact_frame_fraction": 4.081462592122239e-05,
+            "max_actuator_force_norm": 0.5101514409812218,
+            "energy_abs_work": 1.7655093678167522
+          }
+        },
+        {
+          "alpha": 0.01,
+          "normalized_rmse": 0.9221709433314652,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015982012827225313,
+            "truth_rmse_rad": 0.034151153508805494,
+            "contact_frame_fraction": 0.0004079932681110473,
+            "max_actuator_force_norm": 0.6886155651905183,
+            "energy_abs_work": 2.3513350526643224
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013472197159385501,
+            "truth_rmse_rad": 0.027362201135399195,
+            "contact_frame_fraction": 0.00040799326811104725,
+            "max_actuator_force_norm": 0.5131613984266857,
+            "energy_abs_work": 1.7646406908341088
+          }
+        },
+        {
+          "alpha": 0.1,
+          "normalized_rmse": 0.9284770666313424,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.016009322921828717,
+            "truth_rmse_rad": 0.03363205339336627,
+            "contact_frame_fraction": 0.004064696417986199,
+            "max_actuator_force_norm": 0.7108183138144294,
+            "energy_abs_work": 2.367794048742926
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.01348981656890897,
+            "truth_rmse_rad": 0.02679963380968457,
+            "contact_frame_fraction": 0.004064696417986198,
+            "max_actuator_force_norm": 0.5431363063891923,
+            "energy_abs_work": 1.7692326953953739
+          }
+        },
+        {
+          "alpha": 1,
+          "normalized_rmse": 1.46358309786152,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.016484874383086115,
+            "truth_rmse_rad": 0.028949191370295592,
+            "contact_frame_fraction": 0.03918367346938719,
+            "max_actuator_force_norm": 0.946447270418127,
+            "energy_abs_work": 7.16653516130301
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.013691069688524871,
+            "truth_rmse_rad": 0.02277814178083452,
+            "contact_frame_fraction": 0.03918367346938719,
+            "max_actuator_force_norm": 0.8309104279083804,
+            "energy_abs_work": 6.806776050283351
+          }
+        },
+        {
+          "alpha": 10,
+          "normalized_rmse": 8.466230035873366,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.026601976536708496,
+            "truth_rmse_rad": 0.028794835615922883,
+            "contact_frame_fraction": 0.28811524609843603,
+            "max_actuator_force_norm": 2.895315583635352,
+            "energy_abs_work": 52.05538874273092
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.023914903987467113,
+            "truth_rmse_rad": 0.0244593517320086,
+            "contact_frame_fraction": 0.28811524609843603,
+            "max_actuator_force_norm": 2.8632056639059953,
+            "energy_abs_work": 52.023076835733605
+          }
+        }
+      ]
+    },
+    "random_feature_mlp": {
+      "selected_alpha": 1,
+      "candidates": [
+        {
+          "alpha": 0.0001,
+          "normalized_rmse": 6.617318499228488,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.07431384951941904,
+            "truth_rmse_rad": 0.1293002599860957,
+            "contact_frame_fraction": 0.12243661508108158,
+            "max_actuator_force_norm": 2.590087314792588,
+            "energy_abs_work": 35.81218044534957
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.04954865003001474,
+            "truth_rmse_rad": 0.08898421631585805,
+            "contact_frame_fraction": 0.10558037264415117,
+            "max_actuator_force_norm": 1.9373942473177317,
+            "energy_abs_work": 31.722131408388023
+          }
+        },
+        {
+          "alpha": 0.001,
+          "normalized_rmse": 4.074579704307022,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.025426588346984698,
+            "truth_rmse_rad": 0.04849833294295135,
+            "contact_frame_fraction": 0.10646459664392964,
+            "max_actuator_force_norm": 2.3905285922345523,
+            "energy_abs_work": 23.510516655187207
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.020900651162000076,
+            "truth_rmse_rad": 0.04246492775499946,
+            "contact_frame_fraction": 0.08708538472478507,
+            "max_actuator_force_norm": 2.131502827376863,
+            "energy_abs_work": 21.154004120582304
+          }
+        },
+        {
+          "alpha": 0.01,
+          "normalized_rmse": 3.4468774938826012,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.015112254931452063,
+            "truth_rmse_rad": 0.03995035784292598,
+            "contact_frame_fraction": 0.10035406012922463,
+            "max_actuator_force_norm": 1.7235076538844802,
+            "energy_abs_work": 20.5974344617282
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.01179348962159455,
+            "truth_rmse_rad": 0.03496482278112139,
+            "contact_frame_fraction": 0.081684858872391,
+            "max_actuator_force_norm": 1.4136910996855325,
+            "energy_abs_work": 17.481406249912094
+          }
+        },
+        {
+          "alpha": 0.1,
+          "normalized_rmse": 3.168485041705714,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.0130426856730935,
+            "truth_rmse_rad": 0.04189254429282248,
+            "contact_frame_fraction": 0.09604116390685809,
+            "max_actuator_force_norm": 1.4222051484332328,
+            "energy_abs_work": 19.060182788651858
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.010564090312917843,
+            "truth_rmse_rad": 0.034080016037950474,
+            "contact_frame_fraction": 0.08327050138665532,
+            "max_actuator_force_norm": 1.176910211120915,
+            "energy_abs_work": 17.670610704117404
+          }
+        },
+        {
+          "alpha": 1,
+          "normalized_rmse": 3.0460509820136514,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.00855911969547205,
+            "truth_rmse_rad": 0.03300689474091983,
+            "contact_frame_fraction": 0.09935007123275391,
+            "max_actuator_force_norm": 1.221750413662648,
+            "energy_abs_work": 18.585584354391294
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.007333088766300407,
+            "truth_rmse_rad": 0.029807596790459117,
+            "contact_frame_fraction": 0.06658577766342333,
+            "max_actuator_force_norm": 1.1500353375429395,
+            "energy_abs_work": 12.800737199491607
+          }
+        },
+        {
+          "alpha": 10,
+          "normalized_rmse": 3.2831201385932522,
+          "per_target_rmse": {
+            "tracking_rmse_rad": 0.005784928061370445,
+            "truth_rmse_rad": 0.030614480662902076,
+            "contact_frame_fraction": 0.10871465692274766,
+            "max_actuator_force_norm": 1.2924857726558734,
+            "energy_abs_work": 20.160895008809327
+          },
+          "per_target_mae": {
+            "tracking_rmse_rad": 0.0042041368247051755,
+            "truth_rmse_rad": 0.020056136571826408,
+            "contact_frame_fraction": 0.07955251772420961,
+            "max_actuator_force_norm": 0.9409125756250812,
+            "energy_abs_work": 14.716939303369182
+          }
+        }
+      ]
+    }
+  },
+  "historical_audit": [
+    {
+      "name": "constant_mean",
+      "parameter_count": 5,
+      "development_selected": false,
+      "historical_audit": {
+        "normalized_rmse": 0.7933941888385312,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.010845324391370757,
+          "truth_rmse_rad": 0.03831100865547223,
+          "contact_frame_fraction": 4.440892098500626e-16,
+          "max_actuator_force_norm": 0.7044702949969772,
+          "energy_abs_work": 2.299966294918694
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.009080430308987341,
+          "truth_rmse_rad": 0.03264151041091787,
+          "contact_frame_fraction": 4.440892098500626e-16,
+          "max_actuator_force_norm": 0.6065872814541889,
+          "energy_abs_work": 1.9651429357233907
+        }
+      }
+    },
+    {
+      "name": "metadata",
+      "parameter_count": 65,
+      "development_selected": true,
+      "selected_alpha": 0.01,
+      "historical_audit": {
+        "normalized_rmse": 0.8880660480954371,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.009781283908671298,
+          "truth_rmse_rad": 0.05380117761741077,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.7745822390343595,
+          "energy_abs_work": 2.617107700866113
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.007469661097592873,
+          "truth_rmse_rad": 0.039049910003561394,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.6228800868642651,
+          "energy_abs_work": 1.8580431473852
+        },
+        "mean_seconds_per_case": 5.910722216463506e-06
+      }
+    },
+    {
+      "name": "raw_types",
+      "parameter_count": 370,
+      "development_selected": true,
+      "selected_alpha": 0.01,
+      "historical_audit": {
+        "normalized_rmse": 0.8880824804411164,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.00978156488456689,
+          "truth_rmse_rad": 0.05380111517833957,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.7745745789310474,
+          "energy_abs_work": 2.617309311941356
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.007469962232075046,
+          "truth_rmse_rad": 0.039049171776378996,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.6228614674988693,
+          "energy_abs_work": 1.8582055462875422
+        },
+        "mean_seconds_per_case": 8.91427779000272e-06
+      }
+    },
+    {
+      "name": "graph_multihop",
+      "parameter_count": 370,
+      "development_selected": true,
+      "selected_alpha": 0.01,
+      "historical_audit": {
+        "normalized_rmse": 0.8880826022933552,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.009781568012605643,
+          "truth_rmse_rad": 0.053801114630955216,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.7745746084557991,
+          "energy_abs_work": 2.6173101243909085
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.007469965258487667,
+          "truth_rmse_rad": 0.03904916690045603,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.6228615239681682,
+          "energy_abs_work": 1.8582063064729906
+        },
+        "mean_seconds_per_case": 1.1964722236573127e-05
+      }
+    },
+    {
+      "name": "rewired_graph",
+      "parameter_count": 370,
+      "development_selected": true,
+      "selected_alpha": 0.01,
+      "historical_audit": {
+        "normalized_rmse": 0.8880825727487736,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.009781566870802744,
+          "truth_rmse_rad": 0.053801115227659485,
+          "contact_frame_fraction": 0.0003264218049762488,
+          "max_actuator_force_norm": 0.7745745740364165,
+          "energy_abs_work": 2.6173101227059856
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.007469964295601436,
+          "truth_rmse_rad": 0.039049170027529584,
+          "contact_frame_fraction": 0.0003264218049762488,
+          "max_actuator_force_norm": 0.6228614343110485,
+          "energy_abs_work": 1.8582064443952078
+        },
+        "mean_seconds_per_case": 9.237111094585594e-06
+      }
+    },
+    {
+      "name": "matched_random_graph",
+      "parameter_count": 370,
+      "development_selected": true,
+      "selected_alpha": 0.01,
+      "historical_audit": {
+        "normalized_rmse": 0.8880826478543741,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.009781569243292104,
+          "truth_rmse_rad": 0.053801115661528606,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.7745746371960924,
+          "energy_abs_work": 2.6173102302136155
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.007469966616020023,
+          "truth_rmse_rad": 0.03904917132244694,
+          "contact_frame_fraction": 0.000326421804976255,
+          "max_actuator_force_norm": 0.6228615432746856,
+          "energy_abs_work": 1.8582070226023133
+        },
+        "mean_seconds_per_case": 8.497611108598196e-06
+      }
+    },
+    {
+      "name": "random_feature_mlp",
+      "parameter_count": 2533,
+      "development_selected": true,
+      "selected_alpha": 1,
+      "historical_audit": {
+        "normalized_rmse": 2.322067763720395,
+        "per_target_rmse": {
+          "tracking_rmse_rad": 0.01166131582390521,
+          "truth_rmse_rad": 0.04379980940769938,
+          "contact_frame_fraction": 0.07310087145089945,
+          "max_actuator_force_norm": 0.9705575361221951,
+          "energy_abs_work": 13.721987984319101
+        },
+        "per_target_mae": {
+          "tracking_rmse_rad": 0.009319112632086667,
+          "truth_rmse_rad": 0.03221839498637705,
+          "contact_frame_fraction": 0.05296468808271231,
+          "max_actuator_force_norm": 0.8037014726591984,
+          "energy_abs_work": 10.284228527444226
+        },
+        "mean_seconds_per_case": 7.314111119032734e-06
+      }
+    }
+  ],
+  "comparisons_to_graph": {
+    "metadata": {
+      "control_normalized_rmse": 0.8880660480954371,
+      "relative_improvement": -1.8640728303520585e-05
+    },
+    "raw_types": {
+      "control_normalized_rmse": 0.8880824804411164,
+      "relative_improvement": -1.372082453356262e-07
+    },
+    "rewired_graph": {
+      "control_normalized_rmse": 0.8880825727487736,
+      "relative_improvement": -3.3267831817251176e-08
+    },
+    "matched_random_graph": {
+      "control_normalized_rmse": 0.8880826478543741,
+      "relative_improvement": 5.130267881783196e-08
+    },
+    "random_feature_mlp": {
+      "control_normalized_rmse": 2.322067763720395,
+      "relative_improvement": 0.6175466469288228
+    }
+  },
+  "gates": {
+    "graph_margin_required": 0.05,
+    "graph_advantage_go": false,
+    "series127_authorized": false,
+    "series128_authorized": false,
+    "decision": "NO_GO_TEMPORARY_ENGINEERING_CLOSE"
+  },
+  "interpretation": {
+    "outcome_prediction_not_controller_execution": true,
+    "new_physical_run": false,
+    "old_physical_evidence_not_relabelled": true,
+    "series127_untouched_data_not_inspected": true
+  }
+}
