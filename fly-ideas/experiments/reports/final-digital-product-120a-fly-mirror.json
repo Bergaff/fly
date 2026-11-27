@@ -1,0 +1,90 @@
+{
+  "series": "120A",
+  "question": "What can the digital project conclude about fly mirror neurons?",
+  "inputs": {
+    "series118_sha256": "f1a5751b664e28f485f25cabb8949a266debb275aa8af8d9957b292108f0c5b1",
+    "series119_sha256": "2badd87b4efe717458782e71b865b8d426c4526b75893a91e784d43c1aa959d1"
+  },
+  "digital_evidence": {
+    "adaptive_then_untouched_final_three_of_three": true,
+    "frozen_out_of_family_stress_three_of_three": true,
+    "series118_final": {
+      "trial_bundles": 7409,
+      "bootstrap_replicates": 177816,
+      "a_stability_mean": 0.9982548315174109,
+      "a_stability_min": 0.9955050237969328,
+      "b_accuracy": 0.9745460975890183,
+      "b_shuffled_accuracy": 0.6724729183225606,
+      "c_margin": 0.925102764154747,
+      "c_advantage": 0.4147620861538567,
+      "c_win_rate": 0.9865816349484862,
+      "controls": {
+        "pairing_margin": -0.5082281025138549,
+        "structure_margin": 0.45129108934876966,
+        "identity_margin": 0.00022158453708810791,
+        "label_margin": 0.2340496012131014,
+        "zero_margin": -2.570976842176519e-20
+      },
+      "score": 1.7150900969377252
+    },
+    "series119_overall": {
+      "rows": 255345,
+      "replicates": 2042760,
+      "a_stability_mean": 0.9854713282376052,
+      "a_stability_min": 0.8771549444738234,
+      "b_accuracy": 0.8675968624149027,
+      "b_shuffled_accuracy": 0.6304992591722309,
+      "c_margin": 0.755748714463303,
+      "c_advantage": 0.3870981476479652,
+      "c_win_rate": 0.9442396561514813,
+      "controls": {
+        "pairing_margin": -0.4213324414715317,
+        "structure_margin": 0.3282036228942853,
+        "identity_margin": 0.0015298926896721284,
+        "label_margin": 0.14059359463864377,
+        "zero_margin": -4.3164525073476394e-20
+      }
+    },
+    "series119_severe": {
+      "rows": 85115,
+      "replicates": 680920,
+      "a_stability_mean": 0.9780887144226093,
+      "a_stability_min": 0.8771549444738234,
+      "b_accuracy": 0.7848690007636727,
+      "b_shuffled_accuracy": 0.5926710675752414,
+      "c_margin": 0.6173658820309047,
+      "c_advantage": 0.32338321762940053,
+      "c_win_rate": 0.8974578511425718,
+      "controls": {
+        "pairing_margin": -0.3457431909757239,
+        "structure_margin": 0.249587070778136,
+        "identity_margin": 0.0023228444023203855,
+        "label_margin": 0.11652220799192052,
+        "zero_margin": -5.005268671759844e-20
+      }
+    }
+  },
+  "conclusion": {
+    "digital_action_specific_observe_execute_algorithm_supported": true,
+    "fly_type_aggregate_digital_mirror_signature_supported": true,
+    "individual_biological_mirror_neurons_identified": false,
+    "biological_mirror_neuron_claim": false,
+    "promoted_biological_candidates": []
+  },
+  "blocking_external_evidence": {
+    "authoritative_dn_action_labels": {
+      "validated": 0,
+      "required": 3,
+      "actions": [
+        "foreleg_rubbing",
+        "head_directed_grooming",
+        "reach_withdraw"
+      ]
+    },
+    "independent_time_resolved_observation_traces": false,
+    "independent_execution_and_proprioception_traces": false,
+    "same_neuron_observation_execution_recording": false,
+    "intervention_or_lesion_causality": false
+  },
+  "product_status": "digital_method_complete_biological_identification_blocked"
+}

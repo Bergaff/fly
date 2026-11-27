@@ -1,0 +1,46 @@
+{
+  "series": "120B",
+  "algorithm": "species-neutral anchored graph-to-action observe/execute transfer",
+  "implemented_steps": [
+    "nonnegative log and row normalization",
+    "joint incoming/outgoing spectral type embedding",
+    "reviewed-anchor orthogonal Procrustes alignment",
+    "species-native motor head fitted on development only",
+    "configuration freeze before untouched final",
+    "pairing, retrained-structure, identity, label and zero controls"
+  ],
+  "source_fly_types": 61,
+  "required_target_species_inputs": [
+    "typed sensory/connectome graph with stable identities",
+    "reviewed cross-species anchor pairs",
+    "species-native motor/readout identities",
+    "development-only action labels with provenance",
+    "time-resolved observation traces",
+    "independently generated execution/proprioception traces",
+    "untouched final cases and structural/identity/label/zero controls"
+  ],
+  "engineering_audit": {
+    "test_kind": "fly_hidden_reindexing_and_stress_engineering_self_test",
+    "is_cross_animal_validation": false,
+    "embedding_dimensions": 20,
+    "audit_known_anchor_count": 20,
+    "held_type_count": 41,
+    "held_top1_correct": 28,
+    "held_top1_accuracy": 0.6829268292682927,
+    "held_mean_reciprocal_rank": 0.8321138211382114,
+    "development_only_motor_head_ridge": 0.01,
+    "held_motor_rmse": 0.06715005541853611,
+    "held_mean_baseline_rmse": 0.06949118413604106,
+    "held_motor_head_beats_mean_baseline": true,
+    "algorithm_executed": true
+  },
+  "readiness": {
+    "algorithm_implemented": true,
+    "input_contract_defined": true,
+    "leakage_safe_development_final_protocol_defined": true,
+    "fly_hidden_domain_audit_completed": true,
+    "validated_on_other_animal_species_count": 0,
+    "cross_animal_generalization_claim": false
+  },
+  "next_valid_test": "supply one target animal package satisfying every required input, register anchors before outcomes, then run a frozen held-out final"
+}

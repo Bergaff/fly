@@ -968,3 +968,7 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 ### Series119: frozen stress-replication трёх направлений
 
 `experiments\RUN-FROZEN-THREE-DIRECTION-STRESS-119-4H.bat` genuine result SHA `2badd87b…`: frozen run без adaptive search выполнил2 042 760 replicates и прошёл все overall/severe gates. Overall A mean/min0,985471/0,877155; B accuracy0,867597 против shuffled0,630499; C margin0,755749, advantage0,387098, win0,944240. Severe B0,784869 против0,592671; C margin0,617366/advantage0,323383/win0,897458. Из-за ошибочно оптимистичной serial calibration расчёт занял14ч20м53с вместо4ч; scheduler исправлен на concurrent full-bundle calibration. Digital robustness подтверждена, biological claim=false.
+
+### Series120A–C: финальный цифровой продукт
+
+`experiments\RUN-FINAL-DIGITAL-PRODUCT-120ABC.bat` создаёт три отдельных результата.120A фиксирует итог по мухе: robust type-aggregate digital mirror signature поддержана Series118/119, но individual biological neurons0 и promoted candidates0.120B реализует species-neutral anchored spectral alignment и development-only native motor head; stressed hidden-fly audit28/41, но validated other species0 и cross-animal claim=false.120C показывает вычислительный footprint:4 214 dense scalars (~16,46KiB FP32),39,548 stress replicates/s на пользовательской6-worker машине; explicit1M/100M/7B AI references больше по параметрам в237×/23 730×/1 661 130×. Это сравнение размера, не интеллекта или качества.
