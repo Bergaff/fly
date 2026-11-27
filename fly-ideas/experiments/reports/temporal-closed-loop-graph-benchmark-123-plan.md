@@ -22,6 +22,6 @@ All learned candidates use ridge motor readouts. Frozen test conditions are clea
 
 ## Gates and interpretation
 
-A graph-advantage claim requires the graph reservoir to beat both the explicit-history model and matched random reservoir on clean and stress metrics. If it does not, the result remains NO-GO. This is not a FlyGym/NeuroMechFly physical run, living-neuron result, whole-brain model, or general-intelligence benchmark.
+A graph-advantage claim requires the graph reservoir to beat both the explicit-history model and matched random reservoir on clean and stress metrics. If it does not, the result remains NO-GO. This specific Series123 benchmark does not rerun a body. Earlier Series100–112 included official FlyGym/NeuroMechFly runs, but those frozen physical results do not automatically validate the newly defined Series123 Graph reservoir. Series123 is not a living-neuron result, whole-brain model, or general-intelligence benchmark.
 
 Run `experiments\RUN-TEMPORAL-CLOSED-LOOP-123.bat` and return `summary.json` for user-machine replication.

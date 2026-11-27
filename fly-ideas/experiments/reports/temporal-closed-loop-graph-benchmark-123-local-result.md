@@ -26,4 +26,4 @@ The cue-loss condition not hurting—and sometimes slightly improving—non-orac
 
 ## Boundaries
 
-This is a deterministic synthetic engineering benchmark seeded by frozen project artifacts. It is not a physical FlyGym/NeuroMechFly experiment, a living-neuron result, a whole-brain simulation, or evidence for general intelligence.
+This specific Series123 run is a deterministic synthetic engineering benchmark seeded by frozen project artifacts; it does not rerun a body. Earlier Series100–112 did include official FlyGym/NeuroMechFly physical runs, but that evidence belongs to those frozen adapters and does not automatically validate the new Series123 Graph reservoir. Neither line establishes living-neuron validation, a whole-brain simulation, or general intelligence.

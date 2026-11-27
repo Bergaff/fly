@@ -24,4 +24,4 @@ Cue loss again failed to hurt the learned controllers, confirming that the prese
 
 ## Boundary
 
-This is a reproducible synthetic engineering NO-GO, not a physical FlyGym result, living-neuron validation, whole-brain model, or general-intelligence benchmark.
+This specific Series123 replication is a reproducible synthetic engineering NO-GO and does not rerun a body. Earlier Series100–112 used official FlyGym/NeuroMechFly, but their physical evidence cannot be transferred automatically to this new Graph reservoir. This remains neither living-neuron validation nor a whole-brain or general-intelligence result.
