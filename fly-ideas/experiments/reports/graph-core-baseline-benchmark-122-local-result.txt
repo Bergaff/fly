@@ -1,0 +1,13 @@
+﻿SERIES122 — SAME-TASK BASELINES
+
+Train: 2000 | Test: 600 | New seed: 600
+
+exact_dot: 600/600 (100.00%), params/scalars=4214, mean=0.142 us/case
+max_weight_channel_rule: 343/600 (57.17%), params/scalars=0, mean=0.085 us/case
+additive_linear_ridge: 243/600 (40.50%), params/scalars=17, mean=0.064 us/case
+diagonal_bilinear_ridge: 600/600 (100.00%), params/scalars=9, mean=0.094 us/case
+parameter_matched_mlp: 547/600 (91.17%), params/scalars=4213, mean=6.450 us/case
+
+Random seeded reference: 134/600
+
+This is a narrow arithmetic ranking benchmark, not a controller, brain, biology, or general-intelligence test.

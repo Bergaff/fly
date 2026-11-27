@@ -1,0 +1,143 @@
+{
+  "schema": "graph-core-baseline-benchmark-122-v1",
+  "status": "completed",
+  "contract": {
+    "task": "rank four candidates by the weighted8-channel dot product",
+    "train_cases": 2000,
+    "test_cases": 600,
+    "new_seed_cases": 600,
+    "train_seed": 122000001,
+    "test_seed": 121000001,
+    "new_seed": 122000003,
+    "paths_sha256": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+    "splits_disjoint": true,
+    "test_cases_match_series121_prefix": true,
+    "not_controller_benchmark": true,
+    "not_general_intelligence_benchmark": true,
+    "not_biological_validation": true
+  },
+  "random_choice_reference": {
+    "correct": 134,
+    "accuracy": 0.22333333333333333,
+    "expected_accuracy": 0.25
+  },
+  "models": [
+    {
+      "name": "exact_dot",
+      "parameter_or_scalar_count": 4214,
+      "approximate_fp32_parameter_bytes": 16856,
+      "count_interpretation": "frozen graph-core scalar capacity; operation itself uses supplied vectors",
+      "correct": 600,
+      "accuracy": 1.0,
+      "new_seed_accuracy": 1.0,
+      "noise_std_0_02_accuracy_against_clean_labels": 0.7,
+      "input_dropout_0_10_accuracy_against_clean_labels": 0.6533333333333333,
+      "single_channel_ablation_mean_accuracy": 0.7727083333333333,
+      "timing": {
+        "mean_seconds_per_case": 1.4214812501525862e-07,
+        "p50_seconds_per_case": 1.3321749994095927e-07,
+        "p95_seconds_per_case": 1.8442341665074e-07,
+        "max_seconds_per_case": 2.704983334448722e-07,
+        "repeats": 200
+      }
+    },
+    {
+      "name": "max_weight_channel_rule",
+      "parameter_or_scalar_count": 0,
+      "approximate_fp32_parameter_bytes": 0,
+      "count_interpretation": "hand rule; no fitted coefficients",
+      "correct": 343,
+      "accuracy": 0.5716666666666667,
+      "new_seed_accuracy": 0.5733333333333334,
+      "noise_std_0_02_accuracy_against_clean_labels": 0.5366666666666666,
+      "input_dropout_0_10_accuracy_against_clean_labels": 0.5333333333333333,
+      "single_channel_ablation_mean_accuracy": 0.53,
+      "timing": {
+        "mean_seconds_per_case": 8.451152498878401e-08,
+        "p50_seconds_per_case": 7.234583335957722e-08,
+        "p95_seconds_per_case": 1.1820716667898518e-07,
+        "max_seconds_per_case": 2.2098666666655238e-07,
+        "repeats": 200
+      }
+    },
+    {
+      "name": "additive_linear_ridge",
+      "parameter_or_scalar_count": 17,
+      "approximate_fp32_parameter_bytes": 68,
+      "count_interpretation": "16 coefficients plus intercept",
+      "correct": 243,
+      "accuracy": 0.405,
+      "new_seed_accuracy": 0.40166666666666667,
+      "noise_std_0_02_accuracy_against_clean_labels": 0.26166666666666666,
+      "input_dropout_0_10_accuracy_against_clean_labels": 0.30666666666666664,
+      "single_channel_ablation_mean_accuracy": 0.34687500000000004,
+      "timing": {
+        "mean_seconds_per_case": 6.382044999024098e-08,
+        "p50_seconds_per_case": 6.017583321712056e-08,
+        "p95_seconds_per_case": 8.194233335719502e-08,
+        "max_seconds_per_case": 1.7192500005573188e-07,
+        "repeats": 200
+      }
+    },
+    {
+      "name": "diagonal_bilinear_ridge",
+      "parameter_or_scalar_count": 9,
+      "approximate_fp32_parameter_bytes": 36,
+      "count_interpretation": "8 interaction coefficients plus intercept",
+      "correct": 600,
+      "accuracy": 1.0,
+      "new_seed_accuracy": 1.0,
+      "noise_std_0_02_accuracy_against_clean_labels": 0.7,
+      "input_dropout_0_10_accuracy_against_clean_labels": 0.6533333333333333,
+      "single_channel_ablation_mean_accuracy": 0.7727083333333333,
+      "timing": {
+        "mean_seconds_per_case": 9.420801665479908e-08,
+        "p50_seconds_per_case": 8.896916654066444e-08,
+        "p95_seconds_per_case": 1.2752691681801764e-07,
+        "max_seconds_per_case": 2.1722499999062468e-07,
+        "repeats": 200
+      }
+    },
+    {
+      "name": "parameter_matched_mlp",
+      "parameter_or_scalar_count": 4213,
+      "approximate_fp32_parameter_bytes": 16852,
+      "count_interpretation": "16x234 +234 biases +234 output weights +1 bias",
+      "correct": 547,
+      "accuracy": 0.9116666666666666,
+      "new_seed_accuracy": 0.9,
+      "noise_std_0_02_accuracy_against_clean_labels": 0.6933333333333334,
+      "input_dropout_0_10_accuracy_against_clean_labels": 0.6433333333333333,
+      "single_channel_ablation_mean_accuracy": 0.678125,
+      "timing": {
+        "mean_seconds_per_case": 6.449729075016345e-06,
+        "p50_seconds_per_case": 6.283143333310667e-06,
+        "p95_seconds_per_case": 7.277292666856283e-06,
+        "max_seconds_per_case": 1.013765833325427e-05,
+        "repeats": 200
+      }
+    }
+  ],
+  "qwen_series121_reference": {
+    "source_sha256": "0f16b0ac2775df05059b64e7c608784af486592ec78e1e00286d72e026d0a41f",
+    "model": {
+      "name": "qwen2.5:7b",
+      "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+      "size_bytes": 4683087332,
+      "parameter_count_if_reported": 7615616512,
+      "family": "qwen2"
+    },
+    "case_count": 60,
+    "correct": 21,
+    "accuracy": 0.35,
+    "mean_wall_seconds_per_case": 0.2966244683332964,
+    "external_prompted_reference_only": true
+  },
+  "interpretation": {
+    "exact_solver_is_oracle_by_task_definition": true,
+    "small_bilinear_model_may_be_sufficient": true,
+    "graph_core_superiority_claim": false,
+    "controller_claim": false,
+    "general_ai_claim": false
+  }
+}
