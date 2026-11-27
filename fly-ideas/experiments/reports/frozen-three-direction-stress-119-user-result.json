@@ -1,0 +1,128 @@
+{
+  "schema": "frozen-three-direction-stress-119-v1",
+  "status": "completed",
+  "protocol": {
+    "target_hours": 4,
+    "workers": 6,
+    "adaptive_search": false,
+    "post_result_tuning": false,
+    "source118_sha256": "f1a5751b664e28f485f25cabb8949a266debb275aa8af8d9957b292108f0c5b1",
+    "source118_runner_sha256": "d75169f8f67dafbda4f61cc901fdc8debc73088ca26456cdb8ec71217195fa82",
+    "frozen_config": {
+      "alpha": 0.125,
+      "beta": 0.5,
+      "ridge": 0.01,
+      "subset": 20,
+      "derivative": 0.0
+    },
+    "profiles": [
+      {
+        "name": "mild",
+        "edge_dropout": 0.05,
+        "edge_sigma": 0.12,
+        "dn_dropout": 0,
+        "case_sigma": 0.18
+      },
+      {
+        "name": "medium",
+        "edge_dropout": 0.1,
+        "edge_sigma": 0.18,
+        "dn_dropout": 1,
+        "case_sigma": 0.22
+      },
+      {
+        "name": "severe",
+        "edge_dropout": 0.15,
+        "edge_sigma": 0.24,
+        "dn_dropout": 2,
+        "case_sigma": 0.28
+      }
+    ],
+    "replicates_per_profile_per_bundle": 8,
+    "seed_namespace": "119900000+",
+    "primary_gate": "overall A mean>=.95,min>=.85; B acc>=.85,shuffled<=.75,delta>=.10; C margin>=.20,advantage>=.10,win>=.80; severe A mean>=.95; B acc>=.65,delta>=.05; C margin>=.20,advantage>=.10,win>=.70"
+  },
+  "active_wall_seconds": 51653.062,
+  "overall": {
+    "rows": 255345,
+    "replicates": 2042760,
+    "a_stability_mean": 0.9854713282376052,
+    "a_stability_min": 0.8771549444738234,
+    "b_accuracy": 0.8675968624149027,
+    "b_shuffled_accuracy": 0.6304992591722309,
+    "c_margin": 0.755748714463303,
+    "c_advantage": 0.3870981476479652,
+    "c_win_rate": 0.9442396561514813,
+    "controls": {
+      "pairing_margin": -0.4213324414715317,
+      "structure_margin": 0.3282036228942853,
+      "identity_margin": 0.0015298926896721284,
+      "label_margin": 0.14059359463864377,
+      "zero_margin": -4.3164525073476394e-20
+    }
+  },
+  "profiles": {
+    "mild": {
+      "rows": 85115,
+      "replicates": 680920,
+      "a_stability_mean": 0.9925666152425812,
+      "a_stability_min": 0.934902168164992,
+      "b_accuracy": 0.9491501693786838,
+      "b_shuffled_accuracy": 0.6652109156239597,
+      "c_margin": 0.8804340166617831,
+      "c_advantage": 0.44255794718466807,
+      "c_win_rate": 0.9925630029959467,
+      "controls": {
+        "pairing_margin": -0.4917006152500675,
+        "structure_margin": 0.40189071802906334,
+        "identity_margin": 0.00021819248308459061,
+        "label_margin": 0.16229346660467941,
+        "zero_margin": -7.859466544717637e-20
+      }
+    },
+    "medium": {
+      "rows": 85115,
+      "replicates": 680920,
+      "a_stability_mean": 0.9857586550476255,
+      "a_stability_min": 0.9062400846113168,
+      "b_accuracy": 0.8687714171023516,
+      "b_shuffled_accuracy": 0.6336157943174919,
+      "c_margin": 0.769446244697222,
+      "c_advantage": 0.39535327812982723,
+      "c_win_rate": 0.9426981143159255,
+      "controls": {
+        "pairing_margin": -0.4265535181888041,
+        "structure_margin": 0.33313307987565655,
+        "identity_margin": 0.0020486411836114094,
+        "label_margin": 0.14296510931933132,
+        "zero_margin": -8.462230556543741e-22
+      }
+    },
+    "severe": {
+      "rows": 85115,
+      "replicates": 680920,
+      "a_stability_mean": 0.9780887144226093,
+      "a_stability_min": 0.8771549444738234,
+      "b_accuracy": 0.7848690007636727,
+      "b_shuffled_accuracy": 0.5926710675752414,
+      "c_margin": 0.6173658820309047,
+      "c_advantage": 0.32338321762940053,
+      "c_win_rate": 0.8974578511425718,
+      "controls": {
+        "pairing_margin": -0.3457431909757239,
+        "structure_margin": 0.249587070778136,
+        "identity_margin": 0.0023228444023203855,
+        "label_margin": 0.11652220799192052,
+        "zero_margin": -5.005268671759844e-20
+      }
+    }
+  },
+  "primary": {
+    "all_three_frozen_stress_directions_passed": true,
+    "a_stress_robustness_passed": true,
+    "b_stress_readout_passed": true,
+    "c_stress_specificity_passed": true,
+    "biological_claim": false,
+    "scientific_biological_result": false
+  }
+}

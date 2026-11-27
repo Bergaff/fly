@@ -1,0 +1,644 @@
+{
+  "schema": "local-ollama-narrow-benchmark-121-v1",
+  "status": "completed",
+  "benchmark_contract": {
+    "task": "choose the largest weighted61-to-8 DN routing score among four candidates",
+    "shared_cases": true,
+    "case_count": 60,
+    "seed": 121000001,
+    "paths_sha256": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+    "not_general_intelligence_benchmark": true,
+    "project_has_exact_task_specific_solver": true,
+    "ollama_uses_prompted_general_model": true
+  },
+  "project": {
+    "dense_scalar_capacity": 4214,
+    "correct": 60,
+    "accuracy": 1.0,
+    "timed_solver_iterations": 2000,
+    "total_solver_seconds": 1.1455229999992298,
+    "mean_seconds_per_case": 9.546024999993581e-06
+  },
+  "ollama": {
+    "model": {
+      "name": "qwen2.5:7b",
+      "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+      "size_bytes": 4683087332,
+      "parameter_count_if_reported": 7615616512,
+      "family": "qwen2"
+    },
+    "correct": 21,
+    "accuracy": 0.35,
+    "total_wall_seconds": 17.797468099997786,
+    "mean_wall_seconds_per_case": 0.2966244683332964,
+    "rows": [
+      {
+        "case": 1,
+        "expected": "Tm3",
+        "answer": "T5b",
+        "correct": false,
+        "wall_seconds": 0.3136207999996259,
+        "eval_count": 8,
+        "eval_duration_ns": 122459000,
+        "raw_response": "{\"answer\":\"T5b\"}"
+      },
+      {
+        "case": 2,
+        "expected": "Lawf1",
+        "answer": "Lawf1",
+        "correct": true,
+        "wall_seconds": 0.1667660999992222,
+        "eval_count": 8,
+        "eval_duration_ns": 126056000,
+        "raw_response": "{\"answer\":\"Lawf1\"}"
+      },
+      {
+        "case": 3,
+        "expected": "TmY3",
+        "answer": "Mi10",
+        "correct": false,
+        "wall_seconds": 0.16854930000044988,
+        "eval_count": 8,
+        "eval_duration_ns": 126932000,
+        "raw_response": "{\"answer\":\"Mi10\"}"
+      },
+      {
+        "case": 4,
+        "expected": "R8",
+        "answer": "Tm30",
+        "correct": false,
+        "wall_seconds": 0.18099869999969087,
+        "eval_count": 9,
+        "eval_duration_ns": 140648000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 5,
+        "expected": "Mi9",
+        "answer": "Mi9",
+        "correct": true,
+        "wall_seconds": 0.17204160000073898,
+        "eval_count": 7,
+        "eval_duration_ns": 106407000,
+        "raw_response": "{\"answer\":\"Mi9\"}"
+      },
+      {
+        "case": 6,
+        "expected": "Lawf1",
+        "answer": "R8",
+        "correct": false,
+        "wall_seconds": 0.14578660000006494,
+        "eval_count": 7,
+        "eval_duration_ns": 104108000,
+        "raw_response": "{\"answer\":\"R8\"}"
+      },
+      {
+        "case": 7,
+        "expected": "R5",
+        "answer": "R5",
+        "correct": true,
+        "wall_seconds": 0.1485740000007354,
+        "eval_count": 7,
+        "eval_duration_ns": 107934000,
+        "raw_response": "{\"answer\":\"R5\"}"
+      },
+      {
+        "case": 8,
+        "expected": "L1",
+        "answer": "T4c",
+        "correct": false,
+        "wall_seconds": 0.18370019999929355,
+        "eval_count": 8,
+        "eval_duration_ns": 122407000,
+        "raw_response": "{\"answer\":\"T4c\"}"
+      },
+      {
+        "case": 9,
+        "expected": "Mi13",
+        "answer": "T1",
+        "correct": false,
+        "wall_seconds": 0.17591519999950833,
+        "eval_count": 7,
+        "eval_duration_ns": 111688000,
+        "raw_response": "{\"answer\":\"T1\"}"
+      },
+      {
+        "case": 10,
+        "expected": "Mi10",
+        "answer": "T4b",
+        "correct": false,
+        "wall_seconds": 0.17042149999906542,
+        "eval_count": 8,
+        "eval_duration_ns": 128607000,
+        "raw_response": "{\"answer\":\"T4b\"}"
+      },
+      {
+        "case": 11,
+        "expected": "Tm1",
+        "answer": "T5a",
+        "correct": false,
+        "wall_seconds": 0.16890839999905438,
+        "eval_count": 8,
+        "eval_duration_ns": 125694000,
+        "raw_response": "{\"answer\":\"T5a\"}"
+      },
+      {
+        "case": 12,
+        "expected": "CT1(Lo1)",
+        "answer": "TmY5a",
+        "correct": false,
+        "wall_seconds": 0.20180450000043493,
+        "eval_count": 10,
+        "eval_duration_ns": 160827000,
+        "raw_response": "{\"answer\":\"TmY5a\"}"
+      },
+      {
+        "case": 13,
+        "expected": "L1",
+        "answer": "Tm30",
+        "correct": false,
+        "wall_seconds": 0.20072049999907904,
+        "eval_count": 9,
+        "eval_duration_ns": 143137000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 14,
+        "expected": "T2a",
+        "answer": "Tm16",
+        "correct": false,
+        "wall_seconds": 0.18377420000069833,
+        "eval_count": 9,
+        "eval_duration_ns": 143701000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 15,
+        "expected": "L3",
+        "answer": "T2a",
+        "correct": false,
+        "wall_seconds": 0.18480490000001737,
+        "eval_count": 8,
+        "eval_duration_ns": 124986000,
+        "raw_response": "{\"answer\":\"T2a\"}"
+      },
+      {
+        "case": 16,
+        "expected": "L1",
+        "answer": "L1",
+        "correct": true,
+        "wall_seconds": 0.14952379999886034,
+        "eval_count": 7,
+        "eval_duration_ns": 110993000,
+        "raw_response": "{\"answer\":\"L1\"}"
+      },
+      {
+        "case": 17,
+        "expected": "T1",
+        "answer": "Mi9",
+        "correct": false,
+        "wall_seconds": 0.14753750000090804,
+        "eval_count": 7,
+        "eval_duration_ns": 107095000,
+        "raw_response": "{\"answer\":\"Mi9\"}"
+      },
+      {
+        "case": 18,
+        "expected": "T2",
+        "answer": "T4c",
+        "correct": false,
+        "wall_seconds": 0.16643040000053588,
+        "eval_count": 8,
+        "eval_duration_ns": 126899000,
+        "raw_response": "{\"answer\":\"T4c\"}"
+      },
+      {
+        "case": 19,
+        "expected": "Tm16",
+        "answer": "Tm16",
+        "correct": true,
+        "wall_seconds": 0.37529390000054264,
+        "eval_count": 9,
+        "eval_duration_ns": 147850000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 20,
+        "expected": "L3",
+        "answer": "T5c",
+        "correct": false,
+        "wall_seconds": 0.3300558999999339,
+        "eval_count": 8,
+        "eval_duration_ns": 126264000,
+        "raw_response": "{\"answer\":\"T5c\"}"
+      },
+      {
+        "case": 21,
+        "expected": "CT1(M10)",
+        "answer": "TmY13",
+        "correct": false,
+        "wall_seconds": 0.3948325000001205,
+        "eval_count": 10,
+        "eval_duration_ns": 167534000,
+        "raw_response": "{\"answer\":\"TmY13\"}"
+      },
+      {
+        "case": 22,
+        "expected": "TmY4",
+        "answer": "TmY4",
+        "correct": true,
+        "wall_seconds": 0.37257859999954235,
+        "eval_count": 9,
+        "eval_duration_ns": 145580000,
+        "raw_response": "{\"answer\":\"TmY4\"}"
+      },
+      {
+        "case": 23,
+        "expected": "T4b",
+        "answer": "T4b",
+        "correct": true,
+        "wall_seconds": 0.3284864999986894,
+        "eval_count": 8,
+        "eval_duration_ns": 124255000,
+        "raw_response": "{\"answer\":\"T4b\"}"
+      },
+      {
+        "case": 24,
+        "expected": "T5d",
+        "answer": "T5d",
+        "correct": true,
+        "wall_seconds": 0.351906500000041,
+        "eval_count": 8,
+        "eval_duration_ns": 123857000,
+        "raw_response": "{\"answer\":\"T5d\"}"
+      },
+      {
+        "case": 25,
+        "expected": "Tm16",
+        "answer": "Tm16",
+        "correct": true,
+        "wall_seconds": 0.3486260999998194,
+        "eval_count": 9,
+        "eval_duration_ns": 145640000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 26,
+        "expected": "TmY14",
+        "answer": "Lawf2",
+        "correct": false,
+        "wall_seconds": 0.349847100000261,
+        "eval_count": 8,
+        "eval_duration_ns": 124500000,
+        "raw_response": "{\"answer\":\"Lawf2\"}"
+      },
+      {
+        "case": 27,
+        "expected": "TmY4",
+        "answer": "TmY4",
+        "correct": true,
+        "wall_seconds": 0.3700014000005467,
+        "eval_count": 9,
+        "eval_duration_ns": 144476000,
+        "raw_response": "{\"answer\":\"TmY4\"}"
+      },
+      {
+        "case": 28,
+        "expected": "C2",
+        "answer": "Mi4",
+        "correct": false,
+        "wall_seconds": 0.3297419999998965,
+        "eval_count": 7,
+        "eval_duration_ns": 105305000,
+        "raw_response": "{\"answer\":\"Mi4\"}"
+      },
+      {
+        "case": 29,
+        "expected": "TmY10",
+        "answer": "TmY10",
+        "correct": true,
+        "wall_seconds": 0.35028260000035516,
+        "eval_count": 10,
+        "eval_duration_ns": 155799000,
+        "raw_response": "{\"answer\":\"TmY10\"}"
+      },
+      {
+        "case": 30,
+        "expected": "T5d",
+        "answer": "T2a",
+        "correct": false,
+        "wall_seconds": 0.3665390000005573,
+        "eval_count": 8,
+        "eval_duration_ns": 125783000,
+        "raw_response": "{\"answer\":\"T2a\"}"
+      },
+      {
+        "case": 31,
+        "expected": "Mi1",
+        "answer": "Tm16",
+        "correct": false,
+        "wall_seconds": 0.3662094999999681,
+        "eval_count": 9,
+        "eval_duration_ns": 143781000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 32,
+        "expected": "Tm16",
+        "answer": "Tm16",
+        "correct": true,
+        "wall_seconds": 0.3503426999996009,
+        "eval_count": 9,
+        "eval_duration_ns": 136299000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 33,
+        "expected": "L3",
+        "answer": "L3",
+        "correct": true,
+        "wall_seconds": 0.30038190000050236,
+        "eval_count": 7,
+        "eval_duration_ns": 105979000,
+        "raw_response": "{\"answer\":\"L3\"}"
+      },
+      {
+        "case": 34,
+        "expected": "Tm1",
+        "answer": "Tm5c",
+        "correct": false,
+        "wall_seconds": 0.36992910000117263,
+        "eval_count": 9,
+        "eval_duration_ns": 147786000,
+        "raw_response": "{\"answer\":\"Tm5c\"}"
+      },
+      {
+        "case": 35,
+        "expected": "T5d",
+        "answer": "R8",
+        "correct": false,
+        "wall_seconds": 0.304485200000272,
+        "eval_count": 7,
+        "eval_duration_ns": 109956000,
+        "raw_response": "{\"answer\":\"R8\"}"
+      },
+      {
+        "case": 36,
+        "expected": "L5",
+        "answer": "Tm9",
+        "correct": false,
+        "wall_seconds": 0.3258651000014652,
+        "eval_count": 8,
+        "eval_duration_ns": 126664000,
+        "raw_response": "{\"answer\":\"Tm9\"}"
+      },
+      {
+        "case": 37,
+        "expected": "L1",
+        "answer": "TmY4",
+        "correct": false,
+        "wall_seconds": 0.3698291999990033,
+        "eval_count": 9,
+        "eval_duration_ns": 144996000,
+        "raw_response": "{\"answer\":\"TmY4\"}"
+      },
+      {
+        "case": 38,
+        "expected": "R5",
+        "answer": "TmY5a",
+        "correct": false,
+        "wall_seconds": 0.3806196999994427,
+        "eval_count": 10,
+        "eval_duration_ns": 154719000,
+        "raw_response": "{\"answer\":\"TmY5a\"}"
+      },
+      {
+        "case": 39,
+        "expected": "Tm30",
+        "answer": "Tm30",
+        "correct": true,
+        "wall_seconds": 0.33296270000028017,
+        "eval_count": 9,
+        "eval_duration_ns": 137318000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 40,
+        "expected": "TmY13",
+        "answer": "T5c",
+        "correct": false,
+        "wall_seconds": 0.3755046999995102,
+        "eval_count": 8,
+        "eval_duration_ns": 126954000,
+        "raw_response": "{\"answer\":\"T5c\"}"
+      },
+      {
+        "case": 41,
+        "expected": "Tm9",
+        "answer": "TmY9",
+        "correct": false,
+        "wall_seconds": 0.38961469999958354,
+        "eval_count": 9,
+        "eval_duration_ns": 143557000,
+        "raw_response": "{\"answer\":\"TmY9\"}"
+      },
+      {
+        "case": 42,
+        "expected": "T3",
+        "answer": "T3",
+        "correct": true,
+        "wall_seconds": 0.30201949999900535,
+        "eval_count": 7,
+        "eval_duration_ns": 104775000,
+        "raw_response": "{\"answer\":\"T3\"}"
+      },
+      {
+        "case": 43,
+        "expected": "TmY5a",
+        "answer": "T4b",
+        "correct": false,
+        "wall_seconds": 0.3163526999996975,
+        "eval_count": 8,
+        "eval_duration_ns": 120311000,
+        "raw_response": "{\"answer\":\"T4b\"}"
+      },
+      {
+        "case": 44,
+        "expected": "T1",
+        "answer": "T1",
+        "correct": true,
+        "wall_seconds": 0.30027379999955883,
+        "eval_count": 7,
+        "eval_duration_ns": 104031000,
+        "raw_response": "{\"answer\":\"T1\"}"
+      },
+      {
+        "case": 45,
+        "expected": "Tm30",
+        "answer": "Tm30",
+        "correct": true,
+        "wall_seconds": 0.3339661000009073,
+        "eval_count": 9,
+        "eval_duration_ns": 137187000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 46,
+        "expected": "Tm20",
+        "answer": "Tm30",
+        "correct": false,
+        "wall_seconds": 0.3663862000012159,
+        "eval_count": 9,
+        "eval_duration_ns": 139939000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 47,
+        "expected": "Tm30",
+        "answer": "Tm30",
+        "correct": true,
+        "wall_seconds": 0.3664759999992384,
+        "eval_count": 9,
+        "eval_duration_ns": 142956000,
+        "raw_response": "{\"answer\":\"Tm30\"}"
+      },
+      {
+        "case": 48,
+        "expected": "Tm2",
+        "answer": "Lawf1",
+        "correct": false,
+        "wall_seconds": 0.3505189999996219,
+        "eval_count": 8,
+        "eval_duration_ns": 126569000,
+        "raw_response": "{\"answer\":\"Lawf1\"}"
+      },
+      {
+        "case": 49,
+        "expected": "T4d",
+        "answer": "T4d",
+        "correct": true,
+        "wall_seconds": 0.3242357999988599,
+        "eval_count": 8,
+        "eval_duration_ns": 126761000,
+        "raw_response": "{\"answer\":\"T4d\"}"
+      },
+      {
+        "case": 50,
+        "expected": "R8",
+        "answer": "TmY4",
+        "correct": false,
+        "wall_seconds": 0.35938159999932395,
+        "eval_count": 9,
+        "eval_duration_ns": 136038000,
+        "raw_response": "{\"answer\":\"TmY4\"}"
+      },
+      {
+        "case": 51,
+        "expected": "L5",
+        "answer": "L3",
+        "correct": false,
+        "wall_seconds": 0.2997152999996615,
+        "eval_count": 7,
+        "eval_duration_ns": 103434000,
+        "raw_response": "{\"answer\":\"L3\"}"
+      },
+      {
+        "case": 52,
+        "expected": "T1",
+        "answer": "Tm16",
+        "correct": false,
+        "wall_seconds": 0.3659399000007397,
+        "eval_count": 9,
+        "eval_duration_ns": 141418000,
+        "raw_response": "{\"answer\":\"Tm16\"}"
+      },
+      {
+        "case": 53,
+        "expected": "Mi10",
+        "answer": "L5",
+        "correct": false,
+        "wall_seconds": 0.33192609999969136,
+        "eval_count": 7,
+        "eval_duration_ns": 108683000,
+        "raw_response": "{\"answer\":\"L5\"}"
+      },
+      {
+        "case": 54,
+        "expected": "L5",
+        "answer": "TmY10",
+        "correct": false,
+        "wall_seconds": 0.40261479999935545,
+        "eval_count": 10,
+        "eval_duration_ns": 162321000,
+        "raw_response": "{\"answer\":\"TmY10\"}"
+      },
+      {
+        "case": 55,
+        "expected": "Mi15",
+        "answer": "Tm5c",
+        "correct": false,
+        "wall_seconds": 0.3663376000004064,
+        "eval_count": 9,
+        "eval_duration_ns": 143071000,
+        "raw_response": "{\"answer\":\"Tm5c\"}"
+      },
+      {
+        "case": 56,
+        "expected": "Mi10",
+        "answer": "T5d",
+        "correct": false,
+        "wall_seconds": 0.3277656999998726,
+        "eval_count": 8,
+        "eval_duration_ns": 126325000,
+        "raw_response": "{\"answer\":\"T5d\"}"
+      },
+      {
+        "case": 57,
+        "expected": "C2",
+        "answer": "Tm5Y",
+        "correct": false,
+        "wall_seconds": 0.3557723000012629,
+        "eval_count": 9,
+        "eval_duration_ns": 137787000,
+        "raw_response": "{\"answer\":\"Tm5Y\"}"
+      },
+      {
+        "case": 58,
+        "expected": "Tm5c",
+        "answer": "Tm5c",
+        "correct": true,
+        "wall_seconds": 0.33371120000083465,
+        "eval_count": 9,
+        "eval_duration_ns": 136928000,
+        "raw_response": "{\"answer\":\"Tm5c\"}"
+      },
+      {
+        "case": 59,
+        "expected": "Tm20",
+        "answer": "L2",
+        "correct": false,
+        "wall_seconds": 0.30804770000031567,
+        "eval_count": 7,
+        "eval_duration_ns": 110279000,
+        "raw_response": "{\"answer\":\"L2\"}"
+      },
+      {
+        "case": 60,
+        "expected": "T4b",
+        "answer": "T4b",
+        "correct": true,
+        "wall_seconds": 0.3222119999991264,
+        "eval_count": 8,
+        "eval_duration_ns": 126717000,
+        "raw_response": "{\"answer\":\"T4b\"}"
+      }
+    ]
+  },
+  "comparison": {
+    "project_accuracy_minus_ollama": 0.65,
+    "speed_ratio_ollama_wall_to_project_exact": 31073.08731471957,
+    "valid_scope": "only this narrow numeric routing benchmark",
+    "general_ai_superiority_claim": false,
+    "biological_claim": false
+  }
+}

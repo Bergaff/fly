@@ -1,0 +1,11 @@
+﻿SERIES123 — SYNTHETIC TEMPORAL CLOSED LOOP
+
+Train episodes: 80 | Test/condition: 30 | Steps: 120
+
+memoryless_ridge: RMSE=0.20420, success=60.03%, switch=0.22037, us/step=15.955
+history4_ridge: RMSE=0.21547, success=54.42%, switch=0.23261, us/step=20.621
+random_reservoir61: RMSE=0.20423, success=59.97%, switch=0.22204, us/step=37.534
+graph_reservoir61: RMSE=0.20501, success=59.17%, switch=0.22225, us/step=29.685
+privileged_oracle: RMSE=0.17068, success=78.33%, switch=0.17353, us/step=11.566
+
+Synthetic engineering benchmark only; no biology, whole-brain, or general-intelligence claim.

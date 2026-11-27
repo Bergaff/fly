@@ -1,0 +1,1722 @@
+{
+  "schema": "scale-normalized-camera-prototype-user-extract-v1",
+  "source_file": "summary-6.json",
+  "source_file_sha256": "9bed977b784bc5ab05bf1313ca7fa410af3d9b4f08d6b0a66e044ad2ac9dd4e1",
+  "status": "completed",
+  "protocol": {
+    "schema": "scale-normalized-camera-prototype-v1",
+    "created_utc": "2026-11-15T19:21:58.081315+00:00",
+    "script_sha256": "f4dbe408f750500623b201da46b8c5452a3d465541c16b54406afc9eab96de64",
+    "runner82_sha256": "175b8ee1ef63a2e045fb62bff84bdfc345c05d8285f170397e033424ba3d96b1",
+    "mode": "prototype",
+    "training_episodes": 320,
+    "training_motion_seed": 8241,
+    "training_view_seed": 8243,
+    "evaluation_motion_seed": 8242,
+    "evaluation_motion_ids": [
+      241,
+      246
+    ],
+    "representations": {
+      "variable_edge": {
+        "resolution": [
+          96,
+          64
+        ],
+        "fov": "variable 30-70",
+        "features": 576
+      },
+      "fov35_edge": {
+        "resolution": [
+          96,
+          64
+        ],
+        "fov": 35,
+        "other_geometry": "original view",
+        "features": 576
+      },
+      "tracked35_edge": {
+        "resolution": [
+          96,
+          64
+        ],
+        "fov": 35,
+        "other_geometry": "body-relative fixed rig",
+        "features": 576,
+        "diagnostic_only": true
+      }
+    },
+    "same_motion_view_labels": true,
+    "primary_candidate": "fov35_edge",
+    "tracked_camera_can_rescue_primary": false,
+    "visibility_guard": "for fov35: median changed RGB96 >=40 and edge delta RMS >=1e-4 in >=12/16 cells per distal axis",
+    "go_rule": "fov35 both distal below variable/zero with >=60% wins; safe axes below zero and <=5% worse variable; combined below variable/zero; original FOV30/FOV70 groups <=2% worse variable; >=12/16 corners both distal improve; visibility guard passes",
+    "authorizes_series83_only_on_full_fov35_go": true,
+    "scientific_result": false
+  },
+  "go_for_revised_long_training": true,
+  "axes": {
+    "left_proximal": {
+      "variable_edge": 0.4013391840282676,
+      "fov35_edge": 0.3334958687844696,
+      "tracked35_edge": 0.18040340545486028,
+      "zero": 0.42079605917986007,
+      "fov35_wins_vs_variable": 87,
+      "cases": 96,
+      "passed": true
+    },
+    "left_middle": {
+      "variable_edge": 0.2684413141553877,
+      "fov35_edge": 0.17808703154089078,
+      "tracked35_edge": 0.10991478862358055,
+      "zero": 0.4030574727385968,
+      "fov35_wins_vs_variable": 78,
+      "cases": 96,
+      "passed": true
+    },
+    "left_distal": {
+      "variable_edge": 0.47199813464108586,
+      "fov35_edge": 0.4569710095409735,
+      "tracked35_edge": 0.33418922186475464,
+      "zero": 0.4777052255194831,
+      "fov35_wins_vs_variable": 69,
+      "cases": 96,
+      "passed": true
+    },
+    "right_proximal": {
+      "variable_edge": 0.4148928650205829,
+      "fov35_edge": 0.34465229420619276,
+      "tracked35_edge": 0.1974018849824239,
+      "zero": 0.43253116790610524,
+      "fov35_wins_vs_variable": 85,
+      "cases": 96,
+      "passed": true
+    },
+    "right_middle": {
+      "variable_edge": 0.24775161218892972,
+      "fov35_edge": 0.15620134243006145,
+      "tracked35_edge": 0.09961890975198034,
+      "zero": 0.37858076573593286,
+      "fov35_wins_vs_variable": 76,
+      "cases": 96,
+      "passed": true
+    },
+    "right_distal": {
+      "variable_edge": 0.44250886125499567,
+      "fov35_edge": 0.42949569221156897,
+      "tracked35_edge": 0.3145440443654403,
+      "zero": 0.4483489563386621,
+      "fov35_wins_vs_variable": 66,
+      "cases": 96,
+      "passed": true
+    }
+  },
+  "combined": {
+    "variable_edge": 0.38411091322754815,
+    "fov35_edge": 0.33650349224713133,
+    "tracked35_edge": 0.22514383280065012,
+    "zero": 0.4280090198204039
+  },
+  "original_fov_safeguards": {
+    "30": {
+      "variable_edge": 0.3730618148683136,
+      "fov35_edge": 0.33662589922118186,
+      "passed": true
+    },
+    "70": {
+      "variable_edge": 0.3948509460646666,
+      "fov35_edge": 0.3363810407299452,
+      "passed": true
+    }
+  },
+  "held_corners_both_distal_improved": 12,
+  "held_corners_total": 16,
+  "visibility": {
+    "visible_cells_per_axis": {
+      "left_distal": 16,
+      "right_distal": 16
+    },
+    "required_per_axis": 12,
+    "passed": true
+  },
+  "cell_results": [
+    {
+      "cell_id": 1,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 2,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 3,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 4,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 5,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 6,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": false,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 7,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 8,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 9,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 10,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 11,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 12,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": false
+      },
+      "both_distal_improved": false
+    },
+    {
+      "cell_id": 13,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 14,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 15,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    },
+    {
+      "cell_id": 16,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "distal_improved": {
+        "left_distal": true,
+        "right_distal": true
+      },
+      "both_distal_improved": true
+    }
+  ],
+  "visibility_records": [
+    {
+      "cell_id": 1,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 352.0,
+          "feature_delta_rms": 0.0028075871523469687,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 287.0,
+          "feature_delta_rms": 0.0031546982936561108,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 1,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 457.0,
+          "feature_delta_rms": 0.004426175262778997,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 332.0,
+          "feature_delta_rms": 0.0038189373444765806,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 2,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 276.0,
+          "feature_delta_rms": 0.00306831207126379,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 206.0,
+          "feature_delta_rms": 0.0024327810388058424,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 2,
+      "corner_bits": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 275.0,
+          "feature_delta_rms": 0.003975341562181711,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 204.0,
+          "feature_delta_rms": 0.0031397466082125902,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 3,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 437.0,
+          "feature_delta_rms": 0.002695017959922552,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 338.0,
+          "feature_delta_rms": 0.002629724098369479,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 3,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 349.0,
+          "feature_delta_rms": 0.0034853285178542137,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 289.0,
+          "feature_delta_rms": 0.0036010241601616144,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 4,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 318.0,
+          "feature_delta_rms": 0.0026338347233831882,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 238.0,
+          "feature_delta_rms": 0.0023643625900149345,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 4,
+      "corner_bits": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 337.0,
+          "feature_delta_rms": 0.0037288288585841656,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 237.0,
+          "feature_delta_rms": 0.0026788581162691116,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 5,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 376.0,
+          "feature_delta_rms": 0.004414878785610199,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 272.0,
+          "feature_delta_rms": 0.0029502210672944784,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 5,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 342.0,
+          "feature_delta_rms": 0.0040222154930233955,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 267.0,
+          "feature_delta_rms": 0.0034769782796502113,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 6,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 274.0,
+          "feature_delta_rms": 0.0032910562586039305,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 201.0,
+          "feature_delta_rms": 0.0030828777235001326,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 6,
+      "corner_bits": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 312.0,
+          "feature_delta_rms": 0.003671672660857439,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 227.0,
+          "feature_delta_rms": 0.0031026210635900497,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 7,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 370.0,
+          "feature_delta_rms": 0.002120709978044033,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 313.0,
+          "feature_delta_rms": 0.0026897257193922997,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 7,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 465.0,
+          "feature_delta_rms": 0.004426395986229181,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 332.0,
+          "feature_delta_rms": 0.0034218262881040573,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 8,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 312.0,
+          "feature_delta_rms": 0.0021376521326601505,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 224.0,
+          "feature_delta_rms": 0.001825073268264532,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 8,
+      "corner_bits": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 30.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 279.0,
+          "feature_delta_rms": 0.003343474818393588,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 207.0,
+          "feature_delta_rms": 0.0030251203570514917,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 9,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 57.0,
+          "feature_delta_rms": 0.0012536848662421107,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 286.0,
+          "feature_delta_rms": 0.0034905243664979935,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 9,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 56.0,
+          "feature_delta_rms": 0.0018392730271443725,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 271.0,
+          "feature_delta_rms": 0.0038319493178278208,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 10,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 43.0,
+          "feature_delta_rms": 0.001248359796591103,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 211.0,
+          "feature_delta_rms": 0.0027166951913386583,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 10,
+      "corner_bits": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 47.0,
+          "feature_delta_rms": 0.0011259044986218214,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 230.0,
+          "feature_delta_rms": 0.0032200259156525135,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 11,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 68.0,
+          "feature_delta_rms": 0.0009803719585761428,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 317.0,
+          "feature_delta_rms": 0.0026982061099261045,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 11,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 71.0,
+          "feature_delta_rms": 0.0012162685161456466,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 354.0,
+          "feature_delta_rms": 0.003508497728034854,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 12,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 45.0,
+          "feature_delta_rms": 0.0008313000435009599,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 225.0,
+          "feature_delta_rms": 0.001971770077943802,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 12,
+      "corner_bits": [
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.14,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 45.0,
+          "feature_delta_rms": 0.0010699689155444503,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 222.0,
+          "feature_delta_rms": 0.0030214316211640835,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 13,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 58.0,
+          "feature_delta_rms": 0.0015458143316209316,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 291.0,
+          "feature_delta_rms": 0.0031322366558015347,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 13,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 3.82,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 63.0,
+          "feature_delta_rms": 0.0014186881016939878,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 314.0,
+          "feature_delta_rms": 0.0038626505993306637,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 14,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 39.0,
+          "feature_delta_rms": 0.0010840963805094361,
+          "visible": false
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 197.0,
+          "feature_delta_rms": 0.0022643040865659714,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 14,
+      "corner_bits": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.36,
+        "body_x": 4.18,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 45.0,
+          "feature_delta_rms": 0.0012822692515328526,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 200.0,
+          "feature_delta_rms": 0.0034116841852664948,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 15,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 59.0,
+          "feature_delta_rms": 0.0009087917278520763,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 319.0,
+          "feature_delta_rms": 0.002235818887129426,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 15,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 3.82,
+        "body_y": -0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 63.0,
+          "feature_delta_rms": 0.0014286523219197989,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 285.0,
+          "feature_delta_rms": 0.0032945836428552866,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 16,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "left_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 45.0,
+          "feature_delta_rms": 0.0009536458528600633,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 228.0,
+          "feature_delta_rms": 0.002407584572210908,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 246.0,
+          "feature_delta_rms": 0.0026879163924604654,
+          "visible": true
+        }
+      }
+    },
+    {
+      "cell_id": 16,
+      "corner_bits": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "view": {
+        "fov_deg": 70.0,
+        "camera_side": 0.42,
+        "camera_z": 0.56,
+        "body_x": 4.18,
+        "body_y": 0.32
+      },
+      "axis": "right_distal",
+      "perturb_deg": 10.0,
+      "geometry": {
+        "variable_edge": {
+          "median_changed_rgb": 47.0,
+          "feature_delta_rms": 0.0010384413180872798,
+          "visible": true
+        },
+        "fov35_edge": {
+          "median_changed_rgb": 237.0,
+          "feature_delta_rms": 0.0027671626303344965,
+          "visible": true
+        },
+        "tracked35_edge": {
+          "median_changed_rgb": 254.0,
+          "feature_delta_rms": 0.003777662757784128,
+          "visible": true
+        }
+      }
+    }
+  ],
+  "derived": {
+    "counts": {
+      "training_diagnostics": 320,
+      "visibility_records": 32,
+      "cell_results": 16,
+      "evaluation_records": 96
+    },
+    "combined_improvement_vs_variable_pct": 12.394185986643414,
+    "combined_improvement_vs_zero_pct": 21.379345606237237,
+    "distal_by_original_fov": {
+      "30": {
+        "left_distal": {
+          "variable_edge": 0.47243046750388723,
+          "fov35_edge": 0.45678489139362854,
+          "tracked35_edge": 0.3341892218647545,
+          "zero": 0.4777052255194831,
+          "fov35_wins_vs_variable": 33,
+          "cases": 48
+        },
+        "right_distal": {
+          "variable_edge": 0.4403600720762207,
+          "fov35_edge": 0.4296445116170878,
+          "tracked35_edge": 0.31454404436544037,
+          "zero": 0.4483489563386621,
+          "fov35_wins_vs_variable": 29,
+          "cases": 48
+        }
+      },
+      "70": {
+        "left_distal": {
+          "variable_edge": 0.4715654054141246,
+          "fov35_edge": 0.45715705191575456,
+          "tracked35_edge": 0.3341892218647545,
+          "zero": 0.4777052255194831,
+          "fov35_wins_vs_variable": 36,
+          "cases": 48
+        },
+        "right_distal": {
+          "variable_edge": 0.4446472663802307,
+          "fov35_edge": 0.42934682122254475,
+          "tracked35_edge": 0.31454404436544037,
+          "zero": 0.4483489563386621,
+          "fov35_wins_vs_variable": 37,
+          "cases": 48
+        }
+      }
+    },
+    "fov35_visibility_ranges": {
+      "left_distal": {
+        "changed_rgb_min": 197.0,
+        "changed_rgb_median": 255.0,
+        "changed_rgb_max": 338.0,
+        "feature_delta_min": 0.001825073268264532,
+        "feature_delta_median": 0.0026597249088808894,
+        "feature_delta_max": 0.0034905243664979935
+      },
+      "right_distal": {
+        "changed_rgb_min": 200.0,
+        "changed_rgb_median": 252.0,
+        "changed_rgb_max": 354.0,
+        "feature_delta_min": 0.0026788581162691116,
+        "feature_delta_median": 0.0033531339140608907,
+        "feature_delta_max": 0.0038626505993306637
+      }
+    }
+  },
+  "limitations": [
+    "Short supervised geometry ablation, not a scientific long-run result.",
+    "Fixed-FOV camera changes observation geometry; tracked camera is diagnostic only and cannot rescue primary.",
+    "Camera stabilization uses simulator body pose to position the sensor, but the decoder receives pixels only.",
+    "No replay, contacts, actuators, biological brain or mirror-neuron claim."
+  ]
+}

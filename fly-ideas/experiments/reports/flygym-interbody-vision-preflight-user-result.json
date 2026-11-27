@@ -1,0 +1,58 @@
+{
+  "schema": "flygym-interbody-vision-preflight-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "flygym-interbody-vision-preflight-v1",
+    "mode": "full",
+    "created_utc": "2026-11-25T10:55:10.749100+00:00",
+    "script_sha256": "33bc95e41032d1f6bc823d626c6ea8c2f80a7135e5c3b8254c656b8400823d11",
+    "series102_result_sha256": "33795d582e9ac528304018300dc14c67db066d3452e1760df2bb74c9aef9a643",
+    "training_allowed": false,
+    "selection_allowed": false,
+    "official_api": "NeuroMechFly.add_vision + Simulation.get_raw_vision(observer)",
+    "eyes": "official left/right fisheye-corrected RGB resized deterministically to 96x64",
+    "paired_control": "same two bodies and observer; demonstrator moving versus neutral",
+    "thresholds": {
+      "rgb_mean_abs_delta_uint8": 0.05,
+      "edge_mean_abs_delta": 1e-05,
+      "demonstrator_response_rad": 0.03
+    }
+  },
+  "primary": {
+    "checks": {
+      "flygym_2_1_1": true,
+      "frames_49x2x64x96x3": true,
+      "features_47x576": true,
+      "finite_nonconstant": true,
+      "interbody_rgb_delta": true,
+      "interbody_edge_delta": true,
+      "demonstrator_response": true,
+      "real_force_and_contact": true
+    },
+    "metrics": {
+      "moving_shape": [
+        49,
+        2,
+        64,
+        96,
+        3
+      ],
+      "feature_shape": [
+        47,
+        576
+      ],
+      "paired_rgb_mean_abs_delta_uint8": 19.467708665497447,
+      "paired_edge_mean_abs_delta": 0.014275241643190384,
+      "demonstrator_max_mapped_response_rad": 0.16309414865804767,
+      "max_force_norm": 9.326219036498378,
+      "observer_contact_frame_fraction": 0.9795918367346939
+    },
+    "passed": true,
+    "scientific_result": false
+  },
+  "limitations": [
+    "Technical official-eye bridge preflight, not frozen89E policy evidence.",
+    "Deterministic resize to 96x64 is a declared coordinate adapter, not biological vision.",
+    "No FlyVis, connectome mapping, training, model selection, or living animal claim."
+  ]
+}

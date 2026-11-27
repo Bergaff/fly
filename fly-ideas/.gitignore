@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+release
+*.local
+.DS_Store
+npm-debug.log*
+audio/
+workspace/
+__pycache__/
+*.py[cod]

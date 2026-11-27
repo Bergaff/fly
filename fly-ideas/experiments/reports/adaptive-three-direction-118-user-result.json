@@ -1,0 +1,96 @@
+{
+  "schema": "adaptive-three-direction-118-v1",
+  "status": "completed",
+  "protocol": {
+    "target_hours": 4,
+    "workers": 6,
+    "bundle_replicates": 24,
+    "development_fraction": 0.8,
+    "adaptive_development_allowed": true,
+    "untouched_final_adaptation_allowed": false,
+    "source117_sha256": "13679c5ff066d672595ae8562a4da83f758b8e22fb94054bdf051507c1458840",
+    "matrix_sha256": "03157b503d0271cb0991db524d45220bb8f49ce62e3ba171dc997ed7f3816150",
+    "paths_sha256": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+    "candidate_families": [
+      "path depth/mix",
+      "ridge",
+      "type subset",
+      "derivative feedback"
+    ],
+    "primary_gate": "A mean>=.9,min>=.7; B acc>=.9, shuffled<=.75; C margin>=.1, advantage>=.02, win>=.8"
+  },
+  "active_wall_seconds": 14643.625,
+  "development_generations": 1238,
+  "development_all": {
+    "trial_bundles": 29742,
+    "bootstrap_replicates": 713808,
+    "a_stability_mean": 0.9982529057580721,
+    "a_stability_min": 0.9955579058699101,
+    "b_accuracy": 0.9667999736001214,
+    "b_shuffled_accuracy": 0.6819396812588258,
+    "c_margin": 0.8878312677411231,
+    "c_advantage": 0.38191363623006414,
+    "c_win_rate": 0.984324916504158,
+    "controls": {
+      "pairing_margin": -0.43795782133242595,
+      "structure_margin": 0.45787329248033465,
+      "identity_margin": 0.003173184606552397,
+      "label_margin": 0.22444436382958097,
+      "zero_margin": 3.9258072526187253e-20
+    },
+    "score": 1.6650268343294319
+  },
+  "selected_config": {
+    "alpha": 0.125,
+    "beta": 0.5,
+    "ridge": 0.01,
+    "subset": 20,
+    "derivative": 0.0
+  },
+  "selected_development": {
+    "trial_bundles": 1,
+    "bootstrap_replicates": 24,
+    "a_stability_mean": 0.9982747223691169,
+    "a_stability_min": 0.997355896351137,
+    "b_accuracy": 0.9768518518518517,
+    "b_shuffled_accuracy": 0.6481481481481481,
+    "c_margin": 0.9212239666323553,
+    "c_advantage": 0.47899301523582194,
+    "c_win_rate": 1.0,
+    "controls": {
+      "pairing_margin": -0.5027274861741479,
+      "structure_margin": 0.32795332077640954,
+      "identity_margin": 0.0002377349522351481,
+      "label_margin": 0.277447842125844,
+      "zero_margin": -4.336808689942018e-18
+    },
+    "score": 1.8059714413086425
+  },
+  "final": {
+    "trial_bundles": 7409,
+    "bootstrap_replicates": 177816,
+    "a_stability_mean": 0.9982548315174109,
+    "a_stability_min": 0.9955050237969328,
+    "b_accuracy": 0.9745460975890183,
+    "b_shuffled_accuracy": 0.6724729183225606,
+    "c_margin": 0.925102764154747,
+    "c_advantage": 0.4147620861538567,
+    "c_win_rate": 0.9865816349484862,
+    "controls": {
+      "pairing_margin": -0.5082281025138549,
+      "structure_margin": 0.45129108934876966,
+      "identity_margin": 0.00022158453708810791,
+      "label_margin": 0.2340496012131014,
+      "zero_margin": -2.570976842176519e-20
+    },
+    "score": 1.7150900969377252
+  },
+  "primary": {
+    "all_three_directions_passed": true,
+    "a_structural_robustness_passed": true,
+    "b_dn_readout_passed": true,
+    "c_action_specific_mirror_passed": true,
+    "biological_claim": false,
+    "scientific_biological_result": false
+  }
+}

@@ -1,0 +1,488 @@
+{
+  "schema": "wing-context-invariant-result-v1",
+  "created_utc": "2026-11-09T13:03:21.529408+00:00",
+  "status": "completed",
+  "protocol": {
+    "amplitude_bins_deg": [
+      0,
+      10,
+      25,
+      60
+    ],
+    "context_axes": [
+      "left_x",
+      "left_y",
+      "left_z",
+      "right_y",
+      "right_z"
+    ],
+    "donor_offset": 104729,
+    "fixture_limit": null,
+    "holdout_basename": "wing-trajectory5.json",
+    "holdout_motion_sha256": "59c3778e3055e6bb18d09736541dcb4fd0a9b27fef2f0c52c365886398fc779d",
+    "holdout_sha256": "9c74906604299303bd6420810bfb0d8bdadd127a6098e858b0ec69a305dabf6d",
+    "mode": "full",
+    "primary_metric": "right_x RMSE on every scored holdout frame",
+    "replacement_count": 30046,
+    "replacement_rule": "accepted generated candidates with (id-train_count)%2 == 1",
+    "runner59_sha256": "5c700f4c72f3614c245ab34f2b7bf7f8469e3114cb46568556157a2b99e5ddcf",
+    "schema": "wing-context-invariant-v1",
+    "script_sha256": "a14ce9046f82bd704984990eb7bfc7eea9b7cd5e837240379b1cf1d8e501b3e1",
+    "secondary_metrics": [
+      "right_x MAE",
+      "right_x mean error",
+      "opposite-sign frames",
+      "fixed amplitude-bin RMSE"
+    ],
+    "source_active_training_seconds": 28800.937000000005,
+    "source_candidates": 60094,
+    "source_database_sha256": "e57c47736052d2707de81e8a4476b8089344cb6c4d4fb3ac04d3e204fb7fed52",
+    "source_protocol_sha256": "a1709c7c853ccaf1f5edcef33e240a0068f2fa17e3031c6297650a7cff889e4c",
+    "source_series": "E:\\ass\\fly\\fly-ideas\\workspace\\runs\\ideas\\i-observational\\wing-user-long\\wing_user_long_20261108_220403_52156936",
+    "source_training_frames": 2944606,
+    "target_axis": "right_x",
+    "train_count": 2,
+    "workers": 2
+  },
+  "control_model_sha256": "f2ef4321e3438ac719e2148da3dc6821fb95abc43d537095728c05be214716ad",
+  "context_invariant_model_sha256": "4e3309e3bbafbdff85d6bf18113a9cc7eb2ce836c16b09e0e2f58b5ab855a793",
+  "replacements_completed": 30046,
+  "training_frames_each_model": 2944606,
+  "primary": {
+    "test_index": 0,
+    "role": "preregistered_holdout",
+    "source": "holdout.json",
+    "frames": 49,
+    "right_x": {
+      "control": {
+        "frames": 49,
+        "rmse_rad": 0.3404526969251265,
+        "mae_rad": 0.2381318126272343,
+        "mean_error_rad": -0.11524625954866531,
+        "opposite_sign_frames": 8
+      },
+      "context_invariant": {
+        "frames": 49,
+        "rmse_rad": 0.34111040241907536,
+        "mae_rad": 0.25530177813062144,
+        "mean_error_rad": -0.013065002266554264,
+        "opposite_sign_frames": 11
+      },
+      "rmse_change_percent": 0.19318557317626883
+    },
+    "fixed_amplitude_bins": {
+      "control": [
+        {
+          "abs_target_deg": [
+            0,
+            10
+          ],
+          "metrics": {
+            "frames": 12,
+            "rmse_rad": 0.1286309467136376,
+            "mae_rad": 0.11189969134762749,
+            "mean_error_rad": 0.03536200594429267,
+            "opposite_sign_frames": 5
+          }
+        },
+        {
+          "abs_target_deg": [
+            10,
+            25
+          ],
+          "metrics": {
+            "frames": 15,
+            "rmse_rad": 0.16822736405550845,
+            "mae_rad": 0.12948499935337948,
+            "mean_error_rad": 0.007792117287980209,
+            "opposite_sign_frames": 1
+          }
+        },
+        {
+          "abs_target_deg": [
+            25,
+            60
+          ],
+          "metrics": {
+            "frames": 22,
+            "rmse_rad": 0.47941423385261045,
+            "mae_rad": 0.38106306964828446,
+            "mean_error_rad": -0.2812860249334462,
+            "opposite_sign_frames": 2
+          }
+        }
+      ],
+      "context_invariant": [
+        {
+          "abs_target_deg": [
+            0,
+            10
+          ],
+          "metrics": {
+            "frames": 12,
+            "rmse_rad": 0.12844440256054243,
+            "mae_rad": 0.11256818473794244,
+            "mean_error_rad": 0.039356016863359086,
+            "opposite_sign_frames": 5
+          }
+        },
+        {
+          "abs_target_deg": [
+            10,
+            25
+          ],
+          "metrics": {
+            "frames": 15,
+            "rmse_rad": 0.2628006776590236,
+            "mae_rad": 0.20589877069565504,
+            "mean_error_rad": 0.07219531177811807,
+            "opposite_sign_frames": 4
+          }
+        },
+        {
+          "abs_target_deg": [
+            25,
+            60
+          ],
+          "metrics": {
+            "frames": 22,
+            "rmse_rad": 0.45063190521888397,
+            "mae_rad": 0.366840334141378,
+            "mean_error_rad": -0.09979031773151088,
+            "opposite_sign_frames": 2
+          }
+        }
+      ]
+    }
+  },
+  "tests": [
+    {
+      "test_index": 0,
+      "role": "preregistered_holdout",
+      "source": "holdout.json",
+      "frames": 49,
+      "right_x": {
+        "control": {
+          "frames": 49,
+          "rmse_rad": 0.3404526969251265,
+          "mae_rad": 0.2381318126272343,
+          "mean_error_rad": -0.11524625954866531,
+          "opposite_sign_frames": 8
+        },
+        "context_invariant": {
+          "frames": 49,
+          "rmse_rad": 0.34111040241907536,
+          "mae_rad": 0.25530177813062144,
+          "mean_error_rad": -0.013065002266554264,
+          "opposite_sign_frames": 11
+        },
+        "rmse_change_percent": 0.19318557317626883
+      },
+      "fixed_amplitude_bins": {
+        "control": [
+          {
+            "abs_target_deg": [
+              0,
+              10
+            ],
+            "metrics": {
+              "frames": 12,
+              "rmse_rad": 0.1286309467136376,
+              "mae_rad": 0.11189969134762749,
+              "mean_error_rad": 0.03536200594429267,
+              "opposite_sign_frames": 5
+            }
+          },
+          {
+            "abs_target_deg": [
+              10,
+              25
+            ],
+            "metrics": {
+              "frames": 15,
+              "rmse_rad": 0.16822736405550845,
+              "mae_rad": 0.12948499935337948,
+              "mean_error_rad": 0.007792117287980209,
+              "opposite_sign_frames": 1
+            }
+          },
+          {
+            "abs_target_deg": [
+              25,
+              60
+            ],
+            "metrics": {
+              "frames": 22,
+              "rmse_rad": 0.47941423385261045,
+              "mae_rad": 0.38106306964828446,
+              "mean_error_rad": -0.2812860249334462,
+              "opposite_sign_frames": 2
+            }
+          }
+        ],
+        "context_invariant": [
+          {
+            "abs_target_deg": [
+              0,
+              10
+            ],
+            "metrics": {
+              "frames": 12,
+              "rmse_rad": 0.12844440256054243,
+              "mae_rad": 0.11256818473794244,
+              "mean_error_rad": 0.039356016863359086,
+              "opposite_sign_frames": 5
+            }
+          },
+          {
+            "abs_target_deg": [
+              10,
+              25
+            ],
+            "metrics": {
+              "frames": 15,
+              "rmse_rad": 0.2628006776590236,
+              "mae_rad": 0.20589877069565504,
+              "mean_error_rad": 0.07219531177811807,
+              "opposite_sign_frames": 4
+            }
+          },
+          {
+            "abs_target_deg": [
+              25,
+              60
+            ],
+            "metrics": {
+              "frames": 22,
+              "rmse_rad": 0.45063190521888397,
+              "mae_rad": 0.366840334141378,
+              "mean_error_rad": -0.09979031773151088,
+              "opposite_sign_frames": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "test_index": 1,
+      "role": "diagnostic_regression",
+      "source": "test_001.json",
+      "frames": 49,
+      "right_x": {
+        "control": {
+          "frames": 49,
+          "rmse_rad": 0.21086898730477893,
+          "mae_rad": 0.08431515089177324,
+          "mean_error_rad": -0.037643273319761035,
+          "opposite_sign_frames": 2
+        },
+        "context_invariant": {
+          "frames": 49,
+          "rmse_rad": 0.2316399685622888,
+          "mae_rad": 0.11227331875787369,
+          "mean_error_rad": -0.01401423022470878,
+          "opposite_sign_frames": 4
+        },
+        "rmse_change_percent": 9.850183055836737
+      },
+      "fixed_amplitude_bins": {
+        "control": [
+          {
+            "abs_target_deg": [
+              0,
+              10
+            ],
+            "metrics": {
+              "frames": 22,
+              "rmse_rad": 0.3085661496036978,
+              "mae_rad": 0.12846837532626346,
+              "mean_error_rad": -0.10396458820209133,
+              "opposite_sign_frames": 2
+            }
+          },
+          {
+            "abs_target_deg": [
+              10,
+              25
+            ],
+            "metrics": {
+              "frames": 22,
+              "rmse_rad": 0.05953509608011583,
+              "mae_rad": 0.05259537038571005,
+              "mean_error_rad": 0.025342689161355958,
+              "opposite_sign_frames": 0
+            }
+          },
+          {
+            "abs_target_deg": [
+              25,
+              60
+            ],
+            "metrics": {
+              "frames": 5,
+              "rmse_rad": 0.03508800626072057,
+              "mae_rad": 0.029607997606694404,
+              "mean_error_rad": -0.02296772275442268,
+              "opposite_sign_frames": 0
+            }
+          }
+        ],
+        "context_invariant": [
+          {
+            "abs_target_deg": [
+              0,
+              10
+            ],
+            "metrics": {
+              "frames": 22,
+              "rmse_rad": 0.3299317549182902,
+              "mae_rad": 0.1528340336811594,
+              "mean_error_rad": -0.09745070812581186,
+              "opposite_sign_frames": 4
+            }
+          },
+          {
+            "abs_target_deg": [
+              10,
+              25
+            ],
+            "metrics": {
+              "frames": 22,
+              "rmse_rad": 0.10221991357584173,
+              "mae_rad": 0.09070071314969816,
+              "mean_error_rad": 0.06611293324565336,
+              "opposite_sign_frames": 0
+            }
+          },
+          {
+            "abs_target_deg": [
+              25,
+              60
+            ],
+            "metrics": {
+              "frames": 5,
+              "rmse_rad": 0.030038164968032008,
+              "mae_rad": 0.028725637771388923,
+              "mean_error_rad": 0.0005467532705514255,
+              "opposite_sign_frames": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "test_index": 2,
+      "role": "diagnostic_regression",
+      "source": "test_002.json",
+      "frames": 49,
+      "right_x": {
+        "control": {
+          "frames": 49,
+          "rmse_rad": 0.40613379518159226,
+          "mae_rad": 0.19582224076113838,
+          "mean_error_rad": -0.15256960511835316,
+          "opposite_sign_frames": 6
+        },
+        "context_invariant": {
+          "frames": 49,
+          "rmse_rad": 0.37471319905203043,
+          "mae_rad": 0.2111465943748449,
+          "mean_error_rad": -0.12564460245096076,
+          "opposite_sign_frames": 7
+        },
+        "rmse_change_percent": -7.736513558423008
+      },
+      "fixed_amplitude_bins": {
+        "control": [
+          {
+            "abs_target_deg": [
+              0,
+              10
+            ],
+            "metrics": {
+              "frames": 19,
+              "rmse_rad": 0.23660223139491474,
+              "mae_rad": 0.13252041408793405,
+              "mean_error_rad": -0.11001188035350234,
+              "opposite_sign_frames": 2
+            }
+          },
+          {
+            "abs_target_deg": [
+              10,
+              25
+            ],
+            "metrics": {
+              "frames": 20,
+              "rmse_rad": 0.3636682923728906,
+              "mae_rad": 0.16111114505716445,
+              "mean_error_rad": -0.08704670305036737,
+              "opposite_sign_frames": 2
+            }
+          },
+          {
+            "abs_target_deg": [
+              25,
+              60
+            ],
+            "metrics": {
+              "frames": 10,
+              "rmse_rad": 0.6613292735221454,
+              "mae_rad": 0.38551790284817455,
+              "mean_error_rad": -0.36447508630754133,
+              "opposite_sign_frames": 2
+            }
+          }
+        ],
+        "context_invariant": [
+          {
+            "abs_target_deg": [
+              0,
+              10
+            ],
+            "metrics": {
+              "frames": 19,
+              "rmse_rad": 0.18959081709690878,
+              "mae_rad": 0.11283733334117407,
+              "mean_error_rad": -0.06919646995049564,
+              "opposite_sign_frames": 3
+            }
+          },
+          {
+            "abs_target_deg": [
+              10,
+              25
+            ],
+            "metrics": {
+              "frames": 20,
+              "rmse_rad": 0.3269348846338668,
+              "mae_rad": 0.18445507027013197,
+              "mean_error_rad": -0.030051910828013333,
+              "opposite_sign_frames": 2
+            }
+          },
+          {
+            "abs_target_deg": [
+              25,
+              60
+            ],
+            "metrics": {
+              "frames": 10,
+              "rmse_rad": 0.6371351378799737,
+              "mae_rad": 0.4513172385482453,
+              "mean_error_rad": -0.42408143744773935,
+              "opposite_sign_frames": 2
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Holdout создан пользователем и закреплён до вычисления прогнозов, но это не слепой биологический эксперимент.",
+    "Контекстные оси взяты из детерминированных обучающих доноров; полученные сочетания могут быть вне распределения.",
+    "Обе модели имеют одинаковые target-распределение и число кадров; они различаются контекстом закреплённой половины вариантов.",
+    "Основной вывод относится только к right_x на новом holdout; test_001/test_002 являются диагностическими регрессиями.",
+    "Supervised ridge, условные камеры и кинематика не доказывают зеркальные нейроны или автономное воспроизведение."
+  ]
+}

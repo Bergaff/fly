@@ -1,0 +1,69 @@
+{
+  "schema": "connectome-advantage-stage1-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "connectome-advantage-stage1-v1",
+    "scientific_result": null,
+    "stage": "96 engineered units; no biological IDs",
+    "actions": [
+      "foreleg_rubbing",
+      "head_directed_grooming",
+      "reach_withdraw"
+    ],
+    "models": [
+      "structured96",
+      "shuffled96",
+      "dense96"
+    ],
+    "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "workers": 6,
+    "worker_choice": "6",
+    "same_examples": true,
+    "same_units": 96,
+    "structured_vs_shuffled_same_parameter_count": true,
+    "dense96_is_unit_matched_not_parameter_matched": true,
+    "test_shift": "unseen view mixing, time shift, noise and partial occlusion",
+    "delay_s": 0.5,
+    "latent_state_held_without_input_during_delay": true,
+    "lesion_units": 10,
+    "primary": "structured96 accuracy >= shuffled96 +0.02, RMSE <=0.98*shuffled96, paired accuracy wins >=2/3 seeds",
+    "script_sha256": "dde8ea3ddd8e1641b5709080163132b23caf729298e9ca821bbadab3a7695a29"
+  },
+  "aggregate": {
+    "structured96": {
+      "accuracy": 0.9918981481481483,
+      "trajectory_rmse": 0.08410951311961086,
+      "lesion_accuracy": 0.9900462962962963,
+      "lesion_trajectory_rmse": 0.1077453696744043,
+      "trainable_parameters": 2505
+    },
+    "shuffled96": {
+      "accuracy": 0.9874999999999999,
+      "trajectory_rmse": 0.07881718322373814,
+      "lesion_accuracy": 0.9856481481481482,
+      "lesion_trajectory_rmse": 0.0968296248537955,
+      "trainable_parameters": 2505
+    },
+    "dense96": {
+      "accuracy": 0.9930555555555555,
+      "trajectory_rmse": 0.08383233091682067,
+      "lesion_accuracy": 0.9851851851851853,
+      "lesion_trajectory_rmse": 0.10939635232360047,
+      "trainable_parameters": 5577
+    }
+  },
+  "primary": {
+    "accuracy_margin_required": 0.02,
+    "rmse_ratio_required": 0.98,
+    "paired_seed_wins_required": 8,
+    "paired_seed_wins": 6,
+    "passed": false
+  },
+  "limitations": [
+    "The 96 units are engineered software units, not fly neurons.",
+    "Structured mask is a preregistered computational prior, not a connectome.",
+    "Dense96 has the same unit count but more parameters; shuffled96 is the parameter-matched primary control.",
+    "Synthetic actions and view shifts do not establish an advantage in animals.",
+    "A pass only authorizes frozen replication; it does not authorize FlyWire mapping."
+  ]
+}

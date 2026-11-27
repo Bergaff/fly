@@ -1,0 +1,42 @@
+{
+  "schema": "series-77-user-result-extract-v1",
+  "source": "user-pasted full summary.json; original local result files not supplied",
+  "status": "completed",
+  "mode": "full",
+  "script_sha256": "a54fb3cf3bb14e42392dfd690bea7dee47895f87d491d21cf47d876e06b89a9f",
+  "runner76_sha256": "f769c0fb403ee0478383219a6605cc08cb63f9976f61ba07a8ce29f52384db0b",
+  "source_model_sha256": "bb8de6a8fe5fd912a2c627267e988f3c7ef8515eeab79ce981a802feabf4f896",
+  "holdout_seed": 7702,
+  "holdouts": [121, 122, 123, 124, 125, 126, 127, 128, 129, 130],
+  "state_coefficients": 72,
+  "basis": "12-term cosine",
+  "delay_s": 0.5,
+  "state_unchanged_during_delay_count": 10,
+  "replay_access": ["compressed coefficient state", "replay phase"],
+  "forbidden_replay_access": ["observation RGB", "teacher commands", "saved framewise predictions"],
+  "axes": {
+    "left_proximal": {"normal": 0.20107908388615048, "zero": 0.49571359784869506, "wins": 10, "passed": true},
+    "left_middle": {"normal": 0.15151075474287906, "zero": 0.47806877563068717, "wins": 10, "passed": true},
+    "left_distal": {"normal": 0.34006912277400253, "zero": 0.48484126546180595, "wins": 10, "passed": true},
+    "right_proximal": {"normal": 0.21696419355298133, "zero": 0.5024466331368339, "wins": 10, "passed": true},
+    "right_middle": {"normal": 0.1548094217068698, "zero": 0.4850998848705795, "wins": 10, "passed": true},
+    "right_distal": {"normal": 0.34575805552107836, "zero": 0.4874667723001062, "wins": 10, "passed": true}
+  },
+  "combined_pooled_rmse": {
+    "normal": 0.2482013182662272,
+    "zero": 0.48900428586540373,
+    "shuffled": 0.4338244979188082,
+    "static": 0.6129713205426608,
+    "closed": 1.0309521696218453
+  },
+  "combined_wins_vs_zero": 10,
+  "better_than_controls": 3,
+  "contact_summary": {
+    "mean_normal_f1": 0.9558948845125119,
+    "mean_zero_f1": 0.8866887506904007,
+    "normal_better_f1": 8,
+    "zero_better_test_ids": [126, 130]
+  },
+  "primary_passed": true,
+  "interpretation": "Autonomous matched-view replay from an unchanged compressed state passes; it reconstructs the observed action and is not actuator dynamics, biological memory, or novel behavior generation."
+}

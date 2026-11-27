@@ -1,0 +1,90 @@
+{
+  "name": "fly-ideas",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:pages": "cross-env VITE_PUBLIC_SHOWCASE=1 npm run build",
+    "preview": "vite preview",
+    "lint": "oxlint",
+    "test": "node --test tests/app-update.test.cjs tests/brain-accounting.test.cjs tests/assistant-files.test.cjs tests/brian2-smoke.test.cjs tests/data-links.test.cjs tests/folder-sync.test.cjs tests/research-progress.test.cjs tests/small-sample-lif.test.cjs tests/result-copy.test.cjs tests/shiu-reference-check.test.cjs tests/shiu-mn9-adapted.test.cjs tests/compare-shiu.test.cjs tests/shiu-v630-control.test.cjs tests/shiu-original-check.test.cjs tests/shiu-top200.test.cjs tests/brain-launch.test.mjs tests/shiu-lesions.test.cjs tests/shiu-parallel.test.cjs tests/shiu-focused.test.cjs tests/shiu-shared.test.cjs tests/colab.test.cjs tests/two-flies.test.cjs tests/shiu-rank62-paths.test.cjs tests/research-memory.test.cjs tests/wing-studio.test.mjs tests/series69-demo.test.mjs tests/embodied-stack.test.cjs tests/connectome-advantage-stage1.test.cjs tests/complex-connectome-advantage-4h.test.cjs tests/stage92-paired-diagnostic.test.cjs tests/stage94-frozen-paired-loss.test.cjs tests/stage95-strong-controls.test.cjs tests/stage96-hybrid-multihead.test.cjs tests/flygym-two-body-preflight.test.cjs tests/frozen89e-flygym-adapter.test.cjs tests/frozen89e-flygym-replication.test.cjs tests/flygym-interbody-vision-preflight.test.cjs tests/frozen89e-official-eye-policy.test.cjs tests/official-eye-diagnostic-adaptation-105ab.test.cjs tests/temporal-crossfeature-adapter-105c.test.cjs tests/action-aware-temporal-tournament-105d.test.cjs tests/frozen-action-aware-physical-validation-106.test.cjs tests/grooming-temporal-order-repair-107.test.cjs tests/frozen-grooming-repair-physical-108.test.cjs tests/frozen-nuisance-robustness-109.test.cjs tests/nuisance-frontend-repair-110.test.cjs tests/operational-nuisance-router-111.test.cjs tests/frozen-operational-router-physical-112.test.cjs tests/fly-mirror-foundation-113abc.test.cjs tests/bridge-gap-diagnostic-114.test.cjs tests/digital-three-direction-closure-115abc.test.cjs tests/biological-digital-pipeline-116abc.test.cjs tests/frozen-action-specific-mirror-117.test.cjs tests/adaptive-three-direction-118.test.cjs tests/frozen-three-direction-stress-119.test.cjs tests/final-digital-product-120abc.test.cjs tests/local-ollama-narrow-benchmark-121.test.cjs tests/graph-core-baseline-benchmark-122.test.cjs tests/temporal-closed-loop-graph-benchmark-123.test.cjs tests/context-memory-graph-gate-124.test.cjs tests/multihop-structural-specificity-125.test.cjs tests/independent-physical-outcome-development-126.test.cjs tests/hour-flygym-ai-final-129.test.cjs",
+    "electron:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "electron:start": "npm run build && electron .",
+    "dist": "npm run build && electron-builder --win portable"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-dropdown-menu": "^2.1.24",
+    "@radix-ui/react-label": "^2.1.15",
+    "@radix-ui/react-scroll-area": "^1.2.18",
+    "@radix-ui/react-select": "^2.3.7",
+    "@radix-ui/react-slot": "^1.3.3",
+    "@radix-ui/react-tabs": "^1.1.21",
+    "@radix-ui/react-tooltip": "^1.2.16",
+    "@tailwindcss/vite": "^4.3.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.47.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "recharts": "^3.10.1",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "cross-env": "^10.1.0",
+    "electron": "^44.4.2",
+    "electron-builder": "^26.15.3",
+    "jsdom": "^26.1.0",
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "wait-on": "^9.1.0"
+  },
+  "description": "Просмотр, оценка и перенос идей научных статей между проектами (модель мозга мухи)",
+  "author": "Bergaff",
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "ai.arena.fly-ideas",
+    "productName": "Fly Ideas",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Fly-Ideas-${version}-win64.exe"
+    },
+    "extraResources": [
+      {
+        "from": "experiments/templates",
+        "to": "templates"
+      },
+      {
+        "from": "mcp",
+        "to": "mcp"
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "console-compute-accounting-user-extract-v1",
+  "source_file": "summary-10.json",
+  "source_file_sha256": "0d4302c46b4eaf830fba0e528e4cf55193bd1414b24a5a3ab5a7edcacce1d56d",
+  "status": "completed",
+  "protocol": {
+    "schema": "console-compute-accounting-v1",
+    "created_utc": "2026-11-17T06:13:37.748064+00:00",
+    "script_sha256": "fb9b532fdf9286561da0756364ecfdbb5e7e3e19238df1d1c4ad6488d0321859",
+    "runner84r_sha256": "d60f23d33185fde7c18e56ccf26a510166955ded4c5384ec0578ec67185cfd6d",
+    "python": "3.12.0",
+    "candidate_ids": [
+      900000,
+      900127
+    ],
+    "candidate_count": 128,
+    "workers": 2,
+    "fixed_count_not_time_budget": true,
+    "quick_edit_action": {
+      "platform": "nt",
+      "supported": true,
+      "disabled": true,
+      "mode_before": 487,
+      "mode_after": 423,
+      "quick_edit_before": true,
+      "quick_edit_after": false
+    },
+    "scientific_model_training": false
+  },
+  "candidate_count": 128,
+  "frames": 6272,
+  "coordinator_wall_seconds": 77.40691250000009,
+  "worker_cpu_seconds_sum": 144.5,
+  "worker_cpu_parallel_equivalent_seconds": 72.25,
+  "worker_reported_wall_seconds_sum": 144.82599549999895,
+  "throughput_candidates_per_wall_hour": 5952.956720757975,
+  "largest_batch": {
+    "batch_index": 0,
+    "candidate_indices": [
+      0,
+      1
+    ],
+    "wall_seconds": 5.326552200000037,
+    "worker_cpu_seconds": 2.28125,
+    "worker_reported_wall_max": 1.1929968999999119
+  },
+  "max_coordinator_to_worker_wall_ratio": 4.464849992485672,
+  "suspected_blocked_batches": 0,
+  "all_finite": true,
+  "unique_motion_hashes": 128,
+  "unique_rgb_hashes": 128,
+  "derived": {
+    "records": 128,
+    "batches": 64,
+    "first_sequence_id": 900000,
+    "last_sequence_id": 900127,
+    "frames_recomputed": 6272,
+    "parallel_cpu_utilization": 0.9333791733393308,
+    "batch_wall_excluding_startup": {
+      "min": 1.087069900000074,
+      "mean": 1.1405976634920596,
+      "median": 1.1381602000000157,
+      "p95": 1.196166500000004,
+      "max": 1.2428571000000375
+    },
+    "candidate_cpu_seconds": {
+      "min": 1.0625,
+      "mean": 1.12890625,
+      "median": 1.125,
+      "p95": 1.1875,
+      "max": 1.25
+    },
+    "feature_max_std": {
+      "min": 0.024635516107082367,
+      "mean": 0.04595992632675916,
+      "median": 0.044301923364400864,
+      "p95": 0.06436184048652649,
+      "max": 0.07718711346387863
+    },
+    "max_wall_ratio_excluding_startup": 1.0015663558532228,
+    "median_wall_ratio_excluding_startup": 1.0012147936214812,
+    "all_record_hashes_unique": true
+  },
+  "interpretation": [
+    "Fixed candidate count prevents a console stall from satisfying a time budget.",
+    "Worker CPU excludes time while a process is suspended or waiting; coordinator wall includes it.",
+    "QuickEdit is disabled for the current Windows console before workers start.",
+    "This is infrastructure diagnostics, not model training or scientific evidence."
+  ]
+}

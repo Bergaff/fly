@@ -1,0 +1,768 @@
+{
+  "schema": "stage92-paired-diagnostic-v1",
+  "source_folder": "E:\\ass\\fly\\fly-ideas\\workspace\\runs\\ideas\\i-connectome-advantage\\stage-2-complex-development\\complex_20261123_093838_f2166979",
+  "source_summary_schema": "complex-connectome-advantage-result-v1",
+  "read_only": true,
+  "replicates": 47262,
+  "metrics": 1985004,
+  "groups": {
+    "5": {
+      "clean": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.01336789245764744,
+          "median": 0.013333333333333308,
+          "q05": -0.053333333333333344,
+          "q25": -0.01333333333333342,
+          "q75": 0.040000000000000036,
+          "q95": 0.08000000000000007
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.004760222741690052,
+          "median": 0.004755682874109005,
+          "q05": -0.015352771063366103,
+          "q25": -0.0034406032498695074,
+          "q75": 0.013053596839903057,
+          "q95": 0.024822679122793054
+        },
+        "accuracy": {
+          "wins": 29304,
+          "ties": 992,
+          "losses": 16966,
+          "win_rate": 0.6200330074901612
+        },
+        "rmse": {
+          "wins": 30826,
+          "ties": 0,
+          "losses": 16436,
+          "win_rate": 0.6522364690448986
+        },
+        "joint": {
+          "dual_wins": 19330,
+          "accuracy_only": 9974,
+          "rmse_only": 11496,
+          "neither": 6462,
+          "dual_win_rate": 0.4089966569336888,
+          "dual_win_wilson95": [
+            0.40457174596063744,
+            0.41343636022119595
+          ]
+        },
+        "delta_correlation": 0.03995327011839858
+      },
+      "view_high": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.04301261525585507,
+          "median": 0.04222222222222222,
+          "q05": -0.013333333333333308,
+          "q25": 0.020000000000000018,
+          "q75": 0.06666666666666665,
+          "q95": 0.09999999999999998
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.018838856754883556,
+          "median": 0.018777965418905612,
+          "q05": -0.00959778060047914,
+          "q25": 0.00714410028569179,
+          "q75": 0.03040896786421772,
+          "q95": 0.04749561387617797
+        },
+        "accuracy": {
+          "wins": 42175,
+          "ties": 563,
+          "losses": 4524,
+          "win_rate": 0.8923659599678389
+        },
+        "rmse": {
+          "wins": 40809,
+          "ties": 0,
+          "losses": 6453,
+          "win_rate": 0.8634632474292243
+        },
+        "joint": {
+          "dual_wins": 36532,
+          "accuracy_only": 5643,
+          "rmse_only": 4277,
+          "neither": 810,
+          "dual_win_rate": 0.7729677119038552,
+          "dual_win_wilson95": [
+            0.7691688800164022,
+            0.7767221737264879
+          ]
+        },
+        "delta_correlation": 0.039981794255550596
+      },
+      "occlusion": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.03501596302408795,
+          "median": 0.03555555555555556,
+          "q05": -0.026666666666666672,
+          "q25": 0.00888888888888889,
+          "q75": 0.06,
+          "q95": 0.0977777777777778
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.012543921286704843,
+          "median": 0.012507014839424763,
+          "q05": -0.012177497238337106,
+          "q25": 0.00226205086418204,
+          "q75": 0.022763761474600776,
+          "q95": 0.037391513008225456
+        },
+        "accuracy": {
+          "wins": 38582,
+          "ties": 716,
+          "losses": 7964,
+          "win_rate": 0.8163429393593161
+        },
+        "rmse": {
+          "wins": 37567,
+          "ties": 0,
+          "losses": 9695,
+          "win_rate": 0.7948669121069781
+        },
+        "joint": {
+          "dual_wins": 30869,
+          "accuracy_only": 7713,
+          "rmse_only": 6698,
+          "neither": 1982,
+          "dual_win_rate": 0.6531462908890864,
+          "dual_win_wilson95": [
+            0.6488428825878448,
+            0.6574248057301953
+          ]
+        },
+        "delta_correlation": 0.03928404227861952
+      },
+      "lesion10": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.031482045712082525,
+          "median": 0.031111111111111145,
+          "q05": -0.040000000000000036,
+          "q25": 0.0022222222222222365,
+          "q75": 0.06000000000000005,
+          "q95": 0.10222222222222227
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.012091198792396566,
+          "median": 0.011938689125289309,
+          "q05": -0.01445476271317347,
+          "q25": 0.0012037931504356308,
+          "q75": 0.022954761015076243,
+          "q95": 0.038780223752964325
+        },
+        "accuracy": {
+          "wins": 35776,
+          "ties": 760,
+          "losses": 10726,
+          "win_rate": 0.7569717743641826
+        },
+        "rmse": {
+          "wins": 36561,
+          "ties": 0,
+          "losses": 10701,
+          "win_rate": 0.7735813126824933
+        },
+        "joint": {
+          "dual_wins": 27920,
+          "accuracy_only": 7856,
+          "rmse_only": 8641,
+          "neither": 2845,
+          "dual_win_rate": 0.5907494392958402,
+          "dual_win_wilson95": [
+            0.5863093336023097,
+            0.5951747939461947
+          ]
+        },
+        "delta_correlation": 0.0469618383190686
+      },
+      "lesion25": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.026883425255902087,
+          "median": 0.026666666666666672,
+          "q05": -0.05555555555555558,
+          "q25": -0.006666666666666654,
+          "q75": 0.06000000000000005,
+          "q95": 0.10888888888888892
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.011260278138161463,
+          "median": 0.011070644017869086,
+          "q05": -0.01690491902361169,
+          "q25": -0.00012291561672830853,
+          "q75": 0.022745833161395557,
+          "q95": 0.039448071920875204
+        },
+        "accuracy": {
+          "wins": 32828,
+          "ties": 707,
+          "losses": 13727,
+          "win_rate": 0.6945960814184757
+        },
+        "rmse": {
+          "wins": 35361,
+          "ties": 0,
+          "losses": 11901,
+          "win_rate": 0.7481909356353942
+        },
+        "joint": {
+          "dual_wins": 24871,
+          "accuracy_only": 7957,
+          "rmse_only": 10490,
+          "neither": 3944,
+          "dual_win_rate": 0.5262367229486691,
+          "dual_win_wilson95": [
+            0.5217332101984075,
+            0.5307359710000409
+          ]
+        },
+        "delta_correlation": 0.04883011020388983
+      },
+      "state_noise": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.03426934488125297,
+          "median": 0.033333333333333326,
+          "q05": -0.026666666666666672,
+          "q25": 0.00888888888888889,
+          "q75": 0.06,
+          "q95": 0.09555555555555556
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.012235881611435934,
+          "median": 0.012191364608978933,
+          "q05": -0.01235318211364049,
+          "q25": 0.0020032366957831588,
+          "q75": 0.022480800807276616,
+          "q95": 0.03700915988817151
+        },
+        "accuracy": {
+          "wins": 38375,
+          "ties": 719,
+          "losses": 8168,
+          "win_rate": 0.8119630993186916
+        },
+        "rmse": {
+          "wins": 37402,
+          "ties": 0,
+          "losses": 9860,
+          "win_rate": 0.791375735263002
+        },
+        "joint": {
+          "dual_wins": 30510,
+          "accuracy_only": 7865,
+          "rmse_only": 6892,
+          "neither": 1995,
+          "dual_win_rate": 0.6455503364224959,
+          "dual_win_wilson95": [
+            0.6412261136868979,
+            0.6498509003970755
+          ]
+        },
+        "delta_correlation": 0.041377282075406766
+      },
+      "combined_harsh": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.0325007170430555,
+          "median": 0.033333333333333326,
+          "q05": -0.033333333333333326,
+          "q25": 0.004444444444444445,
+          "q75": 0.06,
+          "q95": 0.09999999999999998
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.018062301144695758,
+          "median": 0.017969672133381465,
+          "q05": -0.012605853308598444,
+          "q25": 0.005354219166494825,
+          "q75": 0.03068732237474117,
+          "q95": 0.049093823223058275
+        },
+        "accuracy": {
+          "wins": 36888,
+          "ties": 716,
+          "losses": 9658,
+          "win_rate": 0.7805001904278278
+        },
+        "rmse": {
+          "wins": 39398,
+          "ties": 0,
+          "losses": 7864,
+          "win_rate": 0.8336083957513436
+        },
+        "joint": {
+          "dual_wins": 30865,
+          "accuracy_only": 6023,
+          "rmse_only": 8533,
+          "neither": 1841,
+          "dual_win_rate": 0.6530616562989294,
+          "dual_win_wilson95": [
+            0.6487580094727053,
+            0.6573404234221142
+          ]
+        },
+        "delta_correlation": 0.026216278116621982
+      }
+    },
+    "30": {
+      "clean": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.0032846214247762994,
+          "median": 0.0022222222222222365,
+          "q05": -0.008888888888888835,
+          "q25": -0.0022222222222222365,
+          "q75": 0.00666666666666671,
+          "q95": 0.01777777777777778
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.00011285060455729732,
+          "median": -0.00010502653430309941,
+          "q05": -0.018368195789349704,
+          "q25": -0.005586041252101432,
+          "q75": 0.005503696748840679,
+          "q95": 0.019506505251124295
+        },
+        "accuracy": {
+          "wins": 28462,
+          "ties": 6191,
+          "losses": 12609,
+          "win_rate": 0.6022174262621133
+        },
+        "rmse": {
+          "wins": 23369,
+          "ties": 0,
+          "losses": 23893,
+          "win_rate": 0.4944564343447167
+        },
+        "joint": {
+          "dual_wins": 15459,
+          "accuracy_only": 13003,
+          "rmse_only": 7910,
+          "neither": 10890,
+          "dual_win_rate": 0.3270915323092548,
+          "dual_win_wilson95": [
+            0.322876081193437,
+            0.3313350891664657
+          ]
+        },
+        "delta_correlation": 0.22171405811060138
+      },
+      "view_high": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.10897070232604066,
+          "median": 0.10888888888888892,
+          "q05": 0.033333333333333326,
+          "q25": 0.07777777777777783,
+          "q75": 0.14,
+          "q95": 0.18444444444444452
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.003354471943373763,
+          "median": 0.0033172382559924635,
+          "q05": -0.007877453029269956,
+          "q25": -0.0006829804490258544,
+          "q75": 0.007401520141661951,
+          "q95": 0.01459636178024605
+        },
+        "accuracy": {
+          "wins": 46815,
+          "ties": 54,
+          "losses": 393,
+          "win_rate": 0.9905420845499555
+        },
+        "rmse": {
+          "wins": 33702,
+          "ties": 0,
+          "losses": 13560,
+          "win_rate": 0.7130887393677796
+        },
+        "joint": {
+          "dual_wins": 33508,
+          "accuracy_only": 13307,
+          "rmse_only": 194,
+          "neither": 253,
+          "dual_win_rate": 0.7089839617451652,
+          "dual_win_wilson95": [
+            0.7048719684907184,
+            0.7130619852972454
+          ]
+        },
+        "delta_correlation": 0.20473948568282316
+      },
+      "occlusion": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.04597872850634054,
+          "median": 0.04444444444444451,
+          "q05": -0.0022222222222222365,
+          "q25": 0.02444444444444449,
+          "q75": 0.06666666666666665,
+          "q95": 0.09777777777777774
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.0014325361302403759,
+          "median": 0.0013675325018303597,
+          "q05": -0.011731460895235316,
+          "q25": -0.002811151105837656,
+          "q75": 0.005612265516460158,
+          "q95": 0.014763897003459482
+        },
+        "accuracy": {
+          "wins": 44121,
+          "ties": 447,
+          "losses": 2694,
+          "win_rate": 0.933540688079218
+        },
+        "rmse": {
+          "wins": 27949,
+          "ties": 0,
+          "losses": 19313,
+          "win_rate": 0.5913630400744785
+        },
+        "joint": {
+          "dual_wins": 26725,
+          "accuracy_only": 17396,
+          "rmse_only": 1224,
+          "neither": 1917,
+          "dual_win_rate": 0.5654648554864373,
+          "dual_win_wilson95": [
+            0.5609907447453913,
+            0.5699283251158985
+          ]
+        },
+        "delta_correlation": 0.2352824149638428
+      },
+      "lesion10": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.05221789645428087,
+          "median": 0.053333333333333344,
+          "q05": -0.06444444444444442,
+          "q25": 0.00666666666666671,
+          "q75": 0.09777777777777774,
+          "q95": 0.1644444444444445
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.00013502507264181673,
+          "median": 0.0002330252353295037,
+          "q05": -0.01495843874732803,
+          "q25": -0.005668866937439045,
+          "q75": 0.005932816973021532,
+          "q95": 0.014878590363070973
+        },
+        "accuracy": {
+          "wins": 36756,
+          "ties": 447,
+          "losses": 10059,
+          "win_rate": 0.777707248952647
+        },
+        "rmse": {
+          "wins": 24103,
+          "ties": 0,
+          "losses": 23159,
+          "win_rate": 0.5099868816385257
+        },
+        "joint": {
+          "dual_wins": 19410,
+          "accuracy_only": 17346,
+          "rmse_only": 4693,
+          "neither": 5813,
+          "dual_win_rate": 0.4106893487368287,
+          "dual_win_wilson95": [
+            0.40626150299004554,
+            0.41513171165620383
+          ]
+        },
+        "delta_correlation": 0.13548509380903706
+      },
+      "lesion25": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.04616186835559693,
+          "median": 0.046666666666666745,
+          "q05": -0.12222222222222223,
+          "q25": -0.022222222222222254,
+          "q75": 0.11555555555555563,
+          "q95": 0.21333333333333326
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": -0.00082318710879385,
+          "median": -0.0007134457656009438,
+          "q05": -0.018450369973388253,
+          "q25": -0.007869372433851957,
+          "q75": 0.006301738295888707,
+          "q95": 0.016643867578972408
+        },
+        "accuracy": {
+          "wins": 31731,
+          "ties": 368,
+          "losses": 15163,
+          "win_rate": 0.6713850450679193
+        },
+        "rmse": {
+          "wins": 22303,
+          "ties": 0,
+          "losses": 24959,
+          "win_rate": 0.47190131606787694
+        },
+        "joint": {
+          "dual_wins": 16046,
+          "accuracy_only": 15685,
+          "rmse_only": 6257,
+          "neither": 9274,
+          "dual_win_rate": 0.33951165841479414,
+          "dual_win_wilson95": [
+            0.3352556016883064,
+            0.343793802029249
+          ]
+        },
+        "delta_correlation": 0.1642781390829523
+      },
+      "state_noise": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.04770264106940507,
+          "median": 0.046666666666666745,
+          "q05": -0.004444444444444473,
+          "q25": 0.026666666666666616,
+          "q75": 0.06888888888888889,
+          "q95": 0.10000000000000009
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.0010036068460069335,
+          "median": 0.0009411047183818938,
+          "q05": -0.011887617063375919,
+          "q25": -0.0032084857776305854,
+          "q75": 0.005119551549435757,
+          "q95": 0.01409921679547304
+        },
+        "accuracy": {
+          "wins": 44039,
+          "ties": 408,
+          "losses": 2815,
+          "win_rate": 0.9318056789809995
+        },
+        "rmse": {
+          "wins": 26613,
+          "ties": 0,
+          "losses": 20649,
+          "win_rate": 0.5630950869620414
+        },
+        "joint": {
+          "dual_wins": 25394,
+          "accuracy_only": 18645,
+          "rmse_only": 1219,
+          "neither": 2004,
+          "dual_win_rate": 0.5373026956116965,
+          "dual_win_wilson95": [
+            0.532804635003338,
+            0.5417946927812303
+          ]
+        },
+        "delta_correlation": 0.22901472249153101
+      },
+      "combined_harsh": {
+        "n": 47262,
+        "accuracy_delta_structured_minus_shuffled": {
+          "mean": 0.08114402456283884,
+          "median": 0.0822222222222222,
+          "q05": -0.05555555555555558,
+          "q25": 0.02444444444444449,
+          "q75": 0.13777777777777778,
+          "q95": 0.2155555555555556
+        },
+        "rmse_improvement_shuffled_minus_structured": {
+          "mean": 0.001902637340887964,
+          "median": 0.00197181252943171,
+          "q05": -0.013638755606473808,
+          "q25": -0.00425975829314441,
+          "q75": 0.008210270355969544,
+          "q95": 0.01725511794443623
+        },
+        "accuracy": {
+          "wins": 39325,
+          "ties": 290,
+          "losses": 7647,
+          "win_rate": 0.8320638144809783
+        },
+        "rmse": {
+          "wins": 27675,
+          "ties": 0,
+          "losses": 19587,
+          "win_rate": 0.5855655706487242
+        },
+        "joint": {
+          "dual_wins": 23796,
+          "accuracy_only": 15529,
+          "rmse_only": 3879,
+          "neither": 4058,
+          "dual_win_rate": 0.5034911768439762,
+          "dual_win_wilson95": [
+            0.49898341306277694,
+            0.5079983731450811
+          ]
+        },
+        "delta_correlation": 0.1653698423945865
+      }
+    }
+  },
+  "harsh_all_budgets": {
+    "n": 94524,
+    "accuracy_delta_structured_minus_shuffled": {
+      "mean": 0.056822370802947164,
+      "median": 0.04888888888888887,
+      "q05": -0.04222222222222222,
+      "q25": 0.011111111111111127,
+      "q75": 0.09333333333333338,
+      "q95": 0.1866666666666667
+    },
+    "rmse_improvement_shuffled_minus_structured": {
+      "mean": 0.009982469242791862,
+      "median": 0.0072526341553404705,
+      "q05": -0.01331650841234598,
+      "q25": -0.0014821290102353946,
+      "q75": 0.01941983903517605,
+      "q95": 0.04219287141163076
+    },
+    "accuracy": {
+      "wins": 76213,
+      "ties": 1006,
+      "losses": 17305,
+      "win_rate": 0.8062820024544031
+    },
+    "rmse": {
+      "wins": 67073,
+      "ties": 0,
+      "losses": 27451,
+      "win_rate": 0.7095869832000339
+    },
+    "joint": {
+      "dual_wins": 54661,
+      "accuracy_only": 21552,
+      "rmse_only": 12412,
+      "neither": 5899,
+      "dual_win_rate": 0.5782764165714528,
+      "dual_win_wilson95": [
+        0.5751251238914847,
+        0.5814213471971044
+      ]
+    },
+    "delta_correlation": -0.10406551110977341
+  },
+  "overall": {
+    "n": 661668,
+    "accuracy_delta_structured_minus_shuffled": {
+      "mean": 0.04299946330922591,
+      "median": 0.0377777777777778,
+      "q05": -0.03999999999999998,
+      "q25": 0.006666666666666599,
+      "q75": 0.07333333333333336,
+      "q95": 0.1466666666666666
+    },
+    "rmse_improvement_shuffled_minus_structured": {
+      "mean": 0.006922185807063034,
+      "median": 0.004710039826600287,
+      "q05": -0.014165594509032937,
+      "q25": -0.0023810456017726266,
+      "q75": 0.014824961839912738,
+      "q95": 0.034742140965405593
+    },
+    "accuracy": {
+      "wins": 525177,
+      "ties": 13378,
+      "losses": 123113,
+      "win_rate": 0.7937167884800232
+    },
+    "rmse": {
+      "wins": 443638,
+      "ties": 0,
+      "losses": 218030,
+      "win_rate": 0.6704842912155341
+    },
+    "joint": {
+      "dual_wins": 361235,
+      "accuracy_only": 163942,
+      "rmse_only": 82403,
+      "neither": 54088,
+      "dual_win_rate": 0.5459460031314798,
+      "dual_win_wilson95": [
+        0.544746084135278,
+        0.5471453886315647
+      ]
+    },
+    "delta_correlation": 0.019570157824832245
+  },
+  "lowest_dual_win_groups": [
+    {
+      "budget": 30,
+      "scenario": "clean",
+      "dual_win_rate": 0.3270915323092548,
+      "accuracy_win_rate": 0.6022174262621133,
+      "rmse_win_rate": 0.4944564343447167,
+      "delta_correlation": 0.22171405811060138
+    },
+    {
+      "budget": 30,
+      "scenario": "lesion25",
+      "dual_win_rate": 0.33951165841479414,
+      "accuracy_win_rate": 0.6713850450679193,
+      "rmse_win_rate": 0.47190131606787694,
+      "delta_correlation": 0.1642781390829523
+    },
+    {
+      "budget": 5,
+      "scenario": "clean",
+      "dual_win_rate": 0.4089966569336888,
+      "accuracy_win_rate": 0.6200330074901612,
+      "rmse_win_rate": 0.6522364690448986,
+      "delta_correlation": 0.03995327011839858
+    },
+    {
+      "budget": 30,
+      "scenario": "lesion10",
+      "dual_win_rate": 0.4106893487368287,
+      "accuracy_win_rate": 0.777707248952647,
+      "rmse_win_rate": 0.5099868816385257,
+      "delta_correlation": 0.13548509380903706
+    },
+    {
+      "budget": 30,
+      "scenario": "combined_harsh",
+      "dual_win_rate": 0.5034911768439762,
+      "accuracy_win_rate": 0.8320638144809783,
+      "rmse_win_rate": 0.5855655706487242,
+      "delta_correlation": 0.1653698423945865
+    },
+    {
+      "budget": 5,
+      "scenario": "lesion25",
+      "dual_win_rate": 0.5262367229486691,
+      "accuracy_win_rate": 0.6945960814184757,
+      "rmse_win_rate": 0.7481909356353942,
+      "delta_correlation": 0.04883011020388983
+    },
+    {
+      "budget": 30,
+      "scenario": "state_noise",
+      "dual_win_rate": 0.5373026956116965,
+      "accuracy_win_rate": 0.9318056789809995,
+      "rmse_win_rate": 0.5630950869620414,
+      "delta_correlation": 0.22901472249153101
+    }
+  ],
+  "gate_reproduction": {
+    "harsh_dual_win_rate": 0.5782764165714528,
+    "harsh_required": 0.6,
+    "overall_dual_win_rate": 0.5459460031314798,
+    "overall_required": 0.55,
+    "candidate": false
+  },
+  "interpretation_boundary": "diagnosis of disclosed development data only; no threshold or architecture is changed and no frozen evidence is created"
+}

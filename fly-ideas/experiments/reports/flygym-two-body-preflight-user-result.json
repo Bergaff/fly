@@ -1,0 +1,65 @@
+{
+  "schema": "flygym-two-body-preflight-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "flygym-two-body-preflight-v1",
+    "line": "new official-body roadmap; not synthetic Stage97",
+    "script_sha256": "0fa2c86ced6c472f985fd407ddeabcb448d2ba5a941dd454942f68b8f1749977",
+    "created_utc": "2026-11-25T09:13:19.130523+00:00",
+    "fixture": false,
+    "flygym_version": "2.1.1",
+    "duration_s": 0.36,
+    "timestep_s": 0.0005,
+    "observer_command_delay_s": 0.08,
+    "training_allowed": false,
+    "visual_inference_present": false,
+    "primary_rule": "exact FlyGym2.1.1; two NeuroMechFly bodies; >=30 actuators each; finite response>=0.015rad; nonzero force; contact both; thorax z in[0.15,2.5]mm"
+  },
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]",
+  "metrics": {
+    "runtime": "official_flygym",
+    "flygym_version": "2.1.1",
+    "mujoco_version": "3.16.0",
+    "two_official_bodies": true,
+    "body_names": [
+      "demonstrator",
+      "observer"
+    ],
+    "actuated_dofs_each": 42,
+    "physics_steps": 720,
+    "sampled_rows": 37,
+    "all_finite": true,
+    "demonstrator_command_response_rad": 0.12494850256416104,
+    "observer_delayed_response_rad": 0.12210590019424314,
+    "nonzero_actuator_force": true,
+    "maximum_actuator_force_norm": [
+      9.464207887916961,
+      9.006260620421006
+    ],
+    "ground_contact_both": true,
+    "minimum_thorax_z_mm": 1.0199447809229414,
+    "maximum_thorax_z_mm": 1.9975475
+  },
+  "primary": {
+    "checks": {
+      "exact_flygym_version": true,
+      "two_official_bodies": true,
+      "actuators_present": true,
+      "finite_physics": true,
+      "demonstrator_responds": true,
+      "observer_responds_after_delay": true,
+      "real_actuator_force": true,
+      "ground_contact_for_both": true,
+      "bodies_remain_supported": true
+    },
+    "passed": true,
+    "scientific_result": false,
+    "next_authorized_step": "frozen89E policy adapter prototype"
+  },
+  "limitations": [
+    "Short technical body/runtime gate, not a scientific observation-to-action result.",
+    "Observer receives a delayed diagnostic motor command, not visual input or frozen89E state.",
+    "No training, FlyVis, connectome mapping, biological neuron claim, or live-fly claim."
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "five-hour-wing-observation-user-summary-extract-v1",
+  "source": "Текст summary.json и ОТЧЕТ, вставленный пользователем; оригинальный файл и папка запуска независимо не получены",
+  "status": "completed",
+  "protocol_mode": "long",
+  "active_training_seconds": 18000.5,
+  "candidates": 40516,
+  "accepted_candidates": 40516,
+  "training_frames": 1985284,
+  "baseline_model_sha256": "8eba6ceb1c94513f47ad95becb42d8fb0fd6007f81eb0553209b22a12808aeec",
+  "new_model_sha256": "46966f268f6e6ed1d073b94ad77dcbbc472b3b7805c3002a3c43e90e2ef1b8c1",
+  "audit": { "accepted_total": 40516, "audited_count": 128, "is_exhaustive": false },
+  "tests": [
+    { "test_id": 1, "role": "regression", "movement": null, "rmse_rad": { "old": 0.1087124191527928, "new": 0.1586673080895117, "zero": 0.21308210046565054, "training_mean": 0.20482095020428034 }, "mae_rad": { "old": 0.03629949306191737, "new": 0.057458191759254755, "zero": 0.1558994576614744, "training_mean": 0.15157733631881773 }, "new_axis_rmse_rad": { "left_x": 0.2384411961939869, "left_y": 0.07399821995846195, "left_z": 0.06008015340579509, "right_x": 0.21166193239990794, "right_y": 0.07177136750413234, "right_z": 0.1875111188299285 }, "overlap": { "under_0_001_deg": 42, "under_1_deg": 43, "under_5_deg": 44 } },
+    { "test_id": 2, "role": "new_test", "movement": 71, "rmse_rad": { "old": 0.4051921524810398, "new": 0.42783627602164864, "zero": 0.39008994571301187, "training_mean": 0.41104825336285805 }, "mae_rad": { "old": 0.3227872216236976, "new": 0.3272031002585176, "zero": 0.3300168282770992, "training_mean": 0.35693477151906583 }, "new_axis_rmse_rad": { "left_x": 0.6169861908587266, "left_y": 0.22428034530387267, "left_z": 0.46803021244908777, "right_x": 0.5436277197211596, "right_y": 0.29546044271280314, "right_z": 0.255752596972224 }, "overlap": { "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 3 } },
+    { "test_id": 3, "role": "new_test", "movement": 72, "rmse_rad": { "old": 0.3809544769597686, "new": 0.2898874782463908, "zero": 0.41082342513182546, "training_mean": 0.4342284560777269 }, "mae_rad": { "old": 0.3068964458165714, "new": 0.22066337766133406, "zero": 0.3530433014153156, "training_mean": 0.3679159807252375 }, "new_axis_rmse_rad": { "left_x": 0.3345530777202768, "left_y": 0.2896673076201577, "left_z": 0.224066335713232, "right_x": 0.3574697544664353, "right_y": 0.2314599234204252, "right_z": 0.2771489582160684 }, "overlap": { "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 0 } },
+    { "test_id": 4, "role": "new_test", "movement": 73, "rmse_rad": { "old": 0.5217446101915686, "new": 0.4441836615351423, "zero": 0.4405240592099833, "training_mean": 0.46557422797127684 }, "mae_rad": { "old": 0.4057536508903539, "new": 0.35332245205749585, "zero": 0.3759344224890915, "training_mean": 0.39631844357377494 }, "new_axis_rmse_rad": { "left_x": 0.6239921341323861, "left_y": 0.2870104639501358, "left_z": 0.5912469887088331, "right_x": 0.25196584621899, "right_y": 0.29835346225247095, "right_z": 0.45823463794925184 }, "overlap": { "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 0 } },
+    { "test_id": 5, "role": "new_test", "movement": 74, "rmse_rad": { "old": 0.40370364658943, "new": 0.40475308492728024, "zero": 0.3473868305270432, "training_mean": 0.346271288005601 }, "mae_rad": { "old": 0.31157461797606817, "new": 0.2997819071029085, "zero": 0.2949891387585028, "training_mean": 0.2873059624476728 }, "new_axis_rmse_rad": { "left_x": 0.3587998075377048, "left_y": 0.2486300467601268, "left_z": 0.3956429085892335, "right_x": 0.6691567821730096, "right_y": 0.3258026365242893, "right_z": 0.2862598265502873 }, "overlap": { "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 0 } },
+    { "test_id": 6, "role": "new_test", "movement": 75, "rmse_rad": { "old": 0.4735874105294033, "new": 0.4651164381556998, "zero": 0.43017484734305966, "training_mean": 0.45786486708302315 }, "mae_rad": { "old": 0.3822546713062532, "new": 0.36456166413627805, "zero": 0.3712113478194089, "training_mean": 0.3846117342373115 }, "new_axis_rmse_rad": { "left_x": 0.7759481995143809, "left_y": 0.36700669084063886, "left_z": 0.4231793570064474, "right_x": 0.1919998087895002, "right_y": 0.42517103168855525, "right_z": 0.40558006095684546 }, "overlap": { "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 0 } }
+  ],
+  "derived_new_holdout_aggregate": {
+    "pooled_rmse_rad": { "old": 0.440178623264104, "new": 0.41098323934187025, "zero": 0.4051507147806888, "training_mean": 0.4251631267683889 },
+    "new_minus_old_rmse_rad": -0.029195383922233753,
+    "new_relative_to_old_percent": -6.632621935553818,
+    "new_minus_zero_rmse_rad": 0.00583252456118144,
+    "new_relative_to_zero_percent": 1.4395937976658058,
+    "wins": { "new_better_than_old": 3, "new_better_than_zero": 1, "new_better_than_training_mean": 2, "holdouts": 5 },
+    "pooled_axis_rmse_rad": {
+      "left_x": { "old": 0.6056567359944753, "new": 0.5679430984082533, "zero": 0.4375132212590607 },
+      "left_y": { "old": 0.29989699785556845, "new": 0.28743508487634295, "zero": 0.41115510916244624 },
+      "left_z": { "old": 0.4705499306160888, "new": 0.4369084763371921, "zero": 0.4796992068707455 },
+      "right_x": { "old": 0.46344590930563984, "new": 0.4407804978451948, "zero": 0.38227196911440486 },
+      "right_y": { "old": 0.3690830215925966, "new": 0.32149747182657745, "zero": 0.3644746791753711 },
+      "right_z": { "old": 0.36518954834421236, "new": 0.34601728092127415, "zero": 0.3396046058876302 }
+    }
+  }
+}

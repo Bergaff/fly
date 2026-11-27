@@ -1,0 +1,119 @@
+{
+  "schema": "multihop-structural-specificity-125-v1",
+  "status": "completed",
+  "contract": {
+    "case_count": 600,
+    "final_seed": 125000003,
+    "hops": 4,
+    "gamma": 0.65,
+    "targets_generated_by_same_frozen_graph": true,
+    "structural_self_consistency_only": true,
+    "independent_behavior_target": false,
+    "frozen_input_shas": {
+      "matrix": "03157b503d0271cb0991db524d45220bb8f49ce62e3ba171dc997ed7f3816150",
+      "paths": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+      "prototypes": "28edd80b81111d47708f163aaf9b250f7ad330a87d6c9dc5ee70e7895843ca04"
+    },
+    "not_biological_validation": true,
+    "not_physical_flygym_run": true
+  },
+  "models": [
+    {
+      "name": "full_multihop",
+      "type_rmse": 0.0,
+      "type_cosine": 0.9999999999999493,
+      "dn_rmse": 0.0,
+      "dn_top1_accuracy": 1.0,
+      "mean_seconds_per_case": 2.137016667044615e-06
+    },
+    {
+      "name": "one_hop",
+      "type_rmse": 0.0029384868187687352,
+      "type_cosine": 0.9921165015949359,
+      "dn_rmse": 0.0019444683555595202,
+      "dn_top1_accuracy": 0.895,
+      "mean_seconds_per_case": 8.471000001009088e-07
+    },
+    {
+      "name": "identity",
+      "type_rmse": 0.00817510933592226,
+      "type_cosine": 0.9577440071283757,
+      "dn_rmse": 0.004584406311248259,
+      "dn_top1_accuracy": 0.855,
+      "mean_seconds_per_case": 6.309899996873962e-07
+    },
+    {
+      "name": "weight_shuffled",
+      "type_rmse": 0.0019848127825787096,
+      "type_cosine": 0.9939506351731766,
+      "dn_rmse": 0.0018169683472545747,
+      "dn_top1_accuracy": 0.7733333333333333,
+      "mean_seconds_per_case": 1.1340283337328097e-06
+    },
+    {
+      "name": "topology_rewired",
+      "type_rmse": 0.004179298509467612,
+      "type_cosine": 0.9728106493503098,
+      "dn_rmse": 0.0043889192382012615,
+      "dn_top1_accuracy": 0.8716666666666667,
+      "mean_seconds_per_case": 9.630116664993692e-07
+    },
+    {
+      "name": "node_labels_permuted",
+      "type_rmse": 0.006280877357540419,
+      "type_cosine": 0.9378289831185009,
+      "dn_rmse": 0.006185623477925109,
+      "dn_top1_accuracy": 0.78,
+      "mean_seconds_per_case": 9.000633326650131e-07
+    },
+    {
+      "name": "rank8_approximation",
+      "type_rmse": 0.0002490252462013774,
+      "type_cosine": 0.9999119760584783,
+      "dn_rmse": 0.00020197364446760587,
+      "dn_top1_accuracy": 0.9533333333333334,
+      "mean_seconds_per_case": 9.189699994749389e-07
+    },
+    {
+      "name": "matched_random_weights",
+      "type_rmse": 0.0016273186337447058,
+      "type_cosine": 0.9959534933848897,
+      "dn_rmse": 0.0006472727889276167,
+      "dn_top1_accuracy": 0.805,
+      "mean_seconds_per_case": 9.012999998958548e-07
+    }
+  ],
+  "edge_lesions": [
+    {
+      "edge_dropout": 0.1,
+      "type_rmse": 0.000617302182660137,
+      "type_cosine": 0.9994208171058411,
+      "dn_rmse": 0.0003659810171428504,
+      "dn_top1_accuracy": 0.9783333333333334
+    },
+    {
+      "edge_dropout": 0.25,
+      "type_rmse": 0.0008999446046784603,
+      "type_cosine": 0.9987863415397317,
+      "dn_rmse": 0.00033206079172126923,
+      "dn_top1_accuracy": 0.72
+    },
+    {
+      "edge_dropout": 0.5,
+      "type_rmse": 0.0023949520173981663,
+      "type_cosine": 0.9912996904261225,
+      "dn_rmse": 0.0006882421100965347,
+      "dn_top1_accuracy": 0.5183333333333333
+    }
+  ],
+  "gates": {
+    "structural_specificity_pass": true,
+    "external_behavior_advantage_claim": false,
+    "new_physical_port_authorized": false
+  },
+  "interpretation": {
+    "full_graph_zero_error_is_true_by_construction": true,
+    "control_failures_show_nonredundant_multihop_topology_for_its_own_defined_operator": true,
+    "does_not_show_real_world_utility": true
+  }
+}

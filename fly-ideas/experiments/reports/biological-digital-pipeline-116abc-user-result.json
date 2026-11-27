@@ -1,0 +1,215 @@
+{
+  "schema": "biological-indexed-digital-pipeline-116abc-v1",
+  "status": "completed",
+  "created_utc": "2026-11-26T08:59:07.723841+00:00",
+  "scope": "fully digital with real FlyVis/FlyWire identities and structural connectivity",
+  "inputs": {
+    "series115_sha256": "c98e5a7753bf6d816ba826f5609bf32ce03073b6f76a30cf976cbb840bc2adf2",
+    "connectivity_sha256": "215cf7a65895f9f84768db34052964542f7ebbe986ce9864b7e9ed2976c55e38",
+    "connectivity_commit": "0d8574d46627ce7fadd968a3c5d602e837325373",
+    "annotation_commit": "8587524c1748ce5ef2080822a2fc890fc03bf597"
+  },
+  "direction_a_real_neuron_map": {
+    "schema": "real-type-structural-map-116a-v1",
+    "matrix_shape": [
+      61,
+      61
+    ],
+    "flyvis_types": [
+      "Am",
+      "C2",
+      "C3",
+      "CT1(Lo1)",
+      "CT1(M10)",
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "Lawf1",
+      "Lawf2",
+      "Mi1",
+      "Mi10",
+      "Mi13",
+      "Mi14",
+      "Mi15",
+      "Mi2",
+      "Mi4",
+      "Mi9",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6",
+      "R7",
+      "R8",
+      "T1",
+      "T2",
+      "T2a",
+      "T3",
+      "T4a",
+      "T4b",
+      "T4c",
+      "T4d",
+      "T5a",
+      "T5b",
+      "T5c",
+      "T5d",
+      "Tm1",
+      "Tm16",
+      "Tm2",
+      "Tm20",
+      "Tm3",
+      "Tm30",
+      "Tm4",
+      "Tm5Y",
+      "Tm5a",
+      "Tm5b",
+      "Tm5c",
+      "Tm9",
+      "TmY10",
+      "TmY13",
+      "TmY14",
+      "TmY15",
+      "TmY18",
+      "TmY3",
+      "TmY4",
+      "TmY5a",
+      "TmY9"
+    ],
+    "mapped_root_sets": 61,
+    "unique_root_ids": 64667,
+    "nonzero_type_edges": 2489,
+    "total_type_synapses": 7335202,
+    "source_connection_rows": 72954,
+    "old_artificial96_identity_mapping": "not_attempted_not_needed",
+    "real_identity_fraction": 1.0,
+    "passed": true,
+    "interpretation": "Rows and columns are61 reviewed FlyVis→FlyWire type/root sets. This replaces, rather than relabels, the artificial96×96 browser matrix."
+  },
+  "direction_b_digital_motor_readout": {
+    "schema": "structural-dn-digital-readout-116b-v1",
+    "visual_types": 61,
+    "reachable_dn_types": 8,
+    "dn_types": [
+      "DNc01",
+      "DNc02",
+      "DNg33",
+      "DNp11",
+      "DNp27",
+      "DNp30",
+      "DNp31",
+      "DNpe053"
+    ],
+    "dn_root_counts": {
+      "DNc01": 2,
+      "DNc02": 2,
+      "DNg33": 2,
+      "DNp11": 2,
+      "DNp27": 2,
+      "DNp30": 2,
+      "DNp31": 2,
+      "DNpe053": 2
+    },
+    "path_definition": "direct log-synapses plus0.25× two-hop bottleneck log-synapses",
+    "train_cases": 12,
+    "held_out_cases": 6,
+    "held_out_correct": 6,
+    "held_out_total": 6,
+    "shuffled_structure_correct": 2,
+    "zero_input_correct": 2,
+    "actions": [
+      "foreleg_rubbing",
+      "head_directed_grooming",
+      "reach_withdraw"
+    ],
+    "passed": true,
+    "claim": "digital structural readout; action names are frozen project labels, not biological DN function labels"
+  },
+  "direction_c_digital_mirror_evaluation": {
+    "schema": "digital-observe-execute-116c-v1",
+    "held_out_pairs": 6,
+    "same_action_mean_centered_cosine": 0.874377457845905,
+    "other_action_mean_centered_cosine": 0.8719646825021364,
+    "shuffled_structure_same_action_mean": 0.5079012935156593,
+    "same_minus_other": 0.002412775343768603,
+    "same_minus_shuffled": 0.36647616433024577,
+    "descriptive_type_candidates": [
+      {
+        "flyvis_type": "TmY5a",
+        "root_count": 1176,
+        "score": 0.0006557334418204444
+      },
+      {
+        "flyvis_type": "TmY9",
+        "root_count": 735,
+        "score": 0.0005513257325943917
+      },
+      {
+        "flyvis_type": "Tm4",
+        "root_count": 1489,
+        "score": 0.0004099529362302392
+      },
+      {
+        "flyvis_type": "T2",
+        "root_count": 1466,
+        "score": 0.0004029607227927492
+      },
+      {
+        "flyvis_type": "Mi4",
+        "root_count": 1532,
+        "score": 0.00038572086586760606
+      },
+      {
+        "flyvis_type": "TmY15",
+        "root_count": 257,
+        "score": 0.00038180112199770255
+      },
+      {
+        "flyvis_type": "Tm3",
+        "root_count": 1756,
+        "score": 0.0003665798821195026
+      },
+      {
+        "flyvis_type": "TmY4",
+        "root_count": 432,
+        "score": 0.0003601780313976747
+      },
+      {
+        "flyvis_type": "Mi1",
+        "root_count": 1581,
+        "score": 0.0003496410479806739
+      },
+      {
+        "flyvis_type": "TmY3",
+        "root_count": 734,
+        "score": 0.0003429899015818481
+      },
+      {
+        "flyvis_type": "TmY13",
+        "root_count": 377,
+        "score": 0.0003387444570442783
+      },
+      {
+        "flyvis_type": "Tm1",
+        "root_count": 1554,
+        "score": 0.00033862137860411106
+      }
+    ],
+    "pipeline_completed": true,
+    "action_specificity_supported": false,
+    "structure_specificity_supported": true,
+    "biological_mirror_neuron_claim": false,
+    "development_analysis": true,
+    "threshold_selected_before_checked_run_but_after_method_development": true,
+    "interpretation": "Completed digital observe/execute development test on real type/root labels. Structure specificity passes; action specificity is reported against the finalized Series116 threshold, not an independent confirmatory threshold."
+  },
+  "primary": {
+    "all_three_digital_directions_implemented": true,
+    "real_type_root_identity_matrix": true,
+    "old_artificial96_mapped": false,
+    "digital_pipeline_complete": true,
+    "biological_function_claimed": false
+  }
+}

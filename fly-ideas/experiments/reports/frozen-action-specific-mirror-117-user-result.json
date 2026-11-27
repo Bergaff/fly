@@ -1,0 +1,161 @@
+{
+  "schema": "frozen-action-specific-mirror-confirmation-117-v1",
+  "status": "completed",
+  "created_utc": "2026-11-26T09:12:57.746899+00:00",
+  "protocol": {
+    "series116_user_sha256": "3bf8603cccc0b2770775bb4cbc5f846221303e0d5c1860b0f5c4fc547a1e6bf1",
+    "matrix_sha256": "03157b503d0271cb0991db524d45220bb8f49ce62e3ba171dc997ed7f3816150",
+    "paths_sha256": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+    "manifest_sha256": "37c92d1d7b4bf75824ff1a214f8d3ece8de773990e90039bff9a9e88a2711288",
+    "frozen_candidate_types": [
+      "TmY5a",
+      "TmY9",
+      "Tm4",
+      "T2",
+      "Mi4",
+      "TmY15",
+      "Tm3",
+      "TmY4",
+      "Mi1",
+      "TmY3",
+      "TmY13",
+      "Tm1"
+    ],
+    "development_cases": 18,
+    "untouched_final_cases": 12,
+    "ridge": 0.01,
+    "primary_margin_threshold": 0.1,
+    "minimum_margin_advantage_over_controls": 0.2,
+    "post_final_tuning": false,
+    "development_disclosure": "method and thresholds developed after Series116; Series117 final seeds first evaluated by this frozen runner"
+  },
+  "real": {
+    "same_action_mean": 0.4432541674702651,
+    "other_action_mean": -0.22054725107350634,
+    "margin": 0.6638014185437714,
+    "correct": 12,
+    "total": 12,
+    "predicted": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+    ]
+  },
+  "controls": {
+    "rotated_action_pairing": {
+      "same_action_mean": -0.28809989303334826,
+      "other_action_mean": 0.1494759668349704,
+      "margin": -0.43757585986831865,
+      "correct": 0,
+      "total": 12,
+      "predicted": [
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "retrained_shuffled_structure": {
+      "same_action_mean": 0.4397744337921156,
+      "other_action_mean": -0.2179331578191055,
+      "margin": 0.6577075916112212,
+      "correct": 8,
+      "total": 12,
+      "predicted": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0
+      ]
+    },
+    "reversed_candidate_identity": {
+      "same_action_mean": 0.44043028332221223,
+      "other_action_mean": -0.22060746996231853,
+      "margin": 0.6610377532845307,
+      "correct": 4,
+      "total": 12,
+      "predicted": [
+        0,
+        0,
+        0,
+        0,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "zero_execution": {
+      "same_action_mean": 0.002221113728257599,
+      "other_action_mean": 0.002221113728257567,
+      "margin": 3.209238430557093e-17,
+      "correct": 4,
+      "total": 12,
+      "predicted": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "candidate_root_counts": {
+    "TmY5a": 1176,
+    "TmY9": 735,
+    "Tm4": 1489,
+    "T2": 1466,
+    "Mi4": 1532,
+    "TmY15": 257,
+    "Tm3": 1756,
+    "TmY4": 432,
+    "Mi1": 1581,
+    "TmY3": 734,
+    "TmY13": 377,
+    "Tm1": 1554
+  },
+  "primary": {
+    "action_specific_digital_confirmation_passed": false,
+    "same_action_margin": 0.6638014185437714,
+    "all_controls_beaten": true,
+    "computational_mirror_candidates": [],
+    "biological_mirror_neuron_claim": false,
+    "scientific_biological_result": false
+  }
+}

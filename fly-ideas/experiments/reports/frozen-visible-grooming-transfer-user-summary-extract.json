@@ -1,0 +1,42 @@
+{
+  "schema": "series-76-user-result-extract-v1",
+  "source": "user-pasted summary.json; original local result files not supplied",
+  "status": "completed",
+  "source_model_sha256": "bb8de6a8fe5fd912a2c627267e988f3c7ef8515eeab79ce981a802feabf4f896",
+  "no_retraining": true,
+  "primary_passed": false,
+  "matched": {
+    "left_proximal": {"new": 0.23443427353156196, "zero": 0.49092099008714263, "wins": 10, "passed": true},
+    "left_middle": {"new": 0.1305513715289415, "zero": 0.4807549424180378, "wins": 10, "passed": true},
+    "left_distal": {"new": 0.3347604608647762, "zero": 0.4513061401526824, "wins": 10, "passed": true},
+    "right_proximal": {"new": 0.2335361885861455, "zero": 0.4924427453283516, "wins": 10, "passed": true},
+    "right_middle": {"new": 0.13997115404734478, "zero": 0.48021559578932455, "wins": 10, "passed": true},
+    "right_distal": {"new": 0.33674364057826817, "zero": 0.45721496810559675, "wins": 10, "passed": true}
+  },
+  "geometric_transfer": {
+    "left_proximal": {"fov50": 1.0015470646289846, "fov65": 1.0015470646289846, "lateral_camera": 0.4163999920790373, "body_shift": 1.1497154883095786, "better_than_zero_conditions": 1, "passed": false},
+    "left_middle": {"fov50": 1.0346496907416027, "fov65": 1.0346496907416027, "lateral_camera": 0.5575491483181861, "body_shift": 0.5321336779144435, "better_than_zero_conditions": 0, "passed": false},
+    "left_distal": {"fov50": 0.9937654403179559, "fov65": 0.9940302722564429, "lateral_camera": 0.5048079628052674, "body_shift": 1.1234739301943746, "better_than_zero_conditions": 0, "passed": false},
+    "right_proximal": {"fov50": 0.9904022972172923, "fov65": 0.9904022972172923, "lateral_camera": 0.3850574905353281, "body_shift": 1.1606198319128207, "better_than_zero_conditions": 1, "passed": false},
+    "right_middle": {"fov50": 1.0261608868474625, "fov65": 1.0261608868474625, "lateral_camera": 0.529801321510328, "body_shift": 0.9159227851991044, "better_than_zero_conditions": 0, "passed": false},
+    "right_distal": {"fov50": 1.0287478955663858, "fov65": 1.0292276637724407, "lateral_camera": 0.4609240024691072, "body_shift": 1.0962284706915408, "better_than_zero_conditions": 0, "passed": false}
+  },
+  "derived_combined_pooled_rmse": {
+    "matched": 0.2488624152004586,
+    "zero": 0.4757377373174999,
+    "fov50": 1.0127019439769172,
+    "fov65": 1.0128265026771777,
+    "lateral_camera": 0.4796684154759316,
+    "body_shift": 1.0210187257222314,
+    "temporal_shuffle": 0.4870468174153444,
+    "one_eye": 1.1268410067857648,
+    "distal_mask": 0.8961749976656461
+  },
+  "diagnostic_wins_vs_zero": {
+    "matched": 10,
+    "temporal_shuffle": 4,
+    "one_eye": 0,
+    "distal_mask": 0
+  },
+  "interpretation": "Matched replication succeeds, but every axis fails the preregistered geometric transfer rule."
+}

@@ -1,0 +1,14 @@
+﻿SERIES124 — CONTEXT MEMORY GRAPH GATE
+
+Context necessity: True
+Graph advantage: False
+Decision: NO_GO_KEEP_PHYSICAL_PORT_BLOCKED
+
+memoryless_ridge: RMSE=0.21696, success=54.42%, context=50.59%
+history8_ridge: RMSE=0.37594, success=37.31%, context=42.78%
+random_reservoir61: RMSE=0.21622, success=54.39%, context=100.00%
+graph_reservoir61: RMSE=0.21624, success=54.58%, context=100.00%
+privileged_context_ridge: RMSE=0.21696, success=54.69%, context=100.00%
+privileged_context_bilinear: RMSE=0.21757, success=55.08%, context=100.00%
+
+Series124 is synthetic; earlier official FlyGym evidence is separate.

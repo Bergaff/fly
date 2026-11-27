@@ -1,0 +1,221 @@
+{
+  "schema": "temporal-closed-loop-graph-benchmark-123-v1",
+  "status": "completed",
+  "contract": {
+    "synthetic_engineering_task": true,
+    "train_episodes": 80,
+    "test_episodes_per_condition": 30,
+    "steps_per_episode": 120,
+    "sensor_delay": 2,
+    "motor_delay": 2,
+    "contexts": 2,
+    "action_modes": 3,
+    "action_switching": true,
+    "partial_observability": true,
+    "body_feedback": true,
+    "closed_loop_dynamics": true,
+    "frozen_input_shas": {
+      "matrix": "03157b503d0271cb0991db524d45220bb8f49ce62e3ba171dc997ed7f3816150",
+      "paths": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1",
+      "prototypes": "28edd80b81111d47708f163aaf9b250f7ad330a87d6c9dc5ee70e7895843ca04"
+    },
+    "train_seed": 123000001,
+    "test_seed": 123000002,
+    "not_biological_validation": true,
+    "not_whole_brain_model": true,
+    "not_general_intelligence_benchmark": true
+  },
+  "models": [
+    {
+      "name": "memoryless_ridge",
+      "parameter_or_scalar_count": 560,
+      "readout_trainable_count": 560,
+      "conditions": {
+        "clean": {
+          "rmse": 0.20419692394618993,
+          "success_rate": 0.6002777777777779,
+          "switch_recovery_error": 0.22037140008890435,
+          "seconds_per_step": 3.0098861110066837e-05
+        },
+        "noise": {
+          "rmse": 0.20569540001478454,
+          "success_rate": 0.5786111111111112,
+          "switch_recovery_error": 0.22229102004743118,
+          "seconds_per_step": 2.7648777777358198e-05
+        },
+        "partial": {
+          "rmse": 0.20454049236097963,
+          "success_rate": 0.5958333333333333,
+          "switch_recovery_error": 0.22240369124633994,
+          "seconds_per_step": 2.6054305556802623e-05
+        },
+        "cue_loss": {
+          "rmse": 0.20324116067180717,
+          "success_rate": 0.6186111111111112,
+          "switch_recovery_error": 0.22051671810460646,
+          "seconds_per_step": 2.880405555616663e-05
+        },
+        "extra_delay": {
+          "rmse": 0.3084798730837746,
+          "success_rate": 0.23194444444444445,
+          "switch_recovery_error": 0.3308922813959215,
+          "seconds_per_step": 2.834838888702506e-05
+        }
+      }
+    },
+    {
+      "name": "history4_ridge",
+      "parameter_or_scalar_count": 2216,
+      "readout_trainable_count": 2216,
+      "conditions": {
+        "clean": {
+          "rmse": 0.21547368468810302,
+          "success_rate": 0.5441666666666667,
+          "switch_recovery_error": 0.23261339846825219,
+          "seconds_per_step": 2.991463889177087e-05
+        },
+        "noise": {
+          "rmse": 0.22209460271735926,
+          "success_rate": 0.4880555555555556,
+          "switch_recovery_error": 0.23665960150367965,
+          "seconds_per_step": 3.270597221974943e-05
+        },
+        "partial": {
+          "rmse": 0.21483768353421565,
+          "success_rate": 0.548611111111111,
+          "switch_recovery_error": 0.23222157330455023,
+          "seconds_per_step": 3.1755722223654935e-05
+        },
+        "cue_loss": {
+          "rmse": 0.214802753569438,
+          "success_rate": 0.5461111111111111,
+          "switch_recovery_error": 0.232402972524968,
+          "seconds_per_step": 3.3604388889014245e-05
+        },
+        "extra_delay": {
+          "rmse": 0.318219847535766,
+          "success_rate": 0.20111111111111107,
+          "switch_recovery_error": 0.3434280184232899,
+          "seconds_per_step": 3.352372222252597e-05
+        }
+      }
+    },
+    {
+      "name": "random_reservoir61",
+      "parameter_or_scalar_count": 3049,
+      "readout_trainable_count": 560,
+      "conditions": {
+        "clean": {
+          "rmse": 0.2042296542656536,
+          "success_rate": 0.5997222222222223,
+          "switch_recovery_error": 0.22203779872541604,
+          "seconds_per_step": 5.371325000346081e-05
+        },
+        "noise": {
+          "rmse": 0.21235459677776844,
+          "success_rate": 0.5413888888888889,
+          "switch_recovery_error": 0.22906797886537528,
+          "seconds_per_step": 5.16951111078217e-05
+        },
+        "partial": {
+          "rmse": 0.20434552394866376,
+          "success_rate": 0.5933333333333334,
+          "switch_recovery_error": 0.22223178190181428,
+          "seconds_per_step": 5.011630555600278e-05
+        },
+        "cue_loss": {
+          "rmse": 0.20468073594328542,
+          "success_rate": 0.5897222222222221,
+          "switch_recovery_error": 0.22256709442007924,
+          "seconds_per_step": 5.367522222210635e-05
+        },
+        "extra_delay": {
+          "rmse": 0.31061276819933814,
+          "success_rate": 0.1925,
+          "switch_recovery_error": 0.3361580342243741,
+          "seconds_per_step": 4.716236110855082e-05
+        }
+      }
+    },
+    {
+      "name": "graph_reservoir61",
+      "parameter_or_scalar_count": 3049,
+      "readout_trainable_count": 560,
+      "conditions": {
+        "clean": {
+          "rmse": 0.2050124055857455,
+          "success_rate": 0.5916666666666666,
+          "switch_recovery_error": 0.22225463168516438,
+          "seconds_per_step": 4.9469111111951254e-05
+        },
+        "noise": {
+          "rmse": 0.20980724475478965,
+          "success_rate": 0.575,
+          "switch_recovery_error": 0.22641612495123023,
+          "seconds_per_step": 5.377888889193452e-05
+        },
+        "partial": {
+          "rmse": 0.20480595996514459,
+          "success_rate": 0.5933333333333334,
+          "switch_recovery_error": 0.22200800093860412,
+          "seconds_per_step": 5.1426888888575686e-05
+        },
+        "cue_loss": {
+          "rmse": 0.20545431424193833,
+          "success_rate": 0.5827777777777778,
+          "switch_recovery_error": 0.22238960255106888,
+          "seconds_per_step": 5.2382416667266324e-05
+        },
+        "extra_delay": {
+          "rmse": 0.3118138303466226,
+          "success_rate": 0.19638888888888892,
+          "switch_recovery_error": 0.33796364986422744,
+          "seconds_per_step": 5.901091666803243e-05
+        }
+      }
+    },
+    {
+      "name": "privileged_oracle",
+      "parameter_or_scalar_count": 0,
+      "readout_trainable_count": 0,
+      "uses_hidden_future_target_and_context": true,
+      "conditions": {
+        "clean": {
+          "rmse": 0.17067761547886245,
+          "success_rate": 0.7833333333333334,
+          "switch_recovery_error": 0.17352751501021244,
+          "seconds_per_step": 2.299624999876768e-05
+        },
+        "noise": {
+          "rmse": 0.17067761547886245,
+          "success_rate": 0.7833333333333334,
+          "switch_recovery_error": 0.17352751501021244,
+          "seconds_per_step": 2.4790611115450804e-05
+        },
+        "partial": {
+          "rmse": 0.17051697210508798,
+          "success_rate": 0.7772222222222223,
+          "switch_recovery_error": 0.17283764781359853,
+          "seconds_per_step": 2.329608333537989e-05
+        },
+        "cue_loss": {
+          "rmse": 0.17067761547886245,
+          "success_rate": 0.7833333333333334,
+          "switch_recovery_error": 0.17352751501021244,
+          "seconds_per_step": 2.1377805553331402e-05
+        },
+        "extra_delay": {
+          "rmse": 0.30354239557950496,
+          "success_rate": 0.19111111111111112,
+          "switch_recovery_error": 0.3101368381022455,
+          "seconds_per_step": 2.1291083329641778e-05
+        }
+      }
+    }
+  ],
+  "interpretation": {
+    "graph_advantage_claim_requires_graph_to_beat_history_and_random_reservoir": true,
+    "controller_is_synthetic": true,
+    "living_neuron_claim": false
+  }
+}

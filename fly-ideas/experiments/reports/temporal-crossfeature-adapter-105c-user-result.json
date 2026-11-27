@@ -1,0 +1,1659 @@
+{
+  "schema": "temporal-crossfeature-official-eye-adapter-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "temporal-crossfeature-official-eye-adapter-v1",
+    "mode": "full",
+    "created_utc": "2026-11-25T11:46:48.754030+00:00",
+    "script_sha256": "60c74e44bca8c64ecc667e6eb8705f6163565cdd0509230ca8872d50ac4b206f",
+    "runner105ab_sha256": "b070fff687dfcfd263c6868b59954283486dd84b5a4e07156816f333a13dae67",
+    "series105ab_result_sha256": "92715b54fde5fb259ce3947e35edf4f8ba178f659c5de01096546ca739af6a14",
+    "prior_outcomes": "Series104 and exact diagonal105B remain no-go",
+    "training_allowed": true,
+    "adapter": "standardized full 72x72 ridge mixing axes and 12 temporal cosine coefficients",
+    "ridge_candidates": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "ridge_selection": "five folds by replicate on train only; minimum paired synthetic-state NRMSE; tie chooses larger ridge",
+    "fit_uses_action_labels_or_trajectory_truth": false,
+    "train_cases": 30,
+    "validation_cases": 9,
+    "motions": [
+      {
+        "role": "crossfeature_train",
+        "id": 1069,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "seed": 105300,
+        "amplitude": 0.62,
+        "speed": 0.7,
+        "motion_sha256": "d655151981650e8d705e2a4f935e223aa70db7172ca78fd8497e8e1b02b856a5"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1070,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "seed": 105301,
+        "amplitude": 0.62,
+        "speed": 0.8,
+        "motion_sha256": "790ad569e80f7de93ce94e17dc30455da810a798de506d8e2eb55754a28dc12e"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1071,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "seed": 105302,
+        "amplitude": 0.62,
+        "speed": 0.9,
+        "motion_sha256": "4af1bf619325955c68af29c75616fbb59e810424ce55e654ca8b8997f90813e9"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1072,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "seed": 105310,
+        "amplitude": 0.68,
+        "speed": 0.8,
+        "motion_sha256": "6ed4811cc92adec3489f8ed7e3b050d5094acb9e57573e0213648e717566f694"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1073,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "seed": 105311,
+        "amplitude": 0.68,
+        "speed": 0.9,
+        "motion_sha256": "c33d564feb4aaa35d886d5301e60985b547a5a1f713d8f3f16748a1b359aa2ae"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1074,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "seed": 105312,
+        "amplitude": 0.68,
+        "speed": 1.0,
+        "motion_sha256": "22dcacd033dd41c4f1e04db766696fd37b7d30cea35db0b980655255b0001115"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1075,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "seed": 105320,
+        "amplitude": 0.74,
+        "speed": 0.9,
+        "motion_sha256": "5918068cb24320d542fb9ba814e54c6a4f2d229751178280a5ba3e271f9680b2"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1076,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "seed": 105321,
+        "amplitude": 0.74,
+        "speed": 1.0,
+        "motion_sha256": "26ed357f045dd0c7dd677ea0125a4fb9b59d66faca2390a2b5b4292b67336a40"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1077,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "seed": 105322,
+        "amplitude": 0.74,
+        "speed": 1.1,
+        "motion_sha256": "e6c2a0fdeca59c9360d448b7a83bee83a1f8a19c97783b28c45bb614b3fdca74"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1078,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "seed": 105330,
+        "amplitude": 0.8,
+        "speed": 1.0,
+        "motion_sha256": "622c55d6850d2608092334f0e8f13468d0bf9c24f3ebb5065d806919401f1b9b"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1079,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "seed": 105331,
+        "amplitude": 0.8,
+        "speed": 1.1,
+        "motion_sha256": "039be80b31e66aaa2639de7a3ecc58d580566ef1d04c61296659a3cd9bbbe739"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1080,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "seed": 105332,
+        "amplitude": 0.8,
+        "speed": 1.2,
+        "motion_sha256": "dfc1e7f31b98723101f25f4d9a6d7ae4b92bc5935dfe333984191fd4f2239d62"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1081,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "seed": 105340,
+        "amplitude": 0.86,
+        "speed": 1.1,
+        "motion_sha256": "c9b0e308413558ab460919873fd99ecc5518fb43377a79f55ba794dfb4421bf2"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1082,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "seed": 105341,
+        "amplitude": 0.86,
+        "speed": 1.2,
+        "motion_sha256": "757cb7586c1102c772f4c9b773bb4f8eed404edf4b6af1f304b862277d3a41e9"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1083,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "seed": 105342,
+        "amplitude": 0.86,
+        "speed": 0.76,
+        "motion_sha256": "94ef845ada0ee82c52c1fc761bd3e4ba8d5cf5ac8be5274ce74c20c6ee42c822"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1084,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "seed": 105350,
+        "amplitude": 0.92,
+        "speed": 1.2,
+        "motion_sha256": "11a4baf01c14fb3426437eba965c47f7acb2a761b783732f3015693f00124745"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1085,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "seed": 105351,
+        "amplitude": 0.92,
+        "speed": 0.76,
+        "motion_sha256": "0fb64f139bc2b60b492dadac06d148022039dc1e71bfc66f7deb34dda4d45765"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1086,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "seed": 105352,
+        "amplitude": 0.92,
+        "speed": 0.88,
+        "motion_sha256": "5ed876bd3b4bbb73709e0b4c83f6f1c2542161083dcabe59a7c3c0008f3d96c9"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1087,
+        "replicate": 7,
+        "action": "foreleg_rubbing",
+        "seed": 105360,
+        "amplitude": 0.98,
+        "speed": 0.76,
+        "motion_sha256": "1b65aec31cc2c8aad2014a079a1ccceaa3aaafb525697c4a5652f3e1c2c3ed6f"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1088,
+        "replicate": 7,
+        "action": "head_directed_grooming",
+        "seed": 105361,
+        "amplitude": 0.98,
+        "speed": 0.88,
+        "motion_sha256": "080e125229198f7b15df491e80af64d37ee084dad515286120a9361be63ff325"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1089,
+        "replicate": 7,
+        "action": "reach_withdraw",
+        "seed": 105362,
+        "amplitude": 0.98,
+        "speed": 1.06,
+        "motion_sha256": "13aa7ec9ac38a4f050171b773aef002ae11b4952d318b5392498bc74f0d2cfbb"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1090,
+        "replicate": 8,
+        "action": "foreleg_rubbing",
+        "seed": 105370,
+        "amplitude": 0.71,
+        "speed": 0.88,
+        "motion_sha256": "60b03a7a122533dd42d03ce06bc05920cfc2551db38ca610d6b8875aa8549e8d"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1091,
+        "replicate": 8,
+        "action": "head_directed_grooming",
+        "seed": 105371,
+        "amplitude": 0.71,
+        "speed": 1.06,
+        "motion_sha256": "bb9c727a2430620d464dcc08ef0ae9165a2a15ab8e4630d2b2a4c9620350721f"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1092,
+        "replicate": 8,
+        "action": "reach_withdraw",
+        "seed": 105372,
+        "amplitude": 0.71,
+        "speed": 1.16,
+        "motion_sha256": "5decb50f9f287dac13b3e52ace4ef1b9f5f22e626b050c31d60507f1087d9236"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1093,
+        "replicate": 9,
+        "action": "foreleg_rubbing",
+        "seed": 105380,
+        "amplitude": 0.83,
+        "speed": 1.06,
+        "motion_sha256": "c6232c4bc23adccf97514e1c3302863289a6c3c9565e87327af597e85973217a"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1094,
+        "replicate": 9,
+        "action": "head_directed_grooming",
+        "seed": 105381,
+        "amplitude": 0.83,
+        "speed": 1.16,
+        "motion_sha256": "3b26356a2c1611f9e00c6fdc3cb9b0b26df8bd78b6d700c1f0591b85de516347"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1095,
+        "replicate": 9,
+        "action": "reach_withdraw",
+        "seed": 105382,
+        "amplitude": 0.83,
+        "speed": 0.7,
+        "motion_sha256": "ed7d08844960e69a9d8bd42d7a2781c98bc69509dc7c93f90b0f35d390215c98"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1096,
+        "replicate": 10,
+        "action": "foreleg_rubbing",
+        "seed": 105390,
+        "amplitude": 0.95,
+        "speed": 1.16,
+        "motion_sha256": "7a165e3c8d14874bc2c1259669dacfeb7a9d5dcf25631e98a907be445e50f810"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1097,
+        "replicate": 10,
+        "action": "head_directed_grooming",
+        "seed": 105391,
+        "amplitude": 0.95,
+        "speed": 0.7,
+        "motion_sha256": "d779b1c81859e3fb46f5d62aec15fcde6331cf8e536a5330d9f2051e59419283"
+      },
+      {
+        "role": "crossfeature_train",
+        "id": 1098,
+        "replicate": 10,
+        "action": "reach_withdraw",
+        "seed": 105392,
+        "amplitude": 0.95,
+        "speed": 0.8,
+        "motion_sha256": "01712ba715998dcb40c08ccdc446ccccfbdcea86363b03d77ff15bc0ecffdf30"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1099,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "seed": 105500,
+        "amplitude": 0.65,
+        "speed": 0.82,
+        "motion_sha256": "5d351376495b0b3876efaf1867299abdb95df2e4292f8efcda45eba725948c91"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1100,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "seed": 105501,
+        "amplitude": 0.65,
+        "speed": 1.04,
+        "motion_sha256": "5b247c73b0a20819e5f78a88e33e976d109dbd14bb4fe294c7b8cfdfb735af2e"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1101,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "seed": 105502,
+        "amplitude": 0.65,
+        "speed": 1.18,
+        "motion_sha256": "729db4a84485baa56e5eb10328a00ef35dae4f343a15681174c1213244608f37"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1102,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "seed": 105510,
+        "amplitude": 0.85,
+        "speed": 1.04,
+        "motion_sha256": "113ab52ebd2cd820b95d318688b059a7ba5e2595a5cd3091485538e2c79f594b"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1103,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "seed": 105511,
+        "amplitude": 0.85,
+        "speed": 1.18,
+        "motion_sha256": "dab38a50576f577693a00cb4eaf628275d44549b982630bbd7f34270c21e50cc"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1104,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "seed": 105512,
+        "amplitude": 0.85,
+        "speed": 0.82,
+        "motion_sha256": "2e1c9ab22ef30647747fd3546f73087f2333c2827ea785e3bcae4b1d65d10cdb"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1105,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "seed": 105520,
+        "amplitude": 0.97,
+        "speed": 1.18,
+        "motion_sha256": "d4c307bf3225b3fe155e33fb4384a73815c9b11307ec481c5371ee9973d49d07"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1106,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "seed": 105521,
+        "amplitude": 0.97,
+        "speed": 0.82,
+        "motion_sha256": "cf4c3b6fe09dca7098917f0b0a8b475f4003db066a4e3fc3e2deddeab481c75c"
+      },
+      {
+        "role": "crossfeature_validation",
+        "id": 1107,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "seed": 105522,
+        "amplitude": 0.97,
+        "speed": 1.04,
+        "motion_sha256": "2a85c9317747b2de67072c3c0166d7bc21de607798e62cce31598799857fd9e1"
+      }
+    ],
+    "validation_used_for_fit_or_selection": false,
+    "post_result_tuning": false,
+    "controls": [
+      "crossfeature",
+      "diagonal",
+      "raw_frozen",
+      "neutral_visual",
+      "reversed_visual",
+      "zero_state",
+      "shuffled_state"
+    ],
+    "development_gate": "held action>=6/9; crossfeature truth-RMSE wins>=6/9 vs diagonal/raw/neutral/reversed/zero/shuffled; distinct; mean crossfeature below diagonal and raw. Pass only authorizes separate untouched physical Series106."
+  },
+  "series105ab_primary": {
+    "validation_cases": 6,
+    "required_action_correct": 4,
+    "required_control_wins": 4,
+    "action_correct": 2,
+    "adapted_truth_wins": {
+      "raw_frozen": 6,
+      "neutral_visual": 5,
+      "reversed_visual": 3,
+      "zero_state": 2,
+      "shuffled_state": 6
+    },
+    "mean_truth_rmse_rad": {
+      "adapted": 0.2008180929168327,
+      "raw_frozen": 0.5040722221102307,
+      "neutral_visual": 0.21160276890054575,
+      "reversed_visual": 0.21144448269918614,
+      "zero_state": 0.17138485123585442,
+      "shuffled_state": 0.4473556204210796
+    },
+    "targets_distinct": true,
+    "passed": false,
+    "development_candidate": false,
+    "scientific_result": false
+  },
+  "model": {
+    "sha256": "9224cd9e4fd4a2f4b62376cc386d66d983f3c38353365e7d9dc6e47a4b8a68a9",
+    "shape": [
+      72,
+      72
+    ],
+    "cv": [
+      {
+        "ridge": 0.01,
+        "mean_state_nrmse": 0.2992245574272202,
+        "fold_cases": 30
+      },
+      {
+        "ridge": 0.1,
+        "mean_state_nrmse": 0.28269633077975165,
+        "fold_cases": 30
+      },
+      {
+        "ridge": 1.0,
+        "mean_state_nrmse": 0.22790792149531544,
+        "fold_cases": 30
+      },
+      {
+        "ridge": 10.0,
+        "mean_state_nrmse": 0.1750161625019041,
+        "fold_cases": 30
+      },
+      {
+        "ridge": 100.0,
+        "mean_state_nrmse": 0.14647215364269872,
+        "fold_cases": 30
+      }
+    ],
+    "selected": {
+      "ridge": 100.0,
+      "mean_state_nrmse": 0.14647215364269872,
+      "fold_cases": 30
+    },
+    "training_pairs": [
+      {
+        "id": 1069,
+        "replicate": 1,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "589112e9c81ac5c38f4e308cfa29085361e5e4f2c411f317aa49ee2a391fe17a",
+        "synthetic_state_sha256": "818f906788acec747012ed5a038be37836d00b25e8bb37d1781148a787eb48e2",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "c631c192a24cd276a6c110b77ec680eafc1e18a88dc3c97478f263001c87e78a"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "ec32057b0205a6b60b05e2fb6393743d55fb3253a584478bbfe455191955fb4d"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "9c5d7eeca0888e5f1ace54834c533c264f1d01a94a1017bd5d89278180b13133"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "9a1f575da538062e0acc67b275f658a3f28ae9385e938a3478a1d559112509b4"
+          }
+        ]
+      },
+      {
+        "id": 1070,
+        "replicate": 1,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "e0253aee6ac5bba69d2d48560efb2f35e6a300c721132f5c0504eda782770bb4",
+        "synthetic_state_sha256": "fbbe26ef121a97569eaca02371cf06f68eb06a96b2786e3d5767af0b4cc48c4e",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "5afdfe35a025bed76a45d683040380c3ae63ffe6f846d08c31f3fb29a62f8523"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "c7cd15e6d0d4e8abbf8bc3cf63cc1e9871aff72837d62ec3de592cf40fe2634c"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "b785b6fafced110c5e8694a95a2f4ae90b2c5477cb4099b8ab660381c4223dd6"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "5791c418ea1259704fc47d2ebacc9c082c15b3e6c69b43852c4394032b6ad8c7"
+          }
+        ]
+      },
+      {
+        "id": 1071,
+        "replicate": 1,
+        "action": "reach_withdraw",
+        "official_state_sha256": "6a6a95d1bfe63da815371c0c175b808852eba885198042b54798aa516663a926",
+        "synthetic_state_sha256": "e6f77a8a33a55defe9d24a5e5a8950ec7bb41a62c95d6a2a4b1545336845e619",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "272fcb65656f1425f1480deba31b482319f7f5cb384639fb96ea1eff9b5d5f66"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "2fd9a25f8d53ed04762af88171a816f8418fc9164a812f7206a51a92d7ec1a00"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "760e51a44b3c29dd87b9e2497c6734a671b64e241396b0e35b637b30c6b4af76"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "a8da3c65bff36ce6575acc53cc552b06b6203fd293a1806d0490a94cc70ec20c"
+          }
+        ]
+      },
+      {
+        "id": 1072,
+        "replicate": 2,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "1fb356f439b1af7399132b84ee4e1df522bc4bca19f37fa03100e2cc2842bd24",
+        "synthetic_state_sha256": "6910d82faacfb792a8a26ae961dd146c7e55d14b001a8797d2f7cb7ccd64a636",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "9683c1f69d77619d32a11c6b417ca36486531c1f2765a5dbf79c834fa5f9671f"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "f36b7ae7411eba1b68f4b6d83b6f4f257c54dd6f21cb47b694b14c2710bd6678"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "e412be430090efa98219d69c9f0834c3e907b88da45fe26951ea33857f6077f5"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "ec3551ed4f76ecb523d0285da6f46037b0eadb605d3f4aad792954ce4bdb70ce"
+          }
+        ]
+      },
+      {
+        "id": 1073,
+        "replicate": 2,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "2e927522e120bdbfc27bbae74f15407a430e6e7267b835e7966523407addfc78",
+        "synthetic_state_sha256": "e85fbc4fa93b184fb09207d2d14a22c61018cade6cb167df8bb91b31e5dd1d98",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "7b20e6bdc2c8c4e0d7eff60a63f4202ce944e9779be8b06189d4378028c7ec8d"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "d013241c5305cf6e8fcdfc76906d60d826cfde1b3893f95f91b83e66e91cfbc2"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "2998c2fde18988b6d3b56a3cec5b4c685e24b359f54018291259b1e7fdbb57df"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "f8059bc92555ebcc158ddcd1f14fcc4ad8bb969e7c619072035ceecff0676c8a"
+          }
+        ]
+      },
+      {
+        "id": 1074,
+        "replicate": 2,
+        "action": "reach_withdraw",
+        "official_state_sha256": "bd32e50c0525dbd056885f51cfe0d7e108951b3dd31fa995f716cb518bc0b35e",
+        "synthetic_state_sha256": "836ae9435ad12676d3e38d7b43d8761dc91da53a24a1b92f27dcd90960df8083",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "539bb93010b2be9a58b61b26f31e1665c065b6ddc2f3a028b96c2c32a16fe7ad"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "63b51f299a6ad5b48e50ea4057d5e96ad01338ffecd2134bfbfd2d5c7ebf5da6"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "2464dc56faad8091006822a6934e6350bc5f795a2b8bdee8d2f5e83f0018eced"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "5a0509462ec9728cd7766bc6cd791fdb92d34528bf1fd116a2f72d77f7ac7dde"
+          }
+        ]
+      },
+      {
+        "id": 1075,
+        "replicate": 3,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "69bf22231bdd9a4931575d9419f6c7f79046f326f750573613c2ba7d46ca9773",
+        "synthetic_state_sha256": "63b55447b09abb46deb7241134111ca4dda563d8e738f2da0546ae6a10dd8019",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "3d2cfa6937b929202f2f4edfac6e6e8dedca6c829f7d9cc2e7733e26a98e842c"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "6a7408ee11fcbd13528cbc21a4f010c695028ca450d1bbcc0eeadfac92d39580"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "c401a42c9e407419a93686ca0378ca93871cb48dff5f229e742c7446ce69046d"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "8d9c607dac092f4651e4329696a852d2834e28152a8de2f9eca8d6e33a8e41ba"
+          }
+        ]
+      },
+      {
+        "id": 1076,
+        "replicate": 3,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "97142c087259145c78c9b5060f4ba694eabc392af2bd4a6e991274590914585d",
+        "synthetic_state_sha256": "e4dd62d5b3abf6d651f3676385a4aad29035c02d2ca58f44b71d02a93ee51671",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "941eefe3792080e4e7ad4be3d34e7564cdbf444a423e0378fdf202a32ff8efa3"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "bf4de8779a22b143158c1d05e8c8653b80dcf5ee1e273dc2259f5c9631b245a3"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "0e413c5eb8d856c4f23a8d124a684f9d66ff70a3853ae2e87b60ab3f8c37200f"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "23cab687e737a959f3dd820e4352ac6f64ba5e30fb9032d71cbac1e705bab97e"
+          }
+        ]
+      },
+      {
+        "id": 1077,
+        "replicate": 3,
+        "action": "reach_withdraw",
+        "official_state_sha256": "1901046f182fcfb15ac5d97dc006c0c3dcecb0b9a9a107648d9b0c180fbc8298",
+        "synthetic_state_sha256": "8268c4c6e01c2e452e56ca4c00536d6ecbdbac3d7ef7b28f755510701ec69dac",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "4109d9b69e6e5cd72ac68a950c4a18310da8982b8db532f1dd4c3c781982f873"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "80dcda6b268256be594383aa064a5f0accb70f8b7e47c0aaefbb9ea34468980e"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "2953c59fdced327b5a078e9d3c308ea5a9b6b73a770d74768e772f54a8509d47"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "814ac5591721ff1ee641dcb1cb0defff9cbbd1ad44a3287e9bf3b0015b95e629"
+          }
+        ]
+      },
+      {
+        "id": 1078,
+        "replicate": 4,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "50e6bc95b0b7db7f4865301d8a984ef1c42485b6f9a5f6be51dff98976c1cada",
+        "synthetic_state_sha256": "b71bc8be9454bda5bf843f24dc32d42b8f38ba49256ccd21f190fc36495f0fa2",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "13b56e4a5fe8e41c1244391e280646c15ab6c4848a19ca84030001df1adbc285"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "65f7db95a1b14db819750af7090f8d02bf922722753349b916c20308517ecbc1"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "fc667631002629a2c2275a3d344055da6f65c9564f76e1b98f22366db8bea99d"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "c827d84b743630f28130b1d3fb2ff1f04d074c8ba077febd261c69a1b9638c54"
+          }
+        ]
+      },
+      {
+        "id": 1079,
+        "replicate": 4,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "c51baad46475ddc7326ce1caf2aee5d8a23c4748e8ea3130d265a1b6e7dacd5f",
+        "synthetic_state_sha256": "ebf79b21542e3b1faa32311332d05f290d65f558c1aa7dd010514d44ad6698c8",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "345a8983fcf694a58f9e75d366fd128ee31fafc0871d8cfdece48d3c65c0ea11"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "5585ec9d237cde0c12ece1973575ff7d2830aefcb9297296b733ccaa3f466a06"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "4420708b5041305a6768904d4b11fd0d4b11b66a8fdeb3bef6a1d85f8d1fbe24"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "7206acd4f9b61bcd1a69e696b6565c9a9465f2fdfd02e9deacae097af937efea"
+          }
+        ]
+      },
+      {
+        "id": 1080,
+        "replicate": 4,
+        "action": "reach_withdraw",
+        "official_state_sha256": "af16908f5092bac5b50a6612e010759b4f45bf522805674a463d781a877e4c19",
+        "synthetic_state_sha256": "05de887062299f412a3fa43aae607e1ee8b71700484a7cdb8b00fc8d861290c5",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "93115f2cdd0c7d135949771f8290beb6fe94873c8ef48e8c66b15e0ae5e3d246"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "496fb5c527837e4d5ba8bb6f948e4e071aaa44b8bba640728b242c5fc5e6e2c4"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "d63f047b5793818d3b7ede1c092492172120823b67eb586282cee930489e4b01"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "7bf84ed7d08dc7eab93477d3c322eb648051a44a6650d5db8fe9354956b04d96"
+          }
+        ]
+      },
+      {
+        "id": 1081,
+        "replicate": 5,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "bcf47df3ccd3f4c5ee4330a5ffbec5e4915dc7890a0e260b3e9af3c4d51ad123",
+        "synthetic_state_sha256": "6bd9a06bfb9c76e0fd59f1d022b04c8e2752795ee173aab8c41157af1d753a83",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "33b4445613b65210c876fa5f30edc3b6fda909a9518728831f9bf9fa5866d890"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "5d7dfcbfeb3e030315e4ef969c4d7e515b41970bbbbb729bf5d1f91087c37d17"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "c847d26e346e19873d78befb76eac4da8e945ddab471bf0200442c3f7d3f5305"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "1bc8d7ed742bcfab53b1aac1f03c4aed7a8decd06e65ef94a3f6b02a2d793245"
+          }
+        ]
+      },
+      {
+        "id": 1082,
+        "replicate": 5,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "27374ad5a54fdad155a146ea13237cf3dc11ca43718e36c31f03e2ef8daef962",
+        "synthetic_state_sha256": "2f94e7bb2164314c66cb3e2d64ccfe1166136343f5eb721df91dfe913d9c890e",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "ffe7e3b4a3fd3ff3965a3b49791774b387963c05b56d08ad5be5ca451e157975"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "7c74e8ead358de7fd800cacd36b14d150dcc35f94e061180daee42bf35dfb107"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "8c1ecd5cd60854daf3c93925a2eebee8a6f43d2237654f3ff1459014dfc09ebe"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "7583c9a196249ec82616a28c194b7dab44052323bb7be093a8de59d0b89948a6"
+          }
+        ]
+      },
+      {
+        "id": 1083,
+        "replicate": 5,
+        "action": "reach_withdraw",
+        "official_state_sha256": "ce25793152dc898048083875372cd7c2e8710132f6354465f9870b24cca5665f",
+        "synthetic_state_sha256": "090fbe13f4692b37a77c084918790984f771c0485e7b3cac7664f6ad0fa91d15",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "2f09044bb86fd5b7b2f6219d9f4f24f8df414128cceffae47effe090de4083d4"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "1e1b51886ea2079a3f4f5156c5d678beb406d3d3d79ec1d4186a9450391d292c"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "ef3ecce03d8e262b77dc9190d5c2734589b97e484d3ab5ce65b55bb6fc64a985"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "e85f3615672c7e5d91f21d6cdcc5b0fc68a106d86113da2a0d5e18097930a568"
+          }
+        ]
+      },
+      {
+        "id": 1084,
+        "replicate": 6,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "9959d3b1f00145484fec176b639e3c44d854e9dda10ec80d0db9e2c5b702a5c9",
+        "synthetic_state_sha256": "70914cea46ea17dfacc4823210b35114327483353312658d842728b0332bfefc",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "696505eec3e10fc7432a13ee49eb160f4346a5eb3b41b2d6696595b5ef04b08d"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "2f145f4b6f604d490c82aa4f9ed73b5463764a30d510f279deb49fcfc3883326"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "3e8d7024629d26e83bae7a5b217de7c15df7cc1a639fb90ef7765e3a01f80d99"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "a2b3a6ecfb1eafcc47a92197290f83248f534092aa1fe4e6b4bb9c28676f6b0e"
+          }
+        ]
+      },
+      {
+        "id": 1085,
+        "replicate": 6,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "fa5456ec28d4ccb0d09e878541fac4595446ad3ad4a095adef7fa8fa7d8d53c3",
+        "synthetic_state_sha256": "c021e9fe2c5a9542d38fd6dce4bca005bdc7824b43ea43f675ef7c51096db550",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "e1602cf2b55fa0b673b573254a18c44999ebd427edf21f239637bfaf3a004270"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "9b33d634a3d6699cf53f9b7339f868f9011b13bdaa47cba7bc4fed8cffb63e66"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "210c03548e424c19d70cbf2fdf38c121eb446419e876291de809df3f4d863648"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "9372944d2b28a69c2a1652124784de52b2d4c47be07171c4b7631c5a777d3829"
+          }
+        ]
+      },
+      {
+        "id": 1086,
+        "replicate": 6,
+        "action": "reach_withdraw",
+        "official_state_sha256": "53608ae0823e37914b7351f2b103354a2bb18218855c1085a16d12eb347ca365",
+        "synthetic_state_sha256": "e976626d0b8adb7f119d8fe9b935845814b9e6d8b73f720ac1bc72178e0d48bb",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "e05e4c390e6d62951faa5bfdf39b702eff07bce1beeafc92ff60af784fc0552b"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "b9fc9ca0d325dcd78a36e9d3e2f7cbfe21a5a1512d30c15eb4869fe57b571392"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "9c080880301449d92754c48c38809305dd5828375227aa750853ed0048e936d6"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "ddfb94e8075c41470be1a2a505595a2403a5702852eafef5c36e243d127e4276"
+          }
+        ]
+      },
+      {
+        "id": 1087,
+        "replicate": 7,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "ca7a97ad6fe1288ac27228fb055186a9695ad2345ead955ee55c50b513814478",
+        "synthetic_state_sha256": "be242347adcbdc0f1a41f500d75125f5d3113f94d35a34f3ea3ea484e7e52bd8",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "6d3034a03b7a4fafdf0bb13f17cdf93a1c0874e526a1f093380a986212dcc1c9"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "01ebb703004d5d2aa7a2330f8c55e7b95404a801425a7a3d36640f87d90c5351"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "89d5fb0e47abc0785be1b08e0bc8b5c2d8cc731ba6d0a8551963de3753de049e"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "ed9a386373907920bf185b84851916dfc382028245b2f1444dbee0865b3cfe87"
+          }
+        ]
+      },
+      {
+        "id": 1088,
+        "replicate": 7,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "23c302c7a29631777f47631e3bda3c9e2b35a323ee2ef239438c9d3885ed5ec3",
+        "synthetic_state_sha256": "ecc02c29fc7316a34bc4f53153b1baf5ca22c83f181745c6090fb7fa225a9724",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "ac7974ec6aaa620847634ebbc1401919b85fd0368fd37ad45b56b77b0e8ae729"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "550e49756c034dbe839393ad31e7f55db7ceb2fd09fb3fb8613c50f2ffd4b3f2"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "f9e871a52ec518762c247f39678a66c081829336db7d3c7ceebaa2c1df280961"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "2861787f82c28077ac9ee1cb952e9cfb2299bb843e5f1124b8bb3ebeb088192b"
+          }
+        ]
+      },
+      {
+        "id": 1089,
+        "replicate": 7,
+        "action": "reach_withdraw",
+        "official_state_sha256": "a02fc74fd4078c507bbd1e585435250a59e99ba0c41adef3f8ef437f9a0783fa",
+        "synthetic_state_sha256": "59b2fc58d01de614c3373a668a2efd1da8e06be47b3e453f5bb6aac1d63fc02b",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "a795236a167d0d95437fd407011fc504d0a2e18c785d956867d6b1bc845c58cd"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "0b6661bfd47dfe056d07fc308c833449e19182ceb92d0f9a5b4e158433a396a5"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "3ecab1c8be8fa1c466b9747a996a1897ae0471d394cc19a5f33466170e1e4549"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "687dfb019f089f24deaf27b0847ac58fdcad58c7d2abc94f60668ad539a10ec9"
+          }
+        ]
+      },
+      {
+        "id": 1090,
+        "replicate": 8,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "90e7c30f5e76ba237ae7eb30b4911079d0e2c4397a2118a4cacc484816c61385",
+        "synthetic_state_sha256": "5110e5e355d748480497038f0f37c0595adb5274ba3b17fd626fbd86d7070610",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "bf160d2029eeb1d0df4b4a8765ca1d975cec829c8b72a1971cd0b212b655f228"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "1a7d3f4d37a44bb71ba506e9f5b2dd5b8cee2dec17ee6f87c9512b2590e71143"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "9812bcc42251e4523c6ac7859cba860795b0795b31d627f79cc6e3038279c13b"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "57871dabca8e13b9d106458c6b0b4d7afcb888ed38ea30d40a85237c76cb154d"
+          }
+        ]
+      },
+      {
+        "id": 1091,
+        "replicate": 8,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "8263958edfdb31f704aa2679cd26737f400ec63c289804f40dd9929ca9e49c37",
+        "synthetic_state_sha256": "e339371de4ade94112e487774eaf8ca7f07c6be0bd96495325ad18de52810dae",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "f2a073049a53156fec96aa8b6125702c02989ba66ee05f69b0ba58cab1861be8"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "1adc9ec1171373c542a86ff93aa026592e13a0dcce8df7124b0948c9ec2d488a"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "0296ddf60c3d36750279eb4881a7a5e34fb8ec5ba5c544937129eca29cd25084"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "25be2f00f3b285a4ff4dfea13451cc8b63d35d17c4b4919a9247b2a1903e7cfd"
+          }
+        ]
+      },
+      {
+        "id": 1092,
+        "replicate": 8,
+        "action": "reach_withdraw",
+        "official_state_sha256": "983f7b52770afd3344f85b2baae1ea125e6b2ca1a1a3332e6ef3a0e200618686",
+        "synthetic_state_sha256": "13c92c0968ce510a944328e8f21a000234adac7adf9fef06cc712797fdf4331d",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "7d3c683712d119f51288928299b2c0cdbc88a4a049925f1d49901f0863ee7d05"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "4958dc2b6d2c47f0f886ebd9776b1b426ad39be986e7f42845ddbd596ffeefd8"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "35e47e90797fa7fa3ce5cbe8c48da9a7483cdb7cfce62caf7d4f59274832b551"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "eab98e35c73ed096d527725918fc6b6143d2d9874cec482eb5e35eb20b09081a"
+          }
+        ]
+      },
+      {
+        "id": 1093,
+        "replicate": 9,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "2b9b24c8e5e46414e3824682408dffa8ee2dae1d73e02f0f94dddc5883c92e85",
+        "synthetic_state_sha256": "5fdcf53ee3474303b7ebacf3fb3dd911287cbf46b56161ca0f315786167807c6",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "69b4ed770068d904477812fe3740f8d7e1a1d3dd55e9f31c56a5db961df81f00"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "82d48d880cdd6e48d91572bf280d87b4f20980fdfc0e9f9fb2652342d783f15a"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "10cd08d5ebfcca9f179c1a3e8406c57fadac738762bee781d517d571a71b5563"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "bf9fc65dbb30c9c8154235f010091de62769bd93cb7a4d7ea0d0790e06a5e30f"
+          }
+        ]
+      },
+      {
+        "id": 1094,
+        "replicate": 9,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "726f5919ccab3a3453a84ba50fa6ced60bc2a921ab374e7fac703f31a92344e1",
+        "synthetic_state_sha256": "b235263c9feb433fdd1299a040890f763d6b0f88238e7c6f13a30bc57f38b2e7",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "f9bf043ae2e842f952a21a8c00984cf7a8109927704cc4bf341abc2b84f138c5"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "9c88b0b84a8917925bd7abd85f501dec3e025fbe71a0964c25277cd8c975b192"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "9760477af78faae97cd77d3f90ad74413fb20f84ddb94e8b0ea407301b86b619"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "f6460c9e439b8399563fd26fa93b4ed76a1871c4c3a92baad6294235eea22db4"
+          }
+        ]
+      },
+      {
+        "id": 1095,
+        "replicate": 9,
+        "action": "reach_withdraw",
+        "official_state_sha256": "8b6696d019779673c1420e168778a5d8ab8d2009390ce611cb30ef85110177f0",
+        "synthetic_state_sha256": "e4b70098e3ba612d35825d60c1259ed90c49b0e92ba4c3ce54bb46cc530c6610",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "2aa9d69e918a063ce69c15eed1dd814455dc856ca23b545122e9b587619566c9"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "6dd83ec336d564a65c671b74c77f7336c1f3851df7048c9148e832716b51368a"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "9d0f7e1dce708a05e35126e7b3bd9ed187c640bf23ec18d2ce9d49213e1a268a"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "1b9ef15310d67003463b4ab5202aae6d0e6e17740727bcc5dfc044c69a906be4"
+          }
+        ]
+      },
+      {
+        "id": 1096,
+        "replicate": 10,
+        "action": "foreleg_rubbing",
+        "official_state_sha256": "06643bf27ad0d95f4521dda84798ae796a292cc1c59d548c0cb49ee05e85666b",
+        "synthetic_state_sha256": "0d22f07b6a3a125022157ff4d0c91803dae4be0ab6e2b91bd02948f7dcf1fa95",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "60bcb19858724dbf41b8c934ba884c45208a690c3992a7dae58afc587a61723f"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "69e8906d51b1d42040662c2fe2fed5ee96f71bbfa2de9f53a882021291b1c715"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "8c4eb5e35b38a7f261458cee5c13af2f21b487e69e6983f5a71a6aea91af1f06"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "460ac9484be296a2182bf063b93e17a1e10c7b010ca9aadea89851aca6d3e0de"
+          }
+        ]
+      },
+      {
+        "id": 1097,
+        "replicate": 10,
+        "action": "head_directed_grooming",
+        "official_state_sha256": "87ae7bd95c85f0863a8f09293beb280fc2b31b38343d4e3d46b21e366e4f2b98",
+        "synthetic_state_sha256": "3de7e6c64e69a4c1532875ff89d83f794922a102b1b5f00a2ff4f3bcaea0b530",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "e909d00dbc5bfdcdaf737fd00242aa5852607845da515dfb5a8b9e0424c5104e"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "447d33ac272628d0cb211df4d7185c4e763a38ae75ee86ad17595f2190ef5e11"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "e3a5a372eb72be977fcbb2ec34bfe957c65c81b33231efcd4c804ebe5887761a"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "6f888d6433034d3268703414ade42e943efd9e34f5030f1ffca984e11575789f"
+          }
+        ]
+      },
+      {
+        "id": 1098,
+        "replicate": 10,
+        "action": "reach_withdraw",
+        "official_state_sha256": "b53c9c318ce705679dbaa1173ae7e9806545575e94e4bfde3107824e4e8c1ebc",
+        "synthetic_state_sha256": "e382eb834c933c0d461b1932b2de291085babb8ed1cd7a90e8742c8fce582263",
+        "synthetic_views": [
+          {
+            "corner_id": 801,
+            "coeff_sha256": "efd9f438bb3184f63d68c486b47e794eeb0988e804e15bdbde8173bf48e0f917"
+          },
+          {
+            "corner_id": 802,
+            "coeff_sha256": "e1fff6d430c7fb0a958d41643b5fc95f9aca3df73d964761ce0e44c3cf7b90dc"
+          },
+          {
+            "corner_id": 803,
+            "coeff_sha256": "8341095707b5c7bf8796c7c897813bcf356f015dce95f36c40a2744e8a3a385a"
+          },
+          {
+            "corner_id": 804,
+            "coeff_sha256": "508bb8dc7e692e50e63374e1e12a4bedb7ffa06b1608cefb8effe76adcfadd28"
+          }
+        ]
+      }
+    ]
+  },
+  "primary": {
+    "validation_cases": 9,
+    "required_action_correct": 6,
+    "required_control_wins": 6,
+    "action_correct": 4,
+    "crossfeature_truth_wins": {
+      "diagonal": 9,
+      "raw_frozen": 9,
+      "neutral_visual": 5,
+      "reversed_visual": 7,
+      "zero_state": 3,
+      "shuffled_state": 9
+    },
+    "mean_truth_rmse_rad": {
+      "crossfeature": 0.16021748970505745,
+      "diagonal": 0.18999600155453059,
+      "raw_frozen": 0.4959534114119827,
+      "neutral_visual": 0.17420602676545277,
+      "reversed_visual": 0.17946604750367787,
+      "zero_state": 0.16955653620151873,
+      "shuffled_state": 0.4479582144384987
+    },
+    "targets_distinct": true,
+    "passed": false,
+    "development_candidate": false,
+    "scientific_result": false
+  },
+  "validation": [
+    {
+      "id": 1099,
+      "action": "foreleg_rubbing",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.3523060033937271,
+        "head_directed_grooming": 0.012898536128260146,
+        "reach_withdraw": 0.6347954604780127
+      },
+      "official_state_sha256": "ebb42b9a5842cd8fe38a64ab57118cdaba8aad13a950bd9f28eb0daa6d30d12c",
+      "crossfeature_state_sha256": "d17b961d70a7488cc30335331028d6b7aea732535bf66fe2a6f8200fd26c4e9d",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.1705968784622277,
+          "target_sha256": "fc9790c60d1d87efccf4d85a8de0cfbc4a1ec8911bba5b9d346bd97691874938"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.19672702317121202,
+          "target_sha256": "ac137ff5701d14905ac0635b9fe170a47d48413d6adf39910d13a44c9f13227e"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.5648003974762557,
+          "target_sha256": "b6f7a43b09291e3884f7b3a89420ada21c1f38ce4dd60efa4dec24d20c5027ed"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.20769925157795074,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.2032947981465128,
+          "target_sha256": "98236812a523f149fea52a0b2aae6c21946b37a9466fe7553f87e0604d6091d6"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.16219116317067425,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.43313187749455334,
+          "target_sha256": "5307ca03d49c9a61652761d6400a38b0cec8a882f78b2478d1142d421dd4802a"
+        }
+      }
+    },
+    {
+      "id": 1100,
+      "action": "head_directed_grooming",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.03757252962995192,
+        "head_directed_grooming": 0.06625949582666453,
+        "reach_withdraw": 0.8961679745433836
+      },
+      "official_state_sha256": "40719d98eed298f25dd58af582edf33b8d4520686618e5298c8b86cd5869ff87",
+      "crossfeature_state_sha256": "45cdb7582f12bb45af5192cbf87e6d4ebe085c9387d07040a887f0d3c0977583",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.20693774150877592,
+          "target_sha256": "0f195b6cf90c219fdb26bd0aff539d858a18053ad1e70b5be46b21340a7ea922"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.25089276432086766,
+          "target_sha256": "4251fd14664ad22b3b5ec77004aed2b931ff37ce67c44abff53728525b412265"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.4234768546459389,
+          "target_sha256": "eda3069bf6409a8227531cfab585bc1227cc30b374ac9efbc4d89c5a0ac7811e"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.20197946482900445,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.21740608425312133,
+          "target_sha256": "4eb608d0aad993e71aa08db30ca6b334cc42677fc9cc11182ee7d766a56924a5"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.18452312166115187,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.44512246353734297,
+          "target_sha256": "8d7129326023cc8ffef203467a2c5ae2d0c6eace514145cb013d5544d756a54a"
+        }
+      }
+    },
+    {
+      "id": 1101,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.009477813301095745,
+        "head_directed_grooming": 0.007239125915447341,
+        "reach_withdraw": 0.9832830607834568
+      },
+      "official_state_sha256": "d991ce4666e11286c0a73f534c81cb4696704eb4f28b52a63c691979c8c7f927",
+      "crossfeature_state_sha256": "364fdb0b4b9928fb45bf725c205f752d80a8108f03b5e3dd600e5b8cbaac1ccc",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.10393283339305379,
+          "target_sha256": "f99cc865f558ab52ca9bd8ae11cf4dc6db2f38d746e5518d5e2fbd50343a8937"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.1145192411563048,
+          "target_sha256": "7d219f1bde5eae2b13ce22b22d993e385ed2319a7ab0ed79beeb8b2a2bfa2f9f"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.499387719625896,
+          "target_sha256": "fd1fd6069d683b13df1798161b4466df7e7d1ece3735e33c85c8f6147df044c1"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.09548350624193074,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.09741263904083239,
+          "target_sha256": "7897ace4089387c3a0d963c4dfcb67145477a2d0932b116b34c2ef5f78211c96"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.12808075081158193,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.45665234487452105,
+          "target_sha256": "bff91f59e61da9f69cb3c3d50aab661ff8d2e2030b91ba815162c58570ae24cc"
+        }
+      }
+    },
+    {
+      "id": 1102,
+      "action": "foreleg_rubbing",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.3771744391337527,
+        "head_directed_grooming": 0.017391229550754433,
+        "reach_withdraw": 0.6054343313154928
+      },
+      "official_state_sha256": "4d1dae1593e5bbf95e524706ef9a1b2ebe816dcf9530914175817eb9f17ffbee",
+      "crossfeature_state_sha256": "e4fd81f042ba91dcf58f0f59e3628263c0fe3f1187b0fdb4cc79d55e15998931",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.18591589353867122,
+          "target_sha256": "d8ddb6f3915356f08b18bd5c212fd934189a6817c3aced7ff14c5e270890027d"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.20453891500575558,
+          "target_sha256": "b47bbef8d9886d9aa6d555ada7ceb651670463904bee8ebdf171d3b19a3f483d"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.5793828478107546,
+          "target_sha256": "75346ab9fe55eca8540f29602dc9664ca999786f2146d729c6847e719cc7edb3"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.23660775221946073,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.23051373100681052,
+          "target_sha256": "ef36e8d0d2a1d91c6b6c2db28c16571e84f5412fc2b2123f55667971949e6ad3"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.178415130190448,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.42874107205476725,
+          "target_sha256": "f337cd3a8e1af80d4bb81e21aa737e9b5bb2f8b7ad88055f6bc05ea8386eb4e9"
+        }
+      }
+    },
+    {
+      "id": 1103,
+      "action": "head_directed_grooming",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.010751006183921974,
+        "head_directed_grooming": 0.1581730226991327,
+        "reach_withdraw": 0.8310759711169453
+      },
+      "official_state_sha256": "a8e989030ba2f69e429fdd15fe2d4cd77db9c15dddb0cf1cbc181f2d5da6a575",
+      "crossfeature_state_sha256": "6a0962106ba2d20c3251a4b2a94ee4ec881034e31324d6606ba46312b7a6f442",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.19880575783932303,
+          "target_sha256": "8c0b7be6ab57a318ed43898fb3a4c9e1f94dc2a9535698105f794234faac09d2"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.21635561902377876,
+          "target_sha256": "1532410fcfc7533e48beb2e8b9d97e60d9f62fc8c173aedf88c7b99c239716be"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.4166585841293843,
+          "target_sha256": "13cb9e2c661977cd5c3f3b057bfd86a88799d9e91c421298ac13d7c67efa75cc"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.19107688676399612,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.1930606814290826,
+          "target_sha256": "0e2f8883c4c395bc0238c981727d040f883a001472f1fee5b737969f0b936988"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.19727200998154418,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.46352571589921115,
+          "target_sha256": "91ef0ec3ebfde9d671b2ae5edf614800096e8852b5c126f4a543c7dcd4dc0ff8"
+        }
+      }
+    },
+    {
+      "id": 1104,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.04703995304954527,
+        "head_directed_grooming": 0.007879292883527086,
+        "reach_withdraw": 0.9450807540669276
+      },
+      "official_state_sha256": "2c934a253a29a7a447d2b4bf3c7961dc396567db7cca80185a261c9f5522eb69",
+      "crossfeature_state_sha256": "7e8d69684504af25a6eec5892fbdddccfea15cccacf74dc37a4999fe07790a46",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.08387315452399484,
+          "target_sha256": "611402c58702497c11590a6468b9b116a1fee8d13ef7ea473c3b8593a676ac76"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.1193622588644109,
+          "target_sha256": "450f89e914faa3df09a13508b6df96ea8a83ac67ff19e857682499639606d689"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.49565860263939526,
+          "target_sha256": "758769ebd963eaf1bc7bb2dac96fd55a683822d3118a0700423b74c41be1ca72"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.08550981462000665,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.0960414575758438,
+          "target_sha256": "9db84c0c08877a5415732ddc4498ccf32b2561eb1c5a132a01cdd365e3b01207"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.13816946447660233,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.44926672021198,
+          "target_sha256": "188e08049582cd0a802711265e3abc72440d263b3efd0f5b79feab24d8e5b511"
+        }
+      }
+    },
+    {
+      "id": 1105,
+      "action": "foreleg_rubbing",
+      "predicted_action": "foreleg_rubbing",
+      "probabilities": {
+        "foreleg_rubbing": 0.5009859468548521,
+        "head_directed_grooming": 0.014752788926329976,
+        "reach_withdraw": 0.4842612642188179
+      },
+      "official_state_sha256": "a350731d9a3806fc37f342fc516e3e9ce17e250f416f3affe8164c3fbd82ddc1",
+      "crossfeature_state_sha256": "0a4cb409f2efc8d380d1292892f97ee56e8ce19eec0836b3f6e222dc0516bdff",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.19989386819678456,
+          "target_sha256": "c482a66c651675e0ea9072829144fae4545c16ef77a7af038046281658ce2bd8"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.2241684084759402,
+          "target_sha256": "78f4dfc2b17915a1a223d3a4bf40ddaf948595d11522682d83a12956ed592b0d"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.5904007611792711,
+          "target_sha256": "5b41c32e4410d97089c42a0b18aec5a371f2229a7d56d1dc0e1fdbbfe298130a"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.25820188816069595,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.26717099984380305,
+          "target_sha256": "c9f4cf2c58e7d9578c568049fcc9fdf373a3a6356c8db69b8d175450c37875c0"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.1837217208607159,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.4165829258607156,
+          "target_sha256": "7345e48844365a427fcee4a0647aaa1ec34e38e4cf9d04668eeb4afebfd7fd16"
+        }
+      }
+    },
+    {
+      "id": 1106,
+      "action": "head_directed_grooming",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.028241793852179217,
+        "head_directed_grooming": 0.1667607124208023,
+        "reach_withdraw": 0.8049974937270185
+      },
+      "official_state_sha256": "e8b3fe12378a38dc9aaff85e3e17b28a335f38c99c0a42f1397764912bdff828",
+      "crossfeature_state_sha256": "8cb2e2f261b77587649cd7298136b0a440dd63ad0dd19144ff922d4c31f68feb",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.2101588951420974,
+          "target_sha256": "5aec8931838f161a5c61cf0682edea5550641985bd899621d69cbabd06dafa54"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.26250571932003874,
+          "target_sha256": "9d1f3ca3abbe7a4a9c49445935d6998599b590d553099103822494a239e5581b"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.3980233876471661,
+          "target_sha256": "45e92b5b010b194f2411e25df40a248bc230840e7f01b3463c7e6735c3c222f0"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.21053132565432836,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.21822111289932605,
+          "target_sha256": "be818b3b1a42d5cf6b9327eb5d1e9afb415bad0aab3cde6206775fabd925ab5f"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.20716925319946713,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.4784627708334357,
+          "target_sha256": "958932e004e88022c2d6234be699aa547be7c30a580586757b088b610e8547c7"
+        }
+      }
+    },
+    {
+      "id": 1107,
+      "action": "reach_withdraw",
+      "predicted_action": "reach_withdraw",
+      "probabilities": {
+        "foreleg_rubbing": 0.025473340994196406,
+        "head_directed_grooming": 0.007356570474986159,
+        "reach_withdraw": 0.9671700885308173
+      },
+      "official_state_sha256": "73b4a17deb48a1c8dea85cc6de6df29b2f2aeebb2ce95852e58e906e237fc111",
+      "crossfeature_state_sha256": "b92d2057f0add928a7f8d7abbb4b95bc15a67468e0b3b392b7bdc3ac455e6abe",
+      "controls": {
+        "crossfeature": {
+          "truth_rmse_rad": 0.08184238474058854,
+          "target_sha256": "30f4de94f64ffed5be5afe41d88a23ebf42ae8ae06f8769472dbaac2841ce7e5"
+        },
+        "diagonal": {
+          "truth_rmse_rad": 0.12089406465246663,
+          "target_sha256": "7c73f266c46db339cbfaeef169fd52958469531a891929e1fe94389194579cd0"
+        },
+        "raw_frozen": {
+          "truth_rmse_rad": 0.49579154755378196,
+          "target_sha256": "5933463294b48fcd7798dff505b73343c951187e94a941cc03412a90481eca4d"
+        },
+        "neutral_visual": {
+          "truth_rmse_rad": 0.08076435082170134,
+          "target_sha256": "cdf84c2a00f117000a76bd83386bdf9b06aea050c6118093f42f28f1d681b11e"
+        },
+        "reversed_visual": {
+          "truth_rmse_rad": 0.09207292333776808,
+          "target_sha256": "0d81553f334a9d58cad0535037aa19da42f040c9270787cb65d0c7b5a1e5dd7a"
+        },
+        "zero_state": {
+          "truth_rmse_rad": 0.14646621146148292,
+          "target_sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+        },
+        "shuffled_state": {
+          "truth_rmse_rad": 0.46013803917996093,
+          "target_sha256": "2a30ce81d9402ca291c1646f80148dc3e38af1d0d5a04ab165e4d180ffacf946"
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "New train-only-selected temporal cross-feature engineering adapter; not a rescue or replication of Series104/105B.",
+    "Held validation is non-physical development evidence.",
+    "Pass cannot itself establish physical transfer and only authorizes separately frozen Series106.",
+    "No biological vision, FlyVis/FlyWire/connectome mapping, living animal, or mirror-neuron claim."
+  ]
+}

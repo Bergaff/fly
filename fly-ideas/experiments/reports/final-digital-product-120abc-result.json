@@ -1,0 +1,27 @@
+{
+  "schema": "final-digital-product-120abc-v1",
+  "status": "completed",
+  "inputs": {
+    "series118_sha256": "f1a5751b664e28f485f25cabb8949a266debb275aa8af8d9957b292108f0c5b1",
+    "series119_sha256": "2badd87b4efe717458782e71b865b8d426c4526b75893a91e784d43c1aa959d1",
+    "matrix_sha256": "03157b503d0271cb0991db524d45220bb8f49ce62e3ba171dc997ed7f3816150",
+    "paths_sha256": "4186bb6fdbe0a0e81f8626469027976ade1d416ff0549af94b85fb1b07aa3ca1"
+  },
+  "120a": {
+    "digital_method_complete": true,
+    "biological_mirror_neurons_identified": false
+  },
+  "120b": {
+    "algorithm_implemented": true,
+    "other_species_validated": 0,
+    "cross_animal_claim": false,
+    "engineering_top1_accuracy": 0.6829268292682927
+  },
+  "120c": {
+    "dense_scalar_capacity": 4214,
+    "comparison_is_compute_only": true,
+    "general_ai_equivalence": false
+  },
+  "final_product": "robust digital fly mirror-assessment and species-transfer method; biological identification awaits external evidence",
+  "biological_claim": false
+}

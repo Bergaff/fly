@@ -1,0 +1,39 @@
+{
+  "schema": "series-74-user-result-extract-v1",
+  "source": "user-pasted ИТОГ.txt and summary.json; original local result files not supplied",
+  "status": "completed",
+  "scientific_validity": "invalid_visual_stimulus",
+  "active_training_seconds": 28800.359999999993,
+  "candidates": 80794,
+  "accepted_candidates": 80794,
+  "training_frames": 3958906,
+  "new_model_sha256": "c88dd3a35474396b6104bfbd9a6418dee995b59da33285ee0f0104c170439c70",
+  "pooled_rmse": {
+    "new": 0.4683800742952123,
+    "zero": 0.46842880737695336,
+    "training_mean": 0.46838007429521233
+  },
+  "combined_wins": {
+    "vs_zero": 7,
+    "vs_training_mean": 7
+  },
+  "primary_passed": false,
+  "axes": {
+    "left_proximal": {"new": 0.44719224976506255, "zero": 0.4472993560444518, "training_mean": 0.4471922497650627, "wins_vs_zero": 7, "wins_vs_training_mean": 7, "reported_passed": true},
+    "left_middle": {"new": 0.4774824629119321, "zero": 0.47749051056841746, "training_mean": 0.4774824629119321, "wins_vs_zero": 5, "wins_vs_training_mean": 1, "reported_passed": false},
+    "left_distal": {"new": 0.48384618209237445, "zero": 0.48383070187798816, "training_mean": 0.48384618209237445, "wins_vs_zero": 4, "wins_vs_training_mean": 3, "reported_passed": false},
+    "right_proximal": {"new": 0.4673451270248475, "zero": 0.46754898926657584, "training_mean": 0.4673451270248477, "wins_vs_zero": 7, "wins_vs_training_mean": 7, "reported_passed": true},
+    "right_middle": {"new": 0.45440264429955907, "zero": 0.45442327178336983, "training_mean": 0.4544026442995591, "wins_vs_zero": 6, "wins_vs_training_mean": 4, "reported_passed": false},
+    "right_distal": {"new": 0.47886176973807293, "zero": 0.47883678691246595, "training_mean": 0.47886176973807293, "wins_vs_zero": 4, "wins_vs_training_mean": 3, "reported_passed": false}
+  },
+  "audit": {"accepted_total": 80794, "audited_count": 128, "is_exhaustive": false, "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 93, "holdout_frames": 490},
+  "local_diagnostic": {
+    "candidate_id": 0,
+    "image_shape": [51, 2, 32, 48, 3],
+    "unique_rgb_frames": 1,
+    "changed_adjacent_rgb_values": 0,
+    "max_feature_std": 8.881784197001252e-16,
+    "command_std_deg": [22.33200236, 25.49044988, 28.44712207, 22.62687187, 26.73760159, 24.64012231],
+    "root_cause": "capsule geom_size has zero components but renderer divides by every size component; moving capsules are absent from RGB"
+  }
+}

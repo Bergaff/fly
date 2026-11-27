@@ -1,0 +1,28 @@
+{
+  "provenance": "Manual transcription of the user-pasted ОТЧЕТ.txt; not the original summary.json or predictions.csv.",
+  "source": "completed series 59, new_test test_002",
+  "target_axis": "right_x",
+  "segment_s": [1.44, 1.60],
+  "delta_deg": 10.0,
+  "conditions": [
+    {"condition":"baseline","old_rmse_rad":1.105086,"new_rmse_rad":1.201072,"new_mean_delta_rad":0.0,"new_max_abs_delta_rad":0.0},
+    {"condition":"only_right_x","old_rmse_rad":0.203196,"new_rmse_rad":0.230682,"new_mean_delta_rad":0.963114,"new_max_abs_delta_rad":1.156737},
+    {"condition":"left_x_minus_10deg","old_rmse_rad":1.088834,"new_rmse_rad":1.184923,"new_mean_delta_rad":0.013244,"new_max_abs_delta_rad":0.034871},
+    {"condition":"left_x_plus_10deg","old_rmse_rad":1.065416,"new_rmse_rad":1.165359,"new_mean_delta_rad":0.040690,"new_max_abs_delta_rad":0.065888},
+    {"condition":"left_y_minus_10deg","old_rmse_rad":1.082663,"new_rmse_rad":1.157546,"new_mean_delta_rad":0.048408,"new_max_abs_delta_rad":0.072932},
+    {"condition":"left_y_plus_10deg","old_rmse_rad":1.094494,"new_rmse_rad":1.208203,"new_mean_delta_rad":-0.009591,"new_max_abs_delta_rad":0.028177},
+    {"condition":"left_z_minus_10deg","old_rmse_rad":1.040398,"new_rmse_rad":1.173715,"new_mean_delta_rad":0.026063,"new_max_abs_delta_rad":0.035067},
+    {"condition":"left_z_plus_10deg","old_rmse_rad":1.145524,"new_rmse_rad":1.212272,"new_mean_delta_rad":-0.009971,"new_max_abs_delta_rad":0.018985},
+    {"condition":"right_y_minus_10deg","old_rmse_rad":1.160849,"new_rmse_rad":1.265085,"new_mean_delta_rad":-0.081776,"new_max_abs_delta_rad":0.206161},
+    {"condition":"right_y_plus_10deg","old_rmse_rad":0.881668,"new_rmse_rad":0.956433,"new_mean_delta_rad":0.249607,"new_max_abs_delta_rad":0.295035},
+    {"condition":"right_z_minus_10deg","old_rmse_rad":1.176933,"new_rmse_rad":1.273333,"new_mean_delta_rad":-0.081642,"new_max_abs_delta_rad":0.137884},
+    {"condition":"right_z_plus_10deg","old_rmse_rad":0.989356,"new_rmse_rad":1.080054,"new_mean_delta_rad":0.125157,"new_max_abs_delta_rad":0.166182}
+  ],
+  "reported_rank": "right_y_plus_10deg had the largest absolute mean response among single-axis shifts",
+  "reported_limitations": [
+    "Models were not retrained.",
+    "Whole-axis shifts and right_x isolation may be out of distribution.",
+    "Model sensitivity is not biological causality.",
+    "Synthetic cameras and supervised ridge do not prove mirror neurons or autonomous reproduction."
+  ]
+}

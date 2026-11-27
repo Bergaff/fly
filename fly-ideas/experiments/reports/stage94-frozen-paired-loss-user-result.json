@@ -1,0 +1,342 @@
+{
+  "schema": "stage94-frozen-paired-loss-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "stage94-frozen-paired-loss-v1",
+    "mode": "frozen_replication",
+    "biological_result": false,
+    "source_stage92_sha256": "0dbbdcb91fff86ab059e975ded8c358dae345c1b6429795ead516faabe8c4439",
+    "script_sha256": "7d9c713584e389d9e300120fdc27600705bfbcf23e4c4355c462fe21d7ca176f",
+    "fixed_replicates": 2048,
+    "workers": 6,
+    "worker_choice": "6",
+    "seed_namespace": "94000000-series; not Stage92 or disclosed 64/96-replicate development pilots",
+    "models": [
+      "structured96",
+      "shuffled96",
+      "dense96"
+    ],
+    "trajectory_loss_weight": 4.0,
+    "common_random_numbers": {
+      "training_initialization": true,
+      "minibatch_order": true,
+      "lesion_indices": true,
+      "state_noise": true
+    },
+    "budgets": [
+      5,
+      30
+    ],
+    "scenarios": [
+      [
+        "clean",
+        0.12,
+        0,
+        0.0
+      ],
+      [
+        "view_high",
+        0.45,
+        0,
+        0.0
+      ],
+      [
+        "occlusion",
+        0.28,
+        0,
+        0.0
+      ],
+      [
+        "lesion10",
+        0.28,
+        10,
+        0.0
+      ],
+      [
+        "lesion25",
+        0.28,
+        24,
+        0.0
+      ],
+      [
+        "state_noise",
+        0.28,
+        0,
+        0.08
+      ],
+      [
+        "combined_harsh",
+        0.48,
+        24,
+        0.08
+      ]
+    ],
+    "frozen_gate": "few-shot harsh margin>=0.03; RMSE ratio<=0.97; harsh Wilson95 lower>=0.60; overall Wilson95 lower>=0.55",
+    "selection_disclosure": "weight4 and common-random-number correction selected after Stage92 diagnosis and disclosed bounded development pilots",
+    "limitations": [
+      "Frozen computational replication of an engineered candidate, not biological evidence.",
+      "96 units are software units, not neurons or FlyWire IDs.",
+      "No threshold may be weakened after results."
+    ]
+  },
+  "completed_replicates": 2048,
+  "worker_cpu_seconds": 4761.28125,
+  "aggregate": {
+    "5": {
+      "clean": {
+        "dense96": {
+          "accuracy": 0.548733723958334,
+          "rmse": 0.18953482623990953,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.5158843315972224,
+          "rmse": 0.18516088008702594,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.5293174913194446,
+          "rmse": 0.1807540831687389,
+          "n": 2048
+        }
+      },
+      "combined_harsh": {
+        "dense96": {
+          "accuracy": 0.23381944444444425,
+          "rmse": 0.33175462458817373,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.22478407118055593,
+          "rmse": 0.3293950400295646,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.2547873263888884,
+          "rmse": 0.31149598339565265,
+          "n": 2048
+        }
+      },
+      "lesion10": {
+        "dense96": {
+          "accuracy": 0.35453993055555577,
+          "rmse": 0.2711227443331301,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.33397460937500084,
+          "rmse": 0.2663286799070079,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.36538953993055545,
+          "rmse": 0.25446534391595865,
+          "n": 2048
+        }
+      },
+      "lesion25": {
+        "dense96": {
+          "accuracy": 0.31094184027777705,
+          "rmse": 0.2840405530665522,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.29257052951388907,
+          "rmse": 0.2792655418797342,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.31977539062499954,
+          "rmse": 0.26807949667772013,
+          "n": 2048
+        }
+      },
+      "occlusion": {
+        "dense96": {
+          "accuracy": 0.3879676649305554,
+          "rmse": 0.2551909344883204,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.36605577256944444,
+          "rmse": 0.2503370110822515,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.400787760416668,
+          "rmse": 0.23814532568570534,
+          "n": 2048
+        }
+      },
+      "state_noise": {
+        "dense96": {
+          "accuracy": 0.38412651909722334,
+          "rmse": 0.2597079869346793,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.3617252604166665,
+          "rmse": 0.25530954694014324,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.39565646701388946,
+          "rmse": 0.24342370997830165,
+          "n": 2048
+        }
+      },
+      "view_high": {
+        "dense96": {
+          "accuracy": 0.29056857638888917,
+          "rmse": 0.3068054478641439,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.2782465277777778,
+          "rmse": 0.30300911109370054,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.3188216145833334,
+          "rmse": 0.28475835746750844,
+          "n": 2048
+        }
+      }
+    },
+    "30": {
+      "clean": {
+        "dense96": {
+          "accuracy": 0.9816883680555637,
+          "rmse": 0.049066343762774946,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.9858355034722298,
+          "rmse": 0.04468010690855877,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.9901236979166741,
+          "rmse": 0.04427595932085429,
+          "n": 2048
+        }
+      },
+      "combined_harsh": {
+        "dense96": {
+          "accuracy": 0.4094704861111113,
+          "rmse": 0.13497886724898875,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.4115842013888892,
+          "rmse": 0.13310263662587152,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.4849924045138892,
+          "rmse": 0.12881015454243436,
+          "n": 2048
+        }
+      },
+      "lesion10": {
+        "dense96": {
+          "accuracy": 0.7361425781250002,
+          "rmse": 0.09280412763664869,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.7393424479166671,
+          "rmse": 0.08859967092666801,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.7966145833333348,
+          "rmse": 0.08709362760899601,
+          "n": 2048
+        }
+      },
+      "lesion25": {
+        "dense96": {
+          "accuracy": 0.5997124565972213,
+          "rmse": 0.10945812614403927,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.5833159722222216,
+          "rmse": 0.10719227510147834,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.6313454861111101,
+          "rmse": 0.1057657763821327,
+          "n": 2048
+        }
+      },
+      "occlusion": {
+        "dense96": {
+          "accuracy": 0.8346571180555551,
+          "rmse": 0.07898284487852111,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.8631369357638895,
+          "rmse": 0.0728302778149761,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.913989800347223,
+          "rmse": 0.07046526293357298,
+          "n": 2048
+        }
+      },
+      "state_noise": {
+        "dense96": {
+          "accuracy": 0.8242024739583337,
+          "rmse": 0.08069930786587916,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.8467871093749982,
+          "rmse": 0.07549867837529393,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.8993880208333356,
+          "rmse": 0.07351761129068879,
+          "n": 2048
+        }
+      },
+      "view_high": {
+        "dense96": {
+          "accuracy": 0.6164160156249989,
+          "rmse": 0.10717896638320504,
+          "n": 2048
+        },
+        "shuffled96": {
+          "accuracy": 0.6553049045138906,
+          "rmse": 0.10106475776971033,
+          "n": 2048
+        },
+        "structured96": {
+          "accuracy": 0.7627701822916666,
+          "rmse": 0.0961890992196128,
+          "n": 2048
+        }
+      }
+    }
+  },
+  "frozen_gate": {
+    "harsh_fewshot_accuracy_margin": 0.03000325520833247,
+    "harsh_fewshot_rmse_ratio": 0.9456608192026649,
+    "harsh_dual_wins": 2620,
+    "harsh_comparisons": 4096,
+    "harsh_dual_rate": 0.6396484375,
+    "harsh_wilson95_lower": 0.624821031505472,
+    "overall_dual_wins": 17228,
+    "overall_comparisons": 28672,
+    "overall_dual_rate": 0.6008649553571429,
+    "overall_wilson95_lower": 0.5951833158746018,
+    "frozen_pass": true
+  },
+  "interpretation": "computational_candidate_replicated"
+}

@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Independent verifier for uploaded or persisted frozen89E summary."""
+from __future__ import annotations
+import argparse,hashlib,json,math
+from collections import Counter
+from pathlib import Path
+SOURCE='c2608558f4fcddd570367010b8293ecd04204099fae6b26cf2935b44618869a3';SCRIPT='06e41e7ec789514f4ee8bbd06365b9b51a4570e24f5b1451890795d066c5e1bf';RUNNER_D='ac85ba29b05535d48bf238ffb955f526b0c4b18419a7526e352afba86ae2304d';D_EXTRACT='32953b4a1197d8480d3c51a734a660317a2e2283315646ef095fdf358da5960d';D_SUMMARY='fcde095ea33e523f912541183b4120879be8ae6f8ac1a503b9adfedb2bcfb97c';MODEL_D='82fbfe153ccba204f141737bd052193289b2d9494776ff8c05bd315c320ed85c';MODEL84Z='cb7610514c423372362f6cd3512b19f39c156213728c5ecaafe17fe10734e4b0';ACTIONS=('foreleg_rubbing','head_directed_grooming','reach_withdraw');PROFILES=('neutral','pose_offset','velocity_offset');ANGLE=('uncalibrated','zero_state','shuffled_state','open_loop','shared_lesion');BROAD=('soft_mixture','angle_only','common_contact')+ANGLE;CONTACT=('standard_hard','oracle_expert')+BROAD
+
+def close(a,b):return math.isclose(float(a),float(b),rel_tol=1e-11,abs_tol=1e-12)
+def load(path):
+ p=Path(path);d=json.loads(p.read_text(encoding='utf8'));actual=hashlib.sha256(p.read_bytes()).hexdigest()
+ if d.get('source_file_sha256'):assert d['source_file_sha256']==SOURCE and d['reported_schema']=='frozen-routing-margin-replication-result-v1' and d['reported_status']=='completed'
+ else:assert actual==SOURCE and d['schema']=='frozen-routing-margin-replication-result-v1' and d['status']=='completed'
+ return d
+def verify(path):
+ d=load(path);p=d['protocol'];reported=d.get('reported_primary',d.get('primary'));rows=d['tests']
+ assert p['mode']=='full' and p['script_sha256']==SCRIPT and p['runner89d_sha256']==RUNNER_D and p['series89d_go_extract_sha256']==D_EXTRACT and p['series89d_summary_sha256']==D_SUMMARY and p['frozen89d_model_sha256']==MODEL_D and p['frozen84z_model_sha256']==MODEL84Z==p['selected_model_sha256']
+ assert p['training_allowed'] is False and p['selection_allowed'] is False and p['candidate_inference_uses_truth_action'] is False and p['oracle_control_uses_truth_action'] is True and p['frozen_foreleg_boost']==4. and p['frozen_identity_ridge']==.01;assert d['frozen_model']=={'sha256':MODEL_D,'development_summary_sha256':D_SUMMARY,'foreleg_boost':4.0,'identity_ridge':.01}
+ assert [x['id'] for x in p['motions']]==list(range(873,891)) and len({x['motion_sha256'] for x in p['motions']})==18 and [x['corner_id'] for x in p['views']]==list(range(781,793))
+ assert len(rows)==216 and len({(x['id'],x['corner_id']) for x in rows})==216 and Counter(x['action'] for x in rows)==Counter({a:72 for a in ACTIONS}) and all(x['oracle_control_only_uses_truth_action'] is True for x in rows)
+ identity=sum(x['action']==x['predicted_action'] for x in rows);identity_by={a:sum(x['predicted_action']==a for x in rows if x['action']==a) for a in ACTIONS};assert identity==216 and identity_by=={a:72 for a in ACTIONS}
+ flat=[(r,t) for r in rows for t in r['trials']];assert len(flat)==648 and Counter(t['initial_profile'] for r,t in flat)==Counter({x:216 for x in PROFILES}) and len({t['initial_seed'] for r,t in flat})==648
+ means={c:{m:sum(t['controls'][c][m] for r,t in flat)/648 for m in ('angle_rmse_truth','contact_mae_truth')} for c in p['controls']};aw={c:sum(t['controls']['candidate']['angle_rmse_truth']<t['controls'][c]['angle_rmse_truth'] for r,t in flat) for c in ANGLE};cw={c:sum(t['controls']['candidate']['contact_mae_truth']<t['controls'][c]['contact_mae_truth'] for r,t in flat) for c in CONTACT};action_cw={a:{c:sum(t['controls']['candidate']['contact_mae_truth']<t['controls'][c]['contact_mae_truth'] for r,t in flat if r['action']==a) for c in ('angle_only','common_contact')} for a in ACTIONS};foreleg_standard=sum(t['controls']['candidate']['contact_mae_truth']<t['controls']['standard_hard']['contact_mae_truth'] for r,t in flat if r['action']=='foreleg_rubbing')
+ safe=lambda x:x['nan_count']==0 and x['limit_violations']==0 and x['max_abs_torque']<=1.25+1e-12 and x['energy_abs_work']<=4 and x['max_tilt_rad']<=.25 and x['minimum_body_z']>=.30
+ safety=sum(safe(t['controls']['candidate']) for r,t in flat);recovered=sum(t['controls']['candidate']['recovered'] for r,t in flat);completed=sum(t['controls']['candidate']['completion_ratio']>=.65 for r,t in flat)
+ assert aw=={'uncalibrated':648,'zero_state':648,'shuffled_state':648,'open_loop':646,'shared_lesion':648};assert cw=={'standard_hard':134,'oracle_expert':0,'soft_mixture':598,'angle_only':636,'common_contact':633,'uncalibrated':562,'zero_state':648,'shuffled_state':648,'open_loop':642,'shared_lesion':648};assert action_cw=={'foreleg_rubbing':{'angle_only':215,'common_contact':201},'head_directed_grooming':{'angle_only':213,'common_contact':216},'reach_withdraw':{'angle_only':208,'common_contact':216}} and foreleg_standard==134 and safety==648 and recovered==648 and completed==648
+ for c in means:
+  for m in means[c]:assert close(means[c][m],reported['means'][c][m])
+ identity_gate=identity>=195 and all(identity_by[a]>=65 for a in ACTIONS);angle=all(aw[c]>=584 for c in ANGLE) and means['candidate']['angle_rmse_truth']<=1.05*means['angle_only']['angle_rmse_truth'];broad_pass=sum(cw[c]>=584 for c in BROAD);contact=cw['angle_only']>=584 and cw['common_contact']>=584 and all(action_cw[a][c]>=195 for a in ACTIONS for c in ('angle_only','common_contact')) and broad_pass>=7 and means['candidate']['contact_mae_truth']<=means['standard_hard']['contact_mae_truth'] and means['candidate']['contact_mae_truth']<=means['soft_mixture']['contact_mae_truth'] and means['candidate']['contact_mae_truth']<=means['oracle_expert']['contact_mae_truth']+.02
+ assert identity_gate and angle and contact and broad_pass==7 and reported['identity_gate_passed'] is True and reported['angle_gate_passed'] is True and reported['contact_gate_passed'] is True and reported['passed'] is True
+ assert close(means['candidate']['contact_mae_truth'],.12451661500717921) and close(means['standard_hard']['contact_mae_truth'],.12479571845381686) and close(means['soft_mixture']['contact_mae_truth'],.13013584648365456);assert all(t['controls']['candidate']==t['controls']['oracle_expert'] for r,t in flat)
+ assert reported['identity_correct']==identity and reported['identity_by_action']==identity_by and reported['candidate_safety_passed']==safety and reported['candidate_recovered']==recovered and reported['candidate_completed']==completed and reported['candidate_angle_wins']==aw and reported['candidate_contact_wins']==cw and reported['candidate_action_contact_wins']==action_cw and reported['foreleg_wins_standard_hard']==foreleg_standard and reported['broad_controls_passed']==broad_pass
+ return {'source_sha256':SOURCE,'cases':216,'trials':648,'identity':identity,'safety':safety,'recovered':recovered,'completed':completed,'contact_wins':cw,'action_contact_wins':action_cw,'broad_controls_passed':broad_pass,'candidate_contact_mean':means['candidate']['contact_mae_truth'],'passed':True}
+def main():
+ q=argparse.ArgumentParser();q.add_argument('summary');a=q.parse_args();print(json.dumps(verify(a.summary),ensure_ascii=False,indent=2))
+if __name__=='__main__':main()

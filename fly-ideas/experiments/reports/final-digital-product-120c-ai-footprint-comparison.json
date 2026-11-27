@@ -1,0 +1,44 @@
+{
+  "series": "120C",
+  "comparison_kind": "computational_footprint_not_intelligence_or_task_quality",
+  "project_core": {
+    "type_count": 61,
+    "dn_channel_count": 8,
+    "dense_scalar_capacity": 4214,
+    "sparse_nonzero_scalar_capacity": 2916,
+    "approximate_fp32_core_bytes": 16856,
+    "observed_series119_replicates_per_wall_second_on_user_machine": 39.54770387087604,
+    "observed_series119_workers": 6
+  },
+  "reference_ai_models": [
+    {
+      "reference": "small_neural_network_1m",
+      "declared_parameters": 1000000,
+      "parameter_ratio_reference_to_dense_project_core": 237.30422401518746,
+      "fp16_weight_memory_bytes": 2000000,
+      "task_performance_compared": false
+    },
+    {
+      "reference": "compact_transformer_100m",
+      "declared_parameters": 100000000,
+      "parameter_ratio_reference_to_dense_project_core": 23730.422401518746,
+      "fp16_weight_memory_bytes": 200000000,
+      "task_performance_compared": false
+    },
+    {
+      "reference": "reference_language_model_7b",
+      "declared_parameters": 7000000000,
+      "parameter_ratio_reference_to_dense_project_core": 1661129.5681063123,
+      "fp16_weight_memory_bytes": 14000000000,
+      "task_performance_compared": false
+    }
+  ],
+  "interpretation": {
+    "project_is_far_smaller_than_reference_ai_by_parameter_count": true,
+    "project_is_specialized_and_interpretable": true,
+    "project_can_be_cheaper_for_its_narrow_graph_alignment_task": true,
+    "general_intelligence_equivalence": false,
+    "biological_brain_power_equivalence": false,
+    "accuracy_or_capability_ranking_against_ai": "not_measured_and_not_comparable_without_a_shared_dataset_task_and_metric"
+  }
+}

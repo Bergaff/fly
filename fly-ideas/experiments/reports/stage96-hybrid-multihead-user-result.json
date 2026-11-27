@@ -1,0 +1,539 @@
+{
+  "schema": "stage96-hybrid-multihead-result-v1",
+  "status": "completed",
+  "protocol": {
+    "schema": "stage96-hybrid-multihead-development-v1",
+    "mode": "eight_hour_development",
+    "biological_result": false,
+    "stage95_sha256": "58b74a79bf7f2edd9c589c579019d94bf4908354f2734628e575de4b1677425a",
+    "script_sha256": "d80002612536e621ffa580772c02e719054c5b01d1dcca30862baa934c582084",
+    "target_wall_seconds": 28800,
+    "calibration_cpu_seconds": 5.28125,
+    "fixed_replicates": 32720,
+    "workers": 6,
+    "worker_choice": "6",
+    "models": [
+      "hybrid_structured",
+      "hybrid_shuffled",
+      "hybrid_temporal",
+      "hybrid_learned",
+      "learned_sparse96",
+      "rnn54"
+    ],
+    "parameter_count_each": 4437,
+    "hybrid_budget": {
+      "classifier": "61-unit static branch,1464 input +61 bias +549 output +9 bias =2083",
+      "trajectory": "40-unit RNN,18 fixed recurrent zeros =2354",
+      "total": 4437
+    },
+    "controls": [
+      "same-budget shuffled/temporal/learned classifier hybrids",
+      "monolithic learned_sparse96",
+      "monolithic rnn54"
+    ],
+    "seed_namespace": "96000000-series; development",
+    "gate": "classification branch beats all hybrid controls; full hybrid beats learned_sparse96 and rnn54 on mean accuracy/RMSE and Wilson-lower paired RMSE/dual",
+    "limitations": [
+      "Development selection after disclosed Stage95; requires new frozen seeds if pass.",
+      "Task-specialized hybrid is engineered from observed tradeoff.",
+      "Software architectures only, not neurons or connectomes."
+    ]
+  },
+  "completed_replicates": 32720,
+  "worker_cpu_seconds": 213195.6875,
+  "aggregate": {
+    "5": {
+      "clean": {
+        "hybrid_learned": {
+          "accuracy": 0.6057544145612523,
+          "rmse": 0.1672604253479679,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.5692770306981891,
+          "rmse": 0.1672604253479679,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.5888035180657409,
+          "rmse": 0.1672604253479679,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.5086997419179639,
+          "rmse": 0.1672604253479679,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.5483488182559203,
+          "rmse": 0.16379022551947248,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.41727478945938673,
+          "rmse": 0.17842066419930636,
+          "n": 32720
+        }
+      },
+      "combined_harsh": {
+        "hybrid_learned": {
+          "accuracy": 0.27569607443628846,
+          "rmse": 0.2517874587510871,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.2542912252105409,
+          "rmse": 0.2517874587510871,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.29569824775875353,
+          "rmse": 0.2517874587510871,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.23878918772072932,
+          "rmse": 0.2517874587510871,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.23690817712578213,
+          "rmse": 0.30037408296144186,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.1804207416462953,
+          "rmse": 0.27219412003408255,
+          "n": 32720
+        }
+      },
+      "lesion10": {
+        "hybrid_learned": {
+          "accuracy": 0.41169104862809247,
+          "rmse": 0.21476525246112915,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.377584148329269,
+          "rmse": 0.21476525246112915,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.4176384813909262,
+          "rmse": 0.21476525246112915,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.3443943221950625,
+          "rmse": 0.21476525246112915,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.3571975685955003,
+          "rmse": 0.24036950430710716,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.26557076881281916,
+          "rmse": 0.23203393971951466,
+          "n": 32720
+        }
+      },
+      "lesion25": {
+        "hybrid_learned": {
+          "accuracy": 0.37204115729422016,
+          "rmse": 0.2261239014881572,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.3383819614235254,
+          "rmse": 0.2261239014881572,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.3731014669926732,
+          "rmse": 0.2261239014881572,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.3100370143982549,
+          "rmse": 0.2261239014881572,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.3136297201847271,
+          "rmse": 0.25447590966657635,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.23238494974192023,
+          "rmse": 0.24514932109258314,
+          "n": 32720
+        }
+      },
+      "occlusion": {
+        "hybrid_learned": {
+          "accuracy": 0.44524796251017523,
+          "rmse": 0.2030641936786615,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.41290722629720417,
+          "rmse": 0.2030641936786615,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.4573854930725228,
+          "rmse": 0.2030641936786615,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.37607688128227407,
+          "rmse": 0.2030641936786615,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.39094077696279345,
+          "rmse": 0.22437404297167593,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.2948366612333498,
+          "rmse": 0.21624894286925936,
+          "n": 32720
+        }
+      },
+      "state_noise": {
+        "hybrid_learned": {
+          "accuracy": 0.44188277641943974,
+          "rmse": 0.20603711278295886,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.4091466992665078,
+          "rmse": 0.20603711278295886,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.4530202390654576,
+          "rmse": 0.20603711278295886,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.37271013311601564,
+          "rmse": 0.20603711278295886,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.386453545232282,
+          "rmse": 0.22890973011357407,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.2913581907090363,
+          "rmse": 0.21977812848618108,
+          "n": 32720
+        }
+      },
+      "view_high": {
+        "hybrid_learned": {
+          "accuracy": 0.33689269220321,
+          "rmse": 0.22970056008268952,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.31278667481661615,
+          "rmse": 0.22970056008268952,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.3665609209454057,
+          "rmse": 0.22970056008268952,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.2906682966585098,
+          "rmse": 0.22970056008268952,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.29476677533277756,
+          "rmse": 0.2738458623330928,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.22419960608530617,
+          "rmse": 0.24459024894723316,
+          "n": 32720
+        }
+      }
+    },
+    "30": {
+      "clean": {
+        "hybrid_learned": {
+          "accuracy": 0.9953778864440785,
+          "rmse": 0.06405617693685962,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.9924165987504424,
+          "rmse": 0.06405617693685962,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.9947451100246175,
+          "rmse": 0.06405617693685962,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.9415281852757255,
+          "rmse": 0.06405617693685962,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.9875060445531411,
+          "rmse": 0.04442758401811852,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.9917943493617065,
+          "rmse": 0.06585126970157931,
+          "n": 32720
+        }
+      },
+      "combined_harsh": {
+        "hybrid_learned": {
+          "accuracy": 0.5614858054876416,
+          "rmse": 0.15800600145779392,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.5032987639228446,
+          "rmse": 0.15800600145779392,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.571774789459392,
+          "rmse": 0.15800600145779392,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.37600733496332944,
+          "rmse": 0.15800600145779392,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.42573132301005234,
+          "rmse": 0.1346332161389056,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.45907070089649427,
+          "rmse": 0.15252652367870978,
+          "n": 32720
+        }
+      },
+      "lesion10": {
+        "hybrid_learned": {
+          "accuracy": 0.8629750747079646,
+          "rmse": 0.11402746773451497,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.8145814316761711,
+          "rmse": 0.11402746773451497,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.8510630942678582,
+          "rmse": 0.11402746773451497,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.6309483156750916,
+          "rmse": 0.11402746773451497,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.755168907905455,
+          "rmse": 0.0893988304068235,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.8228205650638328,
+          "rmse": 0.11045911806060525,
+          "n": 32720
+        }
+      },
+      "lesion25": {
+        "hybrid_learned": {
+          "accuracy": 0.7525406818799164,
+          "rmse": 0.129110641505452,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.6926764466177703,
+          "rmse": 0.129110641505452,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.721308000543324,
+          "rmse": 0.129110641505452,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.515620279815268,
+          "rmse": 0.129110641505452,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.6007066014669934,
+          "rmse": 0.10838134697139186,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.7177358054876395,
+          "rmse": 0.12610487413304727,
+          "n": 32720
+        }
+      },
+      "occlusion": {
+        "hybrid_learned": {
+          "accuracy": 0.9349483835914121,
+          "rmse": 0.10180662305418876,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.907220863895684,
+          "rmse": 0.10180662305418876,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.9421391605541888,
+          "rmse": 0.10180662305418876,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.7545243140450965,
+          "rmse": 0.10180662305418876,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.874248709589794,
+          "rmse": 0.0729041535647231,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.8811626596033735,
+          "rmse": 0.09623262677386135,
+          "n": 32720
+        }
+      },
+      "state_noise": {
+        "hybrid_learned": {
+          "accuracy": 0.9297737027981545,
+          "rmse": 0.10388012439202962,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.8998205650638479,
+          "rmse": 0.10388012439202962,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.9357115593588733,
+          "rmse": 0.10388012439202962,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.7428723852214099,
+          "rmse": 0.10388012439202962,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.8592390654713495,
+          "rmse": 0.07570012476090614,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.8757450421081324,
+          "rmse": 0.09829391173461621,
+          "n": 32720
+        }
+      },
+      "view_high": {
+        "hybrid_learned": {
+          "accuracy": 0.7773806710133032,
+          "rmse": 0.134790447929064,
+          "n": 32720
+        },
+        "hybrid_shuffled": {
+          "accuracy": 0.7259491985873537,
+          "rmse": 0.134790447929064,
+          "n": 32720
+        },
+        "hybrid_structured": {
+          "accuracy": 0.8169769084487709,
+          "rmse": 0.134790447929064,
+          "n": 32720
+        },
+        "hybrid_temporal": {
+          "accuracy": 0.5573980575930542,
+          "rmse": 0.134790447929064,
+          "n": 32720
+        },
+        "learned_sparse96": {
+          "accuracy": 0.671342705786475,
+          "rmse": 0.10145866330596479,
+          "n": 32720
+        },
+        "rnn54": {
+          "accuracy": 0.6487649415919572,
+          "rmse": 0.12780271885612768,
+          "n": 32720
+        }
+      }
+    }
+  },
+  "development_gate": {
+    "classification_branch_pass": true,
+    "joint_vs_monolithic_pass": false,
+    "development_candidate": false,
+    "classification": {
+      "hybrid_shuffled": {
+        "fewshot_harsh_accuracy_margin": 0.0414070225482126,
+        "harsh_accuracy_wilson95_lower": 0.803065537159745,
+        "overall_accuracy_wilson95_lower": 0.7933218126564888
+      },
+      "hybrid_temporal": {
+        "fewshot_harsh_accuracy_margin": 0.056909060038024206,
+        "harsh_accuracy_wilson95_lower": 0.9524495586659812,
+        "overall_accuracy_wilson95_lower": 0.9754072336840016
+      },
+      "hybrid_learned": {
+        "fewshot_harsh_accuracy_margin": 0.020002173322465067,
+        "harsh_accuracy_wilson95_lower": 0.6116999416569122,
+        "overall_accuracy_wilson95_lower": 0.5527581100917047
+      }
+    },
+    "joint": {
+      "learned_sparse96": {
+        "fewshot_harsh_accuracy_margin": 0.0587900706329714,
+        "fewshot_harsh_rmse_ratio": 0.8382462836629229,
+        "harsh_rmse_wilson95_lower": 0.4975292097311524,
+        "overall_rmse_wilson95_lower": 0.4424666826891191,
+        "harsh_dual_wilson95_lower": 0.45649845714933396,
+        "overall_dual_wilson95_lower": 0.40917910855143036
+      },
+      "rnn54": {
+        "fewshot_harsh_accuracy_margin": 0.11527750611245824,
+        "fewshot_harsh_rmse_ratio": 0.925029015026334,
+        "harsh_rmse_wilson95_lower": 0.5779549826318033,
+        "overall_rmse_wilson95_lower": 0.5962782590371377,
+        "harsh_dual_wilson95_lower": 0.5645844830055181,
+        "overall_dual_wilson95_lower": 0.5572107242779064
+      }
+    }
+  },
+  "interpretation": "no_candidate"
+}

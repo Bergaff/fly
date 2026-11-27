@@ -1,0 +1,54 @@
+{
+  "schema": "series-75-user-result-extract-v1",
+  "source": "user-pasted ИТОГ.txt and summary.json; original local files not supplied",
+  "status": "completed",
+  "active_training_seconds": 28800.86,
+  "candidates": 54296,
+  "accepted_candidates": 54296,
+  "training_frames": 2660504,
+  "new_model_sha256": "bb8de6a8fe5fd912a2c627267e988f3c7ef8515eeab79ce981a802feabf4f896",
+  "pooled_rmse": {
+    "new": 0.24534728078077114,
+    "zero": 0.4709949677747701,
+    "training_mean": 0.4710054726977926
+  },
+  "combined_wins": {"vs_zero": 10, "vs_training_mean": 10},
+  "primary_passed": true,
+  "axes": {
+    "left_proximal": {"new": 0.23419369313905258, "zero": 0.5526023505346563, "training_mean": 0.5526366344665925, "wins_vs_zero": 10, "wins_vs_training_mean": 10, "passed": true},
+    "left_middle": {"new": 0.13067733230752623, "zero": 0.4337126075435596, "training_mean": 0.43390626250466274, "wins_vs_zero": 10, "wins_vs_training_mean": 10, "passed": true},
+    "left_distal": {"new": 0.33029753014818486, "zero": 0.4224458919803486, "training_mean": 0.4222923030938688, "wins_vs_zero": 9, "wins_vs_training_mean": 9, "passed": true},
+    "right_proximal": {"new": 0.21908338275999661, "zero": 0.5282919446971945, "training_mean": 0.5282935775062649, "wins_vs_zero": 10, "wins_vs_training_mean": 10, "passed": true},
+    "right_middle": {"new": 0.1350957830353624, "zero": 0.43461394289019095, "training_mean": 0.43471979928220894, "wins_vs_zero": 10, "wins_vs_training_mean": 10, "passed": true},
+    "right_distal": {"new": 0.3374961042982555, "zero": 0.43714915580234776, "training_mean": 0.43702269997980975, "wins_vs_zero": 9, "wins_vs_training_mean": 9, "passed": true}
+  },
+  "per_test_combined": [
+    {"test_id": 101, "new": 0.19856775732263462, "zero": 0.3952486552966318, "training_mean": 0.39533889222893115},
+    {"test_id": 102, "new": 0.23415087584660382, "zero": 0.5146049902492728, "training_mean": 0.5148630290872575},
+    {"test_id": 103, "new": 0.2438030890377776, "zero": 0.46596517221821215, "training_mean": 0.46593261470061537},
+    {"test_id": 104, "new": 0.19989734620296187, "zero": 0.47512677403572173, "training_mean": 0.47505649108095216},
+    {"test_id": 105, "new": 0.37777968444394056, "zero": 0.5491459692850521, "training_mean": 0.5489819541035068},
+    {"test_id": 106, "new": 0.23351334439797905, "zero": 0.43250667213613636, "training_mean": 0.4324105732169538},
+    {"test_id": 107, "new": 0.18804938015154626, "zero": 0.4031183921858599, "training_mean": 0.4034667781254843},
+    {"test_id": 108, "new": 0.22948848818717132, "zero": 0.486481266095944, "training_mean": 0.48636410974095723},
+    {"test_id": 109, "new": 0.248107272407669, "zero": 0.4683742324119966, "training_mean": 0.4683306466214071},
+    {"test_id": 110, "new": 0.24792634695829288, "zero": 0.4972802118219974, "training_mean": 0.4972763124281002}
+  ],
+  "derived": {
+    "relative_reduction_vs_zero_percent": 47.90872566220362,
+    "axis_relative_reduction_vs_zero_percent": {
+      "left_proximal": 57.619852157258386,
+      "left_middle": 69.87006371623593,
+      "left_distal": 21.813056673409502,
+      "right_proximal": 58.529864981081545,
+      "right_middle": 68.91591140933654,
+      "right_distal": 22.79612122804815
+    }
+  },
+  "audit": {"accepted_total": 54296, "audited_count": 128, "is_exhaustive": false, "under_0_001_deg": 0, "under_1_deg": 0, "under_5_deg": 98, "holdout_frames": 490},
+  "limitations": [
+    "Synthetic supervised close-up experiment, not biological grooming.",
+    "Audit samples commands for 128 of 54296 motions, not RGB.",
+    "Original SQLite, NPZ, protocol, CSV and playback were not independently inspected."
+  ]
+}

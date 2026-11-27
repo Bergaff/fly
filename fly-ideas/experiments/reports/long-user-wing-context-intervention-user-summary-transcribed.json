@@ -1,0 +1,280 @@
+{
+  "schema": "wing-context-intervention-v1",
+  "provenance": "Manual transcription of user-pasted summary.json; exact values preserved, but not original file bytes.",
+  "created_utc": "2026-11-09T07:37:26.505631+00:00",
+  "source_series_basename": "wing_user_long_20261108_220403_52156936",
+  "source_test_id": 2,
+  "source_role": "new_test",
+  "source_protocol_sha256": "a1709c7c853ccaf1f5edcef33e240a0068f2fa17e3031c6297650a7cff889e4c",
+  "baseline_model_sha256": "8eba6ceb1c94513f47ad95becb42d8fb0fd6007f81eb0553209b22a12808aeec",
+  "new_model_sha256": "f2ef4321e3438ac719e2148da3dc6821fb95abc43d537095728c05be214716ad",
+  "source_trajectory_sha256": "462305536541a0165171f32925ae03a4c296f64b4cb4da79946cfd1c8d8d8914",
+  "delta_deg": 10.0,
+  "target_axis": "right_x",
+  "segment_s": [
+    1.44,
+    1.6
+  ],
+  "active_training_seconds": 28800.937000000005,
+  "conditions": [
+    {
+      "condition": "baseline",
+      "changed_axis": null,
+      "delta_deg": 0.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.1050863194202467,
+        "mae_rad": 1.0736428533002367,
+        "mean_prediction_rad": -0.7497097441300893,
+        "mean_delta_from_baseline_rad": 0.0,
+        "max_abs_delta_from_baseline_rad": 0.0
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.2010716665362242,
+        "mae_rad": 1.171367731735741,
+        "mean_prediction_rad": -0.8474346225655932,
+        "mean_delta_from_baseline_rad": 0.0,
+        "max_abs_delta_from_baseline_rad": 0.0
+      }
+    },
+    {
+      "condition": "only_right_x",
+      "changed_axis": null,
+      "delta_deg": 0.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 0.20319622992799397,
+        "mae_rad": 0.17580796671217197,
+        "mean_prediction_rad": 0.1523646592058681,
+        "mean_delta_from_baseline_rad": 0.9020744033359573,
+        "max_abs_delta_from_baseline_rad": 1.0617785671568165
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 0.23068155550493546,
+        "mae_rad": 0.20825419375928753,
+        "mean_prediction_rad": 0.1156789154108598,
+        "mean_delta_from_baseline_rad": 0.9631135379764532,
+        "max_abs_delta_from_baseline_rad": 1.1567369449785265
+      }
+    },
+    {
+      "condition": "left_x_minus_10deg",
+      "changed_axis": "left_x",
+      "delta_deg": -10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.0888341630072138,
+        "mae_rad": 1.059111676883091,
+        "mean_prediction_rad": -0.7351785677129434,
+        "mean_delta_from_baseline_rad": 0.01453117641714582,
+        "max_abs_delta_from_baseline_rad": 0.032547745660832406
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.1849234257835306,
+        "mae_rad": 1.1581240036409226,
+        "mean_prediction_rad": -0.8341908944707754,
+        "mean_delta_from_baseline_rad": 0.013243728094817974,
+        "max_abs_delta_from_baseline_rad": 0.034870583623010765
+      }
+    },
+    {
+      "condition": "left_x_plus_10deg",
+      "changed_axis": "left_x",
+      "delta_deg": 10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.065416096373863,
+        "mae_rad": 1.028390361332193,
+        "mean_prediction_rad": -0.7044572521620455,
+        "mean_delta_from_baseline_rad": 0.0452524919680438,
+        "max_abs_delta_from_baseline_rad": 0.07232448553914783
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.1653594362740614,
+        "mae_rad": 1.1306772493056558,
+        "mean_prediction_rad": -0.8067441401355083,
+        "mean_delta_from_baseline_rad": 0.040690482430084884,
+        "max_abs_delta_from_baseline_rad": 0.06588777652769906
+      }
+    },
+    {
+      "condition": "left_y_minus_10deg",
+      "changed_axis": "left_y",
+      "delta_deg": -10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.0826632492693602,
+        "mae_rad": 1.0450097362544577,
+        "mean_prediction_rad": -0.7210766270843102,
+        "mean_delta_from_baseline_rad": 0.028633117045779054,
+        "max_abs_delta_from_baseline_rad": 0.06437634620745153
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.1575457627456738,
+        "mae_rad": 1.1229601651480674,
+        "mean_prediction_rad": -0.79902705597792,
+        "mean_delta_from_baseline_rad": 0.04840756658767327,
+        "max_abs_delta_from_baseline_rad": 0.07293151525538955
+      }
+    },
+    {
+      "condition": "left_y_plus_10deg",
+      "changed_axis": "left_y",
+      "delta_deg": 10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.0944941403708612,
+        "mae_rad": 1.062466530479925,
+        "mean_prediction_rad": -0.7385334213097778,
+        "mean_delta_from_baseline_rad": 0.011176322820311602,
+        "max_abs_delta_from_baseline_rad": 0.015123395173636145
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.2082029140065793,
+        "mae_rad": 1.1809587825485974,
+        "mean_prediction_rad": -0.8570256733784498,
+        "mean_delta_from_baseline_rad": -0.009591050812856583,
+        "max_abs_delta_from_baseline_rad": 0.028176637896482948
+      }
+    },
+    {
+      "condition": "left_z_minus_10deg",
+      "changed_axis": "left_z",
+      "delta_deg": -10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.0403978620642031,
+        "mae_rad": 1.0077595147943654,
+        "mean_prediction_rad": -0.683826405624218,
+        "mean_delta_from_baseline_rad": 0.06588333850587134,
+        "max_abs_delta_from_baseline_rad": 0.0696811544343855
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.1737150484864884,
+        "mae_rad": 1.1453043013257713,
+        "mean_prediction_rad": -0.8213711921556239,
+        "mean_delta_from_baseline_rad": 0.026063430409969435,
+        "max_abs_delta_from_baseline_rad": 0.03506742891848891
+      }
+    },
+    {
+      "condition": "left_z_plus_10deg",
+      "changed_axis": "left_z",
+      "delta_deg": 10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.1455238063856692,
+        "mae_rad": 1.1138852702026683,
+        "mean_prediction_rad": -0.7899521610325207,
+        "mean_delta_from_baseline_rad": -0.040242416902431466,
+        "max_abs_delta_from_baseline_rad": 0.04688431216449629
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.2122716113991137,
+        "mae_rad": 1.1813389422273095,
+        "mean_prediction_rad": -0.8574058330571621,
+        "mean_delta_from_baseline_rad": -0.009971210491568882,
+        "max_abs_delta_from_baseline_rad": 0.01898522307467254
+      }
+    },
+    {
+      "condition": "right_y_minus_10deg",
+      "changed_axis": "right_y",
+      "delta_deg": -10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.1608489656685843,
+        "mae_rad": 1.147520221372139,
+        "mean_prediction_rad": -0.8235871122019913,
+        "mean_delta_from_baseline_rad": -0.07387736807190212,
+        "max_abs_delta_from_baseline_rad": 0.18596880775606006
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.2650848741773193,
+        "mae_rad": 1.2531433085817638,
+        "mean_prediction_rad": -0.9292101994116161,
+        "mean_delta_from_baseline_rad": -0.0817755768460228,
+        "max_abs_delta_from_baseline_rad": 0.2061608546215945
+      }
+    },
+    {
+      "condition": "right_y_plus_10deg",
+      "changed_axis": "right_y",
+      "delta_deg": 10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 0.8816675940681085,
+        "mae_rad": 0.8495901299844568,
+        "mean_prediction_rad": -0.5256570208143094,
+        "mean_delta_from_baseline_rad": 0.22405272331577986,
+        "max_abs_delta_from_baseline_rad": 0.2535633841623587
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 0.9564330483328041,
+        "mae_rad": 0.9217606942174067,
+        "mean_prediction_rad": -0.5978275850472594,
+        "mean_delta_from_baseline_rad": 0.2496070375183339,
+        "max_abs_delta_from_baseline_rad": 0.2950348299709289
+      }
+    },
+    {
+      "condition": "right_z_minus_10deg",
+      "changed_axis": "right_z",
+      "delta_deg": -10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 1.1769327746685425,
+        "mae_rad": 1.1545830188973407,
+        "mean_prediction_rad": -0.8306499097271933,
+        "mean_delta_from_baseline_rad": -0.08094016559710396,
+        "max_abs_delta_from_baseline_rad": 0.13541018459119392
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.2733330832983227,
+        "mae_rad": 1.253009534991763,
+        "mean_prediction_rad": -0.9290764258216153,
+        "mean_delta_from_baseline_rad": -0.08164180325602217,
+        "max_abs_delta_from_baseline_rad": 0.13788445564769103
+      }
+    },
+    {
+      "condition": "right_z_plus_10deg",
+      "changed_axis": "right_z",
+      "delta_deg": 10.0,
+      "old": {
+        "frames": 5,
+        "rmse_rad": 0.9893558537160273,
+        "mae_rad": 0.9555549342166401,
+        "mean_prediction_rad": -0.6316218250464927,
+        "mean_delta_from_baseline_rad": 0.11808791908359666,
+        "max_abs_delta_from_baseline_rad": 0.146737951048723
+      },
+      "new": {
+        "frames": 5,
+        "rmse_rad": 1.0800543950207404,
+        "mae_rad": 1.0462107318325689,
+        "mean_prediction_rad": -0.7222776226624217,
+        "mean_delta_from_baseline_rad": 0.1251569999031717,
+        "max_abs_delta_from_baseline_rad": 0.1661822021690953
+      }
+    }
+  ],
+  "limitations": [
+    "Диагностика меняет искусственно отрисованные входы уже обученных моделей; модели не переобучаются.",
+    "Сдвиг целой оси на ±10° и изоляция right_x могут создавать движения вне обучающего распределения.",
+    "Результат показывает чувствительность вычислительной модели, но не биологическую причинность.",
+    "Условные камеры и supervised ridge не доказывают зеркальные нейроны или автономное воспроизведение."
+  ],
+  "additional_pasted_data": "User also pasted the predictions.csv text. It was inspected in chat but is not represented as original file bytes in this repository."
+}
