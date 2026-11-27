@@ -972,3 +972,9 @@ FlyGym 2.1.1 теперь можно установить отдельно че�
 ### Series120A–C: финальный цифровой продукт
 
 `experiments\RUN-FINAL-DIGITAL-PRODUCT-120ABC.bat` создаёт три отдельных результата.120A фиксирует итог по мухе: robust type-aggregate digital mirror signature поддержана Series118/119, но individual biological neurons0 и promoted candidates0.120B реализует species-neutral anchored spectral alignment и development-only native motor head; stressed hidden-fly audit28/41, но validated other species0 и cross-animal claim=false.120C показывает вычислительный footprint:4 214 dense scalars (~16,46KiB FP32),39,548 stress replicates/s на пользовательской6-worker машине; explicit1M/100M/7B AI references больше по параметрам в237×/23 730×/1 661 130×. Это сравнение размера, не интеллекта или качества.
+
+### Series121: локальное сравнение с Ollama
+
+`experiments\RUN-LOCAL-OLLAMA-COMPARISON-121.bat` подключается только к локальному `127.0.0.1:11434`, показывает скачанные Ollama-модели и сравнивает выбранную LLM с exact project solver на одинаковых deterministic61→8 numeric routing cases. Сохраняются accuracy, wall time, case-level ответы и локальные model metadata. Это намеренно узкая задача в пользу специализированного solver; результат не является сравнением общего интеллекта или биологическим выводом.
+
+Public showcase обновлён до Series113–121: редактор1–6 блоков расположен слева вертикально, блоки можно добавлять/удалять, а тексты отдельно объясняют120A fly conclusion,120B cross-animal algorithm,120C compute footprint и использование локального Ollama benchmark.
